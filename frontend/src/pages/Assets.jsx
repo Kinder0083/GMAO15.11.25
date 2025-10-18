@@ -110,7 +110,10 @@ const Assets = () => {
           <h1 className="text-3xl font-bold text-gray-900">Équipements</h1>
           <p className="text-gray-600 mt-1">Gérez votre parc d'équipements</p>
         </div>
-        <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+        <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={() => {
+          setSelectedEquipment(null);
+          setFormDialogOpen(true);
+        }}>
           <Plus size={20} className="mr-2" />
           Nouvel équipement
         </Button>
