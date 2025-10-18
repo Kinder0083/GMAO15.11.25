@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: gmao-mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-password123}
+    volumes:
+      - mongodb_data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - gmao-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: gmao-backend
+    restart: always
+    environment:
+      - MONGO_URL=mongodb://${MONGO_USER:-admin}:${MONGO_PASSWORD:-password123}@mongodb:27017/
+      - DB_NAME=${DB_NAME:-gmao_atlas}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-change_this_secret_key_in_production}
+    ports:
+      - "8001:8001"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - gmao-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/api/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    container_name: gmao-frontend
+    restart: always
+    environment:
+      - REACT_APP_BACKEND_URL=${PUBLIC_API_URL:-http://localhost:8001}
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - gmao-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  gmao-network:
+    driver: bridge
