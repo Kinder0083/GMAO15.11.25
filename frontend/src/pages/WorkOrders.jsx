@@ -117,7 +117,7 @@ const WorkOrders = () => {
         <Button
           onClick={() => {
             setSelectedWorkOrder(null);
-            setDialogOpen(true);
+            setFormDialogOpen(true);
           }}
           className="bg-blue-600 hover:bg-blue-700 text-white"
         >
