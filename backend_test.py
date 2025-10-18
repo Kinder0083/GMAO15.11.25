@@ -262,53 +262,63 @@ class EquipmentHierarchyTester:
             self.log(f"✗ Failed to create sub-equipment with explicit location: {response.status_code} - {response.text}", "ERROR")
             return None
         
-    def test_get_user_permissions(self) -> bool:
-        """Test GET /api/users/{user_id}/permissions"""
-        self.log("\n=== Testing GET /api/users/{user_id}/permissions ===")
+    def test_get_equipments_with_hierarchy_info(self) -> bool:
+        """Test GET /api/equipments with hasChildren and parent info"""
+        self.log("\n=== Testing GET /api/equipments with Hierarchy Info ===")
         
-        if not self.test_users:
-            self.log("✗ No test users available", "ERROR")
-            return False
-            
-        success = True
-        user_id = self.test_users[0]  # Use first test user
-        
-        response = self.make_request("GET", f"/users/{user_id}/permissions")
+        response = self.make_request("GET", "/equipments")
         
         if response.status_code == 200:
-            permissions = response.json()
-            self.log(f"✓ Successfully retrieved permissions for user {user_id}")
+            equipments = response.json()
+            self.log(f"✓ Successfully retrieved {len(equipments)} equipments")
             
-            # Verify structure
-            required_modules = ["dashboard", "workOrders", "assets", "preventiveMaintenance", 
-                              "inventory", "locations", "vendors", "reports"]
-            required_perms = ["view", "edit", "delete"]
+            success = True
+            parent_found = False
+            child_found = False
             
-            for module in required_modules:
-                if module not in permissions:
-                    self.log(f"✗ Missing module {module} in permissions", "ERROR")
-                    success = False
-                else:
-                    for perm in required_perms:
-                        if perm not in permissions[module]:
-                            self.log(f"✗ Missing permission {perm} in module {module}", "ERROR")
+            for equipment in equipments:
+                equipment_id = equipment.get("id")
+                
+                # Check if this is one of our test equipments
+                if equipment_id in self.test_equipments:
+                    # Verify required hierarchy fields are present
+                    if "hasChildren" not in equipment:
+                        self.log(f"✗ Missing hasChildren field for equipment {equipment_id}", "ERROR")
+                        success = False
+                        continue
+                        
+                    # Check parent equipment (should have hasChildren = True if it has children)
+                    if equipment.get("parent_id") is None:
+                        parent_found = True
+                        # This should be a parent - check if it has children
+                        has_children = equipment.get("hasChildren", False)
+                        self.log(f"  - Parent Equipment: {equipment.get('nom')} (hasChildren: {has_children})")
+                        
+                        if has_children:
+                            self.log(f"    ✓ Parent correctly shows hasChildren = True")
+                        else:
+                            # This might be OK if no children were created yet
+                            self.log(f"    ⚠ Parent shows hasChildren = False (may be correct if no children)")
+                    else:
+                        child_found = True
+                        # This should be a child - verify parent info
+                        parent_info = equipment.get("parent")
+                        if parent_info and "id" in parent_info and "nom" in parent_info:
+                            self.log(f"  - Child Equipment: {equipment.get('nom')} (parent: {parent_info.get('nom')})")
+                            self.log(f"    ✓ Child has correct parent info")
+                        else:
+                            self.log(f"✗ Child equipment missing or incomplete parent info", "ERROR")
                             success = False
                             
-            if success:
-                self.log("✓ Permissions structure is correct")
+            if not parent_found:
+                self.log("⚠ No parent equipment found in results")
+            if not child_found:
+                self.log("⚠ No child equipment found in results")
+                
+            return success
         else:
-            self.log(f"✗ Failed to get user permissions: {response.status_code} - {response.text}", "ERROR")
-            success = False
-            
-        # Test with invalid user ID
-        response = self.make_request("GET", "/users/invalid_id/permissions")
-        if response.status_code == 404 or response.status_code == 400:
-            self.log("✓ Correctly handled invalid user ID")
-        else:
-            self.log(f"✗ Should have returned 404/400 for invalid user ID: {response.status_code}", "ERROR")
-            success = False
-            
-        return success
+            self.log(f"✗ Failed to get equipments: {response.status_code} - {response.text}", "ERROR")
+            return False
         
     def test_update_user_permissions(self) -> bool:
         """Test PUT /api/users/{user_id}/permissions"""
