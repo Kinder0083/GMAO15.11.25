@@ -151,6 +151,7 @@ class EquipmentBase(BaseModel):
     coutAchat: float
     numeroSerie: str
     garantie: str
+    parent_id: Optional[str] = None
 
 class EquipmentCreate(EquipmentBase):
     pass
@@ -165,12 +166,15 @@ class EquipmentUpdate(BaseModel):
     numeroSerie: Optional[str] = None
     garantie: Optional[str] = None
     derniereMaintenance: Optional[datetime] = None
+    parent_id: Optional[str] = None
 
 class Equipment(EquipmentBase):
     id: str
     derniereMaintenance: Optional[datetime] = None
     dateCreation: datetime
     emplacement: Optional[dict] = None
+    parent: Optional[dict] = None
+    hasChildren: bool = False
 
     class Config:
         from_attributes = True
