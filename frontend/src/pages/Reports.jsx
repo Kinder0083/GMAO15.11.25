@@ -92,7 +92,7 @@ const Reports = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Taux de réalisation</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{mockAnalytics.tauxRealisation}%</p>
+                <p className="text-3xl font-bold text-gray-900 mt-2">{analytics.tauxRealisation}%</p>
                 <p className="text-xs text-green-600 mt-1 font-medium">+8% vs mois précédent</p>
               </div>
               <div className="bg-green-100 p-3 rounded-xl">
