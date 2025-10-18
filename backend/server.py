@@ -325,6 +325,10 @@ async def create_equipment(eq_create: EquipmentCreate, current_user: dict = Depe
         else:
             raise HTTPException(status_code=404, detail="Équipement parent non trouvé")
     
+    # Vérifier qu'on a un emplacement_id valide après héritage
+    if not eq_dict.get("emplacement_id"):
+        raise HTTPException(status_code=400, detail="Un emplacement est requis (directement ou hérité du parent)")
+    
     eq_dict["dateCreation"] = datetime.utcnow()
     eq_dict["derniereMaintenance"] = None
     eq_dict["_id"] = ObjectId()
