@@ -143,81 +143,114 @@ const PreventiveMaintenance = () => {
 
       {/* Maintenance Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {maintenance.map((item) => (
-          <Card key={item.id} className="hover:shadow-xl transition-all duration-300">
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <CardTitle className="text-xl mb-2">{item.titre}</CardTitle>
-                  {getFrequencyBadge(item.frequence)}
+        {loading ? (
+          <div className="col-span-full text-center py-8">
+            <p className="text-gray-500">Chargement...</p>
+          </div>
+        ) : maintenance.length === 0 ? (
+          <div className="col-span-full text-center py-8">
+            <p className="text-gray-500">Aucune maintenance préventive trouvée</p>
+          </div>
+        ) : (
+          maintenance.map((item) => (
+            <Card key={item.id} className="hover:shadow-xl transition-all duration-300">
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <CardTitle className="text-xl mb-2">{item.titre}</CardTitle>
+                    {getFrequencyBadge(item.frequence)}
+                  </div>
+                  <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                    {item.statut}
+                  </span>
                 </div>
-                <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
-                  {item.statut}
-                </span>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {/* Equipment */}
-                <div className="bg-gray-50 p-3 rounded-lg">
-                  <p className="text-xs text-gray-600 mb-1">Équipement</p>
-                  <p className="font-medium text-gray-900">{item.equipement.nom}</p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  {/* Next Maintenance */}
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <Calendar size={16} className="text-blue-600" />
-                      <p className="text-xs text-gray-600">Prochaine maintenance</p>
-                    </div>
-                    <p className="text-sm font-medium text-gray-900">{item.prochaineMaintenance}</p>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {/* Equipment */}
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-xs text-gray-600 mb-1">Équipement</p>
+                    <p className="font-medium text-gray-900">{item.equipement?.nom || '-'}</p>
                   </div>
 
-                  {/* Last Maintenance */}
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <CheckCircle size={16} className="text-green-600" />
-                      <p className="text-xs text-gray-600">Dernière maintenance</p>
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Next Maintenance */}
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <Calendar size={16} className="text-blue-600" />
+                        <p className="text-xs text-gray-600">Prochaine maintenance</p>
+                      </div>
+                      <p className="text-sm font-medium text-gray-900">
+                        {item.prochaineMaintenance ? new Date(item.prochaineMaintenance).toLocaleDateString('fr-FR') : '-'}
+                      </p>
                     </div>
-                    <p className="text-sm font-medium text-gray-900">{item.derniereMaintenance}</p>
+
+                    {/* Last Maintenance */}
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <CheckCircle size={16} className="text-green-600" />
+                        <p className="text-xs text-gray-600">Dernière maintenance</p>
+                      </div>
+                      <p className="text-sm font-medium text-gray-900">
+                        {item.derniereMaintenance ? new Date(item.derniereMaintenance).toLocaleDateString('fr-FR') : 'Jamais'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Assigned To */}
+                  {item.assigneA && (
+                    <div>
+                      <p className="text-xs text-gray-600 mb-2">Assigné à</p>
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                          <span className="text-white text-xs font-medium">
+                            {item.assigneA.prenom[0]}{item.assigneA.nom[0]}
+                          </span>
+                        </div>
+                        <span className="text-sm font-medium text-gray-900">
+                          {item.assigneA.prenom} {item.assigneA.nom}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Duration */}
+                  <div className="flex items-center gap-2 pt-2 border-t">
+                    <Clock size={16} className="text-gray-500" />
+                    <span className="text-sm text-gray-700">Durée estimée: <span className="font-medium">{item.duree}h</span></span>
+                  </div>
+
+                  <div className="flex gap-2 pt-2">
+                    <Button 
+                      variant="outline" 
+                      className="flex-1 hover:bg-blue-50 hover:text-blue-600"
+                      onClick={() => {
+                        setSelectedMaintenance(item);
+                        setFormDialogOpen(true);
+                      }}
+                    >
+                      Modifier
+                    </Button>
+                    <Button 
+                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                      onClick={() => handleExecuteNow(item)}
+                    >
+                      Exécuter maintenant
+                    </Button>
                   </div>
                 </div>
-
-                {/* Assigned To */}
-                <div>
-                  <p className="text-xs text-gray-600 mb-2">Assigné à</p>
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                      <span className="text-white text-xs font-medium">
-                        {item.assigneA.prenom[0]}{item.assigneA.nom[0]}
-                      </span>
-                    </div>
-                    <span className="text-sm font-medium text-gray-900">
-                      {item.assigneA.prenom} {item.assigneA.nom}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Duration */}
-                <div className="flex items-center gap-2 pt-2 border-t">
-                  <Clock size={16} className="text-gray-500" />
-                  <span className="text-sm text-gray-700">Durée estimée: <span className="font-medium">{item.duree}h</span></span>
-                </div>
-
-                <div className="flex gap-2 pt-2">
-                  <Button variant="outline" className="flex-1 hover:bg-blue-50 hover:text-blue-600">
-                    Modifier
-                  </Button>
-                  <Button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white">
-                    Exécuter maintenant
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          ))
+        )}
       </div>
+
+      <PreventiveMaintenanceFormDialog
+        open={formDialogOpen}
+        onOpenChange={setFormDialogOpen}
+        maintenance={selectedMaintenance}
+        onSuccess={loadMaintenance}
+      />
     </div>
   );
 };
