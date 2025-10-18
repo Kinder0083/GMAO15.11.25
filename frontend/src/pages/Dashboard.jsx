@@ -49,35 +49,35 @@ const Dashboard = () => {
   const stats = [
     {
       title: 'Ordres de travail actifs',
-      value: mockWorkOrders.filter(wo => wo.statut !== 'TERMINE').length,
+      value: workOrders.filter(wo => wo.statut !== 'TERMINE').length,
       icon: ClipboardList,
       color: 'bg-blue-500',
       change: '+12%'
     },
     {
       title: 'Équipements en maintenance',
-      value: mockEquipments.filter(e => e.statut === 'EN_MAINTENANCE').length,
+      value: equipments.filter(e => e.statut === 'EN_MAINTENANCE').length,
       icon: Wrench,
       color: 'bg-orange-500',
       change: '+5%'
     },
     {
       title: 'Taux de réalisation',
-      value: `${mockAnalytics.tauxRealisation}%`,
+      value: `${analytics.tauxRealisation}%`,
       icon: TrendingUp,
       color: 'bg-green-500',
       change: '+8%'
     },
     {
       title: 'Temps de réponse moyen',
-      value: `${mockAnalytics.tempsReponse.moyen}h`,
+      value: `${analytics.tempsReponse.moyen}h`,
       icon: Clock,
       color: 'bg-purple-500',
       change: '-15%'
     }
   ];
 
-  const recentWorkOrders = mockWorkOrders.slice(0, 5);
+  const recentWorkOrders = workOrders.slice(0, 5);
 
   const getStatusBadge = (statut) => {
     const badges = {
