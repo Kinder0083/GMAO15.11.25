@@ -28,30 +28,28 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
 
-    // Simulation de connexion avec données mockées
-    setTimeout(() => {
-      if (formData.email && formData.password) {
-        localStorage.setItem('token', 'mock-token-123');
-        localStorage.setItem('user', JSON.stringify({
-          nom: 'Martin',
-          prenom: 'Sophie',
-          email: formData.email,
-          role: 'ADMIN'
-        }));
-        toast({
-          title: 'Connexion réussie',
-          description: 'Bienvenue dans GMAO Atlas'
-        });
-        navigate('/dashboard');
-      } else {
-        toast({
-          title: 'Erreur',
-          description: 'Veuillez remplir tous les champs',
-          variant: 'destructive'
-        });
-      }
+    try {
+      const response = await authAPI.login(formData);
+      const { access_token, user } = response.data;
+      
+      localStorage.setItem('token', access_token);
+      localStorage.setItem('user', JSON.stringify(user));
+      
+      toast({
+        title: 'Connexion réussie',
+        description: `Bienvenue ${user.prenom} ${user.nom}`
+      });
+      
+      navigate('/dashboard');
+    } catch (error) {
+      toast({
+        title: 'Erreur',
+        description: error.response?.data?.detail || 'Email ou mot de passe incorrect',
+        variant: 'destructive'
+      });
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   return (
