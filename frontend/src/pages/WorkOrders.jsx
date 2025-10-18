@@ -42,21 +42,29 @@ const WorkOrders = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer cet ordre de travail ?')) {
-      try {
-        await workOrdersAPI.delete(id);
-        toast({
-          title: 'Succès',
-          description: 'Ordre de travail supprimé'
-        });
-        loadWorkOrders();
-      } catch (error) {
-        toast({
-          title: 'Erreur',
-          description: 'Impossible de supprimer l\'ordre de travail',
-          variant: 'destructive'
-        });
-      }
+    setItemToDelete(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!itemToDelete) return;
+    
+    try {
+      await workOrdersAPI.delete(itemToDelete);
+      toast({
+        title: 'Succès',
+        description: 'Ordre de travail supprimé'
+      });
+      loadWorkOrders();
+    } catch (error) {
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de supprimer l\'ordre de travail',
+        variant: 'destructive'
+      });
+    } finally {
+      setDeleteDialogOpen(false);
+      setItemToDelete(null);
     }
   };
 
