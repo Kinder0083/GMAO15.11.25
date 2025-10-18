@@ -2,14 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
-import { Plus, Search, Wrench, AlertCircle, CheckCircle2, Clock, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Search, Wrench, AlertCircle, CheckCircle2, Clock, Pencil, Trash2, List, GitBranch } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import EquipmentFormDialog from '../components/Equipment/EquipmentFormDialog';
+import EquipmentTreeView from '../components/Equipment/EquipmentTreeView';
 import DeleteConfirmDialog from '../components/Common/DeleteConfirmDialog';
 import { equipmentsAPI } from '../services/api';
 import { useToast } from '../hooks/use-toast';
 
 const Assets = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [equipments, setEquipments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -18,6 +21,8 @@ const Assets = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedEquipment, setSelectedEquipment] = useState(null);
   const [itemToDelete, setItemToDelete] = useState(null);
+  const [viewMode, setViewMode] = useState('list'); // 'list' ou 'tree'
+  const [parentForNewChild, setParentForNewChild] = useState(null);
 
   useEffect(() => {
     loadEquipments();
