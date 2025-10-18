@@ -249,6 +249,27 @@ const People = () => {
                       Contacter
                     </Button>
                   </div>
+
+                  {/* Admin Actions */}
+                  {isAdmin() && user.id !== currentUser?.id && (
+                    <div className="flex gap-2 mt-2 w-full">
+                      <Button 
+                        variant="outline" 
+                        className="flex-1 hover:bg-purple-50 hover:text-purple-600 hover:border-purple-300"
+                        onClick={() => handleManagePermissions(user)}
+                      >
+                        <Settings size={16} className="mr-2" />
+                        Permissions
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        className="hover:bg-red-50 hover:text-red-600 hover:border-red-300"
+                        onClick={() => handleDeleteClick(user)}
+                      >
+                        <Trash2 size={16} />
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -260,6 +281,27 @@ const People = () => {
         open={profileDialogOpen}
         onOpenChange={setProfileDialogOpen}
         user={selectedUser}
+      />
+
+      <InviteMemberDialog
+        open={inviteDialogOpen}
+        onOpenChange={setInviteDialogOpen}
+        onSuccess={loadUsers}
+      />
+
+      <PermissionsManagementDialog
+        open={permissionsDialogOpen}
+        onOpenChange={setPermissionsDialogOpen}
+        user={selectedUser}
+        onSuccess={loadUsers}
+      />
+
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleDeleteConfirm}
+        title="Supprimer le membre"
+        description={`Êtes-vous sûr de vouloir supprimer ${selectedUser?.prenom} ${selectedUser?.nom} ? Cette action est irréversible.`}
       />
     </div>
   );
