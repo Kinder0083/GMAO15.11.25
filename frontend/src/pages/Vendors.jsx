@@ -80,42 +80,27 @@ const Vendors = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="hover:shadow-lg transition-shadow">
           <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total fournisseurs</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{vendors.length}</p>
-              </div>
-              <div className="bg-blue-100 p-3 rounded-xl">
-                <Building size={24} className="text-blue-600" />
-              </div>
+            <div className="flex flex-col items-center text-center">
+              <p className="text-sm font-medium text-gray-600">Total fournisseurs</p>
+              <p className="text-4xl font-bold text-blue-600 mt-2">{vendors.length}</p>
             </div>
           </CardContent>
         </Card>
 
         <Card className="hover:shadow-lg transition-shadow">
           <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Actifs ce mois</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{vendors.length}</p>
-              </div>
-              <div className="bg-green-100 p-3 rounded-xl">
-                <Building size={24} className="text-green-600" />
-              </div>
+            <div className="flex flex-col items-center text-center">
+              <p className="text-sm font-medium text-gray-600">Actifs ce mois</p>
+              <p className="text-4xl font-bold text-green-600 mt-2">{vendors.length}</p>
             </div>
           </CardContent>
         </Card>
 
         <Card className="hover:shadow-lg transition-shadow">
           <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Commandes en cours</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">5</p>
-              </div>
-              <div className="bg-orange-100 p-3 rounded-xl">
-                <Building size={24} className="text-orange-600" />
-              </div>
+            <div className="flex flex-col items-center text-center">
+              <p className="text-sm font-medium text-gray-600">Commandes en cours</p>
+              <p className="text-4xl font-bold text-orange-600 mt-2">5</p>
             </div>
           </CardContent>
         </Card>
