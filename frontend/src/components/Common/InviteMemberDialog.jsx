@@ -132,6 +132,16 @@ const InviteMemberDialog = ({ open, onOpenChange, onSuccess }) => {
             </div>
 
             <div className="grid gap-2">
+              <Label htmlFor="service">Service</Label>
+              <Input
+                id="service"
+                value={formData.service}
+                onChange={(e) => handleChange('service', e.target.value)}
+                placeholder="Ex: Maintenance, Production, Logistique..."
+              />
+            </div>
+
+            <div className="grid gap-2">
               <Label htmlFor="role">Rôle *</Label>
               <Select value={formData.role} onValueChange={(value) => handleChange('role', value)}>
                 <SelectTrigger>
