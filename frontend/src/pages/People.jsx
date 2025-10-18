@@ -218,6 +218,16 @@ const People = () => {
                     {getRoleBadge(user.role)}
                   </div>
 
+                  {/* Service */}
+                  {user.service && (
+                    <div className="mb-3 w-full">
+                      <div className="bg-blue-50 px-3 py-2 rounded-lg">
+                        <p className="text-xs text-gray-600">Service</p>
+                        <p className="text-sm font-semibold text-blue-700">{user.service}</p>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Contact Info */}
                   <div className="space-y-2 w-full">
                     <div className="flex items-center gap-2 text-sm text-gray-600 justify-center">
