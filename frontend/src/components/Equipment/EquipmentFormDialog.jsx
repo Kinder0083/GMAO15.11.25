@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { useToast } from '../../hooks/use-toast';
 import { equipmentsAPI, locationsAPI } from '../../services/api';
 
-const EquipmentFormDialog = ({ open, onOpenChange, equipment, onSuccess }) => {
+const EquipmentFormDialog = ({ open, onOpenChange, equipment, onSuccess, parentId = null, defaultLocation = null }) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [locations, setLocations] = useState([]);
@@ -26,7 +26,8 @@ const EquipmentFormDialog = ({ open, onOpenChange, equipment, onSuccess }) => {
     dateAchat: '',
     coutAchat: '',
     numeroSerie: '',
-    garantie: ''
+    garantie: '',
+    parent_id: null
   });
 
   useEffect(() => {
@@ -36,18 +37,19 @@ const EquipmentFormDialog = ({ open, onOpenChange, equipment, onSuccess }) => {
         setFormData({
           nom: equipment.nom || '',
           categorie: equipment.categorie || '',
-          emplacement_id: equipment.emplacement?.id || '',
+          emplacement_id: equipment.emplacement?.id || equipment.emplacement_id || '',
           statut: equipment.statut || 'OPERATIONNEL',
           dateAchat: equipment.dateAchat?.split('T')[0] || '',
           coutAchat: equipment.coutAchat || '',
           numeroSerie: equipment.numeroSerie || '',
-          garantie: equipment.garantie || ''
+          garantie: equipment.garantie || '',
+          parent_id: equipment.parent_id || null
         });
       } else {
         setFormData({
           nom: '',
           categorie: '',
-          emplacement_id: '',
+          emplacement_id: defaultLocation || '',
           statut: 'OPERATIONNEL',
           dateAchat: '',
           coutAchat: '',
