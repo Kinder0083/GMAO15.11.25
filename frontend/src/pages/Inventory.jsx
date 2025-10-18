@@ -79,7 +79,10 @@ const Inventory = () => {
           <h1 className="text-3xl font-bold text-gray-900">Inventaire</h1>
           <p className="text-gray-600 mt-1">Gérez vos pièces et fournitures</p>
         </div>
-        <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+        <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={() => {
+          setSelectedItem(null);
+          setFormDialogOpen(true);
+        }}>
           <Plus size={20} className="mr-2" />
           Nouvel article
         </Button>
