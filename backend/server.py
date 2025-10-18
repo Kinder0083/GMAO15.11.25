@@ -299,6 +299,14 @@ async def get_equipments(current_user: dict = Depends(get_current_user)):
         del eq["_id"]
         if eq.get("emplacement_id"):
             eq["emplacement"] = await get_location_by_id(eq["emplacement_id"])
+        
+        # Ajouter les informations du parent si présent
+        if eq.get("parent_id"):
+            eq["parent"] = await get_equipment_by_id(eq["parent_id"])
+        
+        # Vérifier si l'équipement a des enfants
+        children_count = await db.equipments.count_documents({"parent_id": eq["id"]})
+        eq["hasChildren"] = children_count > 0
     
     return [Equipment(**eq) for eq in equipments]
 
@@ -306,6 +314,17 @@ async def get_equipments(current_user: dict = Depends(get_current_user)):
 async def create_equipment(eq_create: EquipmentCreate, current_user: dict = Depends(get_current_user)):
     """Créer un nouvel équipement"""
     eq_dict = eq_create.model_dump()
+    
+    # Si un parent est spécifié et qu'aucun emplacement n'est fourni, hériter de l'emplacement du parent
+    if eq_dict.get("parent_id"):
+        parent = await db.equipments.find_one({"_id": ObjectId(eq_dict["parent_id"])})
+        if parent:
+            # Hériter de l'emplacement du parent
+            if not eq_dict.get("emplacement_id"):
+                eq_dict["emplacement_id"] = parent.get("emplacement_id")
+        else:
+            raise HTTPException(status_code=404, detail="Équipement parent non trouvé")
+    
     eq_dict["dateCreation"] = datetime.utcnow()
     eq_dict["derniereMaintenance"] = None
     eq_dict["_id"] = ObjectId()
@@ -316,7 +335,109 @@ async def create_equipment(eq_create: EquipmentCreate, current_user: dict = Depe
     if eq.get("emplacement_id"):
         eq["emplacement"] = await get_location_by_id(eq["emplacement_id"])
     
+    if eq.get("parent_id"):
+        eq["parent"] = await get_equipment_by_id(eq["parent_id"])
+    
+    eq["hasChildren"] = False
+    
     return Equipment(**eq)
+
+@api_router.get("/equipments/{eq_id}", response_model=Equipment)
+async def get_equipment_detail(eq_id: str, current_user: dict = Depends(get_current_user)):
+    """Récupérer les détails d'un équipement"""
+    try:
+        eq = await db.equipments.find_one({"_id": ObjectId(eq_id)})
+        if not eq:
+            raise HTTPException(status_code=404, detail="Équipement non trouvé")
+        
+        eq = serialize_doc(eq)
+        
+        if eq.get("emplacement_id"):
+            eq["emplacement"] = await get_location_by_id(eq["emplacement_id"])
+        
+        if eq.get("parent_id"):
+            eq["parent"] = await get_equipment_by_id(eq["parent_id"])
+        
+        # Vérifier si l'équipement a des enfants
+        children_count = await db.equipments.count_documents({"parent_id": eq["id"]})
+        eq["hasChildren"] = children_count > 0
+        
+        return Equipment(**eq)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@api_router.get("/equipments/{eq_id}/children", response_model=List[Equipment])
+async def get_equipment_children(eq_id: str, current_user: dict = Depends(get_current_user)):
+    """Récupérer tous les sous-équipements d'un équipement"""
+    try:
+        # Vérifier que le parent existe
+        parent = await db.equipments.find_one({"_id": ObjectId(eq_id)})
+        if not parent:
+            raise HTTPException(status_code=404, detail="Équipement parent non trouvé")
+        
+        # Récupérer tous les enfants
+        children = await db.equipments.find({"parent_id": eq_id}).to_list(1000)
+        
+        result = []
+        for child in children:
+            child = serialize_doc(child)
+            
+            if child.get("emplacement_id"):
+                child["emplacement"] = await get_location_by_id(child["emplacement_id"])
+            
+            if child.get("parent_id"):
+                child["parent"] = await get_equipment_by_id(child["parent_id"])
+            
+            # Vérifier si cet enfant a lui-même des enfants
+            grandchildren_count = await db.equipments.count_documents({"parent_id": child["id"]})
+            child["hasChildren"] = grandchildren_count > 0
+            
+            result.append(Equipment(**child))
+        
+        return result
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@api_router.get("/equipments/{eq_id}/hierarchy")
+async def get_equipment_hierarchy(eq_id: str, current_user: dict = Depends(get_current_user)):
+    """Récupérer toute la hiérarchie d'un équipement (récursif)"""
+    try:
+        async def build_hierarchy(equipment_id: str):
+            eq = await db.equipments.find_one({"_id": ObjectId(equipment_id)})
+            if not eq:
+                return None
+            
+            eq = serialize_doc(eq)
+            
+            if eq.get("emplacement_id"):
+                eq["emplacement"] = await get_location_by_id(eq["emplacement_id"])
+            
+            # Récupérer les enfants
+            children = await db.equipments.find({"parent_id": eq["id"]}).to_list(1000)
+            eq["children"] = []
+            
+            for child in children:
+                child_hierarchy = await build_hierarchy(str(child["_id"]))
+                if child_hierarchy:
+                    eq["children"].append(child_hierarchy)
+            
+            eq["hasChildren"] = len(eq["children"]) > 0
+            
+            return eq
+        
+        hierarchy = await build_hierarchy(eq_id)
+        if not hierarchy:
+            raise HTTPException(status_code=404, detail="Équipement non trouvé")
+        
+        return hierarchy
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 @api_router.put("/equipments/{eq_id}", response_model=Equipment)
 async def update_equipment(eq_id: str, eq_update: EquipmentUpdate, current_user: dict = Depends(get_current_user)):
