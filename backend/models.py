@@ -63,6 +63,14 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     password: str
 
+class UserInvite(BaseModel):
+    nom: str
+    prenom: str
+    email: EmailStr
+    telephone: Optional[str] = None
+    role: UserRole = UserRole.VISUALISEUR
+    permissions: Optional[UserPermissions] = None
+
 class UserUpdate(BaseModel):
     nom: Optional[str] = None
     prenom: Optional[str] = None
@@ -70,11 +78,15 @@ class UserUpdate(BaseModel):
     telephone: Optional[str] = None
     role: Optional[UserRole] = None
 
+class UserPermissionsUpdate(BaseModel):
+    permissions: UserPermissions
+
 class User(UserBase):
     id: str
     statut: str = "actif"
     dateCreation: datetime
     derniereConnexion: Optional[datetime] = None
+    permissions: UserPermissions = Field(default_factory=UserPermissions)
 
     class Config:
         from_attributes = True
