@@ -283,6 +283,14 @@ const WorkOrders = () => {
         workOrder={selectedWorkOrder}
         onSuccess={loadWorkOrders}
       />
+
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={confirmDelete}
+        title="Supprimer l'ordre de travail"
+        description="Êtes-vous sûr de vouloir supprimer cet ordre de travail ? Cette action est irréversible."
+      />
     </div>
   );
 };
