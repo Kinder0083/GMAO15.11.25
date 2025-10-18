@@ -17,11 +17,25 @@ const People = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState('ALL');
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
+  const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
+  const [permissionsDialogOpen, setPermissionsDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
+    loadCurrentUser();
     loadUsers();
   }, []);
+
+  const loadCurrentUser = () => {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    setCurrentUser(user);
+  };
+
+  const isAdmin = () => {
+    return currentUser?.role === 'ADMIN';
+  };
 
   const loadUsers = async () => {
     try {
