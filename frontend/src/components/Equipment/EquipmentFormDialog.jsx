@@ -178,12 +178,11 @@ const EquipmentFormDialog = ({ open, onOpenChange, equipment, onSuccess, parentI
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="numeroSerie">Numéro de série *</Label>
+              <Label htmlFor="numeroSerie">Numéro de série</Label>
               <Input
                 id="numeroSerie"
                 value={formData.numeroSerie}
                 onChange={(e) => setFormData({ ...formData, numeroSerie: e.target.value })}
-                required
               />
             </div>
 
@@ -200,25 +199,23 @@ const EquipmentFormDialog = ({ open, onOpenChange, equipment, onSuccess, parentI
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="dateAchat">Date d'achat *</Label>
+              <Label htmlFor="dateAchat">Date d'achat</Label>
               <Input
                 id="dateAchat"
                 type="date"
                 value={formData.dateAchat}
                 onChange={(e) => setFormData({ ...formData, dateAchat: e.target.value })}
-                required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="coutAchat">Coût d'achat (€) *</Label>
+              <Label htmlFor="coutAchat">Coût d'achat (€)</Label>
               <Input
                 id="coutAchat"
                 type="number"
                 step="0.01"
                 value={formData.coutAchat}
                 onChange={(e) => setFormData({ ...formData, coutAchat: e.target.value })}
-                required
               />
             </div>
           </div>
