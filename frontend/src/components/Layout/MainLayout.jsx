@@ -32,6 +32,7 @@ const MainLayout = () => {
     { icon: MapPin, label: 'Emplacements', path: '/locations' },
     { icon: BarChart3, label: 'Rapports', path: '/reports' },
     { icon: Users, label: 'Équipes', path: '/people' },
+    { icon: Calendar, label: 'Planning', path: '/planning' },
     { icon: ShoppingCart, label: 'Fournisseurs', path: '/vendors' }
   ];
 
