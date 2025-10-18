@@ -103,6 +103,41 @@ async def register(user_create: UserCreate):
     # Hash password
     hashed_password = get_password_hash(user_create.password)
     
+    # Définir les permissions par défaut selon le rôle
+    if user_create.role == UserRole.ADMIN:
+        permissions = {
+            "dashboard": {"view": True, "edit": True, "delete": True},
+            "workOrders": {"view": True, "edit": True, "delete": True},
+            "assets": {"view": True, "edit": True, "delete": True},
+            "preventiveMaintenance": {"view": True, "edit": True, "delete": True},
+            "inventory": {"view": True, "edit": True, "delete": True},
+            "locations": {"view": True, "edit": True, "delete": True},
+            "vendors": {"view": True, "edit": True, "delete": True},
+            "reports": {"view": True, "edit": True, "delete": True}
+        }
+    elif user_create.role == UserRole.TECHNICIEN:
+        permissions = {
+            "dashboard": {"view": True, "edit": False, "delete": False},
+            "workOrders": {"view": True, "edit": True, "delete": False},
+            "assets": {"view": True, "edit": True, "delete": False},
+            "preventiveMaintenance": {"view": True, "edit": True, "delete": False},
+            "inventory": {"view": True, "edit": True, "delete": False},
+            "locations": {"view": True, "edit": False, "delete": False},
+            "vendors": {"view": True, "edit": False, "delete": False},
+            "reports": {"view": True, "edit": False, "delete": False}
+        }
+    else:  # VISUALISEUR
+        permissions = {
+            "dashboard": {"view": True, "edit": False, "delete": False},
+            "workOrders": {"view": True, "edit": False, "delete": False},
+            "assets": {"view": True, "edit": False, "delete": False},
+            "preventiveMaintenance": {"view": True, "edit": False, "delete": False},
+            "inventory": {"view": True, "edit": False, "delete": False},
+            "locations": {"view": True, "edit": False, "delete": False},
+            "vendors": {"view": True, "edit": False, "delete": False},
+            "reports": {"view": True, "edit": False, "delete": False}
+        }
+    
     # Create user
     user_dict = user_create.model_dump()
     del user_dict["password"]
@@ -110,6 +145,7 @@ async def register(user_create: UserCreate):
     user_dict["statut"] = "actif"
     user_dict["dateCreation"] = datetime.utcnow()
     user_dict["derniereConnexion"] = None
+    user_dict["permissions"] = permissions
     user_dict["_id"] = ObjectId()
     
     await db.users.insert_one(user_dict)
