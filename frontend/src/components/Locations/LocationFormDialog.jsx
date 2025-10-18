@@ -100,44 +100,41 @@ const LocationFormDialog = ({ open, onOpenChange, location, onSuccess }) => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="type">Type *</Label>
+            <Label htmlFor="type">Type</Label>
             <Input
               id="type"
               placeholder="Ex: Production, Bureau, Stockage"
               value={formData.type}
               onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-              required
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="adresse">Adresse *</Label>
+            <Label htmlFor="adresse">Adresse</Label>
             <Input
               id="adresse"
               value={formData.adresse}
               onChange={(e) => setFormData({ ...formData, adresse: e.target.value })}
-              required
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="codePostal">Code postal *</Label>
+              <Label htmlFor="codePostal">Code postal</Label>
               <Input
                 id="codePostal"
                 value={formData.codePostal}
                 onChange={(e) => setFormData({ ...formData, codePostal: e.target.value })}
-                required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="ville">Ville *</Label>
+              <Label htmlFor="ville">Ville</Label>
               <Input
                 id="ville"
                 value={formData.ville}
                 onChange={(e) => setFormData({ ...formData, ville: e.target.value })}
-                required
+              />
               />
             </div>
           </div>
