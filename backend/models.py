@@ -144,24 +144,24 @@ class WorkOrder(WorkOrderBase):
 # Equipment Models
 class EquipmentBase(BaseModel):
     nom: str
-    categorie: str
+    categorie: Optional[str] = None
     emplacement_id: str
     statut: EquipmentStatus = EquipmentStatus.OPERATIONNEL
-    dateAchat: datetime
-    coutAchat: float
-    numeroSerie: str
-    garantie: str
+    dateAchat: Optional[datetime] = None
+    coutAchat: Optional[float] = None
+    numeroSerie: Optional[str] = None
+    garantie: Optional[str] = None
     parent_id: Optional[str] = None
 
 class EquipmentCreate(BaseModel):
     nom: str
-    categorie: str
+    categorie: Optional[str] = None
     emplacement_id: Optional[str] = None  # Optional to allow inheritance from parent
     statut: EquipmentStatus = EquipmentStatus.OPERATIONNEL
-    dateAchat: datetime
-    coutAchat: float
-    numeroSerie: str
-    garantie: str
+    dateAchat: Optional[datetime] = None
+    coutAchat: Optional[float] = None
+    numeroSerie: Optional[str] = None
+    garantie: Optional[str] = None
     parent_id: Optional[str] = None
 
 class EquipmentUpdate(BaseModel):
