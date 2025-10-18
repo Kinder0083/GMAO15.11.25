@@ -99,76 +99,66 @@ class EquipmentHierarchyTester:
             self.log(f"Login failed: {response.status_code} - {response.text}", "ERROR")
             return False
             
-    def test_register_with_permissions(self) -> bool:
-        """Test POST /api/auth/register with default permissions"""
-        self.log("\n=== Testing POST /api/auth/register with permissions ===")
+    def setup_test_location(self) -> Optional[str]:
+        """Create a test location for equipment testing"""
+        self.log("Creating test location...")
         
-        test_cases = [
-            {
-                "role": "VISUALISEUR",
-                "email": "viewer@test.com",
-                "expected_permissions": {
-                    "dashboard": {"view": True, "edit": False, "delete": False},
-                    "workOrders": {"view": True, "edit": False, "delete": False}
-                }
-            },
-            {
-                "role": "TECHNICIEN", 
-                "email": "tech@test.com",
-                "expected_permissions": {
-                    "dashboard": {"view": True, "edit": False, "delete": False},
-                    "workOrders": {"view": True, "edit": True, "delete": False}
-                }
-            },
-            {
-                "role": "ADMIN",
-                "email": "admin2@test.com", 
-                "expected_permissions": {
-                    "dashboard": {"view": True, "edit": True, "delete": True},
-                    "workOrders": {"view": True, "edit": True, "delete": True}
-                }
-            }
-        ]
+        location_data = {
+            "nom": "Atelier Principal",
+            "adresse": "123 Rue de l'Industrie",
+            "ville": "Paris",
+            "codePostal": "75001",
+            "type": "Atelier"
+        }
         
-        success = True
-        for case in test_cases:
-            register_data = {
-                "nom": "Test",
-                "prenom": "User",
-                "email": case["email"],
-                "telephone": "+33987654321",
-                "password": "testpass123",
-                "role": case["role"]
-            }
+        response = self.make_request("POST", "/locations", location_data)
+        
+        if response.status_code == 200:
+            location = response.json()
+            location_id = location["id"]
+            self.test_locations.append(location_id)
+            self.log(f"✓ Test location created: {location_id}")
+            return location_id
+        else:
+            self.log(f"✗ Failed to create test location: {response.status_code} - {response.text}", "ERROR")
+            return None
             
-            response = self.make_request("POST", "/auth/register", register_data, token=None)
+    def test_create_parent_equipment(self, location_id: str) -> Optional[str]:
+        """Test creating parent equipment without parent_id"""
+        self.log("\n=== Testing POST /api/equipments - Parent Equipment ===")
+        
+        equipment_data = {
+            "nom": "Machine Principale A",
+            "categorie": "Machine de production",
+            "emplacement_id": location_id,
+            "statut": "OPERATIONNEL",
+            "dateAchat": "2023-01-15T10:00:00Z",
+            "coutAchat": 50000.0,
+            "numeroSerie": "MP-A-001",
+            "garantie": "2 ans"
+        }
+        
+        response = self.make_request("POST", "/equipments", equipment_data)
+        
+        if response.status_code == 200:
+            equipment = response.json()
+            equipment_id = equipment["id"]
+            self.test_equipments.append(equipment_id)
             
-            if response.status_code == 200:
-                user_data = response.json()
-                self.test_users.append(user_data["id"])
-                
-                # Check if permissions are included in response
-                if "permissions" in user_data:
-                    permissions = user_data["permissions"]
-                    for module, expected_perms in case["expected_permissions"].items():
-                        if module in permissions:
-                            actual_perms = permissions[module]
-                            for perm_type, expected_value in expected_perms.items():
-                                if actual_perms.get(perm_type) != expected_value:
-                                    self.log(f"Permission mismatch for {case['role']} {module}.{perm_type}: expected {expected_value}, got {actual_perms.get(perm_type)}", "ERROR")
-                                    success = False
-                        else:
-                            self.log(f"Module {module} missing in permissions for {case['role']}", "ERROR")
-                            success = False
-                    self.log(f"✓ User {case['email']} created with role {case['role']} and correct permissions")
-                else:
-                    self.log(f"✗ Permissions not included in register response for {case['role']}", "ERROR")
-                    success = False
+            # Verify parent equipment properties
+            if equipment.get("parent_id") is None and equipment.get("hasChildren") == False:
+                self.log(f"✓ Parent equipment created successfully: {equipment_id}")
+                self.log(f"  - Name: {equipment['nom']}")
+                self.log(f"  - Location: {equipment.get('emplacement', {}).get('nom', 'N/A')}")
+                self.log(f"  - Parent ID: {equipment.get('parent_id', 'None')}")
+                self.log(f"  - Has Children: {equipment.get('hasChildren', False)}")
+                return equipment_id
             else:
-                self.log(f"✗ Failed to register {case['role']} user: {response.status_code} - {response.text}", "ERROR")
-                success = False
-                
-        return success
+                self.log(f"✗ Parent equipment properties incorrect", "ERROR")
+                return None
+        else:
+            self.log(f"✗ Failed to create parent equipment: {response.status_code} - {response.text}", "ERROR")
+            return None
         
     def test_invite_user(self) -> bool:
         """Test POST /api/users/invite"""
