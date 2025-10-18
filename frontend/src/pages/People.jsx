@@ -84,6 +84,33 @@ const People = () => {
     window.location.href = `mailto:${user.email}`;
   };
 
+  const handleDeleteClick = (user) => {
+    setSelectedUser(user);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    try {
+      await usersAPI.delete(selectedUser.id);
+      toast({
+        title: 'Succès',
+        description: 'Le membre a été supprimé avec succès'
+      });
+      loadUsers();
+    } catch (error) {
+      toast({
+        title: 'Erreur',
+        description: error.response?.data?.detail || 'Impossible de supprimer le membre',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleManagePermissions = (user) => {
+    setSelectedUser(user);
+    setPermissionsDialogOpen(true);
+  };
+
   const roles = [
     { value: 'ALL', label: 'Tous', count: users.length },
     { value: 'ADMIN', label: 'Administrateurs', count: users.filter(u => u.role === 'ADMIN').length },
