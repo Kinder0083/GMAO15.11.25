@@ -512,8 +512,8 @@ class EquipmentHierarchyTester:
         return success
         
     def run_all_tests(self) -> Dict[str, bool]:
-        """Run all permission system tests"""
-        self.log("Starting GMAO Atlas Permissions System Tests...")
+        """Run all equipment hierarchy system tests"""
+        self.log("Starting GMAO Atlas Equipment Hierarchy System Tests...")
         self.log(f"Backend URL: {self.base_url}")
         
         results = {}
@@ -523,17 +523,54 @@ class EquipmentHierarchyTester:
             self.log("Failed to setup admin user. Aborting tests.", "ERROR")
             return {"setup": False}
             
-        # Run tests
-        results["register_with_permissions"] = self.test_register_with_permissions()
-        results["invite_user"] = self.test_invite_user()
-        results["get_user_permissions"] = self.test_get_user_permissions()
-        results["update_user_permissions"] = self.test_update_user_permissions()
-        results["delete_user"] = self.test_delete_user()
+        # Create test location
+        location_id = self.setup_test_location()
+        if not location_id:
+            self.log("Failed to setup test location. Aborting tests.", "ERROR")
+            return {"setup_location": False}
+            
+        # Run hierarchy tests in sequence
+        self.log("\n" + "="*60)
+        self.log("EQUIPMENT HIERARCHY TESTS")
+        self.log("="*60)
+        
+        # Test 1: Create parent equipment
+        parent_id = self.test_create_parent_equipment(location_id)
+        results["create_parent_equipment"] = parent_id is not None
+        
+        if parent_id:
+            # Test 2: Create sub-equipment with location inheritance
+            child_id = self.test_create_sub_equipment_with_inheritance(parent_id)
+            results["create_sub_equipment_inheritance"] = child_id is not None
+            
+            # Test 3: Create sub-equipment with explicit location
+            child2_id = self.test_create_sub_equipment_with_explicit_location(parent_id, location_id)
+            results["create_sub_equipment_explicit"] = child2_id is not None
+            
+            # Test 4: GET /api/equipments with hierarchy info
+            results["get_equipments_hierarchy_info"] = self.test_get_equipments_with_hierarchy_info()
+            
+            # Test 5: GET /api/equipments/{id} with details
+            results["get_equipment_detail"] = self.test_get_equipment_detail()
+            
+            # Test 6: GET /api/equipments/{id}/children
+            results["get_equipment_children"] = self.test_get_equipment_children()
+            
+            # Test 7: GET /api/equipments/{id}/hierarchy (recursive)
+            results["get_equipment_hierarchy"] = self.test_get_equipment_hierarchy()
+        else:
+            # Skip dependent tests if parent creation failed
+            results["create_sub_equipment_inheritance"] = False
+            results["create_sub_equipment_explicit"] = False
+            results["get_equipments_hierarchy_info"] = False
+            results["get_equipment_detail"] = False
+            results["get_equipment_children"] = False
+            results["get_equipment_hierarchy"] = False
         
         # Summary
-        self.log("\n" + "="*50)
+        self.log("\n" + "="*60)
         self.log("TEST RESULTS SUMMARY")
-        self.log("="*50)
+        self.log("="*60)
         
         passed = 0
         total = len(results)
