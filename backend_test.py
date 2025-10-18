@@ -374,45 +374,139 @@ class EquipmentHierarchyTester:
             
         return success
         
-    def test_delete_user(self) -> bool:
-        """Test DELETE /api/users/{user_id}"""
-        self.log("\n=== Testing DELETE /api/users/{user_id} ===")
+    def test_get_equipment_children(self) -> bool:
+        """Test GET /api/equipments/{id}/children"""
+        self.log("\n=== Testing GET /api/equipments/{id}/children ===")
         
-        if not self.test_users:
-            self.log("✗ No test users available", "ERROR")
+        if not self.test_equipments:
+            self.log("✗ No test equipments available", "ERROR")
             return False
             
         success = True
+        parent_id = self.test_equipments[0]  # Use first equipment as parent
         
-        # Test 1: Try to delete self (should fail)
-        response = self.make_request("DELETE", f"/users/{self.admin_user_id}")
+        response = self.make_request("GET", f"/equipments/{parent_id}/children")
         
-        if response.status_code == 400:
-            self.log("✓ Correctly prevented admin from deleting themselves")
+        if response.status_code == 200:
+            children = response.json()
+            self.log(f"✓ Successfully retrieved children for equipment {parent_id}")
+            self.log(f"  - Number of children: {len(children)}")
+            
+            # Verify each child has correct parent_id
+            for child in children:
+                if child.get("parent_id") != parent_id:
+                    self.log(f"✗ Child {child.get('id')} has incorrect parent_id: {child.get('parent_id')}", "ERROR")
+                    success = False
+                else:
+                    self.log(f"  - Child: {child.get('nom')} (ID: {child.get('id')})")
+                    
+                # Verify child has required hierarchy fields
+                if "hasChildren" not in child:
+                    self.log(f"✗ Child missing hasChildren field", "ERROR")
+                    success = False
+                    
+                if "parent" not in child or not child["parent"]:
+                    self.log(f"✗ Child missing parent info", "ERROR")
+                    success = False
+                    
         else:
-            self.log(f"✗ Should have prevented self-deletion: {response.status_code}", "ERROR")
+            self.log(f"✗ Failed to get equipment children: {response.status_code} - {response.text}", "ERROR")
             success = False
             
-        # Test 2: Delete another user (should succeed)
-        if len(self.test_users) > 1:
-            user_to_delete = self.test_users[-1]  # Use last test user
-            response = self.make_request("DELETE", f"/users/{user_to_delete}")
-            
-            if response.status_code == 200:
-                self.log(f"✓ Successfully deleted user {user_to_delete}")
-                self.test_users.remove(user_to_delete)
-            else:
-                self.log(f"✗ Failed to delete user: {response.status_code} - {response.text}", "ERROR")
-                success = False
-        else:
-            self.log("⚠ Skipping user deletion test - not enough test users")
-            
-        # Test 3: Try to delete non-existent user
-        response = self.make_request("DELETE", "/users/nonexistent_id")
+        # Test with invalid equipment ID
+        response = self.make_request("GET", "/equipments/invalid_id/children")
         if response.status_code == 404 or response.status_code == 400:
-            self.log("✓ Correctly handled deletion of non-existent user")
+            self.log("✓ Correctly handled invalid equipment ID for children")
         else:
-            self.log(f"✗ Should have returned 404/400 for non-existent user: {response.status_code}", "ERROR")
+            self.log(f"✗ Should have returned 404/400 for invalid equipment ID: {response.status_code}", "ERROR")
+            success = False
+            
+        return success
+        
+    def test_get_equipment_hierarchy(self) -> bool:
+        """Test GET /api/equipments/{id}/hierarchy - Complete recursive hierarchy"""
+        self.log("\n=== Testing GET /api/equipments/{id}/hierarchy ===")
+        
+        if not self.test_equipments:
+            self.log("✗ No test equipments available", "ERROR")
+            return False
+            
+        # First, create a 3-level hierarchy: parent -> child -> grandchild
+        parent_id = self.test_equipments[0]
+        
+        # Create grandchild equipment (child of the first sub-equipment)
+        if len(self.test_equipments) > 1:
+            child_id = self.test_equipments[1]
+            
+            grandchild_data = {
+                "nom": "Capteur A1-1",
+                "categorie": "Capteur",
+                "parent_id": child_id,
+                "statut": "OPERATIONNEL",
+                "dateAchat": "2023-04-15T10:00:00Z",
+                "coutAchat": 500.0,
+                "numeroSerie": "CAP-A1-1-001",
+                "garantie": "6 mois"
+            }
+            
+            response = self.make_request("POST", "/equipments", grandchild_data)
+            if response.status_code == 200:
+                grandchild = response.json()
+                grandchild_id = grandchild["id"]
+                self.test_equipments.append(grandchild_id)
+                self.log(f"✓ Created grandchild equipment: {grandchild_id}")
+            else:
+                self.log(f"⚠ Failed to create grandchild equipment: {response.status_code}", "WARN")
+        
+        # Now test the hierarchy endpoint
+        success = True
+        response = self.make_request("GET", f"/equipments/{parent_id}/hierarchy")
+        
+        if response.status_code == 200:
+            hierarchy = response.json()
+            self.log(f"✓ Successfully retrieved hierarchy for equipment {parent_id}")
+            
+            # Verify root level
+            if hierarchy.get("id") != parent_id:
+                self.log(f"✗ Hierarchy root ID mismatch", "ERROR")
+                success = False
+            else:
+                self.log(f"  - Root: {hierarchy.get('nom')} (ID: {hierarchy.get('id')})")
+                
+            # Verify children structure
+            if "children" not in hierarchy:
+                self.log(f"✗ Hierarchy missing children field", "ERROR")
+                success = False
+            else:
+                children = hierarchy["children"]
+                self.log(f"  - Direct children count: {len(children)}")
+                
+                # Check each child
+                for child in children:
+                    self.log(f"    - Child: {child.get('nom')} (ID: {child.get('id')})")
+                    
+                    # Check if child has its own children (grandchildren)
+                    if "children" in child and len(child["children"]) > 0:
+                        for grandchild in child["children"]:
+                            self.log(f"      - Grandchild: {grandchild.get('nom')} (ID: {grandchild.get('id')})")
+                            
+                    # Verify hasChildren is correctly set
+                    expected_has_children = "children" in child and len(child["children"]) > 0
+                    actual_has_children = child.get("hasChildren", False)
+                    if expected_has_children != actual_has_children:
+                        self.log(f"✗ Child hasChildren mismatch: expected {expected_has_children}, got {actual_has_children}", "ERROR")
+                        success = False
+                        
+        else:
+            self.log(f"✗ Failed to get equipment hierarchy: {response.status_code} - {response.text}", "ERROR")
+            success = False
+            
+        # Test with invalid equipment ID
+        response = self.make_request("GET", "/equipments/invalid_id/hierarchy")
+        if response.status_code == 404 or response.status_code == 400:
+            self.log("✓ Correctly handled invalid equipment ID for hierarchy")
+        else:
+            self.log(f"✗ Should have returned 404/400 for invalid equipment ID: {response.status_code}", "ERROR")
             success = False
             
         return success
