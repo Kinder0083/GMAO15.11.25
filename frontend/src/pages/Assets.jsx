@@ -190,7 +190,7 @@ const Assets = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="hover:shadow-lg transition-shadow">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
@@ -234,6 +234,22 @@ const Assets = () => {
               </div>
               <div className="bg-red-100 p-3 rounded-xl">
                 <AlertCircle size={24} className="text-red-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-lg transition-shadow">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Alerte S.Equip</p>
+                <p className="text-3xl font-bold text-gray-900 mt-2">
+                  {equipments.filter(e => e.statut === 'ALERTE_S_EQUIP').length}
+                </p>
+              </div>
+              <div className="bg-purple-100 p-3 rounded-xl">
+                <AlertCircle size={24} className="text-purple-600" />
               </div>
             </div>
           </CardContent>
