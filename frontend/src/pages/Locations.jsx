@@ -1,13 +1,58 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
-import { mockLocations } from '../mock/mockData';
-import { Plus, Search, MapPin, Building } from 'lucide-react';
+import { Plus, Search, MapPin, Building, Pencil, Trash2 } from 'lucide-react';
+import LocationFormDialog from '../components/Locations/LocationFormDialog';
+import { locationsAPI } from '../services/api';
+import { useToast } from '../hooks/use-toast';
 
 const Locations = () => {
-  const [locations] = useState(mockLocations);
+  const { toast } = useToast();
+  const [locations, setLocations] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [formDialogOpen, setFormDialogOpen] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState(null);
+
+  useEffect(() => {
+    loadLocations();
+  }, []);
+
+  const loadLocations = async () => {
+    try {
+      setLoading(true);
+      const response = await locationsAPI.getAll();
+      setLocations(response.data);
+    } catch (error) {
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de charger les emplacements',
+        variant: 'destructive'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Êtes-vous sûr de vouloir supprimer cet emplacement ?')) {
+      try {
+        await locationsAPI.delete(id);
+        toast({
+          title: 'Succès',
+          description: 'Emplacement supprimé'
+        });
+        loadLocations();
+      } catch (error) {
+        toast({
+          title: 'Erreur',
+          description: 'Impossible de supprimer l\'emplacement',
+          variant: 'destructive'
+        });
+      }
+    }
+  };
 
   const filteredLocations = locations.filter(loc => {
     return loc.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
