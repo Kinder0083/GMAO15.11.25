@@ -44,8 +44,8 @@ const Assets = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    setItemToDelete(id);
+  const handleDelete = async (equipment) => {
+    setItemToDelete(equipment);
     setDeleteDialogOpen(true);
   };
 
@@ -53,7 +53,7 @@ const Assets = () => {
     if (!itemToDelete) return;
     
     try {
-      await equipmentsAPI.delete(itemToDelete);
+      await equipmentsAPI.delete(itemToDelete.id);
       toast({
         title: 'Succès',
         description: 'Équipement supprimé'
@@ -69,6 +69,28 @@ const Assets = () => {
       setDeleteDialogOpen(false);
       setItemToDelete(null);
     }
+  };
+
+  const handleAddChild = (parent) => {
+    setParentForNewChild(parent);
+    setSelectedEquipment(null);
+    setFormDialogOpen(true);
+  };
+
+  const handleEdit = (equipment) => {
+    setParentForNewChild(null);
+    setSelectedEquipment(equipment);
+    setFormDialogOpen(true);
+  };
+
+  const handleAdd = () => {
+    setParentForNewChild(null);
+    setSelectedEquipment(null);
+    setFormDialogOpen(true);
+  };
+
+  const handleViewDetails = (equipment) => {
+    navigate(`/assets/${equipment.id}`);
   };
 
   const filteredEquipments = equipments.filter(eq => {
