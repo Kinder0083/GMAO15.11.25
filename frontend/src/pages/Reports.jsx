@@ -69,11 +69,18 @@ const Reports = () => {
           <p className="text-gray-600 mt-1">Analysez vos performances de maintenance</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-50">
+          <Button 
+            variant="outline" 
+            className="border-blue-600 text-blue-600 hover:bg-blue-50"
+            onClick={handleCustomPeriod}
+          >
             <Calendar size={20} className="mr-2" />
             Période personnalisée
           </Button>
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+          <Button 
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+            onClick={handleExportPDF}
+          >
             <Download size={20} className="mr-2" />
             Exporter PDF
           </Button>
