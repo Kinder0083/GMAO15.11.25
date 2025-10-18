@@ -54,6 +54,7 @@ function App() {
             <Route path="preventive-maintenance" element={<PreventiveMaintenance />} />
             <Route path="reports" element={<Reports />} />
             <Route path="people" element={<People />} />
+            <Route path="planning" element={<Planning />} />
             <Route path="vendors" element={<Vendors />} />
             <Route path="settings" element={<Settings />} />
           </Route>
