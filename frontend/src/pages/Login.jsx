@@ -6,6 +6,7 @@ import { Label } from '../components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { useToast } from '../hooks/use-toast';
 import { Wrench } from 'lucide-react';
+import { authAPI } from '../services/api';
 
 const Login = () => {
   const navigate = useNavigate();
