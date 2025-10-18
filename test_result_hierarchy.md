@@ -55,15 +55,18 @@ backend:
 
   - task: "Endpoint GET /api/equipments/{id}"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Nouveau endpoint pour récupérer les détails d'un équipement avec ses infos de hiérarchie"
+      - working: true
+        agent: "testing"
+        comment: "✓ Endpoint testé avec succès. Récupération des détails d'équipement fonctionnelle avec infos hiérarchie complètes (parent, hasChildren). Gestion correcte des IDs invalides (400)."
 
   - task: "Endpoint GET /api/equipments/{id}/children"
     implemented: true
