@@ -267,7 +267,7 @@ const Reports = () => {
                 </tr>
               </thead>
               <tbody>
-                {mockEquipments.map((equipment) => {
+                {equipments.map((equipment) => {
                   const availability = equipment.statut === 'OPERATIONNEL' ? 95 : equipment.statut === 'EN_MAINTENANCE' ? 70 : 0;
                   return (
                     <tr key={equipment.id} className="border-b hover:bg-gray-50 transition-colors">
