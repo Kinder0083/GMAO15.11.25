@@ -3,8 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button';
 import { BarChart3, TrendingUp, Download, Calendar } from 'lucide-react';
 import { reportsAPI, equipmentsAPI } from '../services/api';
+import { useToast } from '../hooks/use-toast';
 
 const Reports = () => {
+  const { toast } = useToast();
   const [selectedPeriod, setSelectedPeriod] = useState('MOIS');
   const [loading, setLoading] = useState(true);
   const [analytics, setAnalytics] = useState(null);
