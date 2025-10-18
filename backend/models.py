@@ -153,8 +153,16 @@ class EquipmentBase(BaseModel):
     garantie: str
     parent_id: Optional[str] = None
 
-class EquipmentCreate(EquipmentBase):
-    pass
+class EquipmentCreate(BaseModel):
+    nom: str
+    categorie: str
+    emplacement_id: Optional[str] = None  # Optional to allow inheritance from parent
+    statut: EquipmentStatus = EquipmentStatus.OPERATIONNEL
+    dateAchat: datetime
+    coutAchat: float
+    numeroSerie: str
+    garantie: str
+    parent_id: Optional[str] = None
 
 class EquipmentUpdate(BaseModel):
     nom: Optional[str] = None
