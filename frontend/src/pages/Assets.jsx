@@ -4,6 +4,7 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Plus, Search, Wrench, AlertCircle, CheckCircle2, Clock, Pencil, Trash2 } from 'lucide-react';
 import EquipmentFormDialog from '../components/Equipment/EquipmentFormDialog';
+import DeleteConfirmDialog from '../components/Common/DeleteConfirmDialog';
 import { equipmentsAPI } from '../services/api';
 import { useToast } from '../hooks/use-toast';
 
@@ -14,7 +15,9 @@ const Assets = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('ALL');
   const [formDialogOpen, setFormDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedEquipment, setSelectedEquipment] = useState(null);
+  const [itemToDelete, setItemToDelete] = useState(null);
 
   useEffect(() => {
     loadEquipments();
