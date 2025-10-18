@@ -5,6 +5,7 @@ import { Input } from '../components/ui/input';
 import { Plus, Search, Filter, Eye, Pencil, Trash2 } from 'lucide-react';
 import WorkOrderDialog from '../components/WorkOrders/WorkOrderDialog';
 import WorkOrderFormDialog from '../components/WorkOrders/WorkOrderFormDialog';
+import DeleteConfirmDialog from '../components/Common/DeleteConfirmDialog';
 import { workOrdersAPI } from '../services/api';
 import { useToast } from '../hooks/use-toast';
 
@@ -16,7 +17,9 @@ const WorkOrders = () => {
   const [filterStatus, setFilterStatus] = useState('ALL');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [formDialogOpen, setFormDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedWorkOrder, setSelectedWorkOrder] = useState(null);
+  const [itemToDelete, setItemToDelete] = useState(null);
 
   useEffect(() => {
     loadWorkOrders();
