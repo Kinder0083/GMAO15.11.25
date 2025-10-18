@@ -224,7 +224,7 @@ const Reports = () => {
               <div className="pt-4 border-t">
                 <h4 className="text-sm font-semibold text-gray-700 mb-3">Par priorité</h4>
                 <div className="space-y-3">
-                  {Object.entries(mockAnalytics.workOrdersParPriorite).filter(([_, count]) => count > 0).map(([priorite, count]) => {
+                  {Object.entries(analytics.workOrdersParPriorite).filter(([_, count]) => count > 0).map(([priorite, count]) => {
                     const labels = {
                       'HAUTE': { label: 'Haute', color: 'bg-red-500' },
                       'MOYENNE': { label: 'Moyenne', color: 'bg-orange-500' },
