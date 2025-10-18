@@ -69,7 +69,10 @@ const Locations = () => {
           <h1 className="text-3xl font-bold text-gray-900">Emplacements</h1>
           <p className="text-gray-600 mt-1">Gérez vos sites et lieux de travail</p>
         </div>
-        <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+        <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={() => {
+          setSelectedLocation(null);
+          setFormDialogOpen(true);
+        }}>
           <Plus size={20} className="mr-2" />
           Nouvel emplacement
         </Button>
