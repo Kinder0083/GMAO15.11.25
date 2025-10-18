@@ -320,57 +320,56 @@ class EquipmentHierarchyTester:
             self.log(f"✗ Failed to get equipments: {response.status_code} - {response.text}", "ERROR")
             return False
         
-    def test_update_user_permissions(self) -> bool:
-        """Test PUT /api/users/{user_id}/permissions"""
-        self.log("\n=== Testing PUT /api/users/{user_id}/permissions ===")
+    def test_get_equipment_detail(self) -> bool:
+        """Test GET /api/equipments/{id} with parent and hasChildren info"""
+        self.log("\n=== Testing GET /api/equipments/{id} ===")
         
-        if not self.test_users:
-            self.log("✗ No test users available", "ERROR")
+        if not self.test_equipments:
+            self.log("✗ No test equipments available", "ERROR")
             return False
             
         success = True
-        user_id = self.test_users[0]  # Use first test user
         
-        # Test 1: Update permissions as admin
-        update_data = {
-            "permissions": {
-                "dashboard": {"view": True, "edit": True, "delete": False},
-                "workOrders": {"view": True, "edit": True, "delete": True},
-                "assets": {"view": True, "edit": False, "delete": False},
-                "preventiveMaintenance": {"view": True, "edit": False, "delete": False},
-                "inventory": {"view": True, "edit": False, "delete": False},
-                "locations": {"view": True, "edit": False, "delete": False},
-                "vendors": {"view": True, "edit": False, "delete": False},
-                "reports": {"view": True, "edit": False, "delete": False}
-            }
-        }
-        
-        response = self.make_request("PUT", f"/users/{user_id}/permissions", update_data)
-        
-        if response.status_code == 200:
-            user_data = response.json()
-            self.log(f"✓ Successfully updated permissions for user {user_id}")
+        for equipment_id in self.test_equipments:
+            response = self.make_request("GET", f"/equipments/{equipment_id}")
             
-            # Verify the update
-            if "permissions" in user_data:
-                perms = user_data["permissions"]
-                if (perms.get("workOrders", {}).get("delete") == True and 
-                    perms.get("assets", {}).get("edit") == False):
-                    self.log("✓ Permissions updated correctly")
-                else:
-                    self.log("✗ Permissions not updated as expected", "ERROR")
-                    success = False
+            if response.status_code == 200:
+                equipment = response.json()
+                self.log(f"✓ Successfully retrieved equipment details: {equipment_id}")
+                self.log(f"  - Name: {equipment.get('nom')}")
+                self.log(f"  - Parent ID: {equipment.get('parent_id', 'None')}")
+                self.log(f"  - Has Children: {equipment.get('hasChildren', False)}")
+                
+                # Verify required fields are present
+                required_fields = ["id", "nom", "hasChildren"]
+                for field in required_fields:
+                    if field not in equipment:
+                        self.log(f"✗ Missing required field {field}", "ERROR")
+                        success = False
+                        
+                # If equipment has parent, verify parent info is included
+                if equipment.get("parent_id"):
+                    if "parent" not in equipment or not equipment["parent"]:
+                        self.log(f"✗ Equipment has parent_id but missing parent info", "ERROR")
+                        success = False
+                    else:
+                        parent_info = equipment["parent"]
+                        if "id" not in parent_info or "nom" not in parent_info:
+                            self.log(f"✗ Incomplete parent info", "ERROR")
+                            success = False
+                        else:
+                            self.log(f"  - Parent Info: {parent_info.get('nom')} ({parent_info.get('id')})")
+                            
+            else:
+                self.log(f"✗ Failed to get equipment details: {response.status_code} - {response.text}", "ERROR")
+                success = False
+                
+        # Test with invalid equipment ID
+        response = self.make_request("GET", "/equipments/invalid_id")
+        if response.status_code == 404 or response.status_code == 400:
+            self.log("✓ Correctly handled invalid equipment ID")
         else:
-            self.log(f"✗ Failed to update permissions: {response.status_code} - {response.text}", "ERROR")
-            success = False
-            
-        # Test 2: Try to modify own permissions (should fail)
-        response = self.make_request("PUT", f"/users/{self.admin_user_id}/permissions", update_data)
-        
-        if response.status_code == 400:
-            self.log("✓ Correctly prevented admin from modifying own permissions")
-        else:
-            self.log(f"✗ Should have prevented self-permission modification: {response.status_code}", "ERROR")
+            self.log(f"✗ Should have returned 404/400 for invalid equipment ID: {response.status_code}", "ERROR")
             success = False
             
         return success
