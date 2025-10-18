@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 """
-Backend API Testing for GMAO Atlas Permissions System
-Tests the permissions management system endpoints
+Backend API Testing for GMAO Atlas Equipment Hierarchy System
+Tests the equipment hierarchy management system endpoints
 """
 
 import requests
 import json
 import sys
 from typing import Dict, Any, Optional
+from datetime import datetime
 
 # Backend URL from frontend/.env
 BASE_URL = "https://maintenance-hub-60.preview.emergentagent.com/api"
 
-class PermissionsAPITester:
+class EquipmentHierarchyTester:
     def __init__(self):
         self.base_url = BASE_URL
         self.admin_token = None
