@@ -1,11 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
-import { mockAnalytics, mockWorkOrders, mockEquipments } from '../mock/mockData';
 import { BarChart3, TrendingUp, Download, Calendar } from 'lucide-react';
+import { reportsAPI, equipmentsAPI } from '../services/api';
 
 const Reports = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('MOIS');
+  const [loading, setLoading] = useState(true);
+  const [analytics, setAnalytics] = useState(null);
+  const [equipments, setEquipments] = useState([]);
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      const [analyticsRes, equipRes] = await Promise.all([
+        reportsAPI.getAnalytics(),
+        equipmentsAPI.getAll()
+      ]);
+      setAnalytics(analyticsRes.data);
+      setEquipments(equipRes.data);
+    } catch (error) {
+      console.error('Erreur de chargement:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading || !analytics) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-gray-500">Chargement...</p>
+      </div>
+    );
+  }
 
   const periods = [
     { value: 'SEMAINE', label: 'Cette semaine' },
