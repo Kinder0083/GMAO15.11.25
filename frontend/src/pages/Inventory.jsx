@@ -269,6 +269,14 @@ const Inventory = () => {
         item={selectedItem}
         onSuccess={loadInventory}
       />
+
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={confirmDelete}
+        title="Supprimer l'article"
+        description="Êtes-vous sûr de vouloir supprimer cet article ? Cette action est irréversible."
+      />
     </div>
   );
 };
