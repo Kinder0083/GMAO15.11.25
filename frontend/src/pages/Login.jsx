@@ -110,10 +110,10 @@ const Login = () => {
             </form>
 
             <div className="mt-6 text-center text-sm text-gray-600">
-              <p className="mb-2">Comptes de démonstration :</p>
+              <p className="mb-2">Compte de démonstration :</p>
               <div className="space-y-1 text-xs">
-                <p>Admin : admin@example.com / admin123</p>
-                <p>Technicien : tech@example.com / tech123</p>
+                <p>Email : sophie.martin@gmao.fr</p>
+                <p>Mot de passe : admin123</p>
               </div>
             </div>
           </CardContent>
