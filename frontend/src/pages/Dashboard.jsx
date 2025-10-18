@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { mockWorkOrders, mockEquipments, mockAnalytics } from '../mock/mockData';
+import { workOrdersAPI, equipmentsAPI, reportsAPI } from '../services/api';
 import {
   ClipboardList,
   Wrench,
@@ -12,6 +12,40 @@ import {
 } from 'lucide-react';
 
 const Dashboard = () => {
+  const [loading, setLoading] = useState(true);
+  const [workOrders, setWorkOrders] = useState([]);
+  const [equipments, setEquipments] = useState([]);
+  const [analytics, setAnalytics] = useState(null);
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      const [woRes, eqRes, analyticsRes] = await Promise.all([
+        workOrdersAPI.getAll(),
+        equipmentsAPI.getAll(),
+        reportsAPI.getAnalytics()
+      ]);
+      setWorkOrders(woRes.data);
+      setEquipments(eqRes.data);
+      setAnalytics(analyticsRes.data);
+    } catch (error) {
+      console.error('Erreur de chargement:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading || !analytics) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-gray-500">Chargement...</p>
+      </div>
+    );
+  }
   const stats = [
     {
       title: 'Ordres de travail actifs',
