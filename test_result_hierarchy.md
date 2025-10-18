@@ -85,15 +85,18 @@ backend:
 
   - task: "Endpoint GET /api/equipments/{id}/hierarchy"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Nouveau endpoint pour récupérer toute la hiérarchie d'un équipement de manière récursive"
+      - working: true
+        agent: "testing"
+        comment: "✓ Endpoint testé avec succès. Hiérarchie récursive complète fonctionnelle - structure à 3 niveaux testée (parent → enfant → petit-enfant). Chaque niveau inclut ses enfants dans un tableau 'children' avec hasChildren correctement calculé."
 
 frontend:
   - task: "API functions pour hiérarchie"
