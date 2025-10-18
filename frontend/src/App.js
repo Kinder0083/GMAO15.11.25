@@ -47,6 +47,7 @@ function App() {
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="work-orders" element={<WorkOrders />} />
             <Route path="assets" element={<Assets />} />
+            <Route path="assets/:id" element={<EquipmentDetail />} />
             <Route path="inventory" element={<Inventory />} />
             <Route path="locations" element={<Locations />} />
             <Route path="preventive-maintenance" element={<PreventiveMaintenance />} />
