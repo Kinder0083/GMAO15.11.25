@@ -102,12 +102,26 @@ const Reports = () => {
             <Calendar size={20} className="mr-2" />
             Période personnalisée
           </Button>
+          
+          {userRole === 'ADMIN' && (
+            <Select value={exportFormat} onValueChange={setExportFormat}>
+              <SelectTrigger className="w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="pdf">PDF</SelectItem>
+                <SelectItem value="csv">CSV</SelectItem>
+                <SelectItem value="xlsx">Excel (XLSX)</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+          
           <Button 
             className="bg-blue-600 hover:bg-blue-700 text-white"
-            onClick={handleExportPDF}
+            onClick={handleExportReport}
           >
             <Download size={20} className="mr-2" />
-            Exporter PDF
+            Exporter {userRole === 'ADMIN' ? exportFormat.toUpperCase() : 'PDF'}
           </Button>
         </div>
       </div>
