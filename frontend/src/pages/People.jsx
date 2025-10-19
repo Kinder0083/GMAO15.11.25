@@ -127,10 +127,25 @@ const People = () => {
           <h1 className="text-3xl font-bold text-gray-900">Équipes</h1>
           <p className="text-gray-600 mt-1">Gérez les membres de votre équipe</p>
         </div>
-        <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={() => setInviteDialogOpen(true)}>
-          <Plus size={20} className="mr-2" />
-          Inviter un membre
-        </Button>
+        {isAdmin() && (
+          <div className="flex gap-3">
+            <Button 
+              variant="outline"
+              className="border-blue-600 text-blue-600 hover:bg-blue-50" 
+              onClick={() => setInviteDialogOpen(true)}
+            >
+              <Mail size={20} className="mr-2" />
+              Inviter un membre
+            </Button>
+            <Button 
+              className="bg-blue-600 hover:bg-blue-700 text-white" 
+              onClick={() => setCreateDialogOpen(true)}
+            >
+              <UserPlus size={20} className="mr-2" />
+              Créer un membre
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Stats */}
