@@ -15,6 +15,7 @@ const ImportExport = () => {
   const [importing, setImporting] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [importResult, setImportResult] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   const modules = [
     { value: 'all', label: 'Toutes les données' },
