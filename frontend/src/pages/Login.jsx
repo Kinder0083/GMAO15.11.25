@@ -120,7 +120,7 @@ const Login = () => {
         </Card>
 
         <p className="text-center text-sm text-gray-500 mt-6">
-          © 2025 GMAO Atlas - Tous droits réservés
+          © 2025 GMAO Iris - Tous droits réservés
         </p>
       </div>
     </div>
