@@ -147,6 +147,24 @@ const WorkOrderDialog = ({ open, onOpenChange, workOrder }) => {
               </div>
             )}
           </div>
+
+          {/* Pièces jointes */}
+          <Separator className="my-6" />
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Pièces jointes</h3>
+            
+            <div className="mb-4">
+              <AttachmentUploader 
+                workOrderId={workOrder.id} 
+                onUploadComplete={handleUploadComplete}
+              />
+            </div>
+
+            <AttachmentsList 
+              workOrderId={workOrder.id}
+              refreshTrigger={refreshAttachments}
+            />
+          </div>
         </div>
       </DialogContent>
     </Dialog>
