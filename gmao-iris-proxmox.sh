@@ -401,8 +401,8 @@ asyncio.run(main())
 EOPYEND
 "
     
-    # Exécuter le script Python avec les paramètres
-    pct exec $CTID -- bash -c "cd /opt/gmao-iris/backend && source venv/bin/activate && python3 /tmp/create_admins.py '$ADMIN_EMAIL' '$ADMIN_PASS' '$ADMIN_FIRSTNAME' '$ADMIN_LASTNAME'" >/dev/null 2>&1
+    # Exécuter le script Python avec les variables d'environnement
+    pct exec $CTID -- bash -c "cd /opt/gmao-iris/backend && source venv/bin/activate && export MONGO_URL='mongodb://localhost:27017' && export DB_NAME='gmao_iris' && python3 /tmp/create_admins.py '$ADMIN_EMAIL' '$ADMIN_PASS' '$ADMIN_FIRSTNAME' '$ADMIN_LASTNAME'" >/dev/null 2>&1
     
     # Supprimer le script temporaire
     pct exec $CTID -- bash -c "rm -f /tmp/create_admins.py"
