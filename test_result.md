@@ -111,95 +111,29 @@ user_problem_statement: |
   5. Interface intuitive et ergonomique pour utilisateurs découvrant le logiciel
 
 backend:
-  - task: "Modèle de permissions granulaires"
+  - task: "Endpoint GET /api/export/{module}"
     implemented: true
-    working: true
-    file: "/app/backend/models.py"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-      - working: "NA"
-        agent: "main"
-        comment: "Création des modèles UserPermissions, ModulePermission, UserInvite et UserPermissionsUpdate dans models.py"
-      - working: true
-        agent: "testing"
-        comment: "✓ Modèles testés indirectement via les endpoints - structure des permissions correcte avec 8 modules (dashboard, workOrders, assets, preventiveMaintenance, inventory, locations, vendors, reports) et 3 niveaux (view, edit, delete)"
-
-  - task: "Endpoint POST /api/users/invite"
-    implemented: true
-    working: true
+    working: "NA"
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Endpoint créé pour inviter un nouveau membre avec génération de mot de passe temporaire et permissions par défaut selon le rôle"
-      - working: true
-        agent: "testing"
-        comment: "✓ Endpoint testé avec succès - Invitation VISUALISEUR, TECHNICIEN et ADMIN fonctionnelle. Permissions par défaut correctement assignées selon le rôle. Rejet correct des emails dupliqués (400). Mots de passe temporaires générés et loggés."
+        comment: "Endpoint existant pour exporter les données d'un module (work-orders, equipments, users, inventory, locations, vendors, all). Supporte CSV et XLSX. Admin uniquement."
 
-  - task: "Endpoint GET /api/users/{user_id}/permissions"
+  - task: "Endpoint POST /api/import/{module}"
     implemented: true
-    working: true
+    working: "NA"
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Endpoint créé pour récupérer les permissions d'un utilisateur"
-      - working: true
-        agent: "testing"
-        comment: "✓ Endpoint testé avec succès - Récupération des permissions utilisateur fonctionnelle (200). Structure complète avec tous les modules et permissions. Gestion correcte des IDs invalides (400)."
-
-  - task: "Endpoint PUT /api/users/{user_id}/permissions"
-    implemented: true
-    working: true
-    file: "/app/backend/server.py"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-      - working: "NA"
-        agent: "main"
-        comment: "Endpoint créé pour mettre à jour les permissions d'un utilisateur (admin only). Empêche de modifier ses propres permissions"
-      - working: true
-        agent: "testing"
-        comment: "✓ Endpoint testé avec succès - Mise à jour des permissions fonctionnelle (200). Empêche correctement un admin de modifier ses propres permissions (400). Permissions mises à jour correctement dans la base de données."
-
-  - task: "Endpoint DELETE /api/users/{user_id} amélioré"
-    implemented: true
-    working: true
-    file: "/app/backend/server.py"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-      - working: "NA"
-        agent: "main"
-        comment: "Endpoint modifié pour empêcher un admin de se supprimer lui-même"
-      - working: true
-        agent: "testing"
-        comment: "✓ Endpoint testé avec succès - Suppression d'utilisateur fonctionnelle (200). Empêche correctement un admin de se supprimer lui-même (400). Gestion correcte des IDs inexistants (400)."
-
-  - task: "Permissions par défaut lors de l'enregistrement"
-    implemented: true
-    working: true
-    file: "/app/backend/server.py"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-      - working: "NA"
-        agent: "main"
-        comment: "Mise à jour de l'endpoint /api/auth/register pour ajouter les permissions par défaut selon le rôle"
-      - working: true
-        agent: "testing"
-        comment: "✓ Endpoint testé avec succès - Enregistrement avec permissions par défaut fonctionnel. VISUALISEUR: view only sur tous modules. TECHNICIEN: view+edit sur workOrders/assets/preventiveMaintenance/inventory, view only sur autres. ADMIN: view+edit+delete sur tous modules."
+        comment: "Endpoint existant pour importer les données d'un module. Supporte CSV et XLSX. Deux modes : 'add' (ajouter) et 'replace' (écraser par ID). Retourne des statistiques détaillées. Admin uniquement."
 
 frontend:
   - task: "API functions pour les permissions"
