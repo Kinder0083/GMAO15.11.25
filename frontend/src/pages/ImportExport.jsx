@@ -236,15 +236,25 @@ const ImportExport = () => {
                 id="import-file"
                 type="file"
                 accept=".csv,.xlsx,.xls"
-                onChange={handleImport}
+                onChange={handleFileSelect}
                 disabled={importing || selectedModule === 'all'}
                 className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 cursor-pointer"
               />
+              {selectedFile && (
+                <p className="text-sm text-green-600">
+                  Fichier sélectionné : {selectedFile.name}
+                </p>
+              )}
             </div>
 
-            {importing && (
-              <p className="text-sm text-green-600">Import en cours...</p>
-            )}
+            <Button
+              onClick={handleImport}
+              disabled={importing || !selectedFile || selectedModule === 'all'}
+              className="w-full bg-green-600 hover:bg-green-700"
+            >
+              <Upload size={20} className="mr-2" />
+              {importing ? 'Import en cours...' : 'Importer'}
+            </Button>
           </CardContent>
         </Card>
       </div>
