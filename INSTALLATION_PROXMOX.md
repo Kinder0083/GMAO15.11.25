@@ -1,208 +1,441 @@
-# GMAO Atlas - Script d'installation Proxmox LXC
+# GMAO Iris - Installation Proxmox LXC
 
-Ce script permet d'installer automatiquement l'application GMAO Atlas dans un conteneur LXC Proxmox.
+Ce guide décrit l'installation automatique de GMAO Iris dans un conteneur LXC Proxmox.
 
-## Prérequis
+## 📋 Prérequis
 
-- Proxmox VE 7.0 ou supérieur
-- Accès SSH root à votre serveur Proxmox
-- Au moins 2 Go de RAM et 10 Go d'espace disque disponibles
+- **Proxmox VE 7.0 ou supérieur**
+- **Accès SSH root** à votre serveur Proxmox
+- **Ressources minimales recommandées** :
+  - RAM : 2 Go minimum (4 Go recommandé)
+  - Disque : 10 Go minimum (20 Go recommandé)
+  - CPU : 2 cœurs minimum
 
-## Installation automatique
+## 🚀 Installation automatique (Méthode recommandée)
 
-### Étape 1 : Se connecter à Proxmox
+### Étape 1 : Créer le conteneur LXC dans Proxmox
 
-Connectez-vous en SSH à votre serveur Proxmox :
+1. Connectez-vous à l'interface web Proxmox
+2. Cliquez sur **"Create CT"** (Créer CT)
+3. Configurez le conteneur :
 
-```bash
-ssh root@votre-serveur-proxmox
-```
+   **Général :**
+   - CT ID : Choisir un ID libre (ex: 100)
+   - Hostname : `gmao-iris`
+   - Password : Définir un mot de passe root
+   - Template : **Debian 12 standard**
 
-### Étape 2 : Télécharger et exécuter le script
+   **Ressources :**
+   - RAM : `2048 MB` (ou plus)
+   - Swap : `512 MB`
+   - Disque : `20 GB`
 
-```bash
-wget -O install-gmao-atlas.sh https://raw.githubusercontent.com/VOTRE_REPO/gmao-atlas-clone/main/install-gmao-atlas.sh
-chmod +x install-gmao-atlas.sh
-./install-gmao-atlas.sh
-```
+   **Réseau :**
+   - Bridge : `vmbr0` (ou votre bridge réseau)
+   - IPv4 : Choisir entre :
+     - **DHCP** (automatique)
+     - **IP statique** (ex: 192.168.1.100/24)
+   - Gateway : L'adresse de votre routeur (si IP statique)
 
-Le script va :
-1. Créer un nouveau conteneur LXC (Debian 12)
-2. Installer toutes les dépendances nécessaires
-3. Configurer Docker et Docker Compose
-4. Cloner le dépôt de l'application
-5. Démarrer tous les services
+4. Cliquez sur **"Finish"** pour créer le conteneur
+5. **Démarrer** le conteneur
 
-### Étape 3 : Accéder à l'application
+### Étape 2 : Se connecter au conteneur
 
-Une fois l'installation terminée, vous pouvez accéder à l'application via :
-
-```
-http://IP_DU_CONTENEUR:3000
-```
-
-Le script affichera l'adresse IP à la fin de l'installation.
-
-## Connexion par défaut
-
-**Email** : sophie.martin@gmao.fr  
-**Mot de passe** : admin123
-
-## Configuration manuelle
-
-Si vous préférez installer manuellement, suivez ces étapes :
-
-### 1. Créer le conteneur LXC
-
-Dans l'interface Proxmox :
-- Cliquez sur "Create CT"
-- Template : Debian 12
-- RAM : 2048 Mo minimum
-- Disk : 10 Go minimum
-- Network : Bridge avec IP statique ou DHCP
-
-### 2. Se connecter au conteneur
+Depuis votre serveur Proxmox :
 
 ```bash
-pct enter VMID
+pct enter 100  # Remplacez 100 par votre CT ID
 ```
 
-### 3. Installer les dépendances
+Ou via SSH (si vous avez configuré une IP) :
 
 ```bash
-apt update && apt upgrade -y
-apt install -y git curl wget docker.io docker-compose
-systemctl enable docker
-systemctl start docker
+ssh root@IP_DU_CONTENEUR
 ```
 
-### 4. Cloner le dépôt
+### Étape 3 : Exécuter le script d'installation
+
+Une seule commande suffit :
 
 ```bash
-cd /opt
-git clone https://github.com/VOTRE_REPO/gmao-atlas-clone.git
-cd gmao-atlas-clone
+bash <(curl -fsSL https://raw.githubusercontent.com/VOTRE_USER/gmao-iris/main/install-proxmox-lxc.sh)
 ```
 
-### 5. Configurer l'environnement
+**OU** si vous préférez télécharger d'abord :
 
 ```bash
-cp .env.example .env
-# Éditez le fichier .env avec vos paramètres
-nano .env
+wget https://raw.githubusercontent.com/VOTRE_USER/gmao-iris/main/install-proxmox-lxc.sh
+chmod +x install-proxmox-lxc.sh
+./install-proxmox-lxc.sh
 ```
 
-### 6. Démarrer l'application
+### Étape 4 : Suivre l'assistant d'installation
 
-```bash
-docker-compose up -d
+Le script vous posera plusieurs questions :
+
+#### 1. **Configuration du dépôt GitHub**
+```
+Configuration du dépôt GitHub
+1) Dépôt public (aucune authentification requise)
+2) Dépôt privé (nécessite un token GitHub)
+Choisissez une option [1-2] (défaut: 1):
 ```
 
-### 7. Vérifier le statut
+**Pour un dépôt public :** Choisir `1` et entrer l'URL
+**Pour un dépôt privé :** Choisir `2`, entrer l'URL et votre token GitHub
 
-```bash
-docker-compose ps
+#### 2. **Configuration du compte Administrateur**
+```
+Email de l'administrateur (défaut: admin@gmao-iris.local): admin@example.com
+Mot de passe de l'administrateur: ********
+Prénom de l'administrateur (défaut: System): Sophie
+Nom de l'administrateur (défaut: Admin): Martin
 ```
 
-## Gestion de l'application
-
-### Arrêter l'application
-```bash
-cd /opt/gmao-atlas-clone
-docker-compose stop
+#### 3. **Configuration réseau**
+```
+Adresse IP détectée: 192.168.1.100
+Utiliser cette adresse IP ? (y/n) [défaut: y]: y
+Avez-vous un nom de domaine ? (y/n) [défaut: n]: y
+Nom de domaine (ex: gmao-iris.votredomaine.com): gmao.example.com
 ```
 
-### Démarrer l'application
-```bash
-cd /opt/gmao-atlas-clone
-docker-compose start
+#### 4. **Configuration SSL/HTTPS** (si nom de domaine)
+```
+Configuration SSL/HTTPS
+1) HTTP uniquement (pas de SSL)
+2) HTTPS avec Let's Encrypt (certificat automatique)
+3) HTTPS avec certificat manuel
+Choisissez une option [1-3] (défaut: 1):
 ```
 
-### Redémarrer l'application
-```bash
-cd /opt/gmao-atlas-clone
-docker-compose restart
+**Option 1 :** HTTP simple (réseau local)
+**Option 2 :** HTTPS automatique avec Let's Encrypt (recommandé pour Internet)
+**Option 3 :** Vos propres certificats SSL
+
+#### 5. **Configuration des ports**
+```
+Port du frontend [défaut: 3000]: 3000
+Port du backend [défaut: 8001]: 8001
 ```
 
-### Voir les logs
-```bash
-cd /opt/gmao-atlas-clone
-docker-compose logs -f
+#### 6. **Confirmation**
+```
+═══════════════════════════════════════════════════════════
+               RÉSUMÉ DE LA CONFIGURATION
+═══════════════════════════════════════════════════════════
+
+  Dépôt GitHub:       https://github.com/user/repo
+  Admin Email:        admin@example.com
+  IP locale:          192.168.1.100
+  Nom de domaine:     gmao.example.com
+  SSL:                HTTPS
+  Port frontend:      3000
+  Port backend:       8001
+
+═══════════════════════════════════════════════════════════
+
+Confirmer l'installation avec ces paramètres ? (y/n):
 ```
 
-### Mettre à jour l'application
+Tapez `y` pour continuer.
+
+### Étape 5 : Attendez la fin de l'installation
+
+Le script va automatiquement :
+- ✓ Installer toutes les dépendances système
+- ✓ Installer Node.js 20.x et Yarn
+- ✓ Installer Python 3 et pip
+- ✓ Installer MongoDB 7.0
+- ✓ Cloner le dépôt GitHub
+- ✓ Configurer les variables d'environnement
+- ✓ Installer les dépendances de l'application
+- ✓ Créer le compte administrateur
+- ✓ Configurer Supervisor pour le backend
+- ✓ Configurer Nginx comme reverse proxy
+- ✓ Configurer le firewall UFW
+- ✓ (Optionnel) Configurer Let's Encrypt pour HTTPS
+
+**Durée estimée :** 10-15 minutes selon votre connexion Internet
+
+### Étape 6 : Accéder à l'application
+
+Une fois l'installation terminée, le script affichera :
+
+```
+═══════════════════════════════════════════════════════════
+      INSTALLATION TERMINÉE AVEC SUCCÈS !
+═══════════════════════════════════════════════════════════
+
+  📍 Accès à l'application:
+     🔒 https://gmao.example.com
+     🏠 http://192.168.1.100
+
+  👤 Compte Administrateur:
+     Email:       admin@example.com
+     Mot de passe: ********
+
+  📂 Répertoire d'installation: /opt/gmao-iris
+
+  🔧 Commandes utiles:
+     - Redémarrer backend:  supervisorctl restart gmao-iris-backend
+     - Voir les logs:       tail -f /var/log/gmao-iris-backend.out.log
+     - Redémarrer Nginx:    systemctl restart nginx
+     - MongoDB status:      systemctl status mongod
+
+═══════════════════════════════════════════════════════════
+```
+
+Ouvrez votre navigateur et accédez à l'une des URLs affichées !
+
+## 🔧 Gestion de l'application
+
+### Commandes Supervisor (Backend)
+
 ```bash
-cd /opt/gmao-atlas-clone
+# Statut du backend
+supervisorctl status gmao-iris-backend
+
+# Redémarrer le backend
+supervisorctl restart gmao-iris-backend
+
+# Arrêter le backend
+supervisorctl stop gmao-iris-backend
+
+# Démarrer le backend
+supervisorctl start gmao-iris-backend
+
+# Voir les logs en temps réel
+tail -f /var/log/gmao-iris-backend.out.log
+
+# Voir les erreurs
+tail -f /var/log/gmao-iris-backend.err.log
+```
+
+### Commandes Nginx (Frontend)
+
+```bash
+# Statut de Nginx
+systemctl status nginx
+
+# Redémarrer Nginx
+systemctl restart nginx
+
+# Recharger la configuration
+systemctl reload nginx
+
+# Tester la configuration
+nginx -t
+
+# Voir les logs
+tail -f /var/log/nginx/access.log
+tail -f /var/log/nginx/error.log
+```
+
+### Commandes MongoDB
+
+```bash
+# Statut de MongoDB
+systemctl status mongod
+
+# Redémarrer MongoDB
+systemctl restart mongod
+
+# Se connecter à MongoDB
+mongosh
+
+# Sauvegarder la base de données
+mongodump --out /root/backup-gmao-$(date +%Y%m%d)
+
+# Restaurer la base de données
+mongorestore /root/backup-gmao-20250119
+```
+
+## 🔄 Mise à jour de l'application
+
+Pour mettre à jour l'application vers la dernière version :
+
+```bash
+cd /opt/gmao-iris
+
+# Arrêter le backend
+supervisorctl stop gmao-iris-backend
+
+# Mettre à jour le code
 git pull
-docker-compose down
-docker-compose up -d --build
+
+# Backend : Réinstaller les dépendances si nécessaire
+cd backend
+source venv/bin/activate
+pip install -r requirements.txt
+deactivate
+
+# Frontend : Rebuild
+cd ../frontend
+yarn install
+yarn build
+
+# Redémarrer les services
+supervisorctl start gmao-iris-backend
+systemctl reload nginx
 ```
 
-## Sauvegarde et restauration
+## 📊 Sauvegarde et restauration
 
-### Sauvegarder la base de données
+### Sauvegarde complète
 
 ```bash
-docker exec gmao-mongodb mongodump --out /data/backup
-docker cp gmao-mongodb:/data/backup ./backup-$(date +%Y%m%d)
+#!/bin/bash
+BACKUP_DIR="/root/backups/gmao-iris-$(date +%Y%m%d-%H%M%S)"
+mkdir -p "$BACKUP_DIR"
+
+# Sauvegarder MongoDB
+mongodump --out "$BACKUP_DIR/mongodb"
+
+# Sauvegarder les fichiers uploadés (si applicable)
+cp -r /opt/gmao-iris/uploads "$BACKUP_DIR/" 2>/dev/null || true
+
+# Sauvegarder la configuration
+cp /opt/gmao-iris/backend/.env "$BACKUP_DIR/backend.env"
+cp /opt/gmao-iris/frontend/.env "$BACKUP_DIR/frontend.env"
+
+echo "Sauvegarde terminée : $BACKUP_DIR"
 ```
 
-### Restaurer la base de données
+### Restauration
 
 ```bash
-docker cp ./backup-20250118 gmao-mongodb:/data/restore
-docker exec gmao-mongodb mongorestore /data/restore
+BACKUP_DIR="/root/backups/gmao-iris-20250119-140530"
+
+# Arrêter les services
+supervisorctl stop gmao-iris-backend
+
+# Restaurer MongoDB
+mongorestore "$BACKUP_DIR/mongodb"
+
+# Restaurer les fichiers (si applicable)
+cp -r "$BACKUP_DIR/uploads" /opt/gmao-iris/ 2>/dev/null || true
+
+# Redémarrer les services
+supervisorctl start gmao-iris-backend
 ```
 
-## Dépannage
+## 🛠️ Dépannage
 
-### L'application ne démarre pas
+### Le backend ne démarre pas
 
-1. Vérifiez que Docker fonctionne :
-   ```bash
-   systemctl status docker
-   ```
+```bash
+# Vérifier les logs
+tail -n 100 /var/log/gmao-iris-backend.err.log
 
-2. Vérifiez les logs :
-   ```bash
-   docker-compose logs
-   ```
+# Vérifier que MongoDB fonctionne
+systemctl status mongod
 
-3. Vérifiez que les ports ne sont pas déjà utilisés :
-   ```bash
-   netstat -tulpn | grep -E '3000|8001|27017'
-   ```
+# Vérifier que le port n'est pas déjà utilisé
+netstat -tulpn | grep 8001
 
-### Erreur de connexion à la base de données
+# Redémarrer manuellement pour voir les erreurs
+cd /opt/gmao-iris/backend
+source venv/bin/activate
+uvicorn server:app --host 0.0.0.0 --port 8001
+```
 
-1. Vérifiez que MongoDB fonctionne :
-   ```bash
-   docker-compose ps mongodb
-   ```
+### L'interface ne se charge pas
 
-2. Vérifiez les variables d'environnement :
-   ```bash
-   cat .env | grep MONGO
-   ```
+```bash
+# Vérifier que Nginx fonctionne
+systemctl status nginx
 
-### L'interface ne charge pas
+# Vérifier la configuration Nginx
+nginx -t
 
-1. Vérifiez que le frontend est accessible :
-   ```bash
-   curl http://localhost:3000
-   ```
+# Vérifier les logs Nginx
+tail -f /var/log/nginx/error.log
 
-2. Vérifiez les logs du frontend :
-   ```bash
-   docker-compose logs frontend
-   ```
+# Vérifier que le build frontend existe
+ls -la /opt/gmao-iris/frontend/build
+```
 
-## Support
+### Erreur de connexion MongoDB
+
+```bash
+# Vérifier que MongoDB écoute
+netstat -tulpn | grep 27017
+
+# Vérifier les logs MongoDB
+tail -f /var/log/mongodb/mongod.log
+
+# Tester la connexion
+mongosh --eval "db.adminCommand('ping')"
+```
+
+### Problème de certificat SSL (Let's Encrypt)
+
+```bash
+# Renouveler manuellement
+certbot renew
+
+# Tester le renouvellement
+certbot renew --dry-run
+
+# Vérifier l'expiration
+certbot certificates
+```
+
+## 🔐 Sécurité
+
+### Recommandations
+
+1. **Changer le mot de passe admin** après la première connexion
+2. **Configurer UFW** (fait automatiquement par le script)
+3. **Activer HTTPS** avec Let's Encrypt si accessible depuis Internet
+4. **Sauvegardes régulières** de MongoDB
+5. **Mettre à jour régulièrement** le système et l'application
+
+### Ports ouverts par défaut
+
+- **22** : SSH
+- **80** : HTTP
+- **443** : HTTPS (si SSL activé)
+
+## 📝 Structure des fichiers
+
+```
+/opt/gmao-iris/
+├── backend/
+│   ├── venv/              # Environnement Python
+│   ├── server.py          # API FastAPI
+│   ├── models.py          # Modèles Pydantic
+│   ├── requirements.txt   # Dépendances Python
+│   └── .env              # Variables d'environnement backend
+├── frontend/
+│   ├── build/            # Build de production
+│   ├── src/              # Code source React
+│   ├── package.json      # Dépendances Node.js
+│   └── .env             # Variables d'environnement frontend
+└── install-proxmox-lxc.sh  # Script d'installation
+
+/etc/nginx/
+└── sites-available/
+    └── gmao-iris         # Configuration Nginx
+
+/etc/supervisor/
+└── conf.d/
+    └── gmao-iris-backend.conf  # Configuration Supervisor
+```
+
+## 📞 Support
 
 Pour toute question ou problème :
-- Créez une issue sur GitHub
-- Consultez la documentation complète sur https://docs.gmao-atlas.fr
+- **Issues GitHub** : https://github.com/VOTRE_USER/gmao-iris/issues
+- **Documentation** : Consultez ce README
 
-## Licence
+## 📄 Licence
 
 Ce projet est sous licence GPL-3.0. Voir le fichier LICENSE pour plus de détails.
+
+---
+
+**GMAO Iris** - Système de Gestion de Maintenance Assistée par Ordinateur
+Version 1.0.0
