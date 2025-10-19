@@ -8,6 +8,7 @@ import MainLayout from "./components/Layout/MainLayout";
 
 // Pages
 import Login from "./pages/Login";
+import Inscription from "./pages/Inscription";
 import Dashboard from "./pages/Dashboard";
 import WorkOrders from "./pages/WorkOrders";
 import Assets from "./pages/Assets";
