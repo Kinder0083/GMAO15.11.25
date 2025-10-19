@@ -138,7 +138,6 @@ class WorkOrder(WorkOrderBase):
     tempsReel: Optional[float] = None
     dateCreation: datetime
     dateTermine: Optional[datetime] = None
-    dateEcheance: Optional[datetime] = None
     equipement: Optional[dict] = None
     assigneA: Optional[dict] = None
     emplacement: Optional[dict] = None
