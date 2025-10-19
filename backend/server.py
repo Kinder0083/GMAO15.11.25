@@ -216,9 +216,17 @@ async def get_work_orders(
         wo["id"] = str(wo["_id"])
         del wo["_id"]
         
-        # S'assurer que attachments existe
+        # S'assurer que attachments existe et convertir les ObjectId
         if "attachments" not in wo:
             wo["attachments"] = []
+        else:
+            # Convertir tous les ObjectId dans attachments
+            for att in wo["attachments"]:
+                if "_id" in att and isinstance(att["_id"], ObjectId):
+                    att["_id"] = str(att["_id"])
+                for key, value in att.items():
+                    if isinstance(value, ObjectId):
+                        att[key] = str(value)
         
         if wo.get("assigne_a_id"):
             wo["assigneA"] = await get_user_by_id(wo["assigne_a_id"])
