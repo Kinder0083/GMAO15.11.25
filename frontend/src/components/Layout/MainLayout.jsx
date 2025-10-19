@@ -22,7 +22,23 @@ const MainLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
-  const [user] = useState({ nom: 'Sophie Martin', role: 'ADMIN' });
+  const [user, setUser] = useState({ nom: 'Utilisateur', role: 'VIEWER' });
+
+  useEffect(() => {
+    // Récupérer les informations de l'utilisateur depuis localStorage
+    const userInfo = localStorage.getItem('userInfo');
+    if (userInfo) {
+      try {
+        const parsedUser = JSON.parse(userInfo);
+        setUser({
+          nom: `${parsedUser.first_name || ''} ${parsedUser.last_name || ''}`.trim() || 'Utilisateur',
+          role: parsedUser.role || 'VIEWER'
+        });
+      } catch (error) {
+        console.error('Erreur lors du parsing des infos utilisateur:', error);
+      }
+    }
+  }, []);
 
   const menuItems = [
     { icon: LayoutDashboard, label: 'Tableau de bord', path: '/dashboard' },
