@@ -118,7 +118,7 @@ const WorkOrderFormDialog = ({ open, onOpenChange, workOrder, onSuccess }) => {
         if (attachments.length > 0) {
           for (const attachment of attachments) {
             try {
-              await workOrdersAPI.addAttachment(workOrder.id, attachment.file);
+              await workOrdersAPI.uploadAttachment(workOrder.id, attachment.file);
             } catch (err) {
               console.error('Erreur upload fichier:', err);
             }
@@ -137,7 +137,7 @@ const WorkOrderFormDialog = ({ open, onOpenChange, workOrder, onSuccess }) => {
         if (attachments.length > 0) {
           for (const attachment of attachments) {
             try {
-              await workOrdersAPI.addAttachment(newWorkOrderId, attachment.file);
+              await workOrdersAPI.uploadAttachment(newWorkOrderId, attachment.file);
             } catch (err) {
               console.error('Erreur upload fichier:', err);
             }
