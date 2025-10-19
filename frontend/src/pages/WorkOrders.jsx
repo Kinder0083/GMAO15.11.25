@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
-import { Plus, Search, Filter, Eye, Pencil, Trash2 } from 'lucide-react';
+import { Label } from '../components/ui/label';
+import { Plus, Search, Filter, Eye, Pencil, Trash2, Calendar, ArrowUpDown, Paperclip } from 'lucide-react';
 import WorkOrderDialog from '../components/WorkOrders/WorkOrderDialog';
 import WorkOrderFormDialog from '../components/WorkOrders/WorkOrderFormDialog';
 import DeleteConfirmDialog from '../components/Common/DeleteConfirmDialog';
@@ -20,15 +21,69 @@ const WorkOrders = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedWorkOrder, setSelectedWorkOrder] = useState(null);
   const [itemToDelete, setItemToDelete] = useState(null);
+  
+  // Filtres de date
+  const [dateFilter, setDateFilter] = useState('today'); // today, week, month, custom
+  const [dateType, setDateType] = useState('creation'); // creation ou echeance
+  const [customStartDate, setCustomStartDate] = useState('');
+  const [customEndDate, setCustomEndDate] = useState('');
+  const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
 
   useEffect(() => {
     loadWorkOrders();
-  }, []);
+  }, [dateFilter, dateType, customStartDate, customEndDate]);
+
+  const getDateRange = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    let startDate, endDate;
+    
+    switch (dateFilter) {
+      case 'today':
+        startDate = new Date(today);
+        endDate = new Date(today);
+        endDate.setHours(23, 59, 59, 999);
+        break;
+      case 'week':
+        startDate = new Date(today);
+        startDate.setDate(today.getDate() - today.getDay());
+        endDate = new Date(startDate);
+        endDate.setDate(startDate.getDate() + 6);
+        endDate.setHours(23, 59, 59, 999);
+        break;
+      case 'month':
+        startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+        endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        endDate.setHours(23, 59, 59, 999);
+        break;
+      case 'custom':
+        if (customStartDate && customEndDate) {
+          startDate = new Date(customStartDate);
+          endDate = new Date(customEndDate);
+          endDate.setHours(23, 59, 59, 999);
+        }
+        break;
+      default:
+        return {};
+    }
+    
+    if (startDate && endDate) {
+      return {
+        date_debut: startDate.toISOString(),
+        date_fin: endDate.toISOString(),
+        date_type: dateType
+      };
+    }
+    
+    return {};
+  };
 
   const loadWorkOrders = async () => {
     try {
       setLoading(true);
-      const response = await workOrdersAPI.getAll();
+      const params = getDateRange();
+      const response = await workOrdersAPI.getAll(params);
       setWorkOrders(response.data);
     } catch (error) {
       toast({
