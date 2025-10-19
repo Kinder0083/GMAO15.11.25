@@ -103,12 +103,10 @@
 #====================================================================================================
 
 user_problem_statement: |
-  L'utilisateur demande l'implémentation d'une fonctionnalité Import/Export (Admin uniquement) :
-  1. Créer une page Import/Export accessible uniquement aux administrateurs
-  2. Permettre l'export des données en CSV ou XLSX pour chaque module ou toutes les données
-  3. Permettre l'import de données avec deux modes : Ajouter ou Écraser
-  4. Afficher un rapport détaillé après l'import (succès, duplicatas, erreurs)
-  5. Interface intuitive et ergonomique pour utilisateurs découvrant le logiciel
+  L'utilisateur demande 3 corrections/améliorations :
+  1. Import de fichier - Ajouter confirmation : Le fichier ne doit plus être importé automatiquement dès la sélection, mais après clic sur un bouton "Importer"
+  2. Rapports - Export multi-format selon rôle : VIEWER/TECHNICIAN voient uniquement PDF, ADMIN peut choisir entre PDF/CSV/XLS
+  3. Fichiers joints dans création d'ordre de travail : Ajouter la possibilité de joindre des fichiers lors de la création d'un nouvel ordre de travail
 
 backend:
   - task: "Endpoint GET /api/export/{module}"
