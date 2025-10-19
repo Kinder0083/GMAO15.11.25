@@ -15,8 +15,20 @@ const Reports = () => {
   const [equipments, setEquipments] = useState([]);
   const [customPeriodOpen, setCustomPeriodOpen] = useState(false);
   const [customDates, setCustomDates] = useState(null);
+  const [exportFormat, setExportFormat] = useState('pdf');
+  const [userRole, setUserRole] = useState('VIEWER');
 
   useEffect(() => {
+    // Récupérer le rôle de l'utilisateur
+    const userInfo = localStorage.getItem('user');
+    if (userInfo) {
+      try {
+        const parsedUser = JSON.parse(userInfo);
+        setUserRole(parsedUser.role || 'VIEWER');
+      } catch (error) {
+        console.error('Erreur parsing user:', error);
+      }
+    }
     loadData();
   }, []);
 
