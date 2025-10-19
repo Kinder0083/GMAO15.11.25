@@ -60,19 +60,27 @@ def serialize_doc(doc):
     if "password" in doc:
         del doc["password"]
     
-    # Convertir récursivement tous les ObjectId
+    # Convertir récursivement tous les ObjectId et types non sérialisables
     for key, value in list(doc.items()):
         if isinstance(value, ObjectId):
+            doc[key] = str(value)
+        elif isinstance(value, (int, float)) and key in ["telephone", "phone"]:
+            # Convertir les numéros de téléphone en strings
             doc[key] = str(value)
         elif isinstance(value, list):
             doc[key] = [
                 str(item) if isinstance(item, ObjectId) 
                 else serialize_doc(item) if isinstance(item, dict) 
+                else str(item) if isinstance(item, (int, float)) and key in ["telephone", "phone"]
                 else item 
                 for item in value
             ]
         elif isinstance(value, dict):
             doc[key] = serialize_doc(value)
+    
+    # Ajouter dateCreation si manquant (pour compatibilité)
+    if "dateCreation" not in doc:
+        doc["dateCreation"] = datetime.utcnow()
     
     # S'assurer que attachments existe
     if "attachments" not in doc:
