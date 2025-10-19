@@ -64,11 +64,33 @@ const MainLayout = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     navigate('/login');
+  };
+
+  const handleFirstLoginSuccess = () => {
+    // Mettre à jour le user dans localStorage pour marquer firstLogin comme false
+    const userInfo = localStorage.getItem('user');
+    if (userInfo) {
+      try {
+        const parsedUser = JSON.parse(userInfo);
+        parsedUser.firstLogin = false;
+        localStorage.setItem('user', JSON.stringify(parsedUser));
+        setUser(prev => ({ ...prev, firstLogin: false }));
+      } catch (error) {
+        console.error('Erreur lors de la mise à jour:', error);
+      }
+    }
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* First Login Password Dialog */}
+      <FirstLoginPasswordDialog 
+        open={firstLoginDialogOpen}
+        onOpenChange={setFirstLoginDialogOpen}
+        onSuccess={handleFirstLoginSuccess}
+      />
       {/* Top Navigation */}
       <div className="fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-200 z-30 flex items-center justify-between px-4">
         <div className="flex items-center gap-4">
