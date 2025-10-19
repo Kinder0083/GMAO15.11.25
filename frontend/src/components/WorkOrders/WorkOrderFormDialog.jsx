@@ -62,6 +62,7 @@ const WorkOrderFormDialog = ({ open, onOpenChange, workOrder, onSuccess }) => {
           dateLimite: '',
           tempsEstime: ''
         });
+        setAttachments([]);
       }
     }
   }, [open, workOrder]);
