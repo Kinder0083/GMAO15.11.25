@@ -45,11 +45,29 @@ export const authAPI = {
 
 // ==================== WORK ORDERS ====================
 export const workOrdersAPI = {
-  getAll: () => api.get('/work-orders'),
+  getAll: (params) => api.get('/work-orders', { params }),
   getById: (id) => api.get(`/work-orders/${id}`),
   create: (data) => api.post('/work-orders', data),
   update: (id, data) => api.put(`/work-orders/${id}`, data),
-  delete: (id) => api.delete(`/work-orders/${id}`)
+  delete: (id) => api.delete(`/work-orders/${id}`),
+  
+  // Attachments
+  uploadAttachment: (workOrderId, file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post(`/work-orders/${workOrderId}/attachments`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  },
+  getAttachments: (workOrderId) => api.get(`/work-orders/${workOrderId}/attachments`),
+  downloadAttachment: (workOrderId, attachmentId) => {
+    return api.get(`/work-orders/${workOrderId}/attachments/${attachmentId}`, {
+      responseType: 'blob'
+    });
+  },
+  deleteAttachment: (workOrderId, attachmentId) => {
+    return api.delete(`/work-orders/${workOrderId}/attachments/${attachmentId}`);
+  }
 };
 
 // ==================== EQUIPMENTS ====================
