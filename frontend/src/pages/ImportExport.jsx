@@ -70,7 +70,7 @@ const ImportExport = () => {
     }
   };
 
-  const handleImport = async (event) => {
+  const handleFileSelect = (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -80,8 +80,16 @@ const ImportExport = () => {
         description: 'Veuillez sélectionner un module spécifique pour l\'import',
         variant: 'destructive'
       });
+      event.target.value = '';
       return;
     }
+
+    setSelectedFile(file);
+    setImportResult(null); // Réinitialiser le résultat précédent
+  };
+
+  const handleImport = async () => {
+    if (!selectedFile) return;
 
     try {
       setImporting(true);
