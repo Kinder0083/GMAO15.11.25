@@ -194,9 +194,26 @@ async def register(user_create: UserCreate):
 @api_router.post("/auth/login", response_model=Token)
 async def login(login_request: LoginRequest):
     """Se connecter et obtenir un token JWT"""
+    # Debug logging
+    logger.info(f"🔍 LOGIN ATTEMPT - Email: {login_request.email}")
+    
     # Find user
     user = await db.users.find_one({"email": login_request.email})
-    if not user or not verify_password(login_request.password, user["password"]):
+    logger.info(f"🔍 User found in DB: {user is not None}")
+    
+    if not user:
+        logger.warning(f"❌ User not found for email: {login_request.email}")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Email ou mot de passe incorrect"
+        )
+    
+    # Verify password
+    password_valid = verify_password(login_request.password, user["password"])
+    logger.info(f"🔍 Password valid: {password_valid}")
+    
+    if not password_valid:
+        logger.warning(f"❌ Invalid password for email: {login_request.email}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Email ou mot de passe incorrect"
