@@ -109,6 +109,18 @@ user_problem_statement: |
   3. Fichiers joints dans création d'ordre de travail : Ajouter la possibilité de joindre des fichiers lors de la création d'un nouvel ordre de travail
 
 backend:
+  - task: "Support des fichiers joints lors de la création d'ordre de travail"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Endpoint POST /api/work-orders/{id}/attachments déjà existant. Permet l'upload de fichiers après création de l'ordre de travail."
+
   - task: "Endpoint GET /api/export/{module}"
     implemented: true
     working: true
