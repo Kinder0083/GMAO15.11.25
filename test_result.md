@@ -144,7 +144,7 @@ backend:
 frontend:
   - task: "API functions pour import/export"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/services/api.js"
     stuck_count: 0
     priority: "high"
@@ -153,10 +153,13 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "Ajout de importExportAPI avec fonctions exportData et importData"
+      - working: true
+        agent: "testing"
+        comment: "✓ TESTÉ ET FONCTIONNEL - API functions correctement implémentées dans api.js avec exportData et importData. Utilisation correcte des endpoints backend /api/export/{module} et /api/import/{module}. Headers et paramètres corrects."
 
   - task: "Page ImportExport.jsx"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/pages/ImportExport.jsx"
     stuck_count: 0
     priority: "high"
@@ -165,18 +168,24 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "Page complète avec interface intuitive et ergonomique : sélection de module, choix de format (CSV/XLSX), mode d'import (Ajouter/Écraser), affichage du rapport d'import avec statistiques (total, ajoutés, mis à jour, ignorés) et guide d'utilisation"
+      - working: true
+        agent: "testing"
+        comment: "✓ TESTÉ ET FONCTIONNEL - Page Import/Export complète et ergonomique : Interface Export (dropdowns module/format, avertissement CSV+toutes données, bouton export), Interface Import (dropdowns module/mode, upload fichier), Rapport d'import avec 4 statistiques colorées, Guide d'utilisation complet, Layout responsive 2 colonnes, Labels français corrects, Exports CSV/XLSX fonctionnels testés."
 
   - task: "Navigation Import/Export (Admin uniquement)"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/frontend/src/components/Layout/MainLayout.jsx"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Ajout du lien 'Import / Export' dans la navigation avec icône Database. Visible uniquement pour les utilisateurs ADMIN. Récupération du rôle depuis localStorage."
+      - working: false
+        agent: "testing"
+        comment: "❌ PROBLÈME CRITIQUE - Menu 'Import / Export' absent du sidebar malgré connexion admin réussie. CAUSE IDENTIFIÉE: userInfo manquant dans localStorage après login (seul token présent). Le code MainLayout.jsx vérifie user.role === 'ADMIN' mais user.role est undefined car userInfo n'est pas sauvegardé lors du login. IMPACT: Utilisateurs ne peuvent pas découvrir la fonctionnalité. SOLUTION: Corriger le processus de login pour sauvegarder userInfo avec le rôle utilisateur."
 
 metadata:
   created_by: "main_agent"
