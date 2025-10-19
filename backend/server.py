@@ -582,7 +582,7 @@ async def change_password_first_login(request: ChangePasswordRequest, current_us
     """
     Changer le mot de passe lors de la première connexion
     """
-    user_id = current_user.get("_id")
+    user_id = current_user.get("id")  # Changé de "_id" à "id"
     
     # Vérifier l'ancien mot de passe
     user = await db.users.find_one({"_id": ObjectId(user_id)})
