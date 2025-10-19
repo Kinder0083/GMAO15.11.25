@@ -121,6 +121,8 @@ export const usersAPI = {
   update: (id, data) => api.put(`/users/${id}`, data),
   delete: (id) => api.delete(`/users/${id}`),
   invite: (data) => api.post('/users/invite', data),
+  inviteMember: (data) => api.post('/users/invite-member', data),
+  createMember: (data) => api.post('/users/create-member', data),
   getPermissions: (id) => api.get(`/users/${id}/permissions`),
   updatePermissions: (id, permissions) => api.put(`/users/${id}/permissions`, permissions)
 };
