@@ -125,7 +125,7 @@ const WorkOrders = () => {
 
   const filteredWorkOrders = workOrders.filter(wo => {
     const matchesSearch = wo.titre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         wo.id.includes(searchTerm);
+                         (wo.numero && wo.numero.toString().includes(searchTerm));
     const matchesStatus = filterStatus === 'ALL' || wo.statut === filterStatus;
     return matchesSearch && matchesStatus;
   });
