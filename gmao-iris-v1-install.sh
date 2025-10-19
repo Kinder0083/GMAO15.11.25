@@ -359,10 +359,25 @@ setup_application() {
     CONTAINER_IP=$(pct exec $CTID -- hostname -I | awk '{print $1}')
     
     pct exec $CTID -- bash -c "
-        # Cloner le dépôt
+        export LANG=fr_FR.UTF-8
+        export LC_ALL=fr_FR.UTF-8
+        
+        # Créer le répertoire et cloner
         mkdir -p /opt/gmao-iris
+        cd /opt
+        
+        # Supprimer le dossier s'il existe déjà
+        rm -rf gmao-iris
+        
+        # Cloner le dépôt
+        git clone -b $BRANCH $REPO_URL gmao-iris
+        
+        if [ ! -d '/opt/gmao-iris/backend' ]; then
+            echo 'Erreur: Le clonage a échoué. Vérifiez l'URL du dépôt et les permissions.'
+            exit 1
+        fi
+        
         cd /opt/gmao-iris
-        git clone -b $BRANCH $REPO_URL .
         
         # Configuration Backend
         cat > /opt/gmao-iris/backend/.env <<ENV_EOF
@@ -392,15 +407,19 @@ FRONTEND_EOF
         cd /opt/gmao-iris/backend
         python3 -m venv venv
         source venv/bin/activate
-        pip install --upgrade pip
-        pip install -r requirements.txt
+        pip install --upgrade pip -q
+        pip install -r requirements.txt -q
         deactivate
         
         # Installation et build Frontend
         cd /opt/gmao-iris/frontend
-        yarn install --production=false
+        yarn install --production=false --silent
         yarn build
-    "
+    " 2>&1 | grep -v "warning" | grep -v "deprecated" || {
+        msg_error "Erreur lors de la configuration de l'application"
+        msg_error "Vérifiez que le dépôt GitHub est accessible et public"
+        exit 1
+    }
     
     msg_ok "Application configurée"
 }
