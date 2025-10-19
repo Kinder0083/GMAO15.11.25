@@ -113,12 +113,37 @@ const WorkOrderFormDialog = ({ open, onOpenChange, workOrder, onSuccess }) => {
 
       if (workOrder) {
         await workOrdersAPI.update(workOrder.id, submitData);
+        
+        // Upload des fichiers si présents
+        if (attachments.length > 0) {
+          for (const attachment of attachments) {
+            try {
+              await workOrdersAPI.addAttachment(workOrder.id, attachment.file);
+            } catch (err) {
+              console.error('Erreur upload fichier:', err);
+            }
+          }
+        }
+        
         toast({
           title: 'Succès',
           description: 'Ordre de travail modifié avec succès'
         });
       } else {
-        await workOrdersAPI.create(submitData);
+        const response = await workOrdersAPI.create(submitData);
+        const newWorkOrderId = response.data.id;
+        
+        // Upload des fichiers si présents
+        if (attachments.length > 0) {
+          for (const attachment of attachments) {
+            try {
+              await workOrdersAPI.addAttachment(newWorkOrderId, attachment.file);
+            } catch (err) {
+              console.error('Erreur upload fichier:', err);
+            }
+          }
+        }
+        
         toast({
           title: 'Succès',
           description: 'Ordre de travail créé avec succès'
