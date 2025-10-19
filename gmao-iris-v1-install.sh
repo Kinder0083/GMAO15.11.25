@@ -202,7 +202,8 @@ create_container() {
         --ostype debian \
         --rootfs local-lvm:$DISK \
         --unprivileged 1 \
-        --features nesting=1
+        --features nesting=1 \
+        --password "$ROOT_PASSWORD"
     
     msg_ok "Container créé avec ID: $CTID"
     
@@ -211,6 +212,21 @@ create_container() {
     pct start $CTID
     sleep 5
     msg_ok "Container démarré"
+    
+    # Configurer les locales
+    msg_info "Configuration des locales..."
+    pct exec $CTID -- bash -c "
+        export DEBIAN_FRONTEND=noninteractive
+        apt-get update -qq
+        apt-get install -y -qq locales
+        sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen
+        sed -i '/fr_FR.UTF-8/s/^# //g' /etc/locale.gen
+        locale-gen
+        update-locale LANG=fr_FR.UTF-8
+        export LANG=fr_FR.UTF-8
+        export LC_ALL=fr_FR.UTF-8
+    "
+    msg_ok "Locales configurées"
 }
 
 # Installer les dépendances système
