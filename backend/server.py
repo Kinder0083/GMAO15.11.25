@@ -1273,6 +1273,182 @@ async def get_analytics(current_user: dict = Depends(get_current_user)):
     
     return analytics
 
+# ==================== IMPORT/EXPORT ROUTES ====================
+EXPORT_MODULES = {
+    "work-orders": "work_orders",
+    "equipments": "equipments",
+    "users": "users",
+    "inventory": "inventory",
+    "locations": "locations",
+    "vendors": "vendors"
+}
+
+@api_router.get("/export/{module}")
+async def export_data(
+    module: str,
+    format: str = "csv",  # csv ou xlsx
+    current_user: dict = Depends(get_current_admin_user)
+):
+    """Exporter les données d'un module (admin uniquement)"""
+    try:
+        if module not in EXPORT_MODULES and module != "all":
+            raise HTTPException(status_code=400, detail="Module invalide")
+        
+        # Préparer les données
+        data_to_export = {}
+        
+        if module == "all":
+            modules_to_export = EXPORT_MODULES
+        else:
+            modules_to_export = {module: EXPORT_MODULES[module]}
+        
+        for mod_name, collection_name in modules_to_export.items():
+            items = await db[collection_name].find().to_list(10000)
+            
+            # Nettoyer les données
+            cleaned_items = []
+            for item in items:
+                cleaned_item = {k: v for k, v in item.items() if k != "_id"}
+                cleaned_item["id"] = str(item["_id"])
+                
+                # Convertir les dates en strings
+                for key, value in cleaned_item.items():
+                    if isinstance(value, datetime):
+                        cleaned_item[key] = value.isoformat()
+                    elif isinstance(value, ObjectId):
+                        cleaned_item[key] = str(value)
+                    elif isinstance(value, dict) or isinstance(value, list):
+                        cleaned_item[key] = str(value)
+                
+                cleaned_items.append(cleaned_item)
+            
+            data_to_export[mod_name] = cleaned_items
+        
+        # Générer le fichier
+        if format == "csv":
+            # Pour CSV, un fichier par module
+            if len(data_to_export) == 1:
+                mod_name = list(data_to_export.keys())[0]
+                df = pd.DataFrame(data_to_export[mod_name])
+                
+                output = io.StringIO()
+                df.to_csv(output, index=False, encoding='utf-8')
+                output.seek(0)
+                
+                return StreamingResponse(
+                    io.BytesIO(output.getvalue().encode('utf-8')),
+                    media_type="text/csv",
+                    headers={"Content-Disposition": f"attachment; filename={mod_name}.csv"}
+                )
+            else:
+                # Pour "all", créer un zip avec plusieurs CSV
+                raise HTTPException(status_code=400, detail="Pour exporter tout, utilisez le format xlsx")
+        
+        elif format == "xlsx":
+            output = io.BytesIO()
+            with pd.ExcelWriter(output, engine='openpyxl') as writer:
+                for mod_name, items in data_to_export.items():
+                    df = pd.DataFrame(items)
+                    sheet_name = mod_name[:31]  # Excel limite à 31 caractères
+                    df.to_excel(writer, sheet_name=sheet_name, index=False)
+            
+            output.seek(0)
+            filename = "export_all.xlsx" if module == "all" else f"{module}.xlsx"
+            
+            return StreamingResponse(
+                output,
+                media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                headers={"Content-Disposition": f"attachment; filename={filename}"}
+            )
+        
+        else:
+            raise HTTPException(status_code=400, detail="Format invalide (csv ou xlsx)")
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/import/{module}")
+async def import_data(
+    module: str,
+    mode: str = "add",  # add ou replace
+    file: UploadFile = File(...),
+    current_user: dict = Depends(get_current_admin_user)
+):
+    """Importer les données d'un module (admin uniquement)"""
+    try:
+        if module not in EXPORT_MODULES:
+            raise HTTPException(status_code=400, detail="Module invalide")
+        
+        collection_name = EXPORT_MODULES[module]
+        
+        # Lire le fichier
+        content = await file.read()
+        
+        if file.filename.endswith('.csv'):
+            df = pd.read_csv(io.BytesIO(content))
+        elif file.filename.endswith(('.xlsx', '.xls')):
+            df = pd.read_excel(io.BytesIO(content))
+        else:
+            raise HTTPException(status_code=400, detail="Format de fichier non supporté (CSV ou XLSX uniquement)")
+        
+        # Convertir en dictionnaires
+        items_to_import = df.to_dict('records')
+        
+        stats = {
+            "total": len(items_to_import),
+            "inserted": 0,
+            "updated": 0,
+            "skipped": 0,
+            "errors": []
+        }
+        
+        for item in items_to_import:
+            try:
+                # Nettoyer les NaN
+                cleaned_item = {k: v for k, v in item.items() if pd.notna(v)}
+                
+                # Gérer l'ID
+                item_id = cleaned_item.get('id')
+                if item_id and 'id' in cleaned_item:
+                    del cleaned_item['id']
+                
+                if mode == "replace" and item_id:
+                    # Vérifier si l'item existe
+                    existing = await db[collection_name].find_one({"_id": ObjectId(item_id)})
+                    
+                    if existing:
+                        # Mettre à jour
+                        await db[collection_name].replace_one(
+                            {"_id": ObjectId(item_id)},
+                            cleaned_item
+                        )
+                        stats["updated"] += 1
+                    else:
+                        # Insérer avec l'ID spécifié
+                        cleaned_item["_id"] = ObjectId(item_id)
+                        await db[collection_name].insert_one(cleaned_item)
+                        stats["inserted"] += 1
+                else:
+                    # Mode add - toujours insérer un nouveau
+                    if "_id" in cleaned_item:
+                        del cleaned_item["_id"]
+                    cleaned_item["_id"] = ObjectId()
+                    await db[collection_name].insert_one(cleaned_item)
+                    stats["inserted"] += 1
+            
+            except Exception as e:
+                stats["skipped"] += 1
+                stats["errors"].append(f"Ligne {stats['inserted'] + stats['updated'] + stats['skipped']}: {str(e)}")
+        
+        return stats
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 # Include the router in the main app
 app.include_router(api_router)
 
