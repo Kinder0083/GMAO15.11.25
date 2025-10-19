@@ -1,5 +1,58 @@
 # GMAO Iris - Notes de Version
 
+## Version 1.0.1 - CORRECTION CRITIQUE (Octobre 2025)
+
+### 🔴 CORRECTION CRITIQUE - BUG LOGIN PROXMOX
+
+**Problème Identifié:**
+Le script Proxmox (`gmao-iris-proxmox.sh`) contenait une **erreur critique** qui empêchait la connexion sur les installations Proxmox :
+- Ligne 344: `db = client.gmao_iris` (nom de base de données EN DUR)
+- L'application utilisait `db = client[os.environ.get('DB_NAME')]`
+- **Résultat:** Les utilisateurs étaient créés dans une base mais l'application les cherchait dans une autre
+
+### ✅ Solutions Appliquées
+
+#### 1. **Script Proxmox Corrigé** (`gmao-iris-proxmox.sh`)
+- ✅ Remplacement de `db = client.gmao_iris` par `db = client[db_name]`
+- ✅ Ajout du chargement des variables d'environnement
+- ✅ Export explicite de `MONGO_URL` et `DB_NAME` lors de l'exécution
+- ✅ Utilisation cohérente de la configuration
+
+#### 2. **Scripts de Réparation Créés**
+- ✅ `fix-proxmox-login.sh` : Diagnostic complet et correction
+- ✅ `quick-create-admin.sh` : Création rapide d'admin
+
+#### 3. **Utilisation des Scripts de Réparation**
+
+**Sur votre serveur Proxmox, depuis le HOST:**
+```bash
+# Entrer dans le container
+pct enter <CTID>
+
+# Télécharger et exécuter le script de correction
+wget https://raw.githubusercontent.com/votreuser/gmao-iris/main/fix-proxmox-login.sh
+chmod +x fix-proxmox-login.sh
+./fix-proxmox-login.sh
+```
+
+**OU version rapide:**
+```bash
+pct enter <CTID>
+wget https://raw.githubusercontent.com/votreuser/gmao-iris/main/quick-create-admin.sh
+chmod +x quick-create-admin.sh
+./quick-create-admin.sh
+```
+
+### 🔍 Diagnostic
+Le script de correction effectue:
+1. Vérification de la configuration (.env)
+2. Vérification de MongoDB et des bases de données
+3. Comptage des utilisateurs existants
+4. Création/réinitialisation du compte admin
+5. Redémarrage du backend
+
+---
+
 ## Version 1.0.0 - Corrections Critiques Login & Proxmox (Octobre 2025)
 
 ### 🔧 Corrections Critiques
