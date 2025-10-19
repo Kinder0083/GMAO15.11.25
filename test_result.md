@@ -174,9 +174,9 @@ frontend:
 
   - task: "Navigation Import/Export (Admin uniquement)"
     implemented: true
-    working: false
+    working: true
     file: "/app/frontend/src/components/Layout/MainLayout.jsx"
-    stuck_count: 1
+    stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
@@ -186,6 +186,9 @@ frontend:
       - working: false
         agent: "testing"
         comment: "❌ PROBLÈME CRITIQUE - Menu 'Import / Export' absent du sidebar malgré connexion admin réussie. CAUSE IDENTIFIÉE: userInfo manquant dans localStorage après login (seul token présent). Le code MainLayout.jsx vérifie user.role === 'ADMIN' mais user.role est undefined car userInfo n'est pas sauvegardé lors du login. IMPACT: Utilisateurs ne peuvent pas découvrir la fonctionnalité. SOLUTION: Corriger le processus de login pour sauvegarder userInfo avec le rôle utilisateur."
+      - working: true
+        agent: "testing"
+        comment: "✅ BUG CORRIGÉ ET TESTÉ - Correction réussie du problème userInfo. Login.jsx sauvegarde maintenant 'user' dans localStorage (ligne 36) et MainLayout.jsx le récupère correctement (ligne 29). TESTS RÉUSSIS: Menu 'Import / Export' visible dans sidebar pour admin (Menu 11/13), Navigation vers /import-export fonctionnelle, user.role='ADMIN' correctement stocké et affiché, Nom utilisateur 'System Admin' affiché dans header, Session persistante après refresh, Page Import/Export complète avec sections Export/Import/Guide. SCORE: 9/9 tests réussis (100%)."
 
 metadata:
   created_by: "main_agent"
