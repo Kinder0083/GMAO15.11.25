@@ -288,7 +288,8 @@ install_in_container() {
     
     # Backend .env
     pct exec $CTID -- bash -c "cat > /opt/gmao-iris/backend/.env <<EOF
-MONGO_URL=mongodb://localhost:27017/gmao_iris
+MONGO_URL=mongodb://localhost:27017
+DB_NAME=gmao_iris
 SECRET_KEY=\$(openssl rand -hex 32)
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=10080
