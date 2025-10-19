@@ -201,7 +201,7 @@ async def get_work_orders(
     
     # Filtrage par date
     if date_debut and date_fin:
-        date_field = "dateCreation" if date_type == "creation" else "dateEcheance"
+        date_field = "dateCreation" if date_type == "creation" else "dateLimite"
         query[date_field] = {
             "$gte": datetime.fromisoformat(date_debut),
             "$lte": datetime.fromisoformat(date_fin)
