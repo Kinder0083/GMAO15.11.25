@@ -316,6 +316,12 @@ const People = () => {
         onSuccess={loadUsers}
       />
 
+      <CreateMemberDialog
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+        onSuccess={loadUsers}
+      />
+
       <PermissionsManagementDialog
         open={permissionsDialogOpen}
         onOpenChange={setPermissionsDialogOpen}
