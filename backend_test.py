@@ -11,7 +11,7 @@ from typing import Dict, Any, Optional
 from datetime import datetime
 
 # Backend URL from frontend/.env
-BASE_URL = "https://maintenance-hub-60.preview.emergentagent.com/api"
+BASE_URL = "https://cmms-manager.preview.emergentagent.com/api"
 
 class EquipmentHierarchyTester:
     def __init__(self):

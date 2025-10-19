@@ -1,0 +1,111 @@
+<analysis>
+The AI engineer successfully guided the application from an initial MVP through several significant feature additions and bug fixes. The development process was iterative, involving constant communication with the user to clarify requirements and address reported issues. Key features implemented include a granular user permission system (Admin, Technician, Viewer with module-level controls), a hierarchical equipment management system with parent-child relationships, work order filtering by date, and a file attachment mechanism for work orders. Multiple UI/UX bugs related to icon positioning, status badge updates, and form field optionality were identified and resolved through several feedback loops with the user. The engineer demonstrated proficiency in both backend (FastAPI, MongoDB) and frontend (React, Shadcn UI) development, maintaining architectural integrity and adhering to environment constraints. The current work involves implementing the admin-specific Import/Export functionality.
+</analysis>
+
+<product_requirements>
+The application is a pixel-perfect, 100% functional clone of the atlas-cmms GMAO (Computerized Maintenance Management System), including premium features and French localization, designed for self-hosting.
+
+**Implemented Features:**
+*   **Dashboard**: Analytics display.
+*   **Work Order Management**: CRUD operations, filtering by creation/due date (default: today), custom date range selection, sorting options, and attachment of multiple files (photos/videos/documents) with a 25MB local storage limit per file, indicated by a paperclip icon on cards.
+*   **Equipment/Asset Tracking**: CRUD operations, detail viewing, hierarchical structure with parent-child relationships, display modes (list/tree view with expand/collapse), inheritance of location from parent to sub-equipment, quick status change (Operational, In Maintenance, Out of Service), and an automatic Alerte S.Equip (violet) status for parents if any sub-equipment is not operational. Serial number, purchase date, cost, and category fields are now optional.
+*   **Preventive Maintenance**: CRUD operations, 'execute now' functionality.
+*   **Inventory Management**: CRUD operations, stock alerts.
+*   **Location Management**: CRUD operations, fields are optional.
+*   **Vendor Management**: CRUD operations, removed initial stats icons.
+*   **Advanced Reporting**: Custom period selection with calendar, PDF export.
+*   **Multi-user System**: User roles (Admin, Technician, Viewer), user profile viewing.
+*   **Authentication/Login System**: Secure user access.
+*   **Admin Capabilities (People/Inviter des membres page)**: Invite new members, delete team members, manage granular user permissions for menu visualization and actions (Visualisation, Édition, Suppression for each module), and a free-text Service field for users.
+*   **Planning Module**: A new Planning menu to view personnel availability via a calendar for assigning work orders.
+*   **Import/Export (Admin Only)**: Ability to download or upload data in CSV or XLS format for selected modules (or all data), with options to add or overwrite data and handling of duplicates.
+
+**Outstanding/Recent Problem to Solve:**
+*   Complete the frontend implementation of the Import/Export section.
+</product_requirements>
+
+<key_technical_concepts>
+-   **Full-stack Architecture**: React (frontend), FastAPI (backend), MongoDB (database).
+-   **Styling**: Shadcn UI components, Tailwind CSS.
+-   **Data Flow**: Axios for API calls, React Router for navigation.
+-   **Backend Patterns**: RESTful API, Pydantic models, FastAPI dependencies, JWT authentication, file upload (, ).
+-   **Data Handling**: , , ,  for import/export.
+</key_technical_concepts>
+
+<code_architecture>
+The application follows a typical full-stack architecture with a React frontend, FastAPI backend, and MongoDB database.
+
+**Directory Structure (High-level):**
+
+
+**Key Files and their Importance:**
+
+*   :
+    *   **Importance**: Main entry point for React app, defining routing.
+    *   **Changes**: Updated to include new routes for , , and .
+*   :
+    *   **Importance**: Main FastAPI application file, API routing, middleware, DB connection.
+    *   **Changes**: Expanded with comprehensive API routes for granular permissions (, ,  delete), hierarchical equipment management (, , ), work order filtering, work order attachments (), and import/export (, ). Also includes new endpoints for .
+*   :
+    *   **Importance**: Centralized API service for frontend-to-backend communication.
+    *   **Changes**: Extended to include new API calls for user management (invite, permissions, delete), equipment hierarchy (get children, hierarchy, update status), work order filtering, work order attachments, and import/export.
+*   :
+    *   **Importance**: Defines Pydantic models for request/response validation and MongoDB document structure.
+    *   **Changes**: Updated to include  and  for granular permissions,  field in ,  in ,  status in , optional fields in  (serial number, purchase date, cost, category),  field in ,  model for planning, and optional fields in .
+*   :
+    *   **Importance**: Manages user display and interactions.
+    *   **Changes**: Transformed to Inviter des membres, integrated  and , added admin-specific delete and permission management buttons, and displays the new Service field.
+*   :
+    *   **Importance**: Manages equipment/asset display and interactions.
+    *   **Changes**: Implemented a toggle for List/Tree view, integrated  and , added Add sub-equipment functionality, and refined status badge display including Alerte S.Equip with forced refresh. Resolved several UI positioning bugs.
+*    (New):
+    *   **Importance**: Provides UI for inviting new users with role and initial service field.
+*    (New):
+    *   **Importance**: Provides UI for administrators to set granular permissions for users.
+*    (New):
+    *   **Importance**: Displays equipment hierarchy with expand/collapse functionality.
+*    (New):
+    *   **Importance**: Reusable component for quickly changing an equipment's status.
+*    (New):
+    *   **Importance**: Dedicated page for viewing detailed equipment information and managing its direct sub-equipments.
+*    (New):
+    *   **Importance**: Displays personnel availability on a calendar.
+*   :
+    *   **Importance**: Manages work order display and interactions.
+    *   **Changes**: Implemented date filtering UI (Today, This week, This month, Custom) and sorting by creation/due date. Displays paperclip icon for attachments.
+*    (New):
+    *   **Importance**: Component for uploading files to a work order.
+*    (New):
+    *   **Importance**: Component for displaying and managing attached files.
+*   :
+    *   **Importance**: Displays details of a work order.
+    *   **Changes**: Integrated  to show associated files.
+*    (New):
+    *   **Importance**: Dedicated page for administrators to manage data import and export.
+</code_architecture>
+
+<pending_tasks>
+-   Complete the frontend implementation of the Import/Export page. This includes:
+    -   Implementing the UI for selecting modules to export/import.
+    -   Developing the file upload mechanism for CSV/XLS.
+    -   Adding options for Add or Overwrite data.
+    -   Displaying an import report (success, duplicates, errors).
+</pending_tasks>
+
+<current_work>
+Immediately before this summary, the AI engineer was focused on implementing the Import/Export functionality as requested by the user.
+
+**Backend Status:**
+*   Dependencies (, , , ) have been installed.
+*   New API endpoints in  for exporting () and importing () data for various modules (work-orders, equipments, users, inventory, locations, vendors, all) have been added. These endpoints support  and  formats and include logic for handling import modes (add/replace) and duplicates.
+*   The backend has successfully compiled and restarted.
+
+**Frontend Status:**
+*   A new page component, , has been created.
+*   The corresponding route  has been added to .
+*   The engineer was in the process of adding the navigation link for this new Import/Export page to the sidebar by modifying .
+</current_work>
+
+<optional_next_step>
+Add the Import/Export link to the navigation menu in .
+</optional_next_step>
