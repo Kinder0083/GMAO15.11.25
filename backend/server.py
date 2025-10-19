@@ -222,6 +222,72 @@ async def get_me(current_user: dict = Depends(get_current_user)):
     """Obtenir l'utilisateur connecté"""
     return User(**current_user)
 
+
+@api_router.post("/auth/forgot-password")
+async def forgot_password(request: ForgotPasswordRequest):
+    """Demander une réinitialisation de mot de passe"""
+    # Vérifier si l'utilisateur existe
+    user = await db.users.find_one({"email": request.email})
+    
+    if user:
+        # Créer un token de réinitialisation (valide 1 heure)
+        reset_token = create_access_token(
+            data={"sub": str(user["_id"]), "type": "reset"},
+            expires_delta=timedelta(hours=1)
+        )
+        
+        # Dans une vraie application, on enverrait un email ici
+        # Pour l'instant, on log le token (pour dev/test uniquement)
+        print(f"Reset token for {request.email}: {reset_token}")
+        print(f"Reset URL: http://localhost:3000/reset-password?token={reset_token}")
+        
+        # Sauvegarder le token dans la base (optionnel, pour invalider après usage)
+        await db.users.update_one(
+            {"_id": user["_id"]},
+            {"$set": {"reset_token": reset_token, "reset_token_created": datetime.utcnow()}}
+        )
+    
+    # Toujours retourner succès pour ne pas révéler si l'email existe
+    return {"message": "Si cet email existe, un lien de réinitialisation a été envoyé"}
+
+@api_router.post("/auth/reset-password")
+async def reset_password(request: ResetPasswordRequest):
+    """Réinitialiser le mot de passe avec un token"""
+    try:
+        # Vérifier le token
+        payload = jwt.decode(request.token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = payload.get("sub")
+        token_type = payload.get("type")
+        
+        if token_type != "reset":
+            raise HTTPException(status_code=400, detail="Token invalide")
+        
+        # Trouver l'utilisateur
+        user = await db.users.find_one({"_id": ObjectId(user_id)})
+        if not user:
+            raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+        
+        # Vérifier que le token correspond (si sauvegardé)
+        if user.get("reset_token") != request.token:
+            raise HTTPException(status_code=400, detail="Token invalide ou déjà utilisé")
+        
+        # Hacher le nouveau mot de passe
+        hashed_password = get_password_hash(request.new_password)
+        
+        # Mettre à jour le mot de passe et supprimer le token
+        await db.users.update_one(
+            {"_id": ObjectId(user_id)},
+            {
+                "$set": {"password": hashed_password},
+                "$unset": {"reset_token": "", "reset_token_created": ""}
+            }
+        )
+        
+        return {"message": "Mot de passe réinitialisé avec succès"}
+        
+    except JWTError:
+        raise HTTPException(status_code=400, detail="Token invalide ou expiré")
+
 # ==================== WORK ORDERS ROUTES ====================
 @api_router.get("/work-orders", response_model=List[WorkOrder])
 async def get_work_orders(
