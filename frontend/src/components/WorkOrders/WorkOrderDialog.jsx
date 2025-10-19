@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -9,9 +9,17 @@ import {
 import { Badge } from '../ui/badge';
 import { Separator } from '../ui/separator';
 import { Calendar, Clock, User, MapPin, Wrench, FileText } from 'lucide-react';
+import AttachmentsList from './AttachmentsList';
+import AttachmentUploader from './AttachmentUploader';
 
 const WorkOrderDialog = ({ open, onOpenChange, workOrder }) => {
+  const [refreshAttachments, setRefreshAttachments] = useState(0);
+  
   if (!workOrder) return null;
+
+  const handleUploadComplete = () => {
+    setRefreshAttachments(prev => prev + 1);
+  };
 
   const getStatusBadge = (statut) => {
     const badges = {
