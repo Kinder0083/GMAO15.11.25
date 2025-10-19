@@ -104,24 +104,26 @@ const MainLayout = () => {
         } overflow-hidden`}
       >
         <div className="p-4 space-y-2">
-          {menuItems.map((item, index) => {
-            const Icon = item.icon;
-            const isActive = location.pathname === item.path;
-            return (
-              <button
-                key={index}
-                onClick={() => navigate(item.path)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-                  isActive
-                    ? 'bg-blue-600 text-white'
-                    : 'hover:bg-gray-800 text-gray-300'
-                }`}
-              >
-                <Icon size={20} />
-                <span className="text-sm font-medium">{item.label}</span>
-              </button>
-            );
-          })}
+          {menuItems
+            .filter(item => !item.adminOnly || user.role === 'ADMIN')
+            .map((item, index) => {
+              const Icon = item.icon;
+              const isActive = location.pathname === item.path;
+              return (
+                <button
+                  key={index}
+                  onClick={() => navigate(item.path)}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                    isActive
+                      ? 'bg-blue-600 text-white'
+                      : 'hover:bg-gray-800 text-gray-300'
+                  }`}
+                >
+                  <Icon size={20} />
+                  <span className="text-sm font-medium">{item.label}</span>
+                </button>
+              );
+            })}
           
           <div className="pt-4 mt-4 border-t border-gray-700">
             <button
