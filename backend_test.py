@@ -874,10 +874,10 @@ class ImportExportTester:
             
     def create_test_csv_file(self) -> str:
         """Create a test CSV file for import testing"""
-        csv_content = """name,description,address
-Test Location Import 1,Description for location 1,123 Import Street
-Test Location Import 2,Description for location 2,456 Import Avenue
-Test Location Import 3,Description for location 3,789 Import Boulevard"""
+        csv_content = """nom,adresse,ville,codePostal,type
+Test Location Import 1,123 Import Street,Paris,75001,Atelier
+Test Location Import 2,456 Import Avenue,Lyon,69001,Bureau
+Test Location Import 3,789 Import Boulevard,Marseille,13001,Entrepot"""
         
         # Create temporary file
         temp_file = tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False)
