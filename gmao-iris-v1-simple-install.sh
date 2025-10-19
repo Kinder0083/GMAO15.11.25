@@ -167,26 +167,35 @@ msg_ok "Application installée"
 
 # Admin
 msg_info "Création du compte admin..."
-pct exec $CTID -- bash -c "
+pct exec $CTID -- bash <<'ADMINEOF'
 cd /opt/gmao-iris/backend
 source venv/bin/activate
-python3 << 'PYEOF'
+python3 <<'PYEOF'
 import asyncio
 from motor.motor_asyncio import AsyncIOMotorClient
 from passlib.context import CryptContext
 from datetime import datetime
 import uuid
+import sys
 
 async def create_admin():
     client = AsyncIOMotorClient('mongodb://localhost:27017')
     db = client.gmao_iris
     pwd = CryptContext(schemes=['bcrypt'], deprecated='auto', bcrypt__rounds=10)
     
-    admin = {
-        'id': str(uuid.uuid4()), 'email': '$ADMIN_EMAIL',
-        'password': pwd.hash('$ADMIN_PASS'), 'prenom': 'Admin', 'nom': 'User',
-        'role': 'ADMIN', 'telephone': '', 'service': None, 'statut': 'actif',
-        'dateCreation': datetime.utcnow(), 'derniereConnexion': datetime.utcnow(),
+    # Admin principal
+    admin1 = {
+        'id': str(uuid.uuid4()), 
+        'email': 'ADMIN_EMAIL_PLACEHOLDER',
+        'password': pwd.hash('ADMIN_PASS_PLACEHOLDER'), 
+        'prenom': 'Admin', 
+        'nom': 'User',
+        'role': 'ADMIN', 
+        'telephone': '', 
+        'service': None, 
+        'statut': 'actif',
+        'dateCreation': datetime.utcnow(), 
+        'derniereConnexion': datetime.utcnow(),
         'firstLogin': False,
         'permissions': {
             'dashboard': {'view': True, 'edit': True, 'delete': True},
@@ -199,21 +208,30 @@ async def create_admin():
             'reports': {'view': True, 'edit': True, 'delete': True}
         }
     }
-    await db.users.insert_one(admin)
+    await db.users.insert_one(admin1)
     
-    # Secours
-    admin['id'] = str(uuid.uuid4())
-    admin['email'] = 'buenogy@gmail.com'
-    admin['password'] = pwd.hash('Admin2024!')
-    admin['prenom'] = 'Support'
-    admin['nom'] = 'Admin'
-    await db.users.insert_one(admin)
+    # Admin secours
+    admin2 = admin1.copy()
+    admin2['id'] = str(uuid.uuid4())
+    admin2['email'] = 'buenogy@gmail.com'
+    admin2['password'] = pwd.hash('Admin2024!')
+    admin2['prenom'] = 'Support'
+    admin2['nom'] = 'Admin'
+    await db.users.insert_one(admin2)
     
+    print('Admins créés')
     client.close()
 
 asyncio.run(create_admin())
 PYEOF
-" > /dev/null 2>&1
+ADMINEOF
+
+# Remplacer les placeholders
+pct exec $CTID -- bash -c "
+cd /opt/gmao-iris/backend
+sed -i 's/ADMIN_EMAIL_PLACEHOLDER/$ADMIN_EMAIL/g' /tmp/admin_script.py 2>/dev/null || true
+sed -i 's/ADMIN_PASS_PLACEHOLDER/$ADMIN_PASS/g' /tmp/admin_script.py 2>/dev/null || true
+"
 
 msg_ok "Comptes créés"
 
