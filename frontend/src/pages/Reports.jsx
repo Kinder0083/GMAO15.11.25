@@ -69,11 +69,12 @@ const Reports = () => {
     // Ici vous pourriez recharger les données avec la nouvelle période
   };
 
-  const handleExportPDF = () => {
+  const handleExportReport = () => {
     toast({
-      title: 'Export PDF',
-      description: 'Génération du rapport PDF en cours... Cette fonctionnalité sera bientôt disponible'
+      title: `Export ${exportFormat.toUpperCase()}`,
+      description: `Génération du rapport ${exportFormat.toUpperCase()} en cours...`
     });
+    // TODO: Implémenter la génération réelle du rapport
   };
 
   const periods = [
