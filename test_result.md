@@ -152,24 +152,9 @@ backend:
         comment: "✓ TESTÉ ET FONCTIONNEL - Tous les tests d'import passent avec succès : Mode 'add' fonctionne (3 locations ajoutées), Mode 'replace' fonctionne (1 location mise à jour), Support CSV et XLSX validé, Gestion d'erreurs correcte (module invalide=400, format invalide=400), Contrôle d'accès Admin fonctionnel (403 pour non-admin), Structure de réponse correcte avec statistiques détaillées (total, inserted, updated, skipped, errors)."
 
 frontend:
-  - task: "API functions pour import/export"
+  - task: "Import avec confirmation (ImportExport.jsx)"
     implemented: true
-    working: true
-    file: "/app/frontend/src/services/api.js"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-      - working: "NA"
-        agent: "main"
-        comment: "Ajout de importExportAPI avec fonctions exportData et importData"
-      - working: true
-        agent: "testing"
-        comment: "✓ TESTÉ ET FONCTIONNEL - API functions correctement implémentées dans api.js avec exportData et importData. Utilisation correcte des endpoints backend /api/export/{module} et /api/import/{module}. Headers et paramètres corrects."
-
-  - task: "Page ImportExport.jsx"
-    implemented: true
-    working: true
+    working: "NA"
     file: "/app/frontend/src/pages/ImportExport.jsx"
     stuck_count: 0
     priority: "high"
@@ -177,28 +162,31 @@ frontend:
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Page complète avec interface intuitive et ergonomique : sélection de module, choix de format (CSV/XLSX), mode d'import (Ajouter/Écraser), affichage du rapport d'import avec statistiques (total, ajoutés, mis à jour, ignorés) et guide d'utilisation"
-      - working: true
-        agent: "testing"
-        comment: "✓ TESTÉ ET FONCTIONNEL - Page Import/Export complète et ergonomique : Interface Export (dropdowns module/format, avertissement CSV+toutes données, bouton export), Interface Import (dropdowns module/mode, upload fichier), Rapport d'import avec 4 statistiques colorées, Guide d'utilisation complet, Layout responsive 2 colonnes, Labels français corrects, Exports CSV/XLSX fonctionnels testés."
+        comment: "Modification de handleImport pour séparer la sélection du fichier (handleFileSelect) et l'import réel (handleImport). Ajout d'un state selectedFile. Bouton 'Importer' ajouté et désactivé tant qu'aucun fichier n'est sélectionné. Affichage du nom du fichier sélectionné."
 
-  - task: "Navigation Import/Export (Admin uniquement)"
+  - task: "Rapports multi-format selon rôle (Reports.jsx)"
     implemented: true
-    working: true
-    file: "/app/frontend/src/components/Layout/MainLayout.jsx"
+    working: "NA"
+    file: "/app/frontend/src/pages/Reports.jsx"
     stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Ajout du lien 'Import / Export' dans la navigation avec icône Database. Visible uniquement pour les utilisateurs ADMIN. Récupération du rôle depuis localStorage."
-      - working: false
-        agent: "testing"
-        comment: "❌ PROBLÈME CRITIQUE - Menu 'Import / Export' absent du sidebar malgré connexion admin réussie. CAUSE IDENTIFIÉE: userInfo manquant dans localStorage après login (seul token présent). Le code MainLayout.jsx vérifie user.role === 'ADMIN' mais user.role est undefined car userInfo n'est pas sauvegardé lors du login. IMPACT: Utilisateurs ne peuvent pas découvrir la fonctionnalité. SOLUTION: Corriger le processus de login pour sauvegarder userInfo avec le rôle utilisateur."
-      - working: true
-        agent: "testing"
-        comment: "✅ BUG CORRIGÉ ET TESTÉ - Correction réussie du problème userInfo. Login.jsx sauvegarde maintenant 'user' dans localStorage (ligne 36) et MainLayout.jsx le récupère correctement (ligne 29). TESTS RÉUSSIS: Menu 'Import / Export' visible dans sidebar pour admin (Menu 11/13), Navigation vers /import-export fonctionnelle, user.role='ADMIN' correctement stocké et affiché, Nom utilisateur 'System Admin' affiché dans header, Session persistante après refresh, Page Import/Export complète avec sections Export/Import/Guide. SCORE: 9/9 tests réussis (100%)."
+        comment: "Ajout d'un dropdown de sélection de format (PDF/CSV/XLSX) visible uniquement pour ADMIN. Pour VIEWER et TECHNICIAN, seul le bouton 'Exporter PDF' est affiché. Récupération du rôle utilisateur depuis localStorage."
+
+  - task: "Fichiers joints dans création d'ordre de travail (WorkOrderFormDialog.jsx)"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/WorkOrders/WorkOrderFormDialog.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Ajout d'une section 'Joindre des fichiers' dans le formulaire de création/édition d'ordre de travail. State attachments pour stocker les fichiers sélectionnés. Fonctions handleFileSelect et handleRemoveAttachment. Upload automatique des fichiers après création/modification de l'ordre via workOrdersAPI.uploadAttachment. Affichage de la liste des fichiers sélectionnés avec possibilité de suppression."
 
 metadata:
   created_by: "main_agent"
