@@ -114,6 +114,30 @@ class ResetPasswordRequest(BaseModel):
     token: str
     new_password: str
 
+class ChangePasswordRequest(BaseModel):
+    old_password: str
+    new_password: str
+
+class CompleteRegistrationRequest(BaseModel):
+    token: str
+    password: str
+    prenom: str
+    nom: str
+    telephone: Optional[str] = None
+
+class InviteMemberRequest(BaseModel):
+    email: EmailStr
+    role: UserRole
+
+class CreateMemberRequest(BaseModel):
+    email: EmailStr
+    prenom: str
+    nom: str
+    role: UserRole
+    telephone: Optional[str] = None
+    service: Optional[str] = None
+    password: str
+
 # Work Order Models
 class WorkOrderBase(BaseModel):
     titre: str
