@@ -103,7 +103,7 @@ const MainLayout = () => {
           sidebarOpen ? 'w-64' : 'w-0'
         } overflow-hidden`}
       >
-        <div className="p-4 space-y-2">
+        <div className="p-4 space-y-2 h-full overflow-y-auto">
           {menuItems
             .filter(item => !item.adminOnly || user.role === 'ADMIN')
             .map((item, index) => {
