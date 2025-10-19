@@ -26,12 +26,12 @@ const MainLayout = () => {
 
   useEffect(() => {
     // Récupérer les informations de l'utilisateur depuis localStorage
-    const userInfo = localStorage.getItem('userInfo');
+    const userInfo = localStorage.getItem('user');
     if (userInfo) {
       try {
         const parsedUser = JSON.parse(userInfo);
         setUser({
-          nom: `${parsedUser.first_name || ''} ${parsedUser.last_name || ''}`.trim() || 'Utilisateur',
+          nom: `${parsedUser.prenom || ''} ${parsedUser.nom || ''}`.trim() || 'Utilisateur',
           role: parsedUser.role || 'VIEWER'
         });
       } catch (error) {
