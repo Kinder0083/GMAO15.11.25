@@ -78,6 +78,25 @@ const PreventiveMaintenance = () => {
   };
 
   const upcomingMaintenance = maintenance.filter(m => m.statut === 'ACTIF');
+  
+  // Calculer les maintenances à venir cette semaine
+  const now = new Date();
+  const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const upcomingThisWeek = upcomingMaintenance.filter(m => {
+    const nextMaintDate = new Date(m.prochaineMaintenance);
+    return nextMaintDate >= now && nextMaintDate <= nextWeek;
+  }).length;
+
+  // Calculer les maintenances complétées ce mois
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+  const completedThisMonth = maintenance.filter(m => {
+    if (m.derniereMaintenance) {
+      const lastMaintDate = new Date(m.derniereMaintenance);
+      return lastMaintDate >= startOfMonth && lastMaintDate <= endOfMonth;
+    }
+    return false;
+  }).length;
 
   return (
     <div className="space-y-6">
