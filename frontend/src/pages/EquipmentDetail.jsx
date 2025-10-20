@@ -194,8 +194,8 @@ const EquipmentDetail = () => {
             <div className="flex items-start gap-3">
               <Calendar className="text-blue-600 mt-1" size={20} />
               <div>
-                <p className="text-sm text-gray-600">Garantie</p>
-                <p className="font-semibold">{equipment.garantie}</p>
+                <p className="text-sm text-gray-600">Année de Fabrication</p>
+                <p className="font-semibold">{equipment.anneeFabrication || 'Non spécifiée'}</p>
               </div>
             </div>
           </div>
