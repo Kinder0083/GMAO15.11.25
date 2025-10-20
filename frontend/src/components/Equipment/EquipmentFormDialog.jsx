@@ -187,12 +187,13 @@ const EquipmentFormDialog = ({ open, onOpenChange, equipment, onSuccess, parentI
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="garantie">Garantie</Label>
+              <Label htmlFor="anneeFabrication">Année de Fabrication</Label>
               <Input
-                id="garantie"
-                placeholder="Ex: 2 ans"
-                value={formData.garantie}
-                onChange={(e) => setFormData({ ...formData, garantie: e.target.value })}
+                id="anneeFabrication"
+                type="number"
+                placeholder="Ex: 2023"
+                value={formData.anneeFabrication}
+                onChange={(e) => setFormData({ ...formData, anneeFabrication: e.target.value })}
               />
             </div>
           </div>
