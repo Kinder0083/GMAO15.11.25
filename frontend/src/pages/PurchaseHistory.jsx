@@ -10,6 +10,7 @@ import PurchaseFormDialog from '../components/PurchaseHistory/PurchaseFormDialog
 const PurchaseHistory = () => {
   const { toast } = useToast();
   const [purchases, setPurchases] = useState([]);
+  const [groupedPurchases, setGroupedPurchases] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -17,6 +18,7 @@ const PurchaseHistory = () => {
   const [selectedPurchase, setSelectedPurchase] = useState(null);
   const [filterMonth, setFilterMonth] = useState('');
   const [filterSupplier, setFilterSupplier] = useState('');
+  const [expandedOrders, setExpandedOrders] = useState(new Set());
   const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
@@ -28,11 +30,11 @@ const PurchaseHistory = () => {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [purchasesRes, statsRes] = await Promise.all([
-        purchaseHistoryAPI.getAll(),
+      const [groupedRes, statsRes] = await Promise.all([
+        purchaseHistoryAPI.getGrouped(),
         purchaseHistoryAPI.getStats()
       ]);
-      setPurchases(purchasesRes.data);
+      setGroupedPurchases(groupedRes.data);
       setStats(statsRes.data);
     } catch (error) {
       toast({
