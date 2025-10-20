@@ -43,6 +43,7 @@ const EquipmentFormDialog = ({ open, onOpenChange, equipment, onSuccess, parentI
           dateAchat: equipment.dateAchat?.split('T')[0] || '',
           coutAchat: equipment.coutAchat || '',
           numeroSerie: equipment.numeroSerie || '',
+          anneeFabrication: equipment.anneeFabrication || '',
           garantie: equipment.garantie || '',
           parent_id: equipment.parent_id || null
         });
