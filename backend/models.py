@@ -283,6 +283,7 @@ class EquipmentBase(BaseModel):
     dateAchat: Optional[datetime] = None
     coutAchat: Optional[float] = None
     numeroSerie: Optional[str] = None
+    anneeFabrication: Optional[int] = None
     garantie: Optional[str] = None
     parent_id: Optional[str] = None
 
