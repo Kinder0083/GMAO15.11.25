@@ -781,7 +781,56 @@ async def create_work_order(wo_create: WorkOrderCreate, current_user: dict = Dep
 @api_router.put("/work-orders/{wo_id}", response_model=WorkOrder)
 async def update_work_order(wo_id: str, wo_update: WorkOrderUpdate, current_user: dict = Depends(get_current_user)):
     """Modifier un ordre de travail"""
+    from dependencies import can_edit_work_order_status
+    
     try:
+        # Récupérer l'ordre de travail existant
+        existing_wo = await db.work_orders.find_one({"_id": ObjectId(wo_id)})
+        if not existing_wo:
+            raise HTTPException(status_code=404, detail="Ordre de travail non trouvé")
+        
+        existing_wo["id"] = str(existing_wo["_id"])
+        
+        # Vérifier les permissions
+        user_role = current_user.get("role")
+        user_id = current_user.get("id")
+        created_by = existing_wo.get("createdBy")
+        assigne_a_id = existing_wo.get("assigne_a_id")
+        
+        # Admin : peut tout modifier
+        if user_role == "ADMIN":
+            can_full_edit = True
+        # Technicien : peut modifier ce qu'il a créé
+        elif user_role == "TECHNICIEN":
+            can_full_edit = (created_by == user_id)
+        # Visualiseur assigné : peut seulement modifier le statut
+        elif user_role == "VISUALISEUR":
+            can_full_edit = False
+            # Vérifier si le visualiseur est assigné
+            if assigne_a_id != user_id:
+                raise HTTPException(
+                    status_code=403,
+                    detail="Vous ne pouvez pas modifier cet ordre de travail"
+                )
+            # Le visualiseur ne peut modifier que le statut
+            if wo_update.model_dump(exclude_unset=True).keys() != {'statut'}:
+                raise HTTPException(
+                    status_code=403,
+                    detail="Les visualiseurs ne peuvent modifier que le statut"
+                )
+        else:
+            raise HTTPException(status_code=403, detail="Permission refusée")
+        
+        # Si pas de permission complète et qu'on essaie de modifier autre chose que le statut
+        if not can_full_edit:
+            update_dict = wo_update.model_dump(exclude_unset=True)
+            if len(update_dict) > 1 or (len(update_dict) == 1 and 'statut' not in update_dict):
+                raise HTTPException(
+                    status_code=403,
+                    detail="Vous ne pouvez modifier que le statut de cet ordre de travail"
+                )
+        
+        # Appliquer les modifications
         update_data = {k: v for k, v in wo_update.model_dump().items() if v is not None}
         
         if wo_update.statut == WorkOrderStatus.TERMINE and "dateTermine" not in update_data:
@@ -803,6 +852,8 @@ async def update_work_order(wo_id: str, wo_update: WorkOrderUpdate, current_user
             wo["equipement"] = await get_equipment_by_id(wo["equipement_id"])
         
         return WorkOrder(**wo)
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
