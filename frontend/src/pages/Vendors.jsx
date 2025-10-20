@@ -109,14 +109,32 @@ const Vendors = () => {
       {/* Search */}
       <Card>
         <CardContent className="pt-6">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-            <Input
-              placeholder="Rechercher par nom, contact ou spécialité..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
+          <div className="flex gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              <Input
+                placeholder="Rechercher par nom, contact ou spécialité..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant={viewMode === 'grid' ? 'default' : 'outline'}
+                onClick={() => setViewMode('grid')}
+                className={viewMode === 'grid' ? 'bg-blue-600 hover:bg-blue-700' : ''}
+              >
+                <LayoutGrid size={20} />
+              </Button>
+              <Button
+                variant={viewMode === 'list' ? 'default' : 'outline'}
+                onClick={() => setViewMode('list')}
+                className={viewMode === 'list' ? 'bg-blue-600 hover:bg-blue-700' : ''}
+              >
+                <List size={20} />
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
