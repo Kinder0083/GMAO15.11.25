@@ -142,9 +142,16 @@ const MainLayout = () => {
         </div>
 
         <div className="flex items-center gap-4">
-          <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative">
+          <button 
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative"
+            onClick={() => navigate('/work-orders')}
+          >
             <Bell size={20} className="text-gray-600" />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            {workOrdersCount > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                {workOrdersCount > 9 ? '9+' : workOrdersCount}
+              </span>
+            )}
           </button>
           <button 
             onClick={() => navigate('/settings')}
