@@ -61,6 +61,14 @@ const Vendors = () => {
            vendor.specialite.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
+  // Calculer les fournisseurs créés ce mois
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const createdThisMonth = vendors.filter(v => {
+    const createdDate = new Date(v.dateCreation);
+    return createdDate >= startOfMonth;
+  }).length;
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
