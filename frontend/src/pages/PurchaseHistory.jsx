@@ -50,16 +50,19 @@ const PurchaseHistory = () => {
   const handleDeleteAll = async () => {
     if (window.confirm('⚠️ ATTENTION ! Êtes-vous sûr de vouloir supprimer TOUT l\'historique d\'achat ? Cette action est irréversible !')) {
       try {
+        console.log('Début suppression de tout l\'historique...');
         const result = await purchaseHistoryAPI.deleteAll();
+        console.log('Résultat suppression:', result);
         toast({
           title: 'Succès',
           description: `${result.data.deleted_count} achats supprimés`
         });
         loadData();
       } catch (error) {
+        console.error('Erreur lors de la suppression:', error);
         toast({
           title: 'Erreur',
-          description: 'Impossible de supprimer l\'historique',
+          description: error.response?.data?.detail || 'Impossible de supprimer l\'historique',
           variant: 'destructive'
         });
       }
