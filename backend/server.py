@@ -1877,6 +1877,7 @@ async def get_purchase_history_grouped(current_user: dict = Depends(get_current_
             grouped[num_cmd] = {
                 'numeroCommande': num_cmd,
                 'fournisseur': fournisseur_display,
+                'numeroReception': p.get('numeroReception'),  # Premier N° reception de la commande
                 'dateCreation': p.get('dateCreation'),
                 'site': p.get('site'),
                 'items': [],
