@@ -24,7 +24,8 @@ const ImportExport = () => {
     { value: 'users', label: 'Utilisateurs (Équipes)' },
     { value: 'inventory', label: 'Inventaire' },
     { value: 'locations', label: 'Zones' },
-    { value: 'vendors', label: 'Fournisseurs' }
+    { value: 'vendors', label: 'Fournisseurs' },
+    { value: 'purchase-history', label: 'Historique Achat' }
   ];
 
   const handleExport = async () => {
