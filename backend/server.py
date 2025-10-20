@@ -1858,6 +1858,61 @@ async def delete_vendor(vendor_id: str, current_user: dict = Depends(get_current
 
 
 # ==================== PURCHASE HISTORY ROUTES ====================
+@api_router.get("/purchase-history/grouped")
+async def get_purchase_history_grouped(current_user: dict = Depends(get_current_user)):
+    """Liste tous les achats groupés par N° Commande"""
+    purchases = await db.purchase_history.find().sort("dateCreation", -1).to_list(5000)
+    
+    # Grouper par numeroCommande
+    grouped = {}
+    for p in purchases:
+        num_cmd = p.get('numeroCommande')
+        if not num_cmd:
+            continue
+            
+        if num_cmd not in grouped:
+            # Utiliser Fournisseur2 (colonne M) si disponible, sinon fournisseur
+            fournisseur_display = p.get('Fournisseur2') or p.get('fournisseur', 'Inconnu')
+            
+            grouped[num_cmd] = {
+                'numeroCommande': num_cmd,
+                'fournisseur': fournisseur_display,
+                'dateCreation': p.get('dateCreation'),
+                'site': p.get('site'),
+                'items': [],
+                'montantTotal': 0.0,
+                'itemCount': 0
+            }
+        
+        # Ajouter l'item au groupe
+        item_data = {
+            'article': p.get('article'),
+            'description': p.get('description'),
+            'quantite': p.get('quantite', 0.0),
+            'montantLigneHT': p.get('montantLigneHT', 0.0),
+            'numeroReception': p.get('numeroReception'),
+            'groupeStatistique': p.get('groupeStatistique')
+        }
+        
+        grouped[num_cmd]['items'].append(item_data)
+        grouped[num_cmd]['montantTotal'] += item_data['montantLigneHT']
+        grouped[num_cmd]['itemCount'] += 1
+    
+    # Convertir en liste
+    result = list(grouped.values())
+    return result
+
+
+@api_router.delete("/purchase-history/all")
+async def delete_all_purchase_history(current_user: dict = Depends(get_current_admin_user)):
+    """Supprimer tout l'historique d'achat (admin uniquement)"""
+    result = await db.purchase_history.delete_many({})
+    return {
+        "message": f"{result.deleted_count} achats supprimés",
+        "deleted_count": result.deleted_count
+    }
+
+
 @api_router.get("/purchase-history", response_model=List[PurchaseHistory])
 async def get_purchase_history(current_user: dict = Depends(get_current_user)):
     """Liste tous les achats"""
