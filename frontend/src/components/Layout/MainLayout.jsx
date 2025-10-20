@@ -60,6 +60,7 @@ const MainLayout = () => {
     { icon: Users, label: 'Équipes', path: '/people' },
     { icon: Calendar, label: 'Planning', path: '/planning' },
     { icon: ShoppingCart, label: 'Fournisseurs', path: '/vendors' },
+    { icon: ShoppingBag, label: 'Historique Achat', path: '/purchase-history' },
     { icon: Database, label: 'Import / Export', path: '/import-export', adminOnly: true }
   ];
 
