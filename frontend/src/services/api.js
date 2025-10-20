@@ -142,6 +142,11 @@ export const vendorsAPI = {
 export const purchaseHistoryAPI = {
   getAll: () => api.get('/purchase-history'),
   getStats: () => api.get('/purchase-history/stats'),
+  downloadTemplate: (format = 'csv') => 
+    api.get('/purchase-history/template', {
+      params: { format },
+      responseType: 'blob'
+    }),
   create: (data) => api.post('/purchase-history', data),
   update: (id, data) => api.put(`/purchase-history/${id}`, data),
   delete: (id) => api.delete(`/purchase-history/${id}`)
