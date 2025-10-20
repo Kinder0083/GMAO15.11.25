@@ -58,12 +58,20 @@ const People = () => {
   };
 
   const filteredUsers = users.filter(user => {
+    // Masquer le compte de secours pour tous sauf l'admin
+    if (user.email === 'buenogy@gmail.com' && currentUser?.role !== 'ADMIN') {
+      return false;
+    }
+    
     const matchesSearch = user.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          user.prenom.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          user.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRole = filterRole === 'ALL' || user.role === filterRole;
     return matchesSearch && matchesRole;
   });
+
+  // Comptabiliser uniquement les membres qui ne sont pas le compte de secours
+  const activeUsersCount = users.filter(u => u.email !== 'buenogy@gmail.com').length;
 
   const getRoleBadge = (role) => {
     const badges = {
