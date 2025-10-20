@@ -2200,50 +2200,36 @@ async def export_data(
 async def download_purchase_template(format: str = "csv", current_user: dict = Depends(get_current_user)):
     """Télécharger un template vide pour l'import des achats"""
     
-    # Structure du template
+    # Structure du template avec les noms de colonnes françaises
     template_data = {
-        "fournisseur": ["Exemple Fournisseur"],
-        "numeroCommande": ["CMD-001"],
-        "numeroReception": ["REC-001"],
-        "dateCreation": ["2024-01-15"],
-        "article": ["Article exemple"],
-        "description": ["Description de l'article"],
-        "groupeStatistique": ["STK-A"],
-        "quantite": [10.0],
-        "montantLigneHT": [1500.50],
-        "quantiteRetournee": [0.0],
-        "site": ["Site Principal"],
-        "creationUser": ["admin@example.com"]
+        "Fournisseur": ["Exemple Fournisseur"],
+        "N° Commande": ["CMD-001"],
+        "N° reception": ["REC-001"],
+        "Date de création": ["19/09/2025"],
+        "Article": ["Article exemple"],
+        "Description 1": ["Description de l'article"],
+        "Groupe statistique": ["STK-A"],
+        "STK quantité": ["10,00"],
+        "Montant ligne HT": ["1500,50"],
+        "Quantité retournée": ["0,00"],
+        "Site": ["Site Principal"],
+        "Creation user": ["admin@example.com"]
     }
     
     df = pd.DataFrame(template_data)
     
-    # Générer le fichier
-    if format == "csv":
-        output = io.StringIO()
-        df.to_csv(output, index=False)
-        content = output.getvalue()
-        
-        return StreamingResponse(
-            io.BytesIO(content.encode('utf-8')),
-            media_type="text/csv",
-            headers={
-                "Content-Disposition": "attachment; filename=template_historique_achat.csv"
-            }
-        )
-    else:  # xlsx
-        output = io.BytesIO()
-        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-            df.to_excel(writer, sheet_name='Achats', index=False)
-        output.seek(0)
-        
-        return StreamingResponse(
-            output,
-            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            headers={
-                "Content-Disposition": "attachment; filename=template_historique_achat.xlsx"
-            }
-        )
+    # Générer le fichier CSV avec point-virgule
+    output = io.StringIO()
+    df.to_csv(output, index=False, sep=';')
+    content = output.getvalue()
+    
+    return Response(
+        content=content.encode('utf-8'),
+        media_type="text/csv; charset=utf-8",
+        headers={
+            "Content-Disposition": "attachment; filename=template_historique_achat.csv"
+        }
+    )
 
 
         raise HTTPException(status_code=500, detail=str(e))
