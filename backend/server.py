@@ -2252,17 +2252,23 @@ async def import_data(
         
         # Mapping des colonnes pour purchase-history (basé sur Requêteur.xlsx)
         purchase_column_mapping = {
+            # Colonnes avec espaces en trop
             "Fournisseur": "fournisseur",
+            "N° Commande ": "numeroCommande",  # Espace à la fin
             "N° Commande": "numeroCommande",
             "N° reception": "numeroReception",
             "Date de création": "dateCreation",
             "Article": "article",
+            "Description 1": "description",  # Nom exact du CSV
             "Description": "description",
+            "Groupe statistique": "groupeStatistique",
             "Groupe statistique STK": "groupeStatistique",
+            "STK quantité": "quantite",  # Nom exact du CSV
             "quantité": "quantite",
             "Quantité": "quantite",
             "Montant ligne HT": "montantLigneHT",
             "Quantité retournée": "quantiteRetournee",
+            "Site ": "site",  # Espace à la fin
             "Site": "site",
             "Creation user": "creationUser"
         }
