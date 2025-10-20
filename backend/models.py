@@ -234,6 +234,7 @@ class WorkOrderBase(BaseModel):
     emplacement_id: Optional[str] = None
     dateLimite: Optional[datetime] = None
     tempsEstime: Optional[float] = None
+    createdBy: Optional[str] = None  # ID de l'utilisateur créateur
 
 class WorkOrderCreate(WorkOrderBase):
     pass
