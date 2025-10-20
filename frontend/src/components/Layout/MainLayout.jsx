@@ -9,6 +9,7 @@ import {
   BarChart3,
   Users,
   ShoppingCart,
+  ShoppingBag,
   Calendar,
   Settings,
   Menu,
