@@ -284,17 +284,12 @@ frontend:
 
 metadata:
   created_by: "main_agent"
-  version: "2.0"
-  test_sequence: 3
+  version: "2.1"
+  test_sequence: 4
   run_ui: false
 
 test_plan:
-  current_focus:
-    - "Configuration SMTP/Postfix pour envoi d'emails"
-    - "API GET /api/auth/me - Récupérer profil utilisateur"
-    - "API PUT /api/auth/me - Mettre à jour profil utilisateur"
-    - "API POST /api/auth/change-password - Changer mot de passe"
-    - "Invitation utilisateur avec envoi d'email"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
