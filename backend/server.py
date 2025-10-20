@@ -2535,6 +2535,92 @@ async def import_data(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# ==================== UPDATE ROUTES ====================
+from update_manager import UpdateManager
+
+update_manager = UpdateManager(db)
+
+@api_router.get("/updates/current")
+async def get_current_version(current_user: dict = Depends(get_current_admin_user)):
+    """Récupère la version actuelle (admin uniquement)"""
+    version = await update_manager.get_current_version()
+    return {
+        "version": version,
+        "date": datetime.now().isoformat()
+    }
+
+@api_router.get("/updates/check")
+async def check_updates(current_user: dict = Depends(get_current_admin_user)):
+    """Vérifie si une mise à jour est disponible (admin uniquement)"""
+    current = await update_manager.get_current_version()
+    latest = await update_manager.check_github_version()
+    
+    return {
+        "current_version": current,
+        "latest_version": latest,
+        "update_available": latest is not None and latest.get("available", False)
+    }
+
+@api_router.get("/updates/changelog")
+async def get_changelog(
+    from_version: Optional[str] = None,
+    current_user: dict = Depends(get_current_admin_user)
+):
+    """Récupère le changelog (admin uniquement)"""
+    changelog = await update_manager.get_changelog(from_version)
+    return {"changelog": changelog}
+
+@api_router.get("/updates/history")
+async def get_update_history(current_user: dict = Depends(get_current_admin_user)):
+    """Récupère l'historique des mises à jour (admin uniquement)"""
+    history = await update_manager.get_update_history()
+    return {"history": history}
+
+@api_router.post("/updates/apply")
+async def apply_update(
+    github_token: Optional[str] = None,
+    current_user: dict = Depends(get_current_admin_user)
+):
+    """Applique la mise à jour (admin uniquement)"""
+    result = await update_manager.apply_update(github_token)
+    
+    if not result["success"]:
+        raise HTTPException(
+            status_code=500,
+            detail=result.get("message", "Erreur lors de la mise à jour")
+        )
+    
+    return result
+
+@api_router.post("/updates/backup")
+async def create_backup(current_user: dict = Depends(get_current_admin_user)):
+    """Crée un backup de la base de données (admin uniquement)"""
+    result = await update_manager.create_backup()
+    
+    if not result["success"]:
+        raise HTTPException(
+            status_code=500,
+            detail=result.get("error", "Erreur lors de la création du backup")
+        )
+    
+    return result
+
+@api_router.post("/updates/rollback")
+async def rollback_update(
+    backup_path: str,
+    current_user: dict = Depends(get_current_admin_user)
+):
+    """Restaure une version précédente (admin uniquement)"""
+    result = await update_manager.rollback_to_version(backup_path)
+    
+    if not result["success"]:
+        raise HTTPException(
+            status_code=500,
+            detail=result.get("message", "Erreur lors du rollback")
+        )
+    
+    return result
+
 # Include the router in the main app
 app.include_router(api_router)
 
