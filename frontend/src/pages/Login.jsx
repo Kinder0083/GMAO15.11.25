@@ -75,13 +75,17 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-blue-50">
       <div className="w-full max-w-md p-6">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl mb-4">
-            <Wrench size={32} className="text-white" />
+          <div className="inline-flex items-center justify-center mb-4">
+            <img 
+              src="/logo-iris.png" 
+              alt="GMAO Iris" 
+              className="w-20 h-20 object-contain"
+            />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">GMAO Iris</h1>
           <p className="text-gray-600 mb-6">Gestion de Maintenance Assistée par Ordinateur</p>
           <p className="text-sm text-gray-500 mb-1">Concepteur: Grèg</p>
-          <p className="text-sm text-gray-500 mb-6">Version 1.0</p>
+          <p className="text-sm text-gray-500 mb-6">Version {version}</p>
         </div>
 
         <Card className="shadow-xl border-0">
