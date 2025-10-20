@@ -86,7 +86,7 @@ const Vendors = () => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="hover:shadow-lg transition-shadow">
           <CardContent className="pt-6">
             <div className="flex flex-col items-center text-center">
@@ -99,17 +99,8 @@ const Vendors = () => {
         <Card className="hover:shadow-lg transition-shadow">
           <CardContent className="pt-6">
             <div className="flex flex-col items-center text-center">
-              <p className="text-sm font-medium text-gray-600">Actifs ce mois</p>
-              <p className="text-4xl font-bold text-green-600 mt-2">{vendors.length}</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="hover:shadow-lg transition-shadow">
-          <CardContent className="pt-6">
-            <div className="flex flex-col items-center text-center">
-              <p className="text-sm font-medium text-gray-600">Commandes en cours</p>
-              <p className="text-4xl font-bold text-orange-600 mt-2">5</p>
+              <p className="text-sm font-medium text-gray-600">Créés ce mois</p>
+              <p className="text-4xl font-bold text-green-600 mt-2">{createdThisMonth}</p>
             </div>
           </CardContent>
         </Card>
