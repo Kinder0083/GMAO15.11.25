@@ -1978,10 +1978,10 @@ async def get_purchase_stats(current_user: dict = Depends(get_current_user)):
     
     commandes_totales = len(commandes_uniques)
     
-    # Par fournisseur
+    # Par fournisseur (utiliser Fournisseur2 si disponible)
     fournisseurs = {}
     for p in all_purchases:
-        fournisseur = p.get("fournisseur", "Inconnu")
+        fournisseur = p.get("Fournisseur2") or p.get("fournisseur", "Inconnu")
         if fournisseur not in fournisseurs:
             fournisseurs[fournisseur] = {"montant": 0, "quantite": 0, "count": 0}
         fournisseurs[fournisseur]["montant"] += p.get("montantLigneHT", 0)
