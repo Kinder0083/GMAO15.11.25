@@ -2357,6 +2357,9 @@ async def import_data(
         # Appliquer le mapping des colonnes pour purchase-history
         if module == "purchase-history":
             df = df.rename(columns=purchase_column_mapping)
+            
+            # Nettoyer les noms de colonnes (enlever espaces en trop)
+            df.columns = df.columns.str.strip()
         
         # Convertir en dictionnaires
         items_to_import = df.to_dict('records')
@@ -2376,30 +2379,45 @@ async def import_data(
                 
                 # Traitement spécifique pour purchase-history
                 if module == "purchase-history":
-                    # Convertir les dates
+                    # S'assurer que les champs numériques sont corrects
+                    for num_field in ["quantite", "montantLigneHT", "quantiteRetournee"]:
+                        if num_field in cleaned_item:
+                            try:
+                                # Convertir les virgules en points pour les nombres français
+                                value = cleaned_item[num_field]
+                                if isinstance(value, str):
+                                    # Remplacer virgule par point et enlever espaces
+                                    value = value.replace(',', '.').replace(' ', '')
+                                cleaned_item[num_field] = float(value)
+                            except:
+                                if num_field == "quantiteRetournee":
+                                    cleaned_item[num_field] = 0.0
+                                elif num_field == "quantite":
+                                    logger.warning(f"Ligne {idx+1}: quantite invalide '{cleaned_item.get(num_field)}'")
+                                    cleaned_item[num_field] = 0.0
+                    
+                    # Convertir les dates (format français DD/MM/YYYY)
                     if "dateCreation" in cleaned_item:
                         try:
                             date_val = cleaned_item["dateCreation"]
                             if isinstance(date_val, str):
-                                cleaned_item["dateCreation"] = datetime.fromisoformat(date_val.replace('Z', '+00:00'))
+                                # Format français DD/MM/YYYY
+                                if '/' in date_val:
+                                    parts = date_val.split('/')
+                                    if len(parts) == 3:
+                                        # Créer date au format ISO
+                                        cleaned_item["dateCreation"] = f"{parts[2]}-{parts[1].zfill(2)}-{parts[0].zfill(2)}"
+                                cleaned_item["dateCreation"] = datetime.fromisoformat(cleaned_item["dateCreation"])
                             elif hasattr(date_val, 'to_pydatetime'):
                                 cleaned_item["dateCreation"] = date_val.to_pydatetime()
-                        except:
+                        except Exception as e:
+                            logger.warning(f"Ligne {idx+1}: date invalide '{cleaned_item.get('dateCreation')}': {e}")
                             pass
                     
                     # Ajouter dateEnregistrement et creationUser
                     cleaned_item["dateEnregistrement"] = datetime.utcnow()
                     if "creationUser" not in cleaned_item or not cleaned_item["creationUser"]:
                         cleaned_item["creationUser"] = current_user.get("email", "import")
-                    
-                    # S'assurer que les champs numériques sont corrects
-                    for num_field in ["quantite", "montantLigneHT", "quantiteRetournee"]:
-                        if num_field in cleaned_item:
-                            try:
-                                cleaned_item[num_field] = float(cleaned_item[num_field])
-                            except:
-                                if num_field == "quantiteRetournee":
-                                    cleaned_item[num_field] = 0.0
                 
                 # Gérer l'ID
                 item_id = cleaned_item.get('id')
