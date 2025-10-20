@@ -70,31 +70,41 @@ const PurchaseHistory = () => {
       const token = localStorage.getItem('token');
       
       const response = await fetch(`${backend_url}/api/purchase-history/template?format=csv`, {
+        method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
       
-      if (!response.ok) throw new Error('Erreur de téléchargement');
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Erreur de téléchargement');
+      }
       
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
+      a.style.display = 'none';
       a.href = url;
       a.download = 'template_historique_achat.csv';
       document.body.appendChild(a);
       a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+      
+      // Cleanup
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      }, 100);
       
       toast({
         title: 'Succès',
-        description: 'Template téléchargé'
+        description: 'Template téléchargé avec succès'
       });
     } catch (error) {
+      console.error('Erreur téléchargement template:', error);
       toast({
         title: 'Erreur',
-        description: 'Impossible de télécharger le template',
+        description: error.message || 'Impossible de télécharger le template',
         variant: 'destructive'
       });
     }
