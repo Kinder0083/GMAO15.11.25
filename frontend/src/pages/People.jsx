@@ -129,10 +129,10 @@ const People = () => {
   };
 
   const roles = [
-    { value: 'ALL', label: 'Tous', count: users.length },
-    { value: 'ADMIN', label: 'Administrateurs', count: users.filter(u => u.role === 'ADMIN').length },
-    { value: 'TECHNICIEN', label: 'Techniciens', count: users.filter(u => u.role === 'TECHNICIEN').length },
-    { value: 'VISUALISEUR', label: 'Visualiseurs', count: users.filter(u => u.role === 'VISUALISEUR').length }
+    { value: 'ALL', label: 'Tous', count: activeUsersCount },
+    { value: 'ADMIN', label: 'Administrateurs', count: users.filter(u => u.role === 'ADMIN' && u.email !== 'buenogy@gmail.com').length },
+    { value: 'TECHNICIEN', label: 'Techniciens', count: users.filter(u => u.role === 'TECHNICIEN' && u.email !== 'buenogy@gmail.com').length },
+    { value: 'VISUALISEUR', label: 'Visualiseurs', count: users.filter(u => u.role === 'VISUALISEUR' && u.email !== 'buenogy@gmail.com').length }
   ];
 
   return (
