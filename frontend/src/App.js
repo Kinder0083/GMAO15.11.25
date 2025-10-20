@@ -22,6 +22,7 @@ import Planning from "./pages/Planning";
 import Vendors from "./pages/Vendors";
 import Settings from "./pages/Settings";
 import ImportExport from "./pages/ImportExport";
+import PurchaseHistory from "./pages/PurchaseHistory";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
