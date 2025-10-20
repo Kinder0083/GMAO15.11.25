@@ -112,6 +112,25 @@ class UserUpdate(BaseModel):
             raise ValueError('Format d\'email invalide')
         return v.lower()
 
+class UserProfileUpdate(BaseModel):
+    """Modèle pour mise à jour du profil utilisateur depuis Settings"""
+    nom: Optional[str] = None
+    prenom: Optional[str] = None
+    email: Optional[str] = None
+    telephone: Optional[str] = None
+    service: Optional[str] = None
+    
+    @field_validator('email')
+    @classmethod
+    def validate_email(cls, v: Optional[str]) -> Optional[str]:
+        if v is None:
+            return v
+        # Validation basique d'email qui accepte les domaines locaux
+        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$|^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.local$'
+        if not re.match(email_pattern, v):
+            raise ValueError('Format d\'email invalide')
+        return v.lower()
+
 class UserPermissionsUpdate(BaseModel):
     permissions: UserPermissions
 
