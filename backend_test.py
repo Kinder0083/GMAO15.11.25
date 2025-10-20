@@ -1162,10 +1162,352 @@ Test Location Import 3,789 Import Boulevard,Marseille,13001,Entrepot"""
         
         return results
 
+class Phase1Tester:
+    """Tests for Phase 1 - SMTP, User Profile, Password Change"""
+    
+    def __init__(self):
+        self.base_url = BASE_URL
+        self.admin_token = None
+        self.admin_user_id = None
+        self.session = requests.Session()
+        
+    def log(self, message: str, level: str = "INFO"):
+        """Log test messages"""
+        print(f"[{level}] {message}")
+        
+    def make_request(self, method: str, endpoint: str, data: Dict = None, headers: Dict = None, token: str = None) -> requests.Response:
+        """Make HTTP request with proper headers"""
+        url = f"{self.base_url}{endpoint}"
+        
+        request_headers = {"Content-Type": "application/json"}
+        if headers:
+            request_headers.update(headers)
+            
+        if token:
+            request_headers["Authorization"] = f"Bearer {token}"
+        elif self.admin_token:
+            request_headers["Authorization"] = f"Bearer {self.admin_token}"
+            
+        try:
+            if method.upper() == "GET":
+                response = self.session.get(url, headers=request_headers)
+            elif method.upper() == "POST":
+                response = self.session.post(url, json=data, headers=request_headers)
+            elif method.upper() == "PUT":
+                response = self.session.put(url, json=data, headers=request_headers)
+            elif method.upper() == "DELETE":
+                response = self.session.delete(url, headers=request_headers)
+            else:
+                raise ValueError(f"Unsupported method: {method}")
+                
+            self.log(f"{method} {endpoint} -> {response.status_code}")
+            return response
+        except Exception as e:
+            self.log(f"Request failed: {e}", "ERROR")
+            raise
+            
+    def setup_admin_user(self) -> bool:
+        """Login as admin user"""
+        self.log("Setting up admin user...")
+        
+        login_data = {
+            "email": "admin@example.com",
+            "password": "password123"
+        }
+        
+        response = self.make_request("POST", "/auth/login", login_data, token=None)
+        
+        if response.status_code == 200:
+            data = response.json()
+            self.admin_token = data["access_token"]
+            self.admin_user_id = data["user"]["id"]
+            self.log(f"Admin login successful. User ID: {self.admin_user_id}")
+            return True
+        elif response.status_code == 401:
+            # Admin doesn't exist, create it
+            self.log("Admin user not found, creating...")
+            register_data = {
+                "nom": "Admin",
+                "prenom": "System",
+                "email": "admin@example.com",
+                "telephone": "+33123456789",
+                "password": "password123",
+                "role": "ADMIN"
+            }
+            
+            response = self.make_request("POST", "/auth/register", register_data, token=None)
+            if response.status_code == 200:
+                self.log("Admin user created successfully")
+                # Now login
+                return self.setup_admin_user()
+            else:
+                self.log(f"Failed to create admin user: {response.status_code} - {response.text}", "ERROR")
+                return False
+        else:
+            self.log(f"Login failed: {response.status_code} - {response.text}", "ERROR")
+            return False
+            
+    def test_smtp_configuration_user_invite(self) -> bool:
+        """Test 1: SMTP Configuration - User Invitation Email"""
+        self.log("\n=== Test 1: SMTP Configuration - User Invitation Email ===")
+        
+        # Test data for invitation
+        invite_data = {
+            "email": "test.invite@example.com",
+            "role": "TECHNICIEN"
+        }
+        
+        response = self.make_request("POST", "/users/invite-member", invite_data)
+        
+        if response.status_code == 200:
+            data = response.json()
+            
+            # Check response structure
+            required_fields = ["message", "email", "role"]
+            for field in required_fields:
+                if field not in data:
+                    self.log(f"✗ Missing field in response: {field}", "ERROR")
+                    return False
+                    
+            # Verify email and role match
+            if data["email"] != invite_data["email"]:
+                self.log(f"✗ Email mismatch: expected {invite_data['email']}, got {data['email']}", "ERROR")
+                return False
+                
+            if data["role"] != invite_data["role"]:
+                self.log(f"✗ Role mismatch: expected {invite_data['role']}, got {data['role']}", "ERROR")
+                return False
+                
+            self.log("✓ User invitation email sent successfully via SMTP")
+            self.log(f"  - Email: {data['email']}")
+            self.log(f"  - Role: {data['role']}")
+            self.log(f"  - Message: {data['message']}")
+            return True
+        else:
+            self.log(f"✗ User invitation failed: {response.status_code} - {response.text}", "ERROR")
+            return False
+            
+    def test_get_user_profile(self) -> bool:
+        """Test 2: GET /api/auth/me - Get User Profile"""
+        self.log("\n=== Test 2: GET /api/auth/me - Get User Profile ===")
+        
+        response = self.make_request("GET", "/auth/me")
+        
+        if response.status_code == 200:
+            user_data = response.json()
+            
+            # Check required fields
+            required_fields = ["id", "nom", "prenom", "email", "role", "dateCreation"]
+            for field in required_fields:
+                if field not in user_data:
+                    self.log(f"✗ Missing field in user profile: {field}", "ERROR")
+                    return False
+                    
+            # Verify it's the admin user
+            if user_data["email"] != "admin@example.com":
+                self.log(f"✗ Wrong user profile returned: {user_data['email']}", "ERROR")
+                return False
+                
+            if user_data["role"] != "ADMIN":
+                self.log(f"✗ Wrong user role: {user_data['role']}", "ERROR")
+                return False
+                
+            self.log("✓ User profile retrieved successfully")
+            self.log(f"  - ID: {user_data['id']}")
+            self.log(f"  - Name: {user_data['prenom']} {user_data['nom']}")
+            self.log(f"  - Email: {user_data['email']}")
+            self.log(f"  - Role: {user_data['role']}")
+            self.log(f"  - Service: {user_data.get('service', 'N/A')}")
+            self.log(f"  - Phone: {user_data.get('telephone', 'N/A')}")
+            return True
+        else:
+            self.log(f"✗ Failed to get user profile: {response.status_code} - {response.text}", "ERROR")
+            return False
+            
+    def test_update_user_profile(self) -> bool:
+        """Test 3: PUT /api/auth/me - Update User Profile"""
+        self.log("\n=== Test 3: PUT /api/auth/me - Update User Profile ===")
+        
+        # Test data for profile update
+        update_data = {
+            "nom": "Admin Updated",
+            "prenom": "System Updated",
+            "telephone": "+33987654321",
+            "service": "IT Department"
+        }
+        
+        response = self.make_request("PUT", "/auth/me", update_data)
+        
+        if response.status_code == 200:
+            data = response.json()
+            
+            # Check response structure
+            if "message" not in data or "user" not in data:
+                self.log("✗ Invalid response structure", "ERROR")
+                return False
+                
+            user_data = data["user"]
+            
+            # Verify updates were applied
+            if user_data["nom"] != update_data["nom"]:
+                self.log(f"✗ Name not updated: expected {update_data['nom']}, got {user_data['nom']}", "ERROR")
+                return False
+                
+            if user_data["prenom"] != update_data["prenom"]:
+                self.log(f"✗ First name not updated: expected {update_data['prenom']}, got {user_data['prenom']}", "ERROR")
+                return False
+                
+            if user_data["telephone"] != update_data["telephone"]:
+                self.log(f"✗ Phone not updated: expected {update_data['telephone']}, got {user_data['telephone']}", "ERROR")
+                return False
+                
+            if user_data["service"] != update_data["service"]:
+                self.log(f"✗ Service not updated: expected {update_data['service']}, got {user_data['service']}", "ERROR")
+                return False
+                
+            self.log("✓ User profile updated successfully")
+            self.log(f"  - Name: {user_data['prenom']} {user_data['nom']}")
+            self.log(f"  - Phone: {user_data['telephone']}")
+            self.log(f"  - Service: {user_data['service']}")
+            return True
+        else:
+            self.log(f"✗ Failed to update user profile: {response.status_code} - {response.text}", "ERROR")
+            return False
+            
+    def test_change_password_correct_old_password(self) -> bool:
+        """Test 4a: POST /api/auth/change-password - Correct Old Password"""
+        self.log("\n=== Test 4a: POST /api/auth/change-password - Correct Old Password ===")
+        
+        # Change password with correct old password
+        change_data = {
+            "old_password": "password123",
+            "new_password": "newpassword456"
+        }
+        
+        response = self.make_request("POST", "/auth/change-password", change_data)
+        
+        if response.status_code == 200:
+            data = response.json()
+            
+            if "message" not in data:
+                self.log("✗ Missing message in response", "ERROR")
+                return False
+                
+            self.log("✓ Password changed successfully with correct old password")
+            self.log(f"  - Message: {data['message']}")
+            
+            # Update our stored password for future tests
+            # Try to login with new password to verify
+            login_data = {
+                "email": "admin@example.com",
+                "password": "newpassword456"
+            }
+            
+            login_response = self.make_request("POST", "/auth/login", login_data, token=None)
+            if login_response.status_code == 200:
+                self.log("✓ Login successful with new password - password change verified")
+                # Update token for future requests
+                login_result = login_response.json()
+                self.admin_token = login_result["access_token"]
+                return True
+            else:
+                self.log("✗ Could not login with new password - password change may have failed", "ERROR")
+                return False
+        else:
+            self.log(f"✗ Failed to change password: {response.status_code} - {response.text}", "ERROR")
+            return False
+            
+    def test_change_password_incorrect_old_password(self) -> bool:
+        """Test 4b: POST /api/auth/change-password - Incorrect Old Password"""
+        self.log("\n=== Test 4b: POST /api/auth/change-password - Incorrect Old Password ===")
+        
+        # Try to change password with incorrect old password
+        change_data = {
+            "old_password": "wrongpassword",
+            "new_password": "anothernewpassword"
+        }
+        
+        response = self.make_request("POST", "/auth/change-password", change_data)
+        
+        if response.status_code == 400:
+            try:
+                data = response.json()
+                if "detail" in data and "incorrect" in data["detail"].lower():
+                    self.log("✓ Correctly rejected incorrect old password")
+                    self.log(f"  - Error message: {data['detail']}")
+                    return True
+                else:
+                    self.log(f"✗ Unexpected error message: {data.get('detail', 'No detail')}", "ERROR")
+                    return False
+            except:
+                self.log("✓ Correctly rejected incorrect old password (non-JSON response)")
+                return True
+        else:
+            self.log(f"✗ Should have failed with 400, got: {response.status_code}", "ERROR")
+            return False
+            
+    def run_all_tests(self) -> Dict[str, bool]:
+        """Run all Phase 1 tests"""
+        self.log("Starting GMAO Atlas Phase 1 Tests...")
+        self.log(f"Backend URL: {self.base_url}")
+        
+        results = {}
+        
+        # Setup
+        if not self.setup_admin_user():
+            self.log("Failed to setup admin user. Aborting tests.", "ERROR")
+            return {"setup": False}
+            
+        # Run Phase 1 tests
+        self.log("\n" + "="*60)
+        self.log("PHASE 1 TESTS - SMTP, USER PROFILE, PASSWORD CHANGE")
+        self.log("="*60)
+        
+        # Test 1: SMTP Configuration - User Invitation
+        results["smtp_user_invitation"] = self.test_smtp_configuration_user_invite()
+        
+        # Test 2: GET User Profile
+        results["get_user_profile"] = self.test_get_user_profile()
+        
+        # Test 3: PUT User Profile
+        results["update_user_profile"] = self.test_update_user_profile()
+        
+        # Test 4a: Change Password - Correct Old Password
+        results["change_password_correct"] = self.test_change_password_correct_old_password()
+        
+        # Test 4b: Change Password - Incorrect Old Password
+        results["change_password_incorrect"] = self.test_change_password_incorrect_old_password()
+        
+        # Summary
+        self.log("\n" + "="*60)
+        self.log("PHASE 1 TEST RESULTS SUMMARY")
+        self.log("="*60)
+        
+        passed = 0
+        total = len(results)
+        
+        for test_name, result in results.items():
+            status = "✓ PASS" if result else "✗ FAIL"
+            self.log(f"{test_name}: {status}")
+            if result:
+                passed += 1
+                
+        self.log(f"\nPhase 1 Tests: {passed}/{total} tests passed")
+        
+        return results
+
 def main():
     """Main test execution"""
-    # Run Equipment Hierarchy Tests
+    # Run Phase 1 Tests (Priority)
     print("="*80)
+    print("RUNNING PHASE 1 TESTS - SMTP, USER PROFILE, PASSWORD CHANGE")
+    print("="*80)
+    
+    phase1_tester = Phase1Tester()
+    phase1_results = phase1_tester.run_all_tests()
+    
+    # Run Equipment Hierarchy Tests
+    print("\n" + "="*80)
     print("RUNNING EQUIPMENT HIERARCHY TESTS")
     print("="*80)
     
@@ -1181,7 +1523,7 @@ def main():
     import_export_results = import_export_tester.run_all_tests()
     
     # Combined results
-    all_results = {**hierarchy_results, **import_export_results}
+    all_results = {**phase1_results, **hierarchy_results, **import_export_results}
     
     print("\n" + "="*80)
     print("OVERALL TEST SUMMARY")
@@ -1193,6 +1535,11 @@ def main():
     print(f"Total Tests: {total_tests}")
     print(f"Passed: {total_passed}")
     print(f"Failed: {total_tests - total_passed}")
+    
+    # Show Phase 1 results specifically
+    phase1_passed = sum(1 for result in phase1_results.values() if result)
+    phase1_total = len(phase1_results)
+    print(f"\nPhase 1 Critical Tests: {phase1_passed}/{phase1_total} passed")
     
     # Exit with error code if any tests failed
     if not all(all_results.values()):
