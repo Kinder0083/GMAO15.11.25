@@ -320,6 +320,7 @@ class Equipment(EquipmentBase):
     emplacement: Optional[dict] = None
     parent: Optional[dict] = None
     hasChildren: bool = False
+    createdBy: Optional[str] = None  # ID de l'utilisateur créateur
 
     class Config:
         from_attributes = True
