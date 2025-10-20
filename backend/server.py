@@ -2066,7 +2066,7 @@ async def get_purchase_stats(current_user: dict = Depends(get_current_user)):
     return {
         "totalAchats": total_achats,
         "montantTotal": round(montant_total, 2),
-        "quantiteTotale": round(quantite_totale, 2),
+        "commandesTotales": commandes_totales,
         "parFournisseur": par_fournisseur,
         "parMois": par_mois,
         "parSite": par_site,
