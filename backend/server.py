@@ -2217,23 +2217,59 @@ async def import_data(
         try:
             if file.filename.endswith('.csv'):
                 df = pd.read_csv(io.BytesIO(content))
-            elif file.filename.endswith(('.xlsx', '.xls')):
-                # Options plus robustes pour lire les fichiers Excel
-                try:
-                    df = pd.read_excel(io.BytesIO(content), engine='openpyxl')
-                except Exception as e1:
-                    # Essayer avec un autre engine
+            elif file.filename.endswith(('.xlsx', '.xls', '.xlsb')):
+                # Stratégie multi-tentatives pour les fichiers Excel
+                df = None
+                errors = []
+                
+                # Tentative 1: openpyxl (moderne, .xlsx)
+                if file.filename.endswith('.xlsx'):
+                    try:
+                        df = pd.read_excel(io.BytesIO(content), engine='openpyxl')
+                        logger.info("✅ Fichier lu avec openpyxl")
+                    except Exception as e1:
+                        errors.append(f"openpyxl: {str(e1)[:100]}")
+                
+                # Tentative 2: xlrd (ancien format .xls)
+                if df is None:
                     try:
                         df = pd.read_excel(io.BytesIO(content), engine='xlrd')
+                        logger.info("✅ Fichier lu avec xlrd")
                     except Exception as e2:
-                        # Dernière tentative sans spécifier l'engine
+                        errors.append(f"xlrd: {str(e2)[:100]}")
+                
+                # Tentative 3: pyxlsb (format binaire .xlsb)
+                if df is None and file.filename.endswith('.xlsb'):
+                    try:
+                        df = pd.read_excel(io.BytesIO(content), engine='pyxlsb')
+                        logger.info("✅ Fichier lu avec pyxlsb")
+                    except Exception as e3:
+                        errors.append(f"pyxlsb: {str(e3)[:100]}")
+                
+                # Tentative 4: Méthode par défaut (sans engine spécifique)
+                if df is None:
+                    try:
                         df = pd.read_excel(io.BytesIO(content))
+                        logger.info("✅ Fichier lu avec méthode par défaut")
+                    except Exception as e4:
+                        errors.append(f"default: {str(e4)[:100]}")
+                
+                # Si toutes les tentatives ont échoué
+                if df is None:
+                    error_msg = "Impossible de lire le fichier Excel. Erreurs:\n" + "\n".join(errors)
+                    error_msg += "\n\n💡 Solutions:\n"
+                    error_msg += "1. Ouvrez le fichier dans Excel et sauvegardez-le à nouveau\n"
+                    error_msg += "2. Exportez en CSV depuis Excel: Fichier > Enregistrer sous > CSV\n"
+                    error_msg += "3. Utilisez un fichier Excel plus simple sans styles complexes"
+                    raise HTTPException(status_code=400, detail=error_msg)
             else:
-                raise HTTPException(status_code=400, detail="Format de fichier non supporté (CSV ou XLSX uniquement)")
+                raise HTTPException(status_code=400, detail="Format de fichier non supporté (CSV, XLSX, XLS ou XLSB uniquement)")
+        except HTTPException:
+            raise
         except Exception as e:
             raise HTTPException(
                 status_code=400, 
-                detail=f"Impossible de lire le fichier : {str(e)}. Vérifiez que le fichier n'est pas corrompu."
+                detail=f"Erreur de lecture: {str(e)}. Essayez de sauvegarder le fichier en CSV depuis Excel."
             )
         
         # Appliquer le mapping des colonnes pour purchase-history
