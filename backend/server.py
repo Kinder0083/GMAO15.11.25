@@ -1193,7 +1193,23 @@ async def get_equipment_hierarchy(eq_id: str, current_user: dict = Depends(get_c
 @api_router.put("/equipments/{eq_id}", response_model=Equipment)
 async def update_equipment(eq_id: str, eq_update: EquipmentUpdate, current_user: dict = Depends(get_current_user)):
     """Modifier un équipement"""
+    from dependencies import can_edit_resource
+    
     try:
+        # Récupérer l'équipement existant
+        existing_eq = await db.equipments.find_one({"_id": ObjectId(eq_id)})
+        if not existing_eq:
+            raise HTTPException(status_code=404, detail="Équipement non trouvé")
+        
+        existing_eq["id"] = str(existing_eq["_id"])
+        
+        # Vérifier les permissions (sauf admin, seulement le créateur peut modifier)
+        if not can_edit_resource(current_user, existing_eq):
+            raise HTTPException(
+                status_code=403,
+                detail="Vous ne pouvez modifier que les équipements que vous avez créés"
+            )
+        
         update_data = {k: v for k, v in eq_update.model_dump().items() if v is not None}
         
         await db.equipments.update_one(
@@ -1214,6 +1230,8 @@ async def update_equipment(eq_id: str, eq_update: EquipmentUpdate, current_user:
         eq["hasChildren"] = children_count > 0
         
         return Equipment(**eq)
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
