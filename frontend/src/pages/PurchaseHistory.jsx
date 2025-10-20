@@ -445,16 +445,15 @@ const PurchaseHistory = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fournisseur</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">N° Commande</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">N° Reception</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nb Articles</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Montant Total HT</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nb Articles</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Site</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredGroupedPurchases.length === 0 ? (
                   <tr>
-                    <td colSpan="8" className="px-6 py-8 text-center text-gray-500">
+                    <td colSpan="7" className="px-6 py-8 text-center text-gray-500">
                       Aucune commande trouvée
                     </td>
                   </tr>
@@ -481,54 +480,66 @@ const PurchaseHistory = () => {
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                             {order.numeroCommande}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                            {order.numeroReception || '-'}
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">
+                            {formatCurrency(order.montantTotal)}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                             <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
                               {order.itemCount} article{order.itemCount > 1 ? 's' : ''}
                             </span>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">
-                            {formatCurrency(order.montantTotal)}
-                          </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                             {order.site || '-'}
                           </td>
                         </tr>
                         
-                        {/* Expanded Items */}
-                        {isExpanded && order.items.map((item, idx) => (
-                          <tr key={`${order.numeroCommande}-${idx}`} className="bg-blue-50">
-                            <td className="px-6 py-3"></td>
-                            <td className="px-6 py-3 text-sm text-gray-600">
-                              {/* Vide - pas de date pour les lignes détails */}
-                            </td>
-                            <td className="px-6 py-3 text-sm text-gray-600">
-                              <div className="ml-6">
-                                <p className="font-medium text-gray-900">{item.article}</p>
-                                {item.description && (
-                                  <p className="text-xs text-gray-500">{item.description}</p>
-                                )}
+                        {/* Expanded Items - Detail Table with Different Columns */}
+                        {isExpanded && (
+                          <tr>
+                            <td colSpan="7" className="px-0 py-0 bg-blue-50">
+                              <div className="px-6 py-4">
+                                <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                                  <table className="w-full">
+                                    <thead className="bg-gray-100">
+                                      <tr>
+                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-600">Article</th>
+                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-600">Description</th>
+                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-600">N° Réception</th>
+                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-600">Quantité</th>
+                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-600">Montant HT</th>
+                                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-600">Groupe Stat.</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-200">
+                                      {order.items.map((item, idx) => (
+                                        <tr key={`${order.numeroCommande}-${idx}`} className="hover:bg-gray-50">
+                                          <td className="px-4 py-3 text-sm text-gray-900 font-medium">
+                                            {item.article || '-'}
+                                          </td>
+                                          <td className="px-4 py-3 text-sm text-gray-700">
+                                            {item.description || '-'}
+                                          </td>
+                                          <td className="px-4 py-3 text-sm text-gray-700 whitespace-nowrap">
+                                            {item.numeroReception || '-'}
+                                          </td>
+                                          <td className="px-4 py-3 text-sm text-gray-700">
+                                            {item.quantite || 0}
+                                          </td>
+                                          <td className="px-4 py-3 text-sm font-medium text-green-600">
+                                            {formatCurrency(item.montantLigneHT)}
+                                          </td>
+                                          <td className="px-4 py-3 text-sm text-gray-600">
+                                            {item.groupeStatistique || '-'}
+                                          </td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                </div>
                               </div>
                             </td>
-                            <td className="px-6 py-3 text-sm text-gray-600">
-                              {/* Vide - N° Commande déjà affiché dans ligne principale */}
-                            </td>
-                            <td className="px-6 py-3 text-sm text-gray-600">
-                              {item.numeroReception || '-'}
-                            </td>
-                            <td className="px-6 py-3 text-sm text-gray-600">
-                              <span className="text-xs">Qté: {item.quantite}</span>
-                            </td>
-                            <td className="px-6 py-3 text-sm font-medium text-gray-700">
-                              {formatCurrency(item.montantLigneHT)}
-                            </td>
-                            <td className="px-6 py-3 text-sm text-gray-500">
-                              {item.groupeStatistique || '-'}
-                            </td>
                           </tr>
-                        ))}
+                        )}
                       </React.Fragment>
                     );
                   })
