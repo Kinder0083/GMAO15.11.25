@@ -445,6 +445,7 @@ const PurchaseHistory = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fournisseur</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">N° Commande</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">N° Reception</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nb Articles</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Montant Total HT</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Site</th>
