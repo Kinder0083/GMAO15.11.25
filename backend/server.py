@@ -2090,7 +2090,8 @@ EXPORT_MODULES = {
     "users": "users",
     "inventory": "inventory",
     "locations": "locations",
-    "vendors": "vendors"
+    "vendors": "vendors",
+    "purchase-history": "purchase_history"
 }
 
 @api_router.get("/export/{module}")
