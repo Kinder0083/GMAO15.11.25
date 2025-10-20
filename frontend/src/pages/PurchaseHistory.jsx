@@ -186,6 +186,16 @@ const PurchaseHistory = () => {
           <p className="text-gray-600 mt-1">Gérez et analysez vos achats</p>
         </div>
         <div className="flex gap-2">
+          {currentUser?.role === 'ADMIN' && (
+            <Button
+              variant="outline"
+              className="bg-red-50 text-red-600 hover:bg-red-100 border-red-300"
+              onClick={handleDeleteAll}
+            >
+              <Trash2 size={20} className="mr-2" />
+              Supprimer tout
+            </Button>
+          )}
           <Button
             variant="outline"
             className="bg-white"
