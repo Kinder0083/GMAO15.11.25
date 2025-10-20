@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { useToast } from '../hooks/use-toast';
-import { Wrench } from 'lucide-react';
 import { authAPI } from '../services/api';
 import ForgotPasswordDialog from '../components/Common/ForgotPasswordDialog';
+import axios from 'axios';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 const Login = () => {
   const navigate = useNavigate();
@@ -18,6 +20,21 @@ const Login = () => {
   });
   const [loading, setLoading] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [version, setVersion] = useState('1.1.0');
+
+  useEffect(() => {
+    // Récupérer la version depuis l'API (sans authentification pour la page de login)
+    const fetchVersion = async () => {
+      try {
+        // On utilise une version par défaut car l'endpoint nécessite l'authentification
+        // La version sera récupérée depuis le package ou un fichier de config
+        setVersion('1.1.0');
+      } catch (error) {
+        setVersion('1.1.0');
+      }
+    };
+    fetchVersion();
+  }, []);
 
   const handleChange = (e) => {
     setFormData({
