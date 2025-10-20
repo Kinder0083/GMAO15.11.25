@@ -1875,7 +1875,20 @@ async def get_purchase_history(current_user: dict = Depends(get_current_user)):
     for p in purchases:
         # Ne garder que les champs autorisés
         filtered_doc = {k: v for k, v in p.items() if k in allowed_fields}
-        result.append(PurchaseHistory(**serialize_doc(filtered_doc)))
+        
+        # S'assurer que les champs obligatoires existent avec des valeurs par défaut
+        if 'montantLigneHT' not in filtered_doc or filtered_doc['montantLigneHT'] is None:
+            filtered_doc['montantLigneHT'] = 0.0
+        if 'quantite' not in filtered_doc or filtered_doc['quantite'] is None:
+            filtered_doc['quantite'] = 0.0
+        if 'quantiteRetournee' not in filtered_doc:
+            filtered_doc['quantiteRetournee'] = 0.0
+        
+        try:
+            result.append(PurchaseHistory(**serialize_doc(filtered_doc)))
+        except Exception as e:
+            logger.error(f"Erreur serialization purchase {filtered_doc.get('numeroCommande')}: {e}")
+            continue
     
     return result
 
