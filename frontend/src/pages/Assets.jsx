@@ -346,10 +346,10 @@ const Assets = () => {
                           <span className="font-medium text-gray-900">{equipment.coutAchat.toLocaleString('fr-FR')} €</span>
                         </div>
                       )}
-                      {equipment.garantie && (
+                      {equipment.anneeFabrication && (
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Garantie:</span>
-                          <span className="font-medium text-gray-900">{equipment.garantie}</span>
+                          <span className="text-gray-600">Année de Fabrication:</span>
+                          <span className="font-medium text-gray-900">{equipment.anneeFabrication}</span>
                         </div>
                       )}
                       {equipment.derniereMaintenance && (
