@@ -289,6 +289,14 @@ const People = () => {
                     <div className="flex gap-2 mt-2 w-full">
                       <Button 
                         variant="outline" 
+                        className="flex-1 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300"
+                        onClick={() => handleEditUser(user)}
+                      >
+                        <Edit size={16} className="mr-2" />
+                        Modifier
+                      </Button>
+                      <Button 
+                        variant="outline" 
                         className="flex-1 hover:bg-purple-50 hover:text-purple-600 hover:border-purple-300"
                         onClick={() => handleManagePermissions(user)}
                       >
