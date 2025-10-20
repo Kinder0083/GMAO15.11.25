@@ -2269,7 +2269,30 @@ async def import_data(
         
         try:
             if file.filename.endswith('.csv'):
-                df = pd.read_csv(io.BytesIO(content))
+                # Détecter automatiquement le séparateur CSV
+                content_str = content.decode('utf-8', errors='ignore')
+                # Essayer de détecter le séparateur
+                first_line = content_str.split('\n')[0] if content_str else ""
+                
+                # Compter les séparateurs potentiels
+                comma_count = first_line.count(',')
+                semicolon_count = first_line.count(';')
+                tab_count = first_line.count('\t')
+                
+                # Choisir le séparateur le plus fréquent
+                if semicolon_count > comma_count and semicolon_count > tab_count:
+                    separator = ';'
+                elif tab_count > comma_count:
+                    separator = '\t'
+                else:
+                    separator = ','
+                
+                logger.info(f"📋 Séparateur détecté: '{separator}' (virgule={comma_count}, point-virgule={semicolon_count}, tab={tab_count})")
+                
+                df = pd.read_csv(io.BytesIO(content), sep=separator, encoding='utf-8')
+                logger.info(f"✅ CSV lu avec succès: {len(df)} lignes, {len(df.columns)} colonnes")
+                logger.info(f"📋 Colonnes: {list(df.columns)}")
+                
             elif file.filename.endswith(('.xlsx', '.xls', '.xlsb')):
                 # Stratégie multi-tentatives pour les fichiers Excel
                 df = None
