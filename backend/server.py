@@ -1856,6 +1856,185 @@ async def delete_vendor(vendor_id: str, current_user: dict = Depends(get_current
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+
+# ==================== PURCHASE HISTORY ROUTES ====================
+@api_router.get("/purchase-history", response_model=List[PurchaseHistory])
+async def get_purchase_history(current_user: dict = Depends(get_current_user)):
+    """Liste tous les achats"""
+    purchases = await db.purchase_history.find().sort("dateCreation", -1).to_list(5000)
+    return [PurchaseHistory(**serialize_doc(p)) for p in purchases]
+
+@api_router.get("/purchase-history/stats")
+async def get_purchase_stats(current_user: dict = Depends(get_current_user)):
+    """Statistiques détaillées des achats"""
+    
+    # Total des achats
+    all_purchases = await db.purchase_history.find().to_list(10000)
+    
+    if not all_purchases:
+        return {
+            "totalAchats": 0,
+            "montantTotal": 0,
+            "quantiteTotale": 0,
+            "parFournisseur": [],
+            "parMois": [],
+            "parSite": [],
+            "parGroupeStatistique": [],
+            "articlesTop": []
+        }
+    
+    total_achats = len(all_purchases)
+    montant_total = sum(p.get("montantLigneHT", 0) for p in all_purchases)
+    quantite_totale = sum(p.get("quantite", 0) for p in all_purchases)
+    
+    # Par fournisseur
+    fournisseurs = {}
+    for p in all_purchases:
+        fournisseur = p.get("fournisseur", "Inconnu")
+        if fournisseur not in fournisseurs:
+            fournisseurs[fournisseur] = {"montant": 0, "quantite": 0, "count": 0}
+        fournisseurs[fournisseur]["montant"] += p.get("montantLigneHT", 0)
+        fournisseurs[fournisseur]["quantite"] += p.get("quantite", 0)
+        fournisseurs[fournisseur]["count"] += 1
+    
+    par_fournisseur = [
+        {
+            "fournisseur": k,
+            "montant": v["montant"],
+            "quantite": v["quantite"],
+            "count": v["count"],
+            "pourcentage": round((v["montant"] / montant_total * 100) if montant_total > 0 else 0, 2)
+        }
+        for k, v in sorted(fournisseurs.items(), key=lambda x: x[1]["montant"], reverse=True)
+    ]
+    
+    # Par mois
+    mois_dict = {}
+    for p in all_purchases:
+        date_creation = p.get("dateCreation")
+        if date_creation:
+            if isinstance(date_creation, str):
+                date_creation = datetime.fromisoformat(date_creation.replace('Z', '+00:00'))
+            mois_annee = date_creation.strftime("%Y-%m")
+            if mois_annee not in mois_dict:
+                mois_dict[mois_annee] = {"montant": 0, "quantite": 0, "count": 0}
+            mois_dict[mois_annee]["montant"] += p.get("montantLigneHT", 0)
+            mois_dict[mois_annee]["quantite"] += p.get("quantite", 0)
+            mois_dict[mois_annee]["count"] += 1
+    
+    par_mois = [
+        {"mois": k, "montant": v["montant"], "quantite": v["quantite"], "count": v["count"]}
+        for k, v in sorted(mois_dict.items())
+    ]
+    
+    # Par site
+    sites = {}
+    for p in all_purchases:
+        site = p.get("site", "Non défini")
+        if site not in sites:
+            sites[site] = {"montant": 0, "quantite": 0, "count": 0}
+        sites[site]["montant"] += p.get("montantLigneHT", 0)
+        sites[site]["quantite"] += p.get("quantite", 0)
+        sites[site]["count"] += 1
+    
+    par_site = [
+        {"site": k, "montant": v["montant"], "quantite": v["quantite"], "count": v["count"]}
+        for k, v in sorted(sites.items(), key=lambda x: x[1]["montant"], reverse=True)
+    ]
+    
+    # Par groupe statistique
+    groupes = {}
+    for p in all_purchases:
+        groupe = p.get("groupeStatistique", "Non défini")
+        if groupe not in groupes:
+            groupes[groupe] = {"montant": 0, "quantite": 0, "count": 0}
+        groupes[groupe]["montant"] += p.get("montantLigneHT", 0)
+        groupes[groupe]["quantite"] += p.get("quantite", 0)
+        groupes[groupe]["count"] += 1
+    
+    par_groupe = [
+        {"groupe": k, "montant": v["montant"], "quantite": v["quantite"], "count": v["count"]}
+        for k, v in sorted(groupes.items(), key=lambda x: x[1]["montant"], reverse=True)
+    ]
+    
+    # Articles top
+    articles = {}
+    for p in all_purchases:
+        article = p.get("article", "Inconnu")
+        if article not in articles:
+            articles[article] = {"montant": 0, "quantite": 0, "count": 0, "description": p.get("description", "")}
+        articles[article]["montant"] += p.get("montantLigneHT", 0)
+        articles[article]["quantite"] += p.get("quantite", 0)
+        articles[article]["count"] += 1
+    
+    articles_top = [
+        {"article": k, **v}
+        for k, v in sorted(articles.items(), key=lambda x: x[1]["montant"], reverse=True)[:20]
+    ]
+    
+    return {
+        "totalAchats": total_achats,
+        "montantTotal": round(montant_total, 2),
+        "quantiteTotale": round(quantite_totale, 2),
+        "parFournisseur": par_fournisseur,
+        "parMois": par_mois,
+        "parSite": par_site,
+        "parGroupeStatistique": par_groupe,
+        "articlesTop": articles_top
+    }
+
+@api_router.post("/purchase-history", response_model=PurchaseHistory)
+async def create_purchase(purchase: PurchaseHistoryCreate, current_user: dict = Depends(get_current_user)):
+    """Créer un nouvel achat"""
+    purchase_dict = purchase.model_dump()
+    
+    # Convertir datetime en ISO string si nécessaire
+    if isinstance(purchase_dict.get("dateCreation"), datetime):
+        purchase_dict["dateCreation"] = purchase_dict["dateCreation"].isoformat()
+    
+    purchase_dict["dateEnregistrement"] = datetime.utcnow()
+    purchase_dict["_id"] = ObjectId()
+    
+    # Ajouter l'utilisateur créateur si non fourni
+    if not purchase_dict.get("creationUser"):
+        purchase_dict["creationUser"] = current_user.get("email")
+    
+    await db.purchase_history.insert_one(purchase_dict)
+    
+    return PurchaseHistory(**serialize_doc(purchase_dict))
+
+@api_router.put("/purchase-history/{purchase_id}", response_model=PurchaseHistory)
+async def update_purchase(purchase_id: str, purchase_update: PurchaseHistoryUpdate, current_user: dict = Depends(get_current_user)):
+    """Modifier un achat"""
+    try:
+        update_data = {k: v for k, v in purchase_update.model_dump().items() if v is not None}
+        
+        # Convertir datetime en ISO string si nécessaire
+        if "dateCreation" in update_data and isinstance(update_data["dateCreation"], datetime):
+            update_data["dateCreation"] = update_data["dateCreation"].isoformat()
+        
+        await db.purchase_history.update_one(
+            {"_id": ObjectId(purchase_id)},
+            {"$set": update_data}
+        )
+        
+        purchase = await db.purchase_history.find_one({"_id": ObjectId(purchase_id)})
+        return PurchaseHistory(**serialize_doc(purchase))
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@api_router.delete("/purchase-history/{purchase_id}")
+async def delete_purchase(purchase_id: str, current_user: dict = Depends(get_current_user)):
+    """Supprimer un achat"""
+    try:
+        result = await db.purchase_history.delete_one({"_id": ObjectId(purchase_id)})
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Achat non trouvé")
+        return {"message": "Achat supprimé"}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
 # ==================== REPORTS/ANALYTICS ROUTES ====================
 @api_router.get("/reports/analytics")
 async def get_analytics(current_user: dict = Depends(get_current_user)):
