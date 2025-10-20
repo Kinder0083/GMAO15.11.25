@@ -47,6 +47,35 @@ const PurchaseHistory = () => {
     }
   };
 
+  const handleDeleteAll = async () => {
+    if (window.confirm('⚠️ ATTENTION ! Êtes-vous sûr de vouloir supprimer TOUT l\'historique d\'achat ? Cette action est irréversible !')) {
+      try {
+        const result = await purchaseHistoryAPI.deleteAll();
+        toast({
+          title: 'Succès',
+          description: `${result.data.deleted_count} achats supprimés`
+        });
+        loadData();
+      } catch (error) {
+        toast({
+          title: 'Erreur',
+          description: 'Impossible de supprimer l\'historique',
+          variant: 'destructive'
+        });
+      }
+    }
+  };
+
+  const toggleExpand = (numeroCommande) => {
+    const newExpanded = new Set(expandedOrders);
+    if (newExpanded.has(numeroCommande)) {
+      newExpanded.delete(numeroCommande);
+    } else {
+      newExpanded.add(numeroCommande);
+    }
+    setExpandedOrders(newExpanded);
+  };
+
   const handleDelete = async (id) => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer cet achat ?')) {
       try {
