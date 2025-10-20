@@ -320,13 +320,14 @@ class Equipment(EquipmentBase):
     class Config:
         from_attributes = True
 
-# Location Models
+# Location Models (renommées en Zone)
 class LocationBase(BaseModel):
     nom: str
     adresse: Optional[str] = None
     ville: Optional[str] = None
     codePostal: Optional[str] = None
     type: Optional[str] = None
+    parent_id: Optional[str] = None  # Pour hiérarchie (sous-zones)
 
 class LocationCreate(LocationBase):
     pass
@@ -337,10 +338,14 @@ class LocationUpdate(BaseModel):
     ville: Optional[str] = None
     codePostal: Optional[str] = None
     type: Optional[str] = None
+    parent_id: Optional[str] = None
 
 class Location(LocationBase):
     id: str
     dateCreation: datetime
+    parent: Optional[dict] = None  # Informations de la zone parente
+    hasChildren: bool = False  # Indique si cette zone a des sous-zones
+    level: int = 0  # Niveau dans la hiérarchie (0 = racine, 1 = sous-zone, 2 = sous-sous-zone)
 
     class Config:
         from_attributes = True
