@@ -49,6 +49,14 @@ const MainLayout = () => {
 
         // Charger le nombre d'ordres de travail assignés
         loadWorkOrdersCount(parsedUser.id);
+        
+        // Rafraîchir les notifications toutes les 30 secondes
+        const intervalId = setInterval(() => {
+          loadWorkOrdersCount(parsedUser.id);
+        }, 30000); // 30 secondes
+        
+        // Nettoyer l'intervalle au démontage
+        return () => clearInterval(intervalId);
       } catch (error) {
         console.error('Erreur lors du parsing des infos utilisateur:', error);
       }
