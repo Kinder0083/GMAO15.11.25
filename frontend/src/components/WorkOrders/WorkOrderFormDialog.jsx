@@ -157,6 +157,9 @@ const WorkOrderFormDialog = ({ open, onOpenChange, workOrder, onSuccess }) => {
           title: 'Succès',
           description: 'Ordre de travail créé avec succès'
         });
+        
+        // Émettre un événement pour rafraîchir les notifications instantanément
+        window.dispatchEvent(new Event('workOrderCreated'));
       }
 
       onSuccess();
