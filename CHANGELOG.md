@@ -1,6 +1,72 @@
 # GMAO Iris - Notes de Version
 
-## Version 1.0.1 - CORRECTION CRITIQUE (Octobre 2025)
+## Version 1.2.0 - MISE À JOUR MAJEURE (Octobre 2024)
+
+### ✨ Nouvelles Fonctionnalités
+
+#### Statistiques Historique Achat
+- **Statistiques par utilisateur (créateur de commandes)**
+  - Affichage du nombre de commandes passées par utilisateur (sans doublons)
+  - Montant total dépensé par membre
+  - Pourcentage du budget total avec barres de progression
+  - Basé sur la colonne L (Creation User) du fichier Requêteur
+
+- **Évolution mensuelle des achats**
+  - Statistiques détaillées par mois
+  - Nombre de commandes et montant par période
+  - Graphiques avec barres de progression
+  - Affichage des 12 derniers mois
+
+#### Système de Notifications
+- **Rafraîchissement automatique des notifications**
+  - Mise à jour toutes les 30 secondes sans F5
+  - Compteur dynamique d'ordres de travail assignés
+  - Badge rouge avec nombre sur la cloche de notification
+
+### 🔧 Corrections Critiques
+
+#### Authentification Externe
+- **FIX : Connexion externe maintenant fonctionnelle**
+  - Correction variable JWT (SECRET_KEY vs JWT_SECRET_KEY) dans auth.py
+  - Ajout SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES dans .env
+  - Résolution du problème "Utilisateur ou mot de passe incorrect" en externe
+  - Fonctionne maintenant sur tous les réseaux (local et externe)
+
+#### Envoi d'Emails
+- **FIX : Configuration SMTP Gmail fonctionnelle**
+  - Support SMTP externe avec authentification (Gmail, SendGrid, etc.)
+  - Configuration automatique via .env
+  - Logs détaillés pour diagnostic
+  - Chargement dynamique des variables d'environnement
+  - Invitations membres opérationnelles
+
+#### Système de Mise à Jour
+- **Amélioration de la détection de versions**
+  - Détection du commit local via git
+  - Comparaison avec le commit distant GitHub
+  - Affichage "Mise à jour disponible" seulement si différent
+
+### 🐛 Corrections de Bugs
+
+- Fix compteurs équipements (affichait 1 au lieu de 0)
+- Fix masquage compte de secours (buenogy@gmail.com) sauf pour admin
+- Fix colonne "Année de Fabrication" dans équipements (remplace "Garantie")
+- Fix rafraîchissement notifications (plus besoin de F5)
+- Fix détection ordres de travail assignés
+
+---
+
+## Version 1.1.0 (Octobre 2024)
+
+### Fonctionnalités
+- Section "Historique Achat" complète
+- Import/Export CSV/Excel
+- Affichage groupé par commande
+- Système de mise à jour intégré
+- Logo personnalisé
+- Droits utilisateurs avec propriété
+
+---
 
 ### 🔴 CORRECTION CRITIQUE - BUG LOGIN PROXMOX
 
