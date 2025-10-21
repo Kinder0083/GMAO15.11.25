@@ -50,13 +50,25 @@ const MainLayout = () => {
         // Charger le nombre d'ordres de travail assignés
         loadWorkOrdersCount(parsedUser.id);
         
-        // Rafraîchir les notifications toutes les 30 secondes
+        // Rafraîchir les notifications toutes les 60 secondes
         const intervalId = setInterval(() => {
           loadWorkOrdersCount(parsedUser.id);
-        }, 30000); // 30 secondes
+        }, 60000); // 60 secondes
         
-        // Nettoyer l'intervalle au démontage
-        return () => clearInterval(intervalId);
+        // Écouter les événements de création/modification d'ordres de travail
+        const handleWorkOrderChange = () => {
+          loadWorkOrdersCount(parsedUser.id);
+        };
+        
+        window.addEventListener('workOrderCreated', handleWorkOrderChange);
+        window.addEventListener('workOrderUpdated', handleWorkOrderChange);
+        
+        // Nettoyer les listeners et l'intervalle au démontage
+        return () => {
+          clearInterval(intervalId);
+          window.removeEventListener('workOrderCreated', handleWorkOrderChange);
+          window.removeEventListener('workOrderUpdated', handleWorkOrderChange);
+        };
       } catch (error) {
         console.error('Erreur lors du parsing des infos utilisateur:', error);
       }
