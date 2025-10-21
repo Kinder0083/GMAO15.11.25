@@ -297,6 +297,77 @@ const PurchaseHistory = () => {
 
       {/* Statistics Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Statistiques par Utilisateur - NOUVELLE SECTION */}
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>📊 Statistiques par Utilisateur (Créateurs de Commandes)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Utilisateur</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Nb Commandes</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Montant Total</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">% du Budget</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {stats?.par_utilisateur?.map((user, index) => (
+                    <tr key={index} className="hover:bg-gray-50">
+                      <td className="px-4 py-3 text-sm font-medium text-gray-900">{user.utilisateur}</td>
+                      <td className="px-4 py-3 text-sm text-right text-blue-600 font-semibold">{user.nb_commandes}</td>
+                      <td className="px-4 py-3 text-sm text-right text-green-600 font-semibold">{formatCurrency(user.montant_total)}</td>
+                      <td className="px-4 py-3 text-sm text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <div className="w-24 bg-gray-200 rounded-full h-2">
+                            <div 
+                              className="bg-blue-600 h-2 rounded-full" 
+                              style={{width: `${Math.min(user.pourcentage, 100)}%`}}
+                            ></div>
+                          </div>
+                          <span className="font-medium text-gray-700">{user.pourcentage}%</span>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Évolution Mensuelle - NOUVELLE SECTION */}
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>📈 Évolution Mensuelle des Achats</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {stats?.par_mois?.slice(-12).reverse().map((month, index) => (
+                <div key={index} className="border-l-4 border-blue-500 pl-4 py-2">
+                  <div className="flex items-center justify-between mb-2">
+                    <div>
+                      <p className="font-semibold text-gray-900 text-lg">{month.mois}</p>
+                      <p className="text-sm text-gray-600">
+                        {month.nb_commandes} commande{month.nb_commandes > 1 ? 's' : ''} • {month.nb_lignes} ligne{month.nb_lignes > 1 ? 's' : ''}
+                      </p>
+                    </div>
+                    <p className="text-2xl font-bold text-green-600">{formatCurrency(month.montant_total)}</p>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-3">
+                    <div 
+                      className="bg-gradient-to-r from-blue-500 to-green-500 h-3 rounded-full transition-all" 
+                      style={{width: `${Math.min((month.montant_total / (stats?.montant_total || 1)) * 100, 100)}%`}}
+                    ></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Top Fournisseurs */}
         <Card>
           <CardHeader>
