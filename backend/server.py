@@ -743,6 +743,12 @@ async def get_work_orders(
             wo["emplacement"] = await get_location_by_id(wo["emplacement_id"])
         if wo.get("equipement_id"):
             wo["equipement"] = await get_equipment_by_id(wo["equipement_id"])
+        
+        # Ajouter le nom du créateur
+        if wo.get("createdBy"):
+            creator = await get_user_by_id(wo["createdBy"])
+            if creator:
+                wo["createdByName"] = f"{creator.get('prenom', '')} {creator.get('nom', '')}".strip()
     
     return [WorkOrder(**wo) for wo in work_orders]
 
