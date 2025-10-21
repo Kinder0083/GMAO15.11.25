@@ -326,6 +326,34 @@ agent_communication:
       - Password: password123
       
       Note : Le frontend ne nécessite pas de tests automatisés à ce stade, les fonctionnalités peuvent être testées manuellement par l'utilisateur.
+  - agent: "main"
+    message: |
+      🔧 CORRECTION CRITIQUE - Problème de connexion après inscription
+      
+      🐛 PROBLÈME IDENTIFIÉ :
+      - Les membres qui créent leur compte ne peuvent pas se connecter par la suite
+      - Erreur "Email ou mot de passe incorrect" malgré que le membre soit visible dans l'admin
+      
+      🔍 CAUSE RACINE :
+      - Incohérence dans le nom du champ du mot de passe haché
+      - Certains endpoints stockaient dans "password" alors que le login cherchait "hashed_password"
+      
+      ✅ CORRECTIONS EFFECTUÉES :
+      1. /auth/register : Utilise maintenant "hashed_password" au lieu de "password"
+      2. /auth/complete-registration : Utilise "hashed_password" (flux d'invitation)
+      3. Tous les endpoints de changement de mot de passe : Update "hashed_password"
+      4. Toutes les vérifications de mot de passe : Utilisent "hashed_password"
+      5. create_admin_manual.py : Utilise "hashed_password"
+      
+      📂 FICHIERS MODIFIÉS :
+      - /app/backend/server.py (8 corrections)
+      - /app/backend/create_admin_manual.py (1 correction)
+      
+      🧪 TESTS À EFFECTUER :
+      1. Tester inscription complète via invitation (POST /auth/complete-registration)
+      2. Tester connexion après inscription (POST /auth/login)
+      3. Tester création de compte via /auth/register
+      4. Tester connexion après création de compte
   - agent: "testing"
     message: |
       🎉 PHASE 1 TESTS COMPLETED - ALL CRITICAL BACKEND APIS WORKING
