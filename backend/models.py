@@ -54,6 +54,59 @@ class PMStatus(str, Enum):
     ACTIF = "ACTIF"
     INACTIF = "INACTIF"
 
+class ActionType(str, Enum):
+    CREATE = "CREATE"
+    UPDATE = "UPDATE"
+    DELETE = "DELETE"
+    LOGIN = "LOGIN"
+    LOGOUT = "LOGOUT"
+
+class EntityType(str, Enum):
+    USER = "USER"
+    WORK_ORDER = "WORK_ORDER"
+    EQUIPMENT = "EQUIPMENT"
+    LOCATION = "LOCATION"
+    VENDOR = "VENDOR"
+    INVENTORY = "INVENTORY"
+    PREVENTIVE_MAINTENANCE = "PREVENTIVE_MAINTENANCE"
+    PURCHASE_HISTORY = "PURCHASE_HISTORY"
+
+# Audit Log Models
+class AuditLog(BaseModel):
+    id: str
+    timestamp: datetime
+    user_id: str
+    user_name: str
+    user_email: str
+    action: ActionType
+    entity_type: EntityType
+    entity_id: Optional[str] = None
+    entity_name: Optional[str] = None
+    details: Optional[str] = None
+    changes: Optional[Dict] = None
+
+class AuditLogCreate(BaseModel):
+    user_id: str
+    user_name: str
+    user_email: str
+    action: ActionType
+    entity_type: EntityType
+    entity_id: Optional[str] = None
+    entity_name: Optional[str] = None
+    details: Optional[str] = None
+    changes: Optional[Dict] = None
+
+# Comment Models
+class Comment(BaseModel):
+    id: str
+    user_id: str
+    user_name: str
+    text: str
+    timestamp: datetime
+
+class CommentCreate(BaseModel):
+    text: str
+
 # User Models
 class UserBase(BaseModel):
     nom: str
