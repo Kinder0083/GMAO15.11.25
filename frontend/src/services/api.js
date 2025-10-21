@@ -173,6 +173,43 @@ export const importExportAPI = {
       params: { mode },
       headers: { 'Content-Type': 'multipart/form-data' }
     });
+  },
+  
+  // ==================== AUDIT LOGS (JOURNAL) ====================
+  getAuditLogs: async (params) => {
+    const response = await api.get('/audit-logs', { params });
+    return response.data;
+  },
+  getEntityHistory: async (entityType, entityId) => {
+    const response = await api.get(`/audit-logs/entity/${entityType}/${entityId}`);
+    return response.data;
+  },
+  exportAuditLogs: async (params) => {
+    const response = await api.get('/audit-logs/export', {
+      params,
+      responseType: 'blob'
+    });
+    
+    // Créer un lien de téléchargement
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `audit_logs_${new Date().getTime()}.${params.format || 'csv'}`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    
+    return response;
+  },
+  
+  // ==================== WORK ORDER COMMENTS ====================
+  addWorkOrderComment: async (workOrderId, text) => {
+    const response = await api.post(`/work-orders/${workOrderId}/comments`, { text });
+    return response.data;
+  },
+  getWorkOrderComments: async (workOrderId) => {
+    const response = await api.get(`/work-orders/${workOrderId}/comments`);
+    return response.data;
   }
 };
 
