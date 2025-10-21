@@ -36,7 +36,7 @@ async def create_admin_manual():
         
         admin_user = {
             "email": admin_data["email"],
-            "password": hashed_password,
+            "hashed_password": hashed_password,
             "prenom": admin_data["prenom"],
             "nom": admin_data["nom"],
             "role": "ADMIN",
