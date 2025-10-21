@@ -54,16 +54,23 @@ class UpdateManager:
                 async with session.get(url) as response:
                     if response.status == 200:
                         commit_data = await response.json()
-                        commit_sha = commit_data["sha"][:7]
+                        remote_commit = commit_data["sha"][:7]
                         commit_date = commit_data["commit"]["author"]["date"]
-                        commit_message = commit_data["commit"]["message"].split('\n')[0]  # Première ligne
+                        commit_message = commit_data["commit"]["message"].split('\n')[0]
+                        
+                        # Récupérer le commit local actuel
+                        local_commit = await self.get_current_commit()
+                        
+                        # Vérifier si une mise à jour est disponible
+                        update_available = local_commit != remote_commit if local_commit else True
                         
                         return {
-                            "version": f"latest-{commit_sha}",
-                            "commit": commit_sha,
+                            "version": f"latest-{remote_commit}",
+                            "commit": remote_commit,
                             "date": commit_date,
                             "message": commit_message,
-                            "available": True
+                            "available": update_available,
+                            "local_commit": local_commit
                         }
             
             return None
