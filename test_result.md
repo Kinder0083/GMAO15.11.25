@@ -221,11 +221,11 @@ backend:
 
   - task: "Correction champ hashed_password - Problème de connexion après inscription"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py, /app/backend/create_admin_manual.py"
-    stuck_count: 1
+    stuck_count: 0
     priority: "critical"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: false
         agent: "user"
@@ -252,6 +252,38 @@ backend:
           8. create_admin_manual.py - Ligne 39: Utilise "hashed_password"
           
           Tous les endpoints sont maintenant cohérents.
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ CRITICAL FIX VERIFIED - Tests complets réussis
+          
+          TESTS EFFECTUÉS:
+          1. Complete Registration Flow via Invitation: ✓ PASS
+             - Invitation créée avec succès via POST /api/users/invite-member
+             - Registration complétée via POST /api/auth/complete-registration
+             - Utilisateur créé avec champ "hashed_password" correct
+          
+          2. Login After Registration (TEST CRITIQUE): ✓ PASS
+             - Login réussi avec les identifiants du membre nouvellement créé
+             - JWT token valide retourné
+             - Confirme que le champ "hashed_password" est correctement lu
+          
+          3. Direct Registration via /auth/register: ✓ PASS
+             - Création d'utilisateur directe réussie
+             - Login immédiat réussi après création
+          
+          4. Password Change Flow: ✓ PASS
+             - Changement de mot de passe réussi
+             - Login avec nouveau mot de passe réussi
+             - Confirme mise à jour correcte du champ "hashed_password"
+          
+          5. Database Verification: ✓ PASS
+             - Tous les utilisateurs créés peuvent se connecter
+             - Champ "hashed_password" correctement stocké et lu
+          
+          RÉSULTAT: 5/5 tests réussis
+          Le problème de connexion après inscription est RÉSOLU.
+          Tous les endpoints utilisent maintenant le champ "hashed_password" de manière cohérente.
 
 frontend:
   - task: "Settings.jsx - Chargement du profil utilisateur"
