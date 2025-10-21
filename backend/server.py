@@ -589,7 +589,7 @@ async def change_password_first_login(request: ChangePasswordRequest, current_us
     if not user:
         raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
     
-    if not verify_password(request.old_password, user["password"]):
+    if not verify_password(request.old_password, user["hashed_password"]):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Mot de passe actuel incorrect"
@@ -664,7 +664,7 @@ async def change_password(request: ChangePasswordRequest, current_user: dict = D
     if not user:
         raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
     
-    if not verify_password(request.old_password, user["password"]):
+    if not verify_password(request.old_password, user["hashed_password"]):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Mot de passe actuel incorrect"
