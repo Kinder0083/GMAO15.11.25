@@ -83,7 +83,7 @@ const Journal = () => {
         ...(filters.user_id && { user_id: filters.user_id })
       };
 
-      await api.exportAuditLogs(params);
+      await auditAPI.exportAuditLogs(params);
       toast({
         title: 'Succès',
         description: `Export ${format.toUpperCase()} réussi`
