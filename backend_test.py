@@ -1806,10 +1806,19 @@ class MemberRegistrationTester:
         # Instead, we'll verify through successful login operations
         # If login works, it means the hashed_password field is correctly stored and retrieved
         
-        test_cases = [
-            ("member.test@gmao-iris.local", "NewMemberPass456!"),
-            ("direct.user@gmao-iris.local", "DirectPass123!")
-        ]
+        test_cases = []
+        
+        # Add member user if available (with updated password from password change test)
+        if hasattr(self, 'member_email'):
+            test_cases.append((self.member_email, "NewMemberPass456!"))
+            
+        # Add direct user if available
+        if hasattr(self, 'direct_email') and hasattr(self, 'direct_password'):
+            test_cases.append((self.direct_email, self.direct_password))
+            
+        if not test_cases:
+            self.log("✗ No test users available for database verification", "ERROR")
+            return False
         
         all_success = True
         
