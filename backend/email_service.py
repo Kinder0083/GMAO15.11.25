@@ -78,12 +78,18 @@ def send_email(to_email: str, subject: str, html_content: str, text_content: Opt
             server.quit()
         elif SMTP_USE_TLS:
             # SMTP externe avec TLS (port 587)
+            logger.info("🔐 Mode TLS activé")
             server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=10)
+            server.set_debuglevel(1)  # Active debug SMTP
             server.ehlo()
+            logger.info("🔒 Démarrage STARTTLS...")
             server.starttls()
             server.ehlo()
             if needs_auth:
+                logger.info(f"🔐 Authentification avec {SMTP_USERNAME}...")
                 server.login(SMTP_USERNAME, SMTP_PASSWORD)
+                logger.info("✅ Authentification réussie")
+            logger.info(f"📤 Envoi email à {to_email}...")
             server.send_message(msg)
             server.quit()
         else:
