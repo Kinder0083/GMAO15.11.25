@@ -1821,7 +1821,7 @@ async def invite_user(user_invite: UserInvite, current_user: dict = Depends(get_
         "email": user_invite.email,
         "telephone": user_invite.telephone,
         "role": user_invite.role,
-        "password": hashed_password,
+        "hashed_password": hashed_password,
         "statut": "actif",
         "dateCreation": datetime.utcnow(),
         "derniereConnexion": None,
