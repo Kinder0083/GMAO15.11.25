@@ -152,14 +152,14 @@ const Journal = () => {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Select
-              value={filters.action}
-              onValueChange={(value) => setFilters(prev => ({ ...prev, action: value }))}
+              value={filters.action || "all"}
+              onValueChange={(value) => setFilters(prev => ({ ...prev, action: value === "all" ? "" : value }))}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Type d'action" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Toutes les actions</SelectItem>
+                <SelectItem value="all">Toutes les actions</SelectItem>
                 {Object.keys(actionTypes).map(action => (
                   <SelectItem key={action} value={action}>
                     {actionTypes[action].label}
@@ -169,14 +169,14 @@ const Journal = () => {
             </Select>
 
             <Select
-              value={filters.entity_type}
-              onValueChange={(value) => setFilters(prev => ({ ...prev, entity_type: value }))}
+              value={filters.entity_type || "all"}
+              onValueChange={(value) => setFilters(prev => ({ ...prev, entity_type: value === "all" ? "" : value }))}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Type d'entité" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Toutes les entités</SelectItem>
+                <SelectItem value="all">Toutes les entités</SelectItem>
                 {Object.keys(entityTypes).map(entity => (
                   <SelectItem key={entity} value={entity}>
                     {entityTypes[entity]}
