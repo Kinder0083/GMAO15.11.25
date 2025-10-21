@@ -110,15 +110,12 @@ const WorkOrderDialog = ({ open, onOpenChange, workOrder }) => {
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-between">
-            <DialogTitle className="text-2xl">Ordre de travail #{workOrder.id}</DialogTitle>
+            <DialogTitle className="text-2xl">{workOrder.titre}</DialogTitle>
             <div className="flex gap-2">
               {getStatusBadge(workOrder.statut)}
               {getPriorityBadge(workOrder.priorite)}
             </div>
           </div>
-          <DialogDescription className="text-lg font-medium text-gray-700 mt-2">
-            {workOrder.titre}
-          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 mt-4">
