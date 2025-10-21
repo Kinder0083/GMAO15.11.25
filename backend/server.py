@@ -232,6 +232,17 @@ async def login(login_request: LoginRequest):
         {"$set": {"derniereConnexion": datetime.utcnow()}}
     )
     
+    # Log dans l'audit
+    await audit_service.log_action(
+        user_id=user.get("id", str(user["_id"])),
+        user_name=f"{user['prenom']} {user['nom']}",
+        user_email=user["email"],
+        action=ActionType.LOGIN,
+        entity_type=EntityType.USER,
+        entity_id=user.get("id", str(user["_id"])),
+        entity_name=f"{user['prenom']} {user['nom']}"
+    )
+    
     # Create access token
     access_token = create_access_token(data={"sub": str(user["_id"])})
     
