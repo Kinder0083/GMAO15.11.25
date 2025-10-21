@@ -183,7 +183,7 @@ async def register(user_create: UserCreate):
     # Create user
     user_dict = user_create.model_dump()
     del user_dict["password"]
-    user_dict["password"] = hashed_password
+    user_dict["hashed_password"] = hashed_password
     user_dict["statut"] = "actif"
     user_dict["dateCreation"] = datetime.utcnow()
     user_dict["derniereConnexion"] = None
