@@ -1,6 +1,6 @@
 """
 Service d'envoi d'emails pour GMAO Iris
-Utilise Postfix local (SMTP)
+Support SMTP externe avec authentification (Gmail, SendGrid, etc.)
 """
 
 import smtplib
@@ -13,16 +13,19 @@ import logging
 logger = logging.getLogger(__name__)
 
 # Configuration depuis .env
-SMTP_HOST = os.environ.get('SMTP_HOST', 'localhost')
-SMTP_PORT = int(os.environ.get('SMTP_PORT', '25'))
-SMTP_FROM = os.environ.get('SMTP_FROM', 'noreply@gmao-iris.local')
+SMTP_SERVER = os.environ.get('SMTP_SERVER', 'localhost')
+SMTP_PORT = int(os.environ.get('SMTP_PORT', '587'))
+SMTP_USERNAME = os.environ.get('SMTP_USERNAME', '')
+SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD', '')
+SMTP_SENDER_EMAIL = os.environ.get('SMTP_SENDER_EMAIL', 'noreply@gmao-iris.com')
 SMTP_FROM_NAME = os.environ.get('SMTP_FROM_NAME', 'GMAO Iris')
+SMTP_USE_TLS = os.environ.get('SMTP_USE_TLS', 'true').lower() == 'true'
 APP_URL = os.environ.get('APP_URL', 'http://localhost')
 
 
 def send_email(to_email: str, subject: str, html_content: str, text_content: Optional[str] = None) -> bool:
     """
-    Envoie un email via Postfix local
+    Envoie un email via SMTP externe (Gmail, SendGrid, etc.)
     
     Args:
         to_email: Email du destinataire
@@ -34,10 +37,17 @@ def send_email(to_email: str, subject: str, html_content: str, text_content: Opt
         bool: True si envoi réussi, False sinon
     """
     try:
+        # Vérifier que les identifiants SMTP sont configurés
+        if not SMTP_USERNAME or not SMTP_PASSWORD:
+            logger.error("⚠️ SMTP_USERNAME ou SMTP_PASSWORD non configurés dans .env")
+            logger.error("Pour Gmail : Utilisez un App Password (https://support.google.com/accounts/answer/185833)")
+            logger.error("Pour SendGrid : Utilisez votre API Key")
+            return False
+        
         # Créer le message
         msg = MIMEMultipart('alternative')
         msg['Subject'] = subject
-        msg['From'] = f"{SMTP_FROM_NAME} <{SMTP_FROM}>"
+        msg['From'] = f"{SMTP_FROM_NAME} <{SMTP_SENDER_EMAIL}>"
         msg['To'] = to_email
         
         # Ajouter version texte si fournie
@@ -49,15 +59,39 @@ def send_email(to_email: str, subject: str, html_content: str, text_content: Opt
         part_html = MIMEText(html_content, 'html', 'utf-8')
         msg.attach(part_html)
         
-        # Envoyer via SMTP
-        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
-            server.send_message(msg)
+        # Envoyer via SMTP avec authentification
+        logger.info(f"📧 Connexion à {SMTP_SERVER}:{SMTP_PORT}...")
         
-        logger.info(f"Email envoyé avec succès à {to_email}")
+        if SMTP_USE_TLS:
+            # Utiliser TLS (port 587 généralement)
+            server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=10)
+            server.ehlo()
+            server.starttls()
+            server.ehlo()
+        else:
+            # Utiliser SSL (port 465 généralement)
+            server = smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT, timeout=10)
+        
+        # S'authentifier
+        logger.info(f"🔐 Authentification avec {SMTP_USERNAME}...")
+        server.login(SMTP_USERNAME, SMTP_PASSWORD)
+        
+        # Envoyer l'email
+        server.send_message(msg)
+        server.quit()
+        
+        logger.info(f"✅ Email envoyé avec succès à {to_email}")
         return True
         
+    except smtplib.SMTPAuthenticationError as e:
+        logger.error(f"❌ Erreur d'authentification SMTP: {e}")
+        logger.error("Vérifiez SMTP_USERNAME et SMTP_PASSWORD dans .env")
+        return False
+    except smtplib.SMTPException as e:
+        logger.error(f"❌ Erreur SMTP lors de l'envoi à {to_email}: {e}")
+        return False
     except Exception as e:
-        logger.error(f"Erreur lors de l'envoi de l'email à {to_email}: {e}")
+        logger.error(f"❌ Erreur inattendue lors de l'envoi à {to_email}: {e}")
         return False
 
 
