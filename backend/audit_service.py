@@ -115,4 +115,9 @@ class AuditService:
         cursor = self.db.audit_logs.find(query).sort("timestamp", -1)
         logs = await cursor.to_list(length=None)
         
+        # Convertir les ObjectId en string pour la sérialisation JSON
+        for log in logs:
+            if "_id" in log:
+                log["_id"] = str(log["_id"])
+        
         return logs
