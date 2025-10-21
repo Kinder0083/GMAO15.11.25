@@ -13,6 +13,7 @@ const Planning = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [availabilities, setAvailabilities] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [initialLoad, setInitialLoad] = useState(true);
 
   const loadUsers = async () => {
     try {
@@ -31,7 +32,10 @@ const Planning = () => {
 
   const loadAvailabilities = async () => {
     try {
-      setLoading(true);
+      // Ne montrer le loading que lors du premier chargement
+      if (initialLoad) {
+        setLoading(true);
+      }
       const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
       const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
       
@@ -52,7 +56,10 @@ const Planning = () => {
     } catch (error) {
       console.error('Erreur lors du chargement des disponibilités:', error);
     } finally {
-      setLoading(false);
+      if (initialLoad) {
+        setLoading(false);
+        setInitialLoad(false);
+      }
     }
   };
 
