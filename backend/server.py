@@ -762,6 +762,12 @@ async def get_work_order(wo_id: str, current_user: dict = Depends(get_current_us
         if wo.get("equipement_id"):
             wo["equipement"] = await get_equipment_by_id(wo["equipement_id"])
         
+        # Ajouter le nom du créateur
+        if wo.get("createdBy"):
+            creator = await get_user_by_id(wo["createdBy"])
+            if creator:
+                wo["createdByName"] = f"{creator.get('prenom', '')} {creator.get('nom', '')}".strip()
+        
         return WorkOrder(**wo)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
