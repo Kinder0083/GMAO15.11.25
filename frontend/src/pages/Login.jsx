@@ -20,7 +20,7 @@ const Login = () => {
   });
   const [loading, setLoading] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
-  const [version, setVersion] = useState('1.1.0');
+  const [version, setVersion] = useState('1.2.0');
 
   useEffect(() => {
     // Récupérer la version depuis l'API (sans authentification pour la page de login)
