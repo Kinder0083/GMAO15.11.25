@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -8,9 +8,12 @@ import {
 } from '../ui/dialog';
 import { Badge } from '../ui/badge';
 import { Separator } from '../ui/separator';
-import { Calendar, Clock, User, MapPin, Wrench, FileText } from 'lucide-react';
+import { Button } from '../ui/button';
+import { Textarea } from '../ui/textarea';
+import { Calendar, Clock, User, MapPin, Wrench, FileText, MessageSquare, Send } from 'lucide-react';
 import AttachmentsList from './AttachmentsList';
 import AttachmentUploader from './AttachmentUploader';
+import { commentsAPI } from '../../services/api';
 
 const WorkOrderDialog = ({ open, onOpenChange, workOrder }) => {
   const [refreshAttachments, setRefreshAttachments] = useState(0);
