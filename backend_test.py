@@ -1889,7 +1889,7 @@ def main():
     import_export_results = import_export_tester.run_all_tests()
     
     # Combined results
-    all_results = {**phase1_results, **hierarchy_results, **import_export_results}
+    all_results = {**member_results, **phase1_results, **hierarchy_results, **import_export_results}
     
     print("\n" + "="*80)
     print("OVERALL TEST SUMMARY")
