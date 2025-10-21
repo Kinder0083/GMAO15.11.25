@@ -1653,9 +1653,14 @@ class MemberRegistrationTester:
         """Test 2: Login After Registration - Critical Test"""
         self.log("\n=== Test 2: Login After Registration - Critical Test ===")
         
+        # Check if we have a member email from the registration test
+        if not hasattr(self, 'member_email'):
+            self.log("✗ No member email available from registration test", "ERROR")
+            return False
+        
         # Try to login with the newly created member credentials
         login_data = {
-            "email": "member.test@gmao-iris.local",
+            "email": self.member_email,
             "password": "MemberPass123!"
         }
         
