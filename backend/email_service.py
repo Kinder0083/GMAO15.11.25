@@ -115,6 +115,8 @@ def send_email(to_email: str, subject: str, html_content: str, text_content: Opt
         return False
     except Exception as e:
         logger.error(f"❌ Erreur inattendue lors de l'envoi à {to_email}: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
         return False
 
 
