@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Download, Filter, Search, User, FileText } from 'lucide-react';
 import api from '../services/api';
-import { toast } from 'react-hot-toast';
+import { useToast } from '../hooks/use-toast';
 
 const Journal = () => {
   const [logs, setLogs] = useState([]);
