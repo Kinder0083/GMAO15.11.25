@@ -778,10 +778,23 @@ async def create_work_order(wo_create: WorkOrderCreate, current_user: dict = Dep
     wo_dict["tempsReel"] = None
     wo_dict["dateTermine"] = None
     wo_dict["attachments"] = []
+    wo_dict["comments"] = []  # Initialiser les commentaires
     wo_dict["createdBy"] = current_user.get("id")  # Ajouter le créateur
     wo_dict["_id"] = ObjectId()
     
     await db.work_orders.insert_one(wo_dict)
+    
+    # Log dans l'audit
+    await audit_service.log_action(
+        user_id=current_user["id"],
+        user_name=f"{current_user['prenom']} {current_user['nom']}",
+        user_email=current_user["email"],
+        action=ActionType.CREATE,
+        entity_type=EntityType.WORK_ORDER,
+        entity_id=wo_dict.get("id"),
+        entity_name=wo_dict["titre"],
+        details=f"Ordre de travail #{numero} créé"
+    )
     
     wo = serialize_doc(wo_dict)
     if wo.get("assigne_a_id"):
