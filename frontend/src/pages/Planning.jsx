@@ -14,17 +14,6 @@ const Planning = () => {
   const [availabilities, setAvailabilities] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadUsers();
-    loadAvailabilities();
-  }, [currentDate]);
-  
-  // Rafraîchissement automatique toutes les 5 secondes
-  useAutoRefresh(() => {
-    loadUsers();
-    loadAvailabilities();
-  }, [currentDate]);
-
   const loadUsers = async () => {
     try {
       const response = await usersAPI.getAll();
