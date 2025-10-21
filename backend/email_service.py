@@ -1,6 +1,6 @@
 """
 Service d'envoi d'emails pour GMAO Iris
-Support SMTP local (Postfix) et externe (Gmail, SendGrid, etc.)
+Support SMTP externe avec authentification (Gmail, SendGrid, etc.)
 """
 
 import smtplib
@@ -12,15 +12,27 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+# Charger les variables d'environnement depuis .env
+from dotenv import load_dotenv
+import pathlib
+env_path = pathlib.Path(__file__).parent / '.env'
+load_dotenv(dotenv_path=env_path)
+
 # Configuration depuis .env
 SMTP_SERVER = os.environ.get('SMTP_SERVER', 'localhost')
-SMTP_PORT = int(os.environ.get('SMTP_PORT', '25'))
+SMTP_PORT = int(os.environ.get('SMTP_PORT', '587'))
 SMTP_USERNAME = os.environ.get('SMTP_USERNAME', '')
 SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD', '')
 SMTP_SENDER_EMAIL = os.environ.get('SMTP_SENDER_EMAIL', 'noreply@gmao-iris.com')
 SMTP_FROM_NAME = os.environ.get('SMTP_FROM_NAME', 'GMAO Iris')
-SMTP_USE_TLS = os.environ.get('SMTP_USE_TLS', 'false').lower() == 'true'
+SMTP_USE_TLS = os.environ.get('SMTP_USE_TLS', 'true').lower() == 'true'
 APP_URL = os.environ.get('APP_URL', 'http://localhost')
+
+# Log de la configuration au démarrage
+logger.info(f"📧 Configuration SMTP : {SMTP_SERVER}:{SMTP_PORT}")
+logger.info(f"👤 Username: {SMTP_USERNAME}")
+logger.info(f"🔐 Password: {'*' * len(SMTP_PASSWORD) if SMTP_PASSWORD else 'NOT SET'}")
+logger.info(f"🔒 TLS: {SMTP_USE_TLS}")
 
 
 def send_email(to_email: str, subject: str, html_content: str, text_content: Optional[str] = None) -> bool:
