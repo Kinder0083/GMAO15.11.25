@@ -219,6 +219,40 @@ backend:
           - Réponse contient les champs requis: message, email, role
           - Intégration SMTP complètement fonctionnelle
 
+  - task: "Correction champ hashed_password - Problème de connexion après inscription"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py, /app/backend/create_admin_manual.py"
+    stuck_count: 1
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "user"
+        comment: |
+          Problème reporté par l'utilisateur:
+          - Les membres qui créent leur compte via invitation ne peuvent pas se connecter
+          - Message d'erreur: "Email ou mot de passe incorrect"
+          - Le membre est bien visible dans le panel admin
+      - working: "NA"
+        agent: "main"
+        comment: |
+          CAUSE IDENTIFIÉE: Incohérence dans le nom du champ password
+          - Endpoints d'inscription stockaient dans "password"
+          - Endpoint de login cherchait dans "hashed_password"
+          
+          CORRECTIONS EFFECTUÉES (9 occurrences):
+          1. /auth/register - Ligne 186: Utilise "hashed_password"
+          2. /auth/complete-registration - Ligne 557: Utilise "hashed_password"
+          3. Ligne 1824: Utilise "hashed_password"
+          4. Reset password - Ligne 301: Update vers "hashed_password"
+          5. Change password first login - Ligne 606: Update vers "hashed_password"
+          6. Change password - Ligne 679: Update vers "hashed_password"
+          7. Verify password first login - Ligne 592: Lecture de "hashed_password"
+          8. create_admin_manual.py - Ligne 39: Utilise "hashed_password"
+          
+          Tous les endpoints sont maintenant cohérents.
+
 frontend:
   - task: "Settings.jsx - Chargement du profil utilisateur"
     implemented: true
