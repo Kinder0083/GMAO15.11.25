@@ -5,6 +5,7 @@ import { Calendar, ChevronLeft, ChevronRight, UserCheck, UserX, Users } from 'lu
 import { usersAPI } from '../services/api';
 import axios from 'axios';
 import { useToast } from '../hooks/use-toast';
+import { useAutoRefresh } from '../hooks/useAutoRefresh';
 
 const Planning = () => {
   const { toast } = useToast();
