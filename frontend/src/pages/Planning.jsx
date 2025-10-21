@@ -56,6 +56,17 @@ const Planning = () => {
     }
   };
 
+  useEffect(() => {
+    loadUsers();
+    loadAvailabilities();
+  }, [currentDate]);
+  
+  // Rafraîchissement automatique toutes les 5 secondes
+  useAutoRefresh(() => {
+    loadUsers();
+    loadAvailabilities();
+  }, [currentDate]);
+
   const toggleAvailability = async (userId, date) => {
     try {
       const dateStr = date.toISOString().split('T')[0];
