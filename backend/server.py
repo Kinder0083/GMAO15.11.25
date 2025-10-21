@@ -2785,6 +2785,240 @@ async def rollback_update(
     
     return result
 
+# ==================== AUDIT LOG ROUTES (JOURNAL) ====================
+@api_router.get("/audit-logs")
+async def get_audit_logs(
+    skip: int = 0,
+    limit: int = 100,
+    user_id: Optional[str] = None,
+    action: Optional[str] = None,
+    entity_type: Optional[str] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    current_user: dict = Depends(get_current_admin_user)
+):
+    """
+    Récupère les logs d'audit (admin uniquement)
+    Supporte les filtres: user_id, action, entity_type, start_date, end_date
+    """
+    try:
+        # Convertir les strings en enums si fournis
+        action_enum = ActionType(action) if action else None
+        entity_type_enum = EntityType(entity_type) if entity_type else None
+        
+        # Convertir les dates si fournies
+        start_dt = datetime.fromisoformat(start_date) if start_date else None
+        end_dt = datetime.fromisoformat(end_date) if end_date else None
+        
+        logs, total = await audit_service.get_logs(
+            skip=skip,
+            limit=limit,
+            user_id=user_id,
+            action=action_enum,
+            entity_type=entity_type_enum,
+            start_date=start_dt,
+            end_date=end_dt
+        )
+        
+        return {
+            "logs": logs,
+            "total": total,
+            "skip": skip,
+            "limit": limit
+        }
+        
+    except Exception as e:
+        logger.error(f"Erreur lors de la récupération des logs d'audit: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="Erreur lors de la récupération des logs d'audit"
+        )
+
+@api_router.get("/audit-logs/entity/{entity_type}/{entity_id}")
+async def get_entity_audit_history(
+    entity_type: str,
+    entity_id: str,
+    current_user: dict = Depends(get_current_admin_user)
+):
+    """
+    Récupère l'historique complet d'une entité spécifique (admin uniquement)
+    """
+    try:
+        entity_type_enum = EntityType(entity_type)
+        logs = await audit_service.get_entity_history(entity_type_enum, entity_id)
+        
+        return {
+            "entity_type": entity_type,
+            "entity_id": entity_id,
+            "history": logs
+        }
+        
+    except ValueError:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Type d'entité invalide: {entity_type}"
+        )
+    except Exception as e:
+        logger.error(f"Erreur lors de la récupération de l'historique: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="Erreur lors de la récupération de l'historique"
+        )
+
+@api_router.get("/audit-logs/export")
+async def export_audit_logs(
+    format: str = "csv",
+    user_id: Optional[str] = None,
+    action: Optional[str] = None,
+    entity_type: Optional[str] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    current_user: dict = Depends(get_current_admin_user)
+):
+    """
+    Exporte les logs d'audit en CSV ou Excel (admin uniquement)
+    """
+    try:
+        # Récupérer tous les logs avec filtres
+        action_enum = ActionType(action) if action else None
+        entity_type_enum = EntityType(entity_type) if entity_type else None
+        start_dt = datetime.fromisoformat(start_date) if start_date else None
+        end_dt = datetime.fromisoformat(end_date) if end_date else None
+        
+        logs, _ = await audit_service.get_logs(
+            skip=0,
+            limit=10000,  # Limite haute pour export
+            user_id=user_id,
+            action=action_enum,
+            entity_type=entity_type_enum,
+            start_date=start_dt,
+            end_date=end_dt
+        )
+        
+        # Préparer les données pour l'export
+        export_data = []
+        for log in logs:
+            export_data.append({
+                "Date/Heure": log["timestamp"].strftime("%d/%m/%Y %H:%M:%S"),
+                "Utilisateur": log["user_name"],
+                "Email": log["user_email"],
+                "Action": log["action"],
+                "Type": log["entity_type"],
+                "Entité": log.get("entity_name", ""),
+                "Détails": log.get("details", "")
+            })
+        
+        df = pd.DataFrame(export_data)
+        
+        # Créer le fichier selon le format demandé
+        if format.lower() == "csv":
+            output = io.StringIO()
+            df.to_csv(output, index=False, encoding='utf-8-sig')
+            output.seek(0)
+            
+            return Response(
+                content=output.getvalue(),
+                media_type="text/csv",
+                headers={
+                    "Content-Disposition": f"attachment; filename=audit_logs_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+                }
+            )
+        else:  # Excel
+            output = io.BytesIO()
+            with pd.ExcelWriter(output, engine='openpyxl') as writer:
+                df.to_excel(writer, index=False, sheet_name='Audit Logs')
+            output.seek(0)
+            
+            return Response(
+                content=output.getvalue(),
+                media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                headers={
+                    "Content-Disposition": f"attachment; filename=audit_logs_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+                }
+            )
+        
+    except Exception as e:
+        logger.error(f"Erreur lors de l'export des logs: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="Erreur lors de l'export des logs"
+        )
+
+# ==================== WORK ORDER COMMENTS ROUTES ====================
+@api_router.post("/work-orders/{work_order_id}/comments")
+async def add_work_order_comment(
+    work_order_id: str,
+    comment: CommentCreate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Ajoute un commentaire à un ordre de travail"""
+    try:
+        # Vérifier que l'ordre de travail existe
+        work_order = await db.work_orders.find_one({"id": work_order_id})
+        if not work_order:
+            raise HTTPException(status_code=404, detail="Ordre de travail non trouvé")
+        
+        # Créer le commentaire
+        new_comment = {
+            "id": str(uuid.uuid4()),
+            "user_id": current_user["id"],
+            "user_name": f"{current_user['prenom']} {current_user['nom']}",
+            "text": comment.text,
+            "timestamp": datetime.now(timezone.utc)
+        }
+        
+        # Ajouter le commentaire à l'ordre de travail
+        await db.work_orders.update_one(
+            {"id": work_order_id},
+            {"$push": {"comments": new_comment}}
+        )
+        
+        # Log dans l'audit
+        await audit_service.log_action(
+            user_id=current_user["id"],
+            user_name=f"{current_user['prenom']} {current_user['nom']}",
+            user_email=current_user["email"],
+            action=ActionType.UPDATE,
+            entity_type=EntityType.WORK_ORDER,
+            entity_id=work_order_id,
+            entity_name=work_order.get("titre", ""),
+            details=f"Commentaire ajouté: {comment.text[:50]}..."
+        )
+        
+        return new_comment
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erreur lors de l'ajout du commentaire: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="Erreur lors de l'ajout du commentaire"
+        )
+
+@api_router.get("/work-orders/{work_order_id}/comments")
+async def get_work_order_comments(
+    work_order_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Récupère tous les commentaires d'un ordre de travail"""
+    try:
+        work_order = await db.work_orders.find_one({"id": work_order_id})
+        if not work_order:
+            raise HTTPException(status_code=404, detail="Ordre de travail non trouvé")
+        
+        comments = work_order.get("comments", [])
+        return {"comments": comments}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erreur lors de la récupération des commentaires: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="Erreur lors de la récupération des commentaires"
+        )
+
 # Include the router in the main app
 app.include_router(api_router)
 
