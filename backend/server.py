@@ -3049,15 +3049,15 @@ async def add_work_order_comment(
 ):
     """Ajoute un commentaire à un ordre de travail"""
     try:
-        # Vérifier que l'ordre de travail existe
-        work_order = await db.work_orders.find_one({"id": work_order_id})
+        # Vérifier que l'ordre de travail existe (chercher par _id ObjectId)
+        work_order = await db.work_orders.find_one({"_id": ObjectId(work_order_id)})
         if not work_order:
             raise HTTPException(status_code=404, detail="Ordre de travail non trouvé")
         
         # Créer le commentaire
         new_comment = {
             "id": str(uuid.uuid4()),
-            "user_id": current_user["id"],
+            "user_id": current_user.get("id", str(work_order["_id"])),
             "user_name": f"{current_user['prenom']} {current_user['nom']}",
             "text": comment.text,
             "timestamp": datetime.now(timezone.utc)
@@ -3065,7 +3065,7 @@ async def add_work_order_comment(
         
         # Ajouter le commentaire à l'ordre de travail
         await db.work_orders.update_one(
-            {"id": work_order_id},
+            {"_id": ObjectId(work_order_id)},
             {"$push": {"comments": new_comment}}
         )
         
