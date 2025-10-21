@@ -676,7 +676,7 @@ async def change_password(request: ChangePasswordRequest, current_user: dict = D
     # Mettre à jour le mot de passe
     await db.users.update_one(
         {"_id": ObjectId(user_id)},
-        {"$set": {"password": new_hashed_password}}
+        {"$set": {"hashed_password": new_hashed_password}}
     )
     
     logger.info(f"Mot de passe changé pour {user.get('email')}")
