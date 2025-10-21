@@ -97,13 +97,20 @@ class AuditService:
         for log in logs:
             if "_id" in log:
                 log["_id"] = str(log["_id"])
-            # S'assurer que le timestamp est au format ISO avec timezone
+            # S'assurer que le timestamp est au format ISO avec timezone UTC
             if "timestamp" in log and log["timestamp"]:
                 if hasattr(log["timestamp"], 'isoformat'):
-                    log["timestamp"] = log["timestamp"].isoformat()
-                elif isinstance(log["timestamp"], str) and not log["timestamp"].endswith('Z'):
-                    # Si c'est déjà une string sans Z, l'ajouter
-                    log["timestamp"] = log["timestamp"] + 'Z' if not log["timestamp"].endswith('Z') else log["timestamp"]
+                    # Convertir en ISO format
+                    iso_str = log["timestamp"].isoformat()
+                    # Ajouter 'Z' si pas de timezone
+                    if '+' not in iso_str and 'Z' not in iso_str:
+                        log["timestamp"] = iso_str + 'Z'
+                    else:
+                        log["timestamp"] = iso_str
+                elif isinstance(log["timestamp"], str):
+                    # Si c'est déjà une string, s'assurer qu'elle a 'Z'
+                    if '+' not in log["timestamp"] and not log["timestamp"].endswith('Z'):
+                        log["timestamp"] = log["timestamp"] + 'Z'
         
         # Compter le total
         total = await self.db.audit_logs.count_documents(query)
