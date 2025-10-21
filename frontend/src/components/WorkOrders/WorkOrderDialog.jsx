@@ -22,15 +22,8 @@ const WorkOrderDialog = ({ open, onOpenChange, workOrder }) => {
   const [loadingComments, setLoadingComments] = useState(false);
   const [sendingComment, setSendingComment] = useState(false);
 
-  useEffect(() => {
-    if (open && workOrder) {
-      loadComments();
-    }
-  }, [open, workOrder]);
-
-  if (!workOrder) return null;
-
   const loadComments = async () => {
+    if (!workOrder) return;
     try {
       setLoadingComments(true);
       const response = await commentsAPI.getWorkOrderComments(workOrder.id);
@@ -43,7 +36,7 @@ const WorkOrderDialog = ({ open, onOpenChange, workOrder }) => {
   };
 
   const handleSendComment = async () => {
-    if (!newComment.trim()) return;
+    if (!newComment.trim() || !workOrder) return;
     
     try {
       setSendingComment(true);
@@ -82,6 +75,14 @@ const WorkOrderDialog = ({ open, onOpenChange, workOrder }) => {
     const year = String(date.getFullYear()).slice(-2);
     return `${day}/${month}/${year}`;
   };
+
+  useEffect(() => {
+    if (open && workOrder) {
+      loadComments();
+    }
+  }, [open, workOrder]);
+
+  if (!workOrder) return null;
 
   const getStatusBadge = (statut) => {
     const badges = {
