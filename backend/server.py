@@ -869,6 +869,20 @@ async def update_work_order(wo_id: str, wo_update: WorkOrderUpdate, current_user
             {"$set": update_data}
         )
         
+        # Log dans l'audit
+        changes_desc = ", ".join([f"{k}: {v}" for k, v in update_data.items()])
+        await audit_service.log_action(
+            user_id=current_user["id"],
+            user_name=f"{current_user['prenom']} {current_user['nom']}",
+            user_email=current_user["email"],
+            action=ActionType.UPDATE,
+            entity_type=EntityType.WORK_ORDER,
+            entity_id=existing_wo.get("id"),
+            entity_name=existing_wo["titre"],
+            details=f"Modifications: {changes_desc}",
+            changes=update_data
+        )
+        
         wo = await db.work_orders.find_one({"_id": ObjectId(wo_id)})
         wo = serialize_doc(wo)
         
