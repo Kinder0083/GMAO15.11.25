@@ -1579,8 +1579,11 @@ class MemberRegistrationTester:
         self.log("\n=== Test 1: Complete Registration Flow via Invitation ===")
         
         # Step 1: Create invitation as admin
+        import time
+        unique_email = f"member.test.{int(time.time())}@gmao-iris.local"
+        
         invite_data = {
-            "email": "member.test@gmao-iris.local",
+            "email": unique_email,
             "role": "TECHNICIEN"
         }
         
@@ -1592,23 +1595,23 @@ class MemberRegistrationTester:
             
         self.log("✓ Invitation created successfully")
         
-        # Step 2: Create a valid invitation token for testing
-        # We'll use the same method as the backend
-        from jose import jwt
-        import os
-        from datetime import datetime, timedelta
-        
-        SECRET_KEY = os.environ.get('SECRET_KEY', 'cde07833b439f01271581902a8e2207bfba9c8c838307dd17496405120de16d3')
-        ALGORITHM = "HS256"
+        # Step 2: Create a valid invitation token using the same method as backend
+        # Import the actual auth module from backend
+        import sys
+        sys.path.append('/app/backend')
+        from auth import create_access_token
+        from datetime import timedelta
         
         invitation_data = {
             "sub": invite_data["email"],
             "type": "invitation",
             "role": invite_data["role"],
-            "invited_by": self.admin_user_id,
-            "exp": datetime.utcnow() + timedelta(days=7)
+            "invited_by": self.admin_user_id
         }
-        invitation_token = jwt.encode(invitation_data, SECRET_KEY, algorithm=ALGORITHM)
+        invitation_token = create_access_token(
+            data=invitation_data,
+            expires_delta=timedelta(days=7)
+        )
         
         # Step 3: Complete registration using the token
         registration_data = {
@@ -1638,6 +1641,9 @@ class MemberRegistrationTester:
             self.log(f"  - Email: {user_data['email']}")
             self.log(f"  - Name: {user_data['prenom']} {user_data['nom']}")
             self.log(f"  - Role: {user_data['role']}")
+            
+            # Store the email for login test
+            self.member_email = user_data["email"]
             return True
         else:
             self.log(f"✗ Registration failed: {response.status_code} - {response.text}", "ERROR")
