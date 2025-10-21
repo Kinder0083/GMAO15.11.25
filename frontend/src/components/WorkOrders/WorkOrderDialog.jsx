@@ -21,14 +21,14 @@ const WorkOrderDialog = ({ open, onOpenChange, workOrder }) => {
   const [newComment, setNewComment] = useState('');
   const [loadingComments, setLoadingComments] = useState(false);
   const [sendingComment, setSendingComment] = useState(false);
-  
-  if (!workOrder) return null;
 
   useEffect(() => {
     if (open && workOrder) {
       loadComments();
     }
   }, [open, workOrder]);
+
+  if (!workOrder) return null;
 
   const loadComments = async () => {
     try {
