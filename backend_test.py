@@ -1505,6 +1505,9 @@ class MemberRegistrationTester:
         self.admin_user_id = None
         self.session = requests.Session()
         self.test_users = []  # Track created users for cleanup
+        self.member_email = None
+        self.direct_email = None
+        self.direct_password = None
         
     def log(self, message: str, level: str = "INFO"):
         """Log test messages"""
