@@ -298,7 +298,7 @@ async def reset_password(request: ResetPasswordRequest):
         await db.users.update_one(
             {"_id": ObjectId(user_id)},
             {
-                "$set": {"password": hashed_password},
+                "$set": {"hashed_password": hashed_password},
                 "$unset": {"reset_token": "", "reset_token_created": ""}
             }
         )
