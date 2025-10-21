@@ -3099,7 +3099,7 @@ async def get_work_order_comments(
 ):
     """Récupère tous les commentaires d'un ordre de travail"""
     try:
-        work_order = await db.work_orders.find_one({"id": work_order_id})
+        work_order = await db.work_orders.find_one({"_id": ObjectId(work_order_id)})
         if not work_order:
             raise HTTPException(status_code=404, detail="Ordre de travail non trouvé")
         
