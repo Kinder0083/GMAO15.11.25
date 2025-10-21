@@ -23,36 +23,28 @@ class UpdateManager:
         return self.current_version
     
     async def check_github_version(self) -> Optional[Dict]:
-        """Vérifie la dernière version disponible sur GitHub"""
+        """Vérifie la dernière version disponible sur GitHub (dernier commit)"""
         try:
-            # Récupérer les tags depuis GitHub API
-            url = f"https://api.github.com/repos/{self.github_user}/{self.github_repo}/tags"
-            
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url) as response:
-                    if response.status == 200:
-                        tags = await response.json()
-                        if tags:
-                            latest_tag = tags[0]
-                            return {
-                                "version": latest_tag["name"].replace("v", ""),
-                                "commit": latest_tag["commit"]["sha"][:7],
-                                "available": True
-                            }
-            
-            # Si pas de tags, vérifier le dernier commit
+            # Récupérer le dernier commit de la branche
             url = f"https://api.github.com/repos/{self.github_user}/{self.github_repo}/commits/{self.github_branch}"
+            
             async with aiohttp.ClientSession() as session:
                 async with session.get(url) as response:
                     if response.status == 200:
                         commit_data = await response.json()
+                        commit_sha = commit_data["sha"][:7]
+                        commit_date = commit_data["commit"]["author"]["date"]
+                        commit_message = commit_data["commit"]["message"].split('\n')[0]  # Première ligne
+                        
                         return {
-                            "version": "latest",
-                            "commit": commit_data["sha"][:7],
-                            "date": commit_data["commit"]["author"]["date"],
-                            "message": commit_data["commit"]["message"],
+                            "version": f"latest-{commit_sha}",
+                            "commit": commit_sha,
+                            "date": commit_date,
+                            "message": commit_message,
                             "available": True
                         }
+            
+            return None
                         
         except Exception as e:
             print(f"Erreur vérification version GitHub: {e}")
