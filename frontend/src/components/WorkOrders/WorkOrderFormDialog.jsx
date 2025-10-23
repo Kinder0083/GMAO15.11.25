@@ -446,7 +446,14 @@ const WorkOrderFormDialog = ({ open, onOpenChange, workOrder, onSuccess }) => {
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button type="button" variant="outline" onClick={() => {
+              if (workOrder) {
+                setShowStatusDialog(true);
+                setIsClosing(true);
+              } else {
+                onOpenChange(false);
+              }
+            }}>
               Annuler
             </Button>
             <Button type="submit" disabled={loading} className="bg-blue-600 hover:bg-blue-700">
@@ -456,6 +463,15 @@ const WorkOrderFormDialog = ({ open, onOpenChange, workOrder, onSuccess }) => {
         </form>
       </DialogContent>
     </Dialog>
+
+    <StatusChangeDialog
+      open={showStatusDialog}
+      onOpenChange={setShowStatusDialog}
+      currentStatus={savedWorkOrderStatus || (workOrder ? workOrder.statut : 'OUVERT')}
+      onStatusChange={handleStatusChange}
+      onSkip={handleSkipStatusChange}
+    />
+    </>
   );
 };
 
