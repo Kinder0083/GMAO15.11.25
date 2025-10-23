@@ -428,6 +428,7 @@ const WorkOrders = () => {
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         workOrder={selectedWorkOrder}
+        onSuccess={loadWorkOrders}
       />
 
       <WorkOrderFormDialog
