@@ -19,8 +19,12 @@ const Planning = () => {
     try {
       const response = await usersAPI.getAll();
       // Filtrer le compte de secours du planning
-      const filteredUsers = response.data.filter(u => u.email !== 'buenogy@gmail.com');
-      setUsers(filteredUsers);
+      const newUsers = response.data.filter(u => u.email !== 'buenogy@gmail.com');
+      
+      // Mise à jour silencieuse : comparer avant de mettre à jour
+      if (JSON.stringify(newUsers) !== JSON.stringify(users)) {
+        setUsers(newUsers);
+      }
     } catch (error) {
       toast({
         title: 'Erreur',
@@ -52,7 +56,11 @@ const Planning = () => {
         }
       });
       
-      setAvailabilities(response.data);
+      // Mise à jour silencieuse : comparer avant de mettre à jour
+      const newAvailabilities = response.data;
+      if (JSON.stringify(newAvailabilities) !== JSON.stringify(availabilities)) {
+        setAvailabilities(newAvailabilities);
+      }
     } catch (error) {
       console.error('Erreur lors du chargement des disponibilités:', error);
     } finally {
@@ -68,7 +76,7 @@ const Planning = () => {
     loadAvailabilities();
   }, [currentDate]);
   
-  // Rafraîchissement automatique toutes les 5 secondes
+  // Rafraîchissement automatique toutes les 5 secondes (invisible)
   useAutoRefresh(() => {
     loadUsers();
     loadAvailabilities();
