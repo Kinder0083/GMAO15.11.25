@@ -13,14 +13,19 @@ import { Textarea } from '../ui/textarea';
 import { Calendar, Clock, User, MapPin, Wrench, FileText, MessageSquare, Send } from 'lucide-react';
 import AttachmentsList from './AttachmentsList';
 import AttachmentUploader from './AttachmentUploader';
-import { commentsAPI } from '../../services/api';
+import StatusChangeDialog from './StatusChangeDialog';
+import { commentsAPI, workOrdersAPI } from '../../services/api';
+import { useToast } from '../../hooks/use-toast';
 
-const WorkOrderDialog = ({ open, onOpenChange, workOrder }) => {
+const WorkOrderDialog = ({ open, onOpenChange, workOrder, onSuccess }) => {
+  const { toast } = useToast();
   const [refreshAttachments, setRefreshAttachments] = useState(0);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
   const [loadingComments, setLoadingComments] = useState(false);
   const [sendingComment, setSendingComment] = useState(false);
+  const [showStatusDialog, setShowStatusDialog] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
 
   const loadComments = async () => {
     if (!workOrder) return;
