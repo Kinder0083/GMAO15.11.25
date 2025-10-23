@@ -116,6 +116,44 @@ const WorkOrderFormDialog = ({ open, onOpenChange, workOrder, onSuccess }) => {
     setAttachments(attachments.filter((_, i) => i !== index));
   };
 
+  const handleDialogClose = (isOpen) => {
+    if (!isOpen && !isClosing && !loading) {
+      // L'utilisateur veut fermer sans sauvegarder
+      // Dans le cas du formulaire, on ouvre le dialog de statut seulement si on modifie un ordre existant
+      if (workOrder) {
+        setShowStatusDialog(true);
+        setIsClosing(true);
+      } else {
+        onOpenChange(false);
+      }
+    }
+  };
+
+  const handleStatusChange = async (newStatus) => {
+    if (savedWorkOrderId) {
+      try {
+        await workOrdersAPI.update(savedWorkOrderId, { statut: newStatus });
+        toast({
+          title: 'Succès',
+          description: 'Le statut a été mis à jour'
+        });
+      } catch (error) {
+        toast({
+          title: 'Erreur',
+          description: 'Impossible de mettre à jour le statut',
+          variant: 'destructive'
+        });
+      }
+    }
+    setShowStatusDialog(false);
+    onOpenChange(false);
+  };
+
+  const handleSkipStatusChange = () => {
+    setShowStatusDialog(false);
+    onOpenChange(false);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
