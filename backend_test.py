@@ -9,8 +9,8 @@ import json
 import os
 from datetime import datetime
 
-# Get backend URL from frontend .env
-BACKEND_URL = "http://gmaoiris.duckdns.org:3000/api"
+# Use internal backend URL for testing
+BACKEND_URL = "http://localhost:8001/api"
 
 # Test credentials
 TEST_EMAIL = "admin@example.com"
