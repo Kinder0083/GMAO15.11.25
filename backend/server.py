@@ -801,6 +801,10 @@ async def get_work_order(wo_id: str, current_user: dict = Depends(get_current_us
                 logger.error(f"Erreur lors de la recherche du créateur {wo.get('createdBy')}: {e}")
                 pass
         
+        # Ajouter un numero par défaut si manquant
+        if "numero" not in wo or not wo["numero"]:
+            wo["numero"] = "N/A"
+        
         return WorkOrder(**wo)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
