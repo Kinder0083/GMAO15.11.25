@@ -649,7 +649,6 @@ class MeterReading(BaseModel):
     date_creation: datetime
 
 class MeterReadingCreate(BaseModel):
-    meter_id: str
     date_releve: datetime
     valeur: float
     notes: Optional[str] = None
