@@ -679,6 +679,7 @@ class InterventionRequest(BaseModel):
     created_by: str
     created_by_name: Optional[str] = None
     work_order_id: Optional[str] = None  # ID de l'ordre de travail créé
+    work_order_numero: Optional[str] = None  # Numéro de l'ordre de travail créé (ex: 5801)
     work_order_date_limite: Optional[datetime] = None  # Date limite de l'ordre créé
     converted_at: Optional[datetime] = None  # Date de conversion
     converted_by: Optional[str] = None  # ID de qui a converti
