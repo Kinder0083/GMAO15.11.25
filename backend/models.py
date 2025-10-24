@@ -669,7 +669,7 @@ class InterventionRequest(BaseModel):
     id: str
     titre: str
     description: str
-    priorite: PriorityLevel
+    priorite: Priority
     equipement_id: Optional[str] = None
     equipement: Optional[Dict] = None
     emplacement_id: Optional[str] = None
