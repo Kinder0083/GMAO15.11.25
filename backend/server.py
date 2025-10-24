@@ -3618,10 +3618,12 @@ async def convert_to_work_order(
             "dateLimite": req.get("date_limite_desiree"),
             "tempsEstime": None,
             "dateCreation": datetime.utcnow(),
-            "created_by": req["created_by"],
-            "created_by_name": req.get("created_by_name"),
+            "createdBy": req["created_by"],
+            "createdByName": req.get("created_by_name"),
             "tempsReel": None,
-            "dateTermine": None
+            "dateTermine": None,
+            "attachments": [],
+            "comments": []
         }
         
         # Récupérer les informations de l'assigné si fourni
