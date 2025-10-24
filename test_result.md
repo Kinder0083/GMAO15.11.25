@@ -406,6 +406,44 @@ agent_communication:
       - Password: password123
       
       Note : Le frontend ne nécessite pas de tests automatisés à ce stade, les fonctionnalités peuvent être testées manuellement par l'utilisateur.
+  - agent: "main"
+    message: |
+      🆕 NOUVELLE FONCTIONNALITÉ COMPTEURS IMPLÉMENTÉE
+      
+      📊 MODÈLES AJOUTÉS (models.py) :
+      - MeterType (Enum) : Types de compteurs (EAU, GAZ, ELECTRICITE, AIR_COMPRIME, VAPEUR, FUEL, SOLAIRE, AUTRE)
+      - Meter : Modèle principal des compteurs avec calculs automatiques
+      - MeterCreate, MeterUpdate : Modèles de création/modification
+      - MeterReading : Modèle des relevés avec calcul automatique de consommation et coût
+      - MeterReadingCreate, MeterReadingUpdate : Modèles de création/modification des relevés
+      
+      🔗 NOUVEAUX ENDPOINTS (server.py) :
+      1. POST /api/meters - Créer un compteur
+      2. GET /api/meters - Récupérer tous les compteurs
+      3. GET /api/meters/{meter_id} - Récupérer un compteur spécifique
+      4. PUT /api/meters/{meter_id} - Mettre à jour un compteur
+      5. DELETE /api/meters/{meter_id} - Supprimer un compteur (soft delete)
+      6. POST /api/meters/{meter_id}/readings - Créer un relevé pour un compteur
+      7. GET /api/meters/{meter_id}/readings - Récupérer tous les relevés d'un compteur
+      8. GET /api/meters/{meter_id}/statistics - Obtenir les statistiques d'un compteur
+      9. DELETE /api/readings/{reading_id} - Supprimer un relevé
+      
+      ⚙️ FONCTIONNALITÉS IMPORTANTES :
+      - Calcul automatique de la consommation entre deux relevés
+      - Calcul automatique du coût basé sur le prix unitaire
+      - Statistiques par période (week, month, quarter, year)
+      - Support de différents types de compteurs avec unités personnalisables
+      - Soft delete des compteurs (actif: false)
+      - Audit logging pour toutes les opérations
+      
+      🧪 TESTS À EFFECTUER :
+      Tous les endpoints de la nouvelle fonctionnalité compteurs doivent être testés pour vérifier :
+      1. Création de compteurs avec différents types
+      2. Ajout de relevés et calcul automatique de consommation
+      3. Calcul correct des coûts
+      4. Récupération des statistiques
+      5. Soft delete des compteurs
+      6. Suppression des relevés
   - agent: "testing"
     message: |
       🎉 BACKEND ENDPOINTS VERIFICATION COMPLETE - ALL TESTS PASSED
