@@ -3597,8 +3597,14 @@ async def convert_to_work_order(
         
         # Créer l'ordre de travail
         work_order_id = str(uuid.uuid4())
+        
+        # Générer le numéro d'ordre (comme pour les créations normales)
+        count = await db.work_orders.count_documents({})
+        numero = str(5800 + count + 1)
+        
         work_order_data = {
             "id": work_order_id,
+            "numero": numero,
             "titre": req["titre"],
             "description": req["description"],
             "statut": "OUVERT",
@@ -3611,9 +3617,11 @@ async def convert_to_work_order(
             "assigneA": None,
             "dateLimite": req.get("date_limite_desiree"),
             "tempsEstime": None,
-            "date_creation": datetime.utcnow(),
+            "dateCreation": datetime.utcnow(),
             "created_by": req["created_by"],
-            "created_by_name": req.get("created_by_name")
+            "created_by_name": req.get("created_by_name"),
+            "tempsReel": None,
+            "dateTermine": None
         }
         
         # Récupérer les informations de l'assigné si fourni
