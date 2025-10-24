@@ -232,4 +232,14 @@ export const metersAPI = {
   getStatistics: (meterId, period = 'month') => api.get(`/meters/${meterId}/statistics`, { params: { period } })
 };
 
+// ==================== INTERVENTION REQUESTS (DEMANDES D'INTERVENTION) ====================
+export const interventionRequestsAPI = {
+  getAll: () => api.get('/intervention-requests'),
+  getById: (id) => api.get(`/intervention-requests/${id}`),
+  create: (data) => api.post('/intervention-requests', data),
+  update: (id, data) => api.put(`/intervention-requests/${id}`, data),
+  delete: (id) => api.delete(`/intervention-requests/${id}`),
+  convertToWorkOrder: (id, assigneeId) => api.post(`/intervention-requests/${id}/convert-to-work-order`, null, { params: { assignee_id: assigneeId } })
+};
+
 export default api;
