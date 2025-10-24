@@ -285,9 +285,121 @@ const Meters = () => {
                 </div>
               </CardContent>
             </Card>
-          ))
-        )}
-      </div>
+            ))
+          )}
+        </div>
+      )}
+
+      {/* Vue Arborescence */}
+      {viewMode === 'tree' && (
+        <div className="space-y-2">
+          {loading ? (
+            <Card>
+              <CardContent className="py-8 text-center">
+                <p className="text-gray-500">Chargement...</p>
+              </CardContent>
+            </Card>
+          ) : filteredMeters.length === 0 ? (
+            <Card>
+              <CardContent className="py-8 text-center">
+                <p className="text-gray-500">Aucun compteur trouvé</p>
+              </CardContent>
+            </Card>
+          ) : (
+            Object.entries(groupedMeters).map(([typeKey, typeData]) => {
+              if (typeData.meters.length === 0) return null;
+              const isExpanded = expandedTypes.has(typeKey);
+              
+              return (
+                <Card key={typeKey}>
+                  <CardHeader 
+                    className="cursor-pointer hover:bg-gray-50 transition-colors"
+                    onClick={() => toggleTypeExpansion(typeKey)}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        {isExpanded ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
+                        {getTypeBadge(typeKey)}
+                        <span className="font-semibold text-gray-900">
+                          {typeData.label} ({typeData.meters.length})
+                        </span>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  
+                  {isExpanded && (
+                    <CardContent>
+                      <div className="space-y-2">
+                        {typeData.meters.map((meter) => (
+                          <div 
+                            key={meter.id}
+                            className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+                          >
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3">
+                                <div>
+                                  <p className="font-medium text-gray-900">{meter.nom}</p>
+                                  <div className="flex gap-4 mt-1 text-sm text-gray-600">
+                                    {meter.numero_serie && (
+                                      <span>N° {meter.numero_serie}</span>
+                                    )}
+                                    {meter.emplacement && (
+                                      <span className="flex items-center gap-1">
+                                        <Activity size={14} />
+                                        {meter.emplacement.nom}
+                                      </span>
+                                    )}
+                                    <span>Unité: {meter.unite}</span>
+                                    {meter.prix_unitaire && (
+                                      <span>{meter.prix_unitaire} €/{meter.unite}</span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedMeter(meter);
+                                  setDialogOpen(true);
+                                }}
+                                className="hover:bg-blue-50 hover:text-blue-600"
+                              >
+                                <Eye size={16} />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedMeter(meter);
+                                  setFormDialogOpen(true);
+                                }}
+                                className="hover:bg-green-50 hover:text-green-600"
+                              >
+                                <Pencil size={16} />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDelete(meter.id)}
+                                className="hover:bg-red-50 hover:text-red-600"
+                              >
+                                <Trash2 size={16} />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  )}
+                </Card>
+              );
+            })
+          )}
+        </div>
+      )}
 
       <MeterDialog
         open={dialogOpen}
