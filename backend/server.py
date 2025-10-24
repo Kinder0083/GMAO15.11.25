@@ -761,6 +761,11 @@ async def get_work_orders(
                 logger.error(f"Erreur lors de la recherche du créateur {wo.get('createdBy')}: {e}")
                 pass
     
+    # Ajouter un numero par défaut si manquant (pour compatibilité avec anciens ordres)
+    for wo in work_orders:
+        if "numero" not in wo or not wo["numero"]:
+            wo["numero"] = "N/A"
+    
     return [WorkOrder(**wo) for wo in work_orders]
 
 @api_router.get("/work-orders/{wo_id}", response_model=WorkOrder)
