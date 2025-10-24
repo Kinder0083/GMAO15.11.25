@@ -662,3 +662,40 @@ class MeterReadingUpdate(BaseModel):
     prix_unitaire: Optional[float] = None
     abonnement_mensuel: Optional[float] = None
 
+
+
+# Intervention Request (Demande d'intervention) Models
+class InterventionRequest(BaseModel):
+    id: str
+    titre: str
+    description: str
+    priorite: PriorityLevel
+    equipement_id: Optional[str] = None
+    equipement: Optional[Dict] = None
+    emplacement_id: Optional[str] = None
+    emplacement: Optional[Dict] = None
+    date_limite_desiree: Optional[datetime] = None
+    date_creation: datetime
+    created_by: str
+    created_by_name: Optional[str] = None
+    work_order_id: Optional[str] = None  # ID de l'ordre de travail créé
+    work_order_date_limite: Optional[datetime] = None  # Date limite de l'ordre créé
+    converted_at: Optional[datetime] = None  # Date de conversion
+    converted_by: Optional[str] = None  # ID de qui a converti
+
+class InterventionRequestCreate(BaseModel):
+    titre: str
+    description: str
+    priorite: PriorityLevel = PriorityLevel.AUCUNE
+    equipement_id: Optional[str] = None
+    emplacement_id: Optional[str] = None
+    date_limite_desiree: Optional[datetime] = None
+
+class InterventionRequestUpdate(BaseModel):
+    titre: Optional[str] = None
+    description: Optional[str] = None
+    priorite: Optional[PriorityLevel] = None
+    equipement_id: Optional[str] = None
+    emplacement_id: Optional[str] = None
+    date_limite_desiree: Optional[datetime] = None
+
