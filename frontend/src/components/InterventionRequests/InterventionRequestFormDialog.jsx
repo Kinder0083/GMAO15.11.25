@@ -108,7 +108,7 @@ const InterventionRequestFormDialog = ({ open, onOpenChange, request, onSuccess 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className=\"max-w-2xl\">
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>{request ? 'Modifier' : 'Nouvelle'} demande d'intervention</DialogTitle>
           <DialogDescription>
@@ -116,9 +116,9 @@ const InterventionRequestFormDialog = ({ open, onOpenChange, request, onSuccess 
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className=\"space-y-4\">
-          <div className=\"space-y-2\">
-            <Label htmlFor=\"titre\">Titre *</Label>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="titre">Titre *</Label>
             <Input
               id=\"titre\"
               value={formData.titre}
