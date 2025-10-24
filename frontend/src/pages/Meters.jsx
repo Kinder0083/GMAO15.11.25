@@ -77,6 +77,30 @@ const Meters = () => {
     return matchesSearch && matchesType;
   });
 
+  // Grouper les compteurs par type pour le mode arborescence
+  const groupedMeters = React.useMemo(() => {
+    const groups = {};
+    types.forEach(type => {
+      if (type.value !== 'ALL') {
+        groups[type.value] = {
+          label: type.label,
+          meters: filteredMeters.filter(m => m.type === type.value)
+        };
+      }
+    });
+    return groups;
+  }, [filteredMeters]);
+
+  const toggleTypeExpansion = (type) => {
+    const newExpanded = new Set(expandedTypes);
+    if (newExpanded.has(type)) {
+      newExpanded.delete(type);
+    } else {
+      newExpanded.add(type);
+    }
+    setExpandedTypes(newExpanded);
+  };
+
   const getTypeBadge = (type) => {
     const badges = {
       'EAU': { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Eau' },
