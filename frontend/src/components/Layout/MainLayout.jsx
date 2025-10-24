@@ -19,7 +19,8 @@ import {
   Database,
   RefreshCw,
   FileText,
-  Gauge
+  Gauge,
+  MessageSquare
 } from 'lucide-react';
 import FirstLoginPasswordDialog from '../Common/FirstLoginPasswordDialog';
 
