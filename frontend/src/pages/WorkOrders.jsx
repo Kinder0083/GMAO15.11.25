@@ -83,10 +83,18 @@ const WorkOrders = () => {
 
   const loadWorkOrders = async () => {
     try {
-      setLoading(true);
+      // Ne montrer le loading que lors du premier chargement
+      if (initialLoad) {
+        setLoading(true);
+      }
       const params = getDateRange();
       const response = await workOrdersAPI.getAll(params);
-      setWorkOrders(response.data);
+      
+      // Mise à jour silencieuse : comparer avant de mettre à jour
+      const newWorkOrders = response.data;
+      if (JSON.stringify(newWorkOrders) !== JSON.stringify(workOrders)) {
+        setWorkOrders(newWorkOrders);
+      }
     } catch (error) {
       toast({
         title: 'Erreur',
@@ -94,9 +102,15 @@ const WorkOrders = () => {
         variant: 'destructive'
       });
     } finally {
-      setLoading(false);
+      if (initialLoad) {
+        setLoading(false);
+        setInitialLoad(false);
+      }
     }
   };
+  
+  // Rafraîchissement automatique toutes les 5 secondes (invisible)
+  useAutoRefresh(loadWorkOrders, [dateFilter, dateType, customStartDate, customEndDate]);
 
   const handleDelete = async (id) => {
     setItemToDelete(id);
