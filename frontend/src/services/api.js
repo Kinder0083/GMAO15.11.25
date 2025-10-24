@@ -217,4 +217,19 @@ export const commentsAPI = {
   }
 };
 
+// ==================== METERS (COMPTEURS) ====================
+export const metersAPI = {
+  getAll: () => api.get('/meters'),
+  getById: (id) => api.get(`/meters/${id}`),
+  create: (data) => api.post('/meters', data),
+  update: (id, data) => api.put(`/meters/${id}`, data),
+  delete: (id) => api.delete(`/meters/${id}`),
+  
+  // Readings (Relevés)
+  getReadings: (meterId, params) => api.get(`/meters/${meterId}/readings`, { params }),
+  createReading: (meterId, data) => api.post(`/meters/${meterId}/readings`, data),
+  deleteReading: (readingId) => api.delete(`/readings/${readingId}`),
+  getStatistics: (meterId, period = 'month') => api.get(`/meters/${meterId}/statistics`, { params: { period } })
+};
+
 export default api;
