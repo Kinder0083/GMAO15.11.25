@@ -585,3 +585,81 @@ class PurchaseHistory(PurchaseHistoryBase):
 
     class Config:
         from_attributes = True
+
+
+# Meter (Compteur) Models
+class MeterType(str, Enum):
+    EAU = "EAU"  # Eau
+    GAZ = "GAZ"  # Gaz
+    ELECTRICITE = "ELECTRICITE"  # Électricité
+    AIR_COMPRIME = "AIR_COMPRIME"  # Air comprimé
+    VAPEUR = "VAPEUR"  # Vapeur
+    FUEL = "FUEL"  # Fuel/Mazout
+    SOLAIRE = "SOLAIRE"  # Énergie solaire
+    AUTRE = "AUTRE"  # Autre
+
+class Meter(BaseModel):
+    id: str
+    nom: str
+    type: MeterType
+    numero_serie: Optional[str] = None
+    emplacement_id: Optional[str] = None
+    emplacement: Optional[Dict] = None
+    unite: str  # m³, kWh, L, etc.
+    prix_unitaire: Optional[float] = None  # Prix par unité
+    abonnement_mensuel: Optional[float] = None  # Abonnement fixe mensuel
+    date_creation: datetime
+    notes: Optional[str] = None
+    actif: bool = True
+
+class MeterCreate(BaseModel):
+    nom: str
+    type: MeterType
+    numero_serie: Optional[str] = None
+    emplacement_id: Optional[str] = None
+    unite: str = "kWh"
+    prix_unitaire: Optional[float] = None
+    abonnement_mensuel: Optional[float] = None
+    notes: Optional[str] = None
+
+class MeterUpdate(BaseModel):
+    nom: Optional[str] = None
+    numero_serie: Optional[str] = None
+    emplacement_id: Optional[str] = None
+    unite: Optional[str] = None
+    prix_unitaire: Optional[float] = None
+    abonnement_mensuel: Optional[float] = None
+    notes: Optional[str] = None
+    actif: Optional[bool] = None
+
+# Reading (Relevé) Models
+class MeterReading(BaseModel):
+    id: str
+    meter_id: str
+    meter_nom: Optional[str] = None
+    date_releve: datetime
+    valeur: float  # Index du compteur
+    notes: Optional[str] = None
+    created_by: str
+    created_by_name: Optional[str] = None
+    consommation: Optional[float] = None  # Calculée automatiquement
+    cout: Optional[float] = None  # Calculé automatiquement
+    prix_unitaire: Optional[float] = None  # Prix au moment du relevé
+    abonnement_mensuel: Optional[float] = None  # Abonnement au moment du relevé
+    date_creation: datetime
+
+class MeterReadingCreate(BaseModel):
+    meter_id: str
+    date_releve: datetime
+    valeur: float
+    notes: Optional[str] = None
+    prix_unitaire: Optional[float] = None
+    abonnement_mensuel: Optional[float] = None
+
+class MeterReadingUpdate(BaseModel):
+    date_releve: Optional[datetime] = None
+    valeur: Optional[float] = None
+    notes: Optional[str] = None
+    prix_unitaire: Optional[float] = None
+    abonnement_mensuel: Optional[float] = None
+
