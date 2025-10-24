@@ -3555,8 +3555,16 @@ async def delete_intervention_request(request_id: str, current_user: dict = Depe
     
     await db.intervention_requests.delete_one({"id": request_id})
     
-    # Audit log (TODO: implement log_action function)
-    # await log_action(...)
+    # Audit log
+    await audit_service.log_action(
+        user_id=current_user["id"],
+        user_name=current_user.get("nom", "") + " " + current_user.get("prenom", ""),
+        user_email=current_user["email"],
+        action=ActionType.DELETE,
+        entity_type=EntityType.WORK_ORDER,
+        entity_id=request_id,
+        description=f"Suppression demande d'intervention: {req['titre']}"
+    )
     
     return {"message": "Demande supprimée"}
 
