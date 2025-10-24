@@ -88,11 +88,20 @@ const Dashboard = () => {
       {
         title: 'Temps de réponse moyen',
         value: `${analytics.tempsReponse.moyen}h`,
-      icon: Clock,
-      color: 'bg-purple-500',
-      change: '-15%'
-    }
-  ];
+        icon: Clock,
+        color: 'bg-purple-500',
+        change: '-15%'
+      }
+    ];
+  }, [analytics, workOrders, equipments]);
+
+  if (loading || !analytics) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-gray-500">Chargement...</p>
+      </div>
+    );
+  }
 
   const recentWorkOrders = workOrders.slice(0, 5);
 
