@@ -12,9 +12,9 @@ from datetime import datetime, timedelta
 # Use the correct backend URL from frontend .env
 BACKEND_URL = "https://main-reset-copy.preview.emergentagent.com/api"
 
-# Test credentials from review request
-TEST_EMAIL = "admin@example.com"
-TEST_PASSWORD = "password123"
+# Test credentials - using existing admin user
+TEST_EMAIL = "admin@gmao-iris.local"
+TEST_PASSWORD = "Admin123!"
 
 class BackendTester:
     def __init__(self):
