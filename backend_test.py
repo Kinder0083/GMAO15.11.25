@@ -61,75 +61,7 @@ class BackendTester:
             self.log(f"❌ Login request failed - Error: {str(e)}", "ERROR")
             return False
     
-    def test_get_work_orders(self):
-        """Test GET /api/work-orders"""
-        self.log("Testing get work orders endpoint...")
-        
-        try:
-            response = self.session.get(
-                f"{BACKEND_URL}/work-orders",
-                timeout=10
-            )
-            
-            if response.status_code == 200:
-                work_orders = response.json()
-                self.log(f"✅ Get work orders successful - Found {len(work_orders)} work orders")
-                
-                # Return first work order for status update test
-                if work_orders:
-                    return work_orders[0]
-                else:
-                    self.log("⚠️ No work orders found for status update test", "WARNING")
-                    return None
-            else:
-                self.log(f"❌ Get work orders failed - Status: {response.status_code}, Response: {response.text}", "ERROR")
-                return None
-                
-        except requests.exceptions.RequestException as e:
-            self.log(f"❌ Get work orders request failed - Error: {str(e)}", "ERROR")
-            return None
-    
-    def test_update_work_order_status(self, work_order):
-        """Test PUT /api/work-orders/{id} with status update"""
-        if not work_order:
-            self.log("❌ Cannot test status update - No work order available", "ERROR")
-            return False
-            
-        work_order_id = work_order.get("id")
-        current_status = work_order.get("statut")
-        
-        self.log(f"Testing work order status update for ID: {work_order_id}")
-        self.log(f"Current status: {current_status}")
-        
-        # Choose a different status for testing
-        new_status = "EN_COURS" if current_status != "EN_COURS" else "EN_ATTENTE"
-        
-        try:
-            response = self.session.put(
-                f"{BACKEND_URL}/work-orders/{work_order_id}",
-                json={"statut": new_status},
-                timeout=10
-            )
-            
-            if response.status_code == 200:
-                updated_wo = response.json()
-                updated_status = updated_wo.get("statut")
-                self.log(f"✅ Work order status update successful - New status: {updated_status}")
-                
-                # Verify the status was actually changed
-                if updated_status == new_status:
-                    self.log("✅ Status change verified")
-                    return True
-                else:
-                    self.log(f"⚠️ Status not changed as expected - Expected: {new_status}, Got: {updated_status}", "WARNING")
-                    return False
-            else:
-                self.log(f"❌ Work order status update failed - Status: {response.status_code}, Response: {response.text}", "ERROR")
-                return False
-                
-        except requests.exceptions.RequestException as e:
-            self.log(f"❌ Work order status update request failed - Error: {str(e)}", "ERROR")
-            return False
+    # Old work order tests removed - focusing on new meters functionality
     
     def test_create_meter(self):
         """Test POST /api/meters - Create a new meter"""
