@@ -3565,7 +3565,8 @@ async def delete_intervention_request(request_id: str, current_user: dict = Depe
         action=ActionType.DELETE,
         entity_type=EntityType.WORK_ORDER,
         entity_id=request_id,
-        description=f"Suppression demande d'intervention: {req['titre']}"
+        entity_name=req['titre'],
+        details=f"Suppression demande d'intervention"
     )
     
     return {"message": "Demande supprimée"}
