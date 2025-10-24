@@ -234,6 +234,50 @@ class BackendTester:
         self.log("✅ Cost calculations are correct")
         return True
     
+    def test_delete_reading(self, reading_id):
+        """Test DELETE /api/readings/{reading_id} - Delete a reading"""
+        self.log(f"Testing delete reading {reading_id}...")
+        
+        try:
+            response = self.session.delete(
+                f"{BACKEND_URL}/readings/{reading_id}",
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                self.log(f"✅ Delete reading successful - {result.get('message')}")
+                return True
+            else:
+                self.log(f"❌ Delete reading failed - Status: {response.status_code}, Response: {response.text}", "ERROR")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log(f"❌ Delete reading request failed - Error: {str(e)}", "ERROR")
+            return False
+    
+    def test_meter_soft_delete(self, meter_id):
+        """Test DELETE /api/meters/{meter_id} - Soft delete a meter"""
+        self.log(f"Testing soft delete meter {meter_id}...")
+        
+        try:
+            response = self.session.delete(
+                f"{BACKEND_URL}/meters/{meter_id}",
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                self.log(f"✅ Soft delete meter successful - {result.get('message')}")
+                return True
+            else:
+                self.log(f"❌ Soft delete meter failed - Status: {response.status_code}, Response: {response.text}", "ERROR")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log(f"❌ Soft delete meter request failed - Error: {str(e)}", "ERROR")
+            return False
+    
     def run_all_tests(self):
         """Run all backend tests for meters functionality"""
         self.log("=" * 60)
@@ -249,7 +293,9 @@ class BackendTester:
             "get_readings": False,
             "get_statistics": False,
             "consumption_calculation": False,
-            "cost_calculation": False
+            "cost_calculation": False,
+            "delete_reading": False,
+            "soft_delete_meter": False
         }
         
         # Test 1: Login
