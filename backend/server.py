@@ -2432,8 +2432,11 @@ async def get_analytics(current_user: dict = Depends(get_current_user)):
 
 # ==================== IMPORT/EXPORT ROUTES ====================
 EXPORT_MODULES = {
+    "intervention-requests": "intervention_requests",
     "work-orders": "work_orders",
     "equipments": "equipments",
+    "meters": "meters",
+    "meter-readings": "meter_readings",
     "users": "users",
     "inventory": "inventory",
     "locations": "locations",
