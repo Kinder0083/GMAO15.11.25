@@ -179,14 +179,14 @@ const MeterFormDialog = ({ open, onOpenChange, meter, onSuccess }) => {
             <div className="space-y-2">
               <Label htmlFor="emplacement">Emplacement</Label>
               <Select
-                value={formData.emplacement_id}
-                onValueChange={(value) => setFormData({ ...formData, emplacement_id: value })}
+                value={formData.emplacement_id || "none"}
+                onValueChange={(value) => setFormData({ ...formData, emplacement_id: value === "none" ? "" : value })}
               >
                 <SelectTrigger id="emplacement">
                   <SelectValue placeholder="Sélectionner un emplacement" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Aucun</SelectItem>
+                  <SelectItem value="none">Aucun</SelectItem>
                   {locations.map(loc => (
                     <SelectItem key={loc.id} value={loc.id}>
                       {loc.nom}
