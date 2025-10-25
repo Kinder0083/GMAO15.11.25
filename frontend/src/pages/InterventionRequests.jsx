@@ -86,6 +86,11 @@ const InterventionRequests = () => {
     }
   };
 
+  const handleWorkOrderClick = (workOrderId) => {
+    // Naviguer vers les ordres de travail avec l'ID de l'ordre à ouvrir
+    navigate(`/work-orders?open=${workOrderId}`);
+  };
+
   const filteredRequests = requests.filter(req => {
     const matchesSearch = req.titre.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (req.description && req.description.toLowerCase().includes(searchTerm.toLowerCase()));
