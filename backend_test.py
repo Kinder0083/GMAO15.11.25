@@ -20,49 +20,87 @@ ADMIN_PASSWORD = "password123"
 VIEWER_EMAIL = "test_viewer@test.com"
 VIEWER_PASSWORD = "Test123!"
 
-class BackendTester:
+class PermissionsTester:
     def __init__(self):
-        self.session = requests.Session()
-        self.token = None
-        self.user_data = None
+        self.admin_session = requests.Session()
+        self.viewer_session = requests.Session()
+        self.admin_token = None
+        self.viewer_token = None
+        self.admin_data = None
+        self.viewer_data = None
+        self.created_work_order_id = None
         
     def log(self, message, level="INFO"):
         """Log test messages with timestamp"""
         timestamp = datetime.now().strftime("%H:%M:%S")
         print(f"[{timestamp}] {level}: {message}")
         
-    def test_login(self):
-        """Test POST /api/auth/login"""
-        self.log("Testing login endpoint...")
+    def test_admin_login(self):
+        """Test admin login"""
+        self.log("Testing admin login...")
         
         try:
-            response = self.session.post(
+            response = self.admin_session.post(
                 f"{BACKEND_URL}/auth/login",
                 json={
-                    "email": TEST_EMAIL,
-                    "password": TEST_PASSWORD
+                    "email": ADMIN_EMAIL,
+                    "password": ADMIN_PASSWORD
                 },
                 timeout=10
             )
             
             if response.status_code == 200:
                 data = response.json()
-                self.token = data.get("access_token")
-                self.user_data = data.get("user")
+                self.admin_token = data.get("access_token")
+                self.admin_data = data.get("user")
                 
                 # Set authorization header for future requests
-                self.session.headers.update({
-                    "Authorization": f"Bearer {self.token}"
+                self.admin_session.headers.update({
+                    "Authorization": f"Bearer {self.admin_token}"
                 })
                 
-                self.log(f"✅ Login successful - User: {self.user_data.get('prenom')} {self.user_data.get('nom')}")
+                self.log(f"✅ Admin login successful - User: {self.admin_data.get('prenom')} {self.admin_data.get('nom')} (Role: {self.admin_data.get('role')})")
                 return True
             else:
-                self.log(f"❌ Login failed - Status: {response.status_code}, Response: {response.text}", "ERROR")
+                self.log(f"❌ Admin login failed - Status: {response.status_code}, Response: {response.text}", "ERROR")
                 return False
                 
         except requests.exceptions.RequestException as e:
-            self.log(f"❌ Login request failed - Error: {str(e)}", "ERROR")
+            self.log(f"❌ Admin login request failed - Error: {str(e)}", "ERROR")
+            return False
+    
+    def test_viewer_login(self):
+        """Test viewer login"""
+        self.log("Testing viewer login...")
+        
+        try:
+            response = self.viewer_session.post(
+                f"{BACKEND_URL}/auth/login",
+                json={
+                    "email": VIEWER_EMAIL,
+                    "password": VIEWER_PASSWORD
+                },
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.viewer_token = data.get("access_token")
+                self.viewer_data = data.get("user")
+                
+                # Set authorization header for future requests
+                self.viewer_session.headers.update({
+                    "Authorization": f"Bearer {self.viewer_token}"
+                })
+                
+                self.log(f"✅ Viewer login successful - User: {self.viewer_data.get('prenom')} {self.viewer_data.get('nom')} (Role: {self.viewer_data.get('role')})")
+                return True
+            else:
+                self.log(f"❌ Viewer login failed - Status: {response.status_code}, Response: {response.text}", "ERROR")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log(f"❌ Viewer login request failed - Error: {str(e)}", "ERROR")
             return False
     
     # ==================== IMPROVEMENT REQUESTS TESTS ====================
