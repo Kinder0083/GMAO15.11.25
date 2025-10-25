@@ -10,9 +10,11 @@ import DeleteConfirmDialog from '../components/Common/DeleteConfirmDialog';
 import { workOrdersAPI } from '../services/api';
 import { useToast } from '../hooks/use-toast';
 import { useAutoRefresh } from '../hooks/useAutoRefresh';
+import { useSearchParams } from 'react-router-dom';
 
 const WorkOrders = () => {
   const { toast } = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [workOrders, setWorkOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [initialLoad, setInitialLoad] = useState(true);
