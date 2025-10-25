@@ -41,20 +41,28 @@ const WorkOrders = () => {
   useEffect(() => {
     const openWorkOrderId = searchParams.get('open');
     if (openWorkOrderId) {
+      console.log('Tentative d\'ouverture de l\'ordre:', openWorkOrderId);
       // Charger l'ordre directement par son ID
       const loadAndOpenWorkOrder = async () => {
         try {
+          console.log('Appel API pour l\'ordre:', openWorkOrderId);
           const response = await workOrdersAPI.getById(openWorkOrderId);
-          setSelectedWorkOrder(response.data);
-          setFormDialogOpen(true);
-          // Retirer le paramètre de l'URL après ouverture
-          searchParams.delete('open');
-          setSearchParams(searchParams);
+          console.log('Réponse API:', response);
+          if (response && response.data) {
+            setSelectedWorkOrder(response.data);
+            setFormDialogOpen(true);
+            // Retirer le paramètre de l'URL après ouverture
+            searchParams.delete('open');
+            setSearchParams(searchParams);
+          } else {
+            throw new Error('Pas de données dans la réponse');
+          }
         } catch (error) {
-          console.error('Erreur lors du chargement de l\'ordre:', error);
+          console.error('Erreur complète:', error);
+          console.error('Détails erreur:', error.response?.data);
           toast({
             title: 'Erreur',
-            description: 'Impossible d\'ouvrir l\'ordre de travail',
+            description: error.response?.data?.detail || 'Impossible d\'ouvrir l\'ordre de travail',
             variant: 'destructive'
           });
           // Retirer le paramètre même en cas d'erreur
