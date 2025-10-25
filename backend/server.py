@@ -4265,6 +4265,9 @@ async def delete_improvement(imp_id: str, current_user: dict = Depends(get_curre
     return {"message": "Amélioration supprimée"}
 
 
+# Include the router in the main app (MUST be after all endpoint definitions)
+app.include_router(api_router)
+
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
