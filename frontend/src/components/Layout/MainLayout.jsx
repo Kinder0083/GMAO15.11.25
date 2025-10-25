@@ -112,6 +112,8 @@ const MainLayout = () => {
     { icon: LayoutDashboard, label: 'Tableau de bord', path: '/dashboard' },
     { icon: MessageSquare, label: 'Demandes d\'inter.', path: '/intervention-requests' },
     { icon: ClipboardList, label: 'Ordres de travail', path: '/work-orders' },
+    { icon: Lightbulb, label: 'Demandes d\'amél.', path: '/improvement-requests' },
+    { icon: Sparkles, label: 'Améliorations', path: '/improvements' },
     { icon: Calendar, label: 'Maintenance prev.', path: '/preventive-maintenance' },
     { icon: Wrench, label: 'Équipements', path: '/assets' },
     { icon: Package, label: 'Inventaire', path: '/inventory' },
