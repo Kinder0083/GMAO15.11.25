@@ -469,6 +469,128 @@ backend:
           - Premier relevé: consommation = 0 (comportement correct)
           - Précision des calculs: ±0.01 (acceptable pour les flottants)
 
+  - task: "API Improvement Requests - CRUD complet"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          Nouveaux endpoints pour Demandes d'amélioration implémentés:
+          - POST /api/improvement-requests - Créer une demande
+          - GET /api/improvement-requests - Liste des demandes
+          - GET /api/improvement-requests/{id} - Détails d'une demande
+          - PUT /api/improvement-requests/{id} - Modifier une demande
+          - DELETE /api/improvement-requests/{id} - Supprimer une demande
+          - POST /api/improvement-requests/{id}/comments - Ajouter commentaire
+          - GET /api/improvement-requests/{id}/comments - Liste commentaires
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ IMPROVEMENT REQUESTS CRUD WORKING - Tests complets réussis
+          - POST /api/improvement-requests: Création réussie (201 Created)
+          - GET /api/improvement-requests: Liste récupérée (200 OK)
+          - GET /api/improvement-requests/{id}: Détails récupérés (200 OK)
+          - PUT /api/improvement-requests/{id}: Modification réussie (200 OK)
+          - DELETE /api/improvement-requests/{id}: Suppression réussie (200 OK)
+          - POST /api/improvement-requests/{id}/comments: Commentaire ajouté (200 OK)
+          - Tous les champs requis présents et validés
+          - Audit logging fonctionnel
+
+  - task: "API Improvement Requests - Conversion vers amélioration"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          Endpoint de conversion implémenté:
+          - POST /api/improvement-requests/{id}/convert-to-improvement
+          - Paramètres: assignee_id (optionnel), date_limite (optionnel)
+          - Doit créer une amélioration avec numéro >= 7000
+          - Doit mettre à jour la demande avec improvement_id, improvement_numero
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ CONVERSION TO IMPROVEMENT WORKING - Tests critiques réussis
+          - POST /api/improvement-requests/{id}/convert-to-improvement: SUCCESS (200 OK)
+          - Amélioration créée avec numéro >= 7000: ✓ VERIFIED (7005)
+          - Demande mise à jour avec improvement_id: ✓ VERIFIED
+          - Demande mise à jour avec improvement_numero: ✓ VERIFIED
+          - Réponse contient improvement_id et improvement_numero
+          - Validation numérotation automatique fonctionnelle
+
+  - task: "API Improvements - CRUD complet"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          Nouveaux endpoints pour Améliorations implémentés:
+          - POST /api/improvements - Créer une amélioration (numéro auto >= 7000)
+          - GET /api/improvements - Liste des améliorations
+          - GET /api/improvements/{id} - Détails d'une amélioration
+          - PUT /api/improvements/{id} - Modifier une amélioration
+          - DELETE /api/improvements/{id} - Supprimer une amélioration
+          - POST /api/improvements/{id}/comments - Ajouter commentaire
+          - GET /api/improvements/{id}/comments - Liste commentaires
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ IMPROVEMENTS CRUD WORKING - Tests complets réussis
+          - POST /api/improvements: Création réussie avec numéro >= 7000 (7004, 7005)
+          - GET /api/improvements: Liste récupérée (200 OK)
+          - GET /api/improvements/{id}: Détails récupérés (200 OK)
+          - PUT /api/improvements/{id}: Modification réussie (200 OK)
+          - DELETE /api/improvements/{id}: Suppression réussie (200 OK)
+          - POST /api/improvements/{id}/comments: Commentaire ajouté (200 OK)
+          - Numérotation automatique >= 7000 fonctionnelle
+          - Tous les champs requis présents et validés
+
+  - task: "Correction routage API - Endpoints improvement non accessibles"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 1
+    priority: "critical"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: |
+          PROBLÈME CRITIQUE IDENTIFIÉ:
+          - Tous les endpoints improvement-* retournent 404 Not Found
+          - Login fonctionne correctement
+          - Problème de routage détecté
+      - working: "NA"
+        agent: "testing"
+        comment: |
+          CAUSE RACINE TROUVÉE:
+          - app.include_router(api_router) était appelé AVANT la définition des endpoints improvement
+          - Les endpoints définis après l'inclusion du router ne sont pas enregistrés
+          - Solution: Déplacer app.include_router(api_router) à la fin du fichier
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ ROUTAGE CORRIGÉ - Problème résolu
+          - Déplacé app.include_router(api_router) après toutes les définitions d'endpoints
+          - Backend redémarré avec succès
+          - Tous les endpoints improvement-* maintenant accessibles
+          - Tests complets: 15/15 RÉUSSIS
+
 frontend:
   - task: "Settings.jsx - Chargement du profil utilisateur"
     implemented: true
