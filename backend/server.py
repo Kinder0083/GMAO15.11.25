@@ -3661,7 +3661,7 @@ async def convert_to_work_order(
             {"$set": {
                 "work_order_id": work_order_id,
                 "work_order_numero": numero,
-                "work_order_date_limite": req.get("date_limite_desiree"),
+                "work_order_date_limite": date_limite_ordre,
                 "converted_at": datetime.utcnow(),
                 "converted_by": current_user["id"]
             }}
