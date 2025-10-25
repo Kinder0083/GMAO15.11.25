@@ -8,6 +8,7 @@ import {
   DialogTitle
 } from '../ui/dialog';
 import { Button } from '../ui/button';
+import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { useToast } from '../../hooks/use-toast';
@@ -18,13 +19,20 @@ const ConvertToWorkOrderDialog = ({ open, onOpenChange, request, onSuccess }) =>
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState([]);
   const [assigneeId, setAssigneeId] = useState('');
+  const [dateLimite, setDateLimite] = useState('');
 
   useEffect(() => {
     if (open) {
       loadUsers();
       setAssigneeId('');
+      // Pré-remplir avec la date limite désirée si disponible
+      if (request?.date_limite_desiree) {
+        setDateLimite(request.date_limite_desiree.split('T')[0]);
+      } else {
+        setDateLimite('');
+      }
     }
-  }, [open]);
+  }, [open, request]);
 
   const loadUsers = async () => {
     try {
