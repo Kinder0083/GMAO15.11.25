@@ -61,9 +61,9 @@ class BackendTester:
             self.log(f"❌ Login request failed - Error: {str(e)}", "ERROR")
             return False
     
-    # Old work order tests removed - focusing on new meters functionality
+    # ==================== IMPROVEMENT REQUESTS TESTS ====================
     
-    def test_create_meter(self):
+    def test_create_improvement_request(self):
         """Test POST /api/meters - Create a new meter"""
         self.log("Testing create meter endpoint...")
         
