@@ -26,13 +26,22 @@ class ModulePermission(BaseModel):
 
 class UserPermissions(BaseModel):
     dashboard: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
+    interventionRequests: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
     workOrders: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
-    assets: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
+    improvementRequests: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
+    improvements: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
     preventiveMaintenance: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
+    assets: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
     inventory: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
     locations: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
+    meters: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
     vendors: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
     reports: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
+    people: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
+    planning: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
+    purchaseHistory: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
+    importExport: ModulePermission = ModulePermission(view=False, edit=False, delete=False)
+    journal: ModulePermission = ModulePermission(view=False, edit=False, delete=False)
 
 class WorkOrderStatus(str, Enum):
     OUVERT = "OUVERT"
