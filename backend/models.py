@@ -700,3 +700,87 @@ class InterventionRequestUpdate(BaseModel):
     emplacement_id: Optional[str] = None
     date_limite_desiree: Optional[datetime] = None
 
+
+
+# Improvement Request (Demande d'amélioration) Models
+class ImprovementRequest(BaseModel):
+    id: str
+    titre: str
+    description: str
+    priorite: Priority
+    equipement_id: Optional[str] = None
+    equipement: Optional[Dict] = None
+    emplacement_id: Optional[str] = None
+    emplacement: Optional[Dict] = None
+    date_limite_desiree: Optional[datetime] = None
+    date_creation: datetime
+    created_by: str
+    created_by_name: Optional[str] = None
+    improvement_id: Optional[str] = None  # ID de l'amélioration créée
+    improvement_numero: Optional[str] = None  # Numéro de l'amélioration créée
+    improvement_date_limite: Optional[datetime] = None  # Date limite de l'amélioration créée
+    converted_at: Optional[datetime] = None  # Date de conversion
+    converted_by: Optional[str] = None  # ID de qui a converti
+
+class ImprovementRequestCreate(BaseModel):
+    titre: str
+    description: str
+    priorite: Priority = Priority.AUCUNE
+    equipement_id: Optional[str] = None
+    emplacement_id: Optional[str] = None
+    date_limite_desiree: Optional[datetime] = None
+
+class ImprovementRequestUpdate(BaseModel):
+    titre: Optional[str] = None
+    description: Optional[str] = None
+    priorite: Optional[Priority] = None
+    equipement_id: Optional[str] = None
+    emplacement_id: Optional[str] = None
+    date_limite_desiree: Optional[datetime] = None
+
+# Improvement (Amélioration) Models - Copie de WorkOrder
+class Improvement(BaseModel):
+    id: str
+    numero: str
+    titre: str
+    description: str
+    statut: WorkOrderStatus
+    priorite: Priority
+    equipement_id: Optional[str] = None
+    equipement: Optional[Dict] = None
+    emplacement_id: Optional[str] = None
+    emplacement: Optional[Dict] = None
+    assigne_a_id: Optional[str] = None
+    assigneA: Optional[Dict] = None
+    dateLimite: Optional[datetime] = None
+    tempsEstime: Optional[int] = None
+    tempsReel: Optional[int] = None
+    dateCreation: datetime
+    dateTermine: Optional[datetime] = None
+    createdBy: str
+    createdByName: Optional[str] = None
+    attachments: Optional[List[Dict]] = []
+    comments: Optional[List[Dict]] = []
+
+class ImprovementCreate(BaseModel):
+    titre: str
+    description: str
+    priorite: Priority = Priority.AUCUNE
+    equipement_id: Optional[str] = None
+    emplacement_id: Optional[str] = None
+    assigne_a_id: Optional[str] = None
+    dateLimite: Optional[datetime] = None
+    tempsEstime: Optional[int] = None
+
+class ImprovementUpdate(BaseModel):
+    titre: Optional[str] = None
+    description: Optional[str] = None
+    statut: Optional[WorkOrderStatus] = None
+    priorite: Optional[Priority] = None
+    equipement_id: Optional[str] = None
+    emplacement_id: Optional[str] = None
+    assigne_a_id: Optional[str] = None
+    dateLimite: Optional[datetime] = None
+    tempsEstime: Optional[int] = None
+    tempsReel: Optional[int] = None
+
