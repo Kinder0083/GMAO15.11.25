@@ -3,6 +3,7 @@ import { Card, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Plus, Search, Eye, Pencil, Trash2, Wrench } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../components/ui/tooltip';
 import InterventionRequestDialog from '../components/InterventionRequests/InterventionRequestDialog';
 import InterventionRequestFormDialog from '../components/InterventionRequests/InterventionRequestFormDialog';
 import ConvertToWorkOrderDialog from '../components/InterventionRequests/ConvertToWorkOrderDialog';
