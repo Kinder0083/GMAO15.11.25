@@ -404,52 +404,59 @@ class BackendTester:
             self.log("❌ Cannot proceed with other tests - Login failed", "ERROR")
             return results
         
-        # Test 2: Create meter
-        meter = self.test_create_meter()
-        results["create_meter"] = meter is not None
+        # Test 2: Create improvement request
+        improvement_request = self.test_create_improvement_request()
+        results["create_improvement_request"] = improvement_request is not None
         
-        if not meter:
-            self.log("❌ Cannot proceed with reading tests - Meter creation failed", "ERROR")
-            return results
+        if not improvement_request:
+            self.log("❌ Cannot proceed with improvement request tests - Creation failed", "ERROR")
+        else:
+            request_id = improvement_request["id"]
+            
+            # Test 3: Get improvement requests
+            requests_list = self.test_get_improvement_requests()
+            results["get_improvement_requests"] = requests_list is not None and len(requests_list) > 0
+            
+            # Test 4: Get improvement request details
+            request_details = self.test_get_improvement_request_details(request_id)
+            results["get_improvement_request_details"] = request_details is not None
+            
+            # Test 5: Update improvement request
+            updated_request = self.test_update_improvement_request(request_id)
+            results["update_improvement_request"] = updated_request is not None
+            
+            # Test 6: Add comment to improvement request
+            request_comment = self.test_add_improvement_request_comment(request_id)
+            results["add_improvement_request_comment"] = request_comment is not None
+            
+            # Test 7: Convert improvement request to improvement
+            conversion_result = self.test_convert_to_improvement(request_id)
+            results["convert_to_improvement"] = conversion_result is not None
+            
+            if conversion_result:
+                improvement_id = conversion_result.get("improvement_id")
+                
+                # Test improvement endpoints with converted improvement
+                if improvement_id:
+                    # Test 10: Get improvement details
+                    improvement_details = self.test_get_improvement_details(improvement_id)
+                    results["get_improvement_details"] = improvement_details is not None
+                    
+                    # Test 11: Update improvement
+                    updated_improvement = self.test_update_improvement(improvement_id)
+                    results["update_improvement"] = updated_improvement is not None
+                    
+                    # Test 12: Add comment to improvement
+                    improvement_comment = self.test_add_improvement_comment(improvement_id)
+                    results["add_improvement_comment"] = improvement_comment is not None
         
-        meter_id = meter["id"]
+        # Test 8: Create improvement directly
+        direct_improvement = self.test_create_improvement()
+        results["create_improvement"] = direct_improvement is not None
         
-        # Test 3: Get meters
-        meters = self.test_get_meters()
-        results["get_meters"] = meters is not None and len(meters) > 0
-        
-        # Test 4: Create first reading
-        first_reading = self.test_create_reading(meter_id, 1000.0, "Premier relevé")
-        results["create_first_reading"] = first_reading is not None
-        
-        # Test 5: Create second reading (to test consumption calculation)
-        second_reading = self.test_create_reading(meter_id, 1150.0, "Deuxième relevé")
-        results["create_second_reading"] = second_reading is not None
-        
-        # Test 6: Get readings
-        readings = self.test_get_readings(meter_id)
-        results["get_readings"] = readings is not None and len(readings) >= 2
-        
-        # Test 7: Get statistics
-        stats = self.test_get_statistics(meter_id, "month")
-        results["get_statistics"] = stats is not None
-        
-        # Test 8: Verify consumption calculation
-        if readings:
-            results["consumption_calculation"] = self.verify_consumption_calculation(readings)
-        
-        # Test 9: Verify cost calculation
-        if readings:
-            results["cost_calculation"] = self.verify_cost_calculation(readings, 0.15)
-        
-        # Test 10: Delete a reading
-        if readings and len(readings) > 0:
-            reading_to_delete = readings[0]["id"]
-            results["delete_reading"] = self.test_delete_reading(reading_to_delete)
-        
-        # Test 11: Soft delete the meter
-        if meter:
-            results["soft_delete_meter"] = self.test_meter_soft_delete(meter_id)
+        # Test 9: Get improvements
+        improvements = self.test_get_improvements()
+        results["get_improvements"] = improvements is not None
         
         # Summary
         self.log("=" * 60)
