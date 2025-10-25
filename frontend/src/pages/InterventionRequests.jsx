@@ -7,9 +7,10 @@ import InterventionRequestDialog from '../components/InterventionRequests/Interv
 import InterventionRequestFormDialog from '../components/InterventionRequests/InterventionRequestFormDialog';
 import ConvertToWorkOrderDialog from '../components/InterventionRequests/ConvertToWorkOrderDialog';
 import DeleteConfirmDialog from '../components/Common/DeleteConfirmDialog';
-import { interventionRequestsAPI } from '../services/api';
+import { interventionRequestsAPI, workOrdersAPI } from '../services/api';
 import { useToast } from '../hooks/use-toast';
 import { useAutoRefresh } from '../hooks/useAutoRefresh';
+import { useNavigate } from 'react-router-dom';
 
 const InterventionRequests = () => {
   const { toast } = useToast();
