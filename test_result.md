@@ -654,6 +654,102 @@ frontend:
           - completedThisMonth : calcule les maintenances complétées ce mois
           - Les compteurs se mettent maintenant à jour dynamiquement basés sur les données
 
+  - task: "Navigation et menu - Demandes d'amélioration et Améliorations"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/Layout/MainLayout.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          - Menu items ajoutés avec icônes Lightbulb (Demandes d'amél.) et Sparkles (Améliorations)
+          - Routes configurées dans App.js (/improvement-requests, /improvements)
+          - Navigation fonctionnelle vers les nouvelles pages
+
+  - task: "Page Demandes d'amélioration - Interface utilisateur"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/ImprovementRequests.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          - Page complète avec tableau des demandes d'amélioration
+          - Boutons d'action: Voir, Modifier, Supprimer, Convertir
+          - Filtres par priorité et recherche textuelle
+          - Intégration API improvementRequestsAPI
+
+  - task: "Page Demandes d'amélioration - CRUD complet"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/ImprovementRequests.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          - Création de nouvelles demandes via ImprovementRequestFormDialog
+          - Modification des demandes existantes
+          - Suppression avec confirmation
+          - Affichage des détails via ImprovementRequestDialog
+
+  - task: "Page Demandes d'amélioration - Conversion vers amélioration"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/ImprovementRequests.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          - Bouton de conversion (icône clé à molette) pour ADMIN/TECHNICIEN
+          - ConvertToImprovementDialog pour saisir assignation et date limite
+          - Appel API convertToImprovement
+          - Affichage du numéro d'amélioration après conversion
+
+  - task: "Page Améliorations - Interface utilisateur"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/Improvements.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          - Page complète avec tableau des améliorations
+          - Filtres par statut, recherche, et filtres de date
+          - Boutons d'action: Voir, Modifier, Supprimer
+          - Intégration API improvementsAPI
+
+  - task: "Page Améliorations - CRUD complet"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/Improvements.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          - Création de nouvelles améliorations via ImprovementFormDialog
+          - Modification des améliorations existantes
+          - Suppression avec confirmation
+          - Affichage des détails via ImprovementDialog
+          - Numérotation automatique >= 7000
+
 metadata:
   created_by: "main_agent"
   version: "4.0"
