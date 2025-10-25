@@ -1002,6 +1002,52 @@ frontend:
           7. Vérifier que les permissions actuelles du membre sont cochées
           8. Modifier quelques permissions et sauvegarder
           9. Vérifier la persistance des modifications
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ TEST MODIFICATION DES PERMISSIONS - TOUS LES TESTS RÉUSSIS
+          
+          🔧 PROBLÈME IDENTIFIÉ ET CORRIGÉ:
+          - Erreur 422 lors de la sauvegarde des permissions
+          - Cause: Frontend envoyait `permissions` directement, backend attendait `{ permissions: permissions }`
+          - Correction effectuée dans PermissionsManagementDialog.jsx ligne 35
+          
+          📊 RÉSULTATS DES TESTS COMPLETS:
+          1. ✅ Connexion admin: RÉUSSI
+          2. ✅ Navigation page Équipes (/people): RÉUSSI
+          3. ✅ Affichage liste des membres: RÉUSSI (4 cartes trouvées)
+          4. ✅ Clic bouton "Permissions": RÉUSSI
+          5. ✅ Ouverture dialog: RÉUSSI
+          6. ✅ Titre "Modifier les permissions": RÉUSSI
+          7. ✅ Informations membre affichées: RÉUSSI
+             - Description: "Gérer les permissions de Support Admin (buenogy@gmail.com)"
+             - Rôle actuel: ADMIN affiché
+          8. ✅ Grille de permissions: RÉUSSI
+             - 17 modules confirmés (17 lignes trouvées)
+             - 3 colonnes: Module, Visualisation, Édition, Suppression
+             - 31 permissions initialement cochées
+          9. ✅ Bouton "Réinitialiser par défaut": PRÉSENT
+          10. ✅ Modification permissions: RÉUSSI
+              - Permission activée avec succès
+          11. ✅ Sauvegarde: RÉUSSI
+              - Dialog fermé après sauvegarde
+              - Message toast: "Succès - Les permissions ont été mises à jour avec succès"
+          12. ✅ Vérification persistance: RÉUSSI
+              - Dialog rouvert pour vérification
+              - 32 permissions cochées après modification (+1 confirmé)
+          
+          🎯 MODULES DE PERMISSIONS VÉRIFIÉS (17/17):
+          - Tableau de bord, Demandes d'inter., Ordres de travail
+          - Demandes d'amél., Améliorations, Maintenance prev.
+          - Équipements, Inventaire, Zones, Compteurs
+          - Fournisseurs, Rapports, Équipes, Planning
+          - Historique Achat, Import / Export, Journal
+          
+          ✅ CONCLUSION: Fonctionnalité de modification des permissions entièrement opérationnelle
+          - Interface utilisateur intuitive et responsive
+          - Grille de permissions complète avec 17 modules × 3 permissions
+          - Sauvegarde et persistance des modifications fonctionnelles
+          - Messages de confirmation appropriés
 
 metadata:
   created_by: "main_agent"
