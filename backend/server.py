@@ -753,7 +753,7 @@ async def get_work_order(wo_id: str, current_user: dict = Depends(get_current_us
         raise HTTPException(status_code=400, detail=str(e))
 
 @api_router.post("/work-orders", response_model=WorkOrder)
-async def create_work_order(wo_create: WorkOrderCreate, current_user: dict = Depends(get_current_user)):
+async def create_work_order(wo_create: WorkOrderCreate, current_user: dict = Depends(require_permission("workOrders", "edit"))):
     """Créer un nouvel ordre de travail"""
     # Generate numero
     count = await db.work_orders.count_documents({})
