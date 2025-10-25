@@ -76,6 +76,14 @@ const People = () => {
   const getRoleBadge = (role) => {
     const badges = {
       'ADMIN': { bg: 'bg-purple-100', text: 'text-purple-700', label: 'Administrateur' },
+      'DIRECTEUR': { bg: 'bg-red-100', text: 'text-red-700', label: 'Directeur' },
+      'QHSE': { bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'QHSE' },
+      'RSP_PROD': { bg: 'bg-green-100', text: 'text-green-700', label: 'RSP Prod.' },
+      'PROD': { bg: 'bg-green-100', text: 'text-green-600', label: 'Prod.' },
+      'INDUS': { bg: 'bg-cyan-100', text: 'text-cyan-700', label: 'Indus.' },
+      'LOGISTIQUE': { bg: 'bg-orange-100', text: 'text-orange-700', label: 'Logistique' },
+      'LABO': { bg: 'bg-pink-100', text: 'text-pink-700', label: 'Labo.' },
+      'ADV': { bg: 'bg-indigo-100', text: 'text-indigo-700', label: 'ADV' },
       'TECHNICIEN': { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Technicien' },
       'VISUALISEUR': { bg: 'bg-gray-100', text: 'text-gray-700', label: 'Visualiseur' }
     };
