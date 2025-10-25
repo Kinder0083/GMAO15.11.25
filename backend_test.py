@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Backend API Testing Script for GMAO Application
-Tests the new Improvement Requests and Improvements functionality
+Tests the permissions system functionality
 """
 
 import requests
@@ -12,9 +12,13 @@ from datetime import datetime, timedelta
 # Use the correct backend URL from frontend .env
 BACKEND_URL = "https://gmao-improve.preview.emergentagent.com/api"
 
-# Test credentials - using existing admin user
-TEST_EMAIL = "admin@gmao-iris.local"
-TEST_PASSWORD = "Admin123!"
+# Test credentials
+ADMIN_EMAIL = "admin@example.com"
+ADMIN_PASSWORD = "password123"
+
+# Test viewer credentials (to be created)
+VIEWER_EMAIL = "test_viewer@test.com"
+VIEWER_PASSWORD = "Test123!"
 
 class BackendTester:
     def __init__(self):
