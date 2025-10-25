@@ -72,7 +72,8 @@ const CreateMemberDialog = ({ open, onOpenChange, onSuccess }) => {
         telephone: '',
         service: '',
         role: 'TECHNICIEN',
-        password: ''
+        password: '',
+        permissions: {}
       });
 
       onOpenChange(false);
