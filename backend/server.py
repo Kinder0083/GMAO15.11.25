@@ -3897,6 +3897,63 @@ async def convert_to_improvement(
         
         await db.improvement_requests.update_one(
             {"id": request_id},
+
+
+# Attachments pour Improvements
+@api_router.post("/improvements/{imp_id}/attachments")
+async def upload_improvement_attachment(
+    imp_id: str,
+    file: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user)
+):
+    """Upload fichier pour une amélioration"""
+    imp = await db.improvements.find_one({"id": imp_id})
+    if not imp:
+        raise HTTPException(status_code=404, detail="Amélioration non trouvée")
+    
+    return await upload_attachment_generic(imp_id, file, "improvements", current_user)
+
+@api_router.get("/improvements/{imp_id}/attachments/{filename}")
+async def download_improvement_attachment(imp_id: str, filename: str, current_user: dict = Depends(get_current_user)):
+    """Télécharger un fichier d'une amélioration"""
+    return await download_attachment_generic(imp_id, filename, "improvements")
+
+# Comments pour Improvements
+@api_router.post("/improvements/{imp_id}/comments")
+async def add_improvement_comment(
+    imp_id: str,
+    comment_data: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Ajouter un commentaire à une amélioration"""
+    imp = await db.improvements.find_one({"id": imp_id})
+    if not imp:
+        raise HTTPException(status_code=404, detail="Amélioration non trouvée")
+    
+    comment = {
+        "id": str(uuid.uuid4()),
+        "text": comment_data.get("text", ""),
+        "user_id": current_user["id"],
+        "user_name": f"{current_user.get('prenom', '')} {current_user.get('nom', '')}",
+        "timestamp": datetime.utcnow().isoformat()
+    }
+    
+    await db.improvements.update_one(
+        {"id": imp_id},
+        {"$push": {"comments": comment}}
+    )
+    
+    return comment
+
+@api_router.get("/improvements/{imp_id}/comments")
+async def get_improvement_comments(imp_id: str, current_user: dict = Depends(get_current_user)):
+    """Récupérer les commentaires d'une amélioration"""
+    imp = await db.improvements.find_one({"id": imp_id})
+    if not imp:
+        raise HTTPException(status_code=404, detail="Amélioration non trouvée")
+    
+    return imp.get("comments", [])
+
             {"$set": {
                 "improvement_id": improvement_id,
                 "improvement_numero": numero,
