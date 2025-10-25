@@ -48,7 +48,11 @@ const ConvertToWorkOrderDialog = ({ open, onOpenChange, request, onSuccess }) =>
     
     setLoading(true);
     try {
-      await interventionRequestsAPI.convertToWorkOrder(request.id, assigneeId || null);
+      await interventionRequestsAPI.convertToWorkOrder(
+        request.id, 
+        assigneeId || null,
+        dateLimite || null
+      );
       toast({
         title: 'Succès',
         description: 'Demande convertie en ordre de travail'
