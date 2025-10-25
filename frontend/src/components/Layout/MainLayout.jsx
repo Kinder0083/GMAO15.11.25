@@ -25,6 +25,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import FirstLoginPasswordDialog from '../Common/FirstLoginPasswordDialog';
+import { usePermissions } from '../../hooks/usePermissions';
 
 const MainLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
