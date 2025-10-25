@@ -3693,6 +3693,458 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+
+# ==================== IMPROVEMENT REQUESTS (DEMANDES D'AMÉLIORATION) ENDPOINTS ====================
+
+@api_router.post("/improvement-requests", response_model=ImprovementRequest, status_code=201)
+async def create_improvement_request(
+    request: ImprovementRequestCreate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Créer une nouvelle demande d'amélioration"""
+    try:
+        request_id = str(uuid.uuid4())
+        request_data = request.model_dump()
+        request_data["id"] = request_id
+        request_data["date_creation"] = datetime.utcnow()
+        request_data["created_by"] = current_user["id"]
+        request_data["created_by_name"] = f"{current_user.get('prenom', '')} {current_user.get('nom', '')}"
+        request_data["improvement_id"] = None
+        request_data["improvement_numero"] = None
+        request_data["improvement_date_limite"] = None
+        request_data["converted_at"] = None
+        request_data["converted_by"] = None
+        
+        if request_data.get("equipement_id"):
+            equipment = await db.equipments.find_one({"id": request_data["equipement_id"]})
+            if equipment:
+                request_data["equipement"] = {"id": equipment["id"], "nom": equipment["nom"]}
+        
+        if request_data.get("emplacement_id"):
+            location = await db.locations.find_one({"id": request_data["emplacement_id"]})
+            if location:
+                request_data["emplacement"] = {"id": location["id"], "nom": location["nom"]}
+        
+        await db.improvement_requests.insert_one(request_data)
+        
+        await audit_service.log_action(
+            user_id=current_user["id"],
+            user_name=current_user.get("nom", "") + " " + current_user.get("prenom", ""),
+            user_email=current_user["email"],
+            action=ActionType.CREATE,
+            entity_type=EntityType.WORK_ORDER,
+            entity_id=request_id,
+            entity_name=request.titre,
+            details=f"Création demande d'amélioration"
+        )
+        
+        return ImprovementRequest(**request_data)
+    except Exception as e:
+        logger.error(f"Erreur création demande d'amélioration: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/improvement-requests", response_model=List[ImprovementRequest])
+async def get_all_improvement_requests(current_user: dict = Depends(get_current_user)):
+    """Récupérer toutes les demandes d'amélioration"""
+    try:
+        requests = []
+        async for req in db.improvement_requests.find().sort("date_creation", -1):
+            requests.append(ImprovementRequest(**req))
+        return requests
+    except Exception as e:
+        logger.error(f"Erreur récupération demandes: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/improvement-requests/{request_id}", response_model=ImprovementRequest)
+async def get_improvement_request(request_id: str, current_user: dict = Depends(get_current_user)):
+    """Récupérer une demande d'amélioration spécifique"""
+    req = await db.improvement_requests.find_one({"id": request_id})
+    if not req:
+        raise HTTPException(status_code=404, detail="Demande non trouvée")
+    return ImprovementRequest(**req)
+
+@api_router.put("/improvement-requests/{request_id}", response_model=ImprovementRequest)
+async def update_improvement_request(
+    request_id: str,
+    request_update: ImprovementRequestUpdate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Mettre à jour une demande d'amélioration"""
+    req = await db.improvement_requests.find_one({"id": request_id})
+    if not req:
+        raise HTTPException(status_code=404, detail="Demande non trouvée")
+    
+    update_data = {k: v for k, v in request_update.model_dump().items() if v is not None}
+    
+    if "equipement_id" in update_data:
+        if update_data["equipement_id"]:
+            equipment = await db.equipments.find_one({"id": update_data["equipement_id"]})
+            if equipment:
+                update_data["equipement"] = {"id": equipment["id"], "nom": equipment["nom"]}
+        else:
+            update_data["equipement"] = None
+    
+    if "emplacement_id" in update_data:
+        if update_data["emplacement_id"]:
+            location = await db.locations.find_one({"id": update_data["emplacement_id"]})
+            if location:
+                update_data["emplacement"] = {"id": location["id"], "nom": location["nom"]}
+        else:
+            update_data["emplacement"] = None
+    
+    await db.improvement_requests.update_one({"id": request_id}, {"$set": update_data})
+    updated_req = await db.improvement_requests.find_one({"id": request_id})
+    
+    await audit_service.log_action(
+        user_id=current_user["id"],
+        user_name=current_user.get("nom", "") + " " + current_user.get("prenom", ""),
+        user_email=current_user["email"],
+        action=ActionType.UPDATE,
+        entity_type=EntityType.WORK_ORDER,
+        entity_id=request_id,
+        entity_name=updated_req['titre'],
+        details=f"Modification demande d'amélioration"
+    )
+    
+    return ImprovementRequest(**updated_req)
+
+@api_router.delete("/improvement-requests/{request_id}")
+async def delete_improvement_request(request_id: str, current_user: dict = Depends(get_current_user)):
+    """Supprimer une demande d'amélioration"""
+    req = await db.improvement_requests.find_one({"id": request_id})
+    if not req:
+        raise HTTPException(status_code=404, detail="Demande non trouvée")
+    
+    await db.improvement_requests.delete_one({"id": request_id})
+    
+    await audit_service.log_action(
+        user_id=current_user["id"],
+        user_name=current_user.get("nom", "") + " " + current_user.get("prenom", ""),
+        user_email=current_user["email"],
+        action=ActionType.DELETE,
+        entity_type=EntityType.WORK_ORDER,
+        entity_id=request_id,
+        entity_name=req['titre'],
+        details=f"Suppression demande d'amélioration"
+    )
+    
+    return {"message": "Demande supprimée"}
+
+@api_router.post("/improvement-requests/{request_id}/convert-to-improvement", response_model=dict)
+async def convert_to_improvement(
+    request_id: str,
+    assignee_id: Optional[str] = None,
+    date_limite: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """Convertir une demande d'amélioration en amélioration (Admin/Technicien uniquement)"""
+    if current_user.get("role") not in ["ADMIN", "TECHNICIEN"]:
+        raise HTTPException(status_code=403, detail="Accès refusé")
+    
+    try:
+        req = await db.improvement_requests.find_one({"id": request_id})
+        if not req:
+            raise HTTPException(status_code=404, detail="Demande non trouvée")
+        
+        if req.get("improvement_id"):
+            raise HTTPException(status_code=400, detail="Cette demande a déjà été convertie")
+        
+        improvement_id = str(uuid.uuid4())
+        count = await db.improvements.count_documents({})
+        numero = str(7000 + count + 1)
+        
+        date_limite_imp = None
+        if date_limite:
+            date_limite_imp = datetime.fromisoformat(date_limite.replace('Z', '+00:00'))
+        elif req.get("date_limite_desiree"):
+            date_limite_imp = req.get("date_limite_desiree")
+        
+        improvement_data = {
+            "id": improvement_id,
+            "numero": numero,
+            "titre": req["titre"],
+            "description": req["description"],
+            "statut": "OUVERT",
+            "priorite": req["priorite"],
+            "equipement_id": req.get("equipement_id"),
+            "equipement": req.get("equipement"),
+            "emplacement_id": req.get("emplacement_id"),
+            "emplacement": req.get("emplacement"),
+            "assigne_a_id": assignee_id,
+            "assigneA": None,
+            "dateLimite": date_limite_imp,
+            "tempsEstime": None,
+            "dateCreation": datetime.utcnow(),
+            "createdBy": req["created_by"],
+            "createdByName": req.get("created_by_name"),
+            "tempsReel": None,
+            "dateTermine": None,
+            "attachments": [],
+            "comments": []
+        }
+        
+        if assignee_id:
+            assignee = await db.users.find_one({"id": assignee_id})
+            if assignee:
+                improvement_data["assigneA"] = {
+                    "id": assignee["id"],
+                    "nom": assignee["nom"],
+                    "prenom": assignee["prenom"]
+                }
+        
+        await db.improvements.insert_one(improvement_data)
+        
+        await db.improvement_requests.update_one(
+            {"id": request_id},
+            {"$set": {
+                "improvement_id": improvement_id,
+                "improvement_numero": numero,
+                "improvement_date_limite": date_limite_imp,
+                "converted_at": datetime.utcnow(),
+                "converted_by": current_user["id"]
+            }}
+        )
+        
+        return {
+            "message": "Demande convertie en amélioration avec succès",
+            "improvement_id": improvement_id,
+            "request_id": request_id
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erreur conversion demande: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ==================== IMPROVEMENTS (AMÉLIORATIONS) ENDPOINTS ====================
+
+@api_router.get("/improvements", response_model=List[Improvement])
+async def get_improvements(
+    current_user: dict = Depends(get_current_user),
+    statut: Optional[str] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    date_type: str = "creation"
+):
+    """Récupérer toutes les améliorations avec filtres"""
+    try:
+        query = {}
+        
+        if statut:
+            query["statut"] = statut
+        
+        if start_date or end_date:
+            date_field = "dateCreation" if date_type == "creation" else "dateLimite"
+            date_filter = {}
+            if start_date:
+                date_filter["$gte"] = datetime.fromisoformat(start_date.replace('Z', '+00:00'))
+            if end_date:
+                date_filter["$lte"] = datetime.fromisoformat(end_date.replace('Z', '+00:00'))
+            query[date_field] = date_filter
+        
+        improvements = []
+        async for imp in db.improvements.find(query).sort("dateCreation", -1):
+            if imp.get("assigne_a_id"):
+                imp["assigneA"] = await get_user_by_id(imp["assigne_a_id"])
+            if imp.get("emplacement_id"):
+                imp["emplacement"] = await get_location_by_id(imp["emplacement_id"])
+            if imp.get("equipement_id"):
+                imp["equipement"] = await get_equipment_by_id(imp["equipement_id"])
+            
+            if imp.get("createdBy"):
+                try:
+                    creator = await db.users.find_one({"id": imp["createdBy"]})
+                    if creator:
+                        imp["createdByName"] = f"{creator.get('prenom', '')} {creator.get('nom', '')}".strip()
+                except Exception as e:
+                    logger.error(f"Erreur recherche créateur: {e}")
+            
+            if "numero" not in imp or not imp["numero"]:
+                imp["numero"] = "N/A"
+            
+            improvements.append(Improvement(**imp))
+        
+        return improvements
+    except Exception as e:
+        logger.error(f"Erreur récupération améliorations: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/improvements/{imp_id}", response_model=Improvement)
+async def get_improvement(imp_id: str, current_user: dict = Depends(get_current_user)):
+    """Détails d'une amélioration"""
+    try:
+        imp = await db.improvements.find_one({"id": imp_id})
+        if not imp:
+            raise HTTPException(status_code=404, detail="Amélioration non trouvée")
+        
+        imp = serialize_doc(imp)
+        if imp.get("assigne_a_id"):
+            imp["assigneA"] = await get_user_by_id(imp["assigne_a_id"])
+        if imp.get("emplacement_id"):
+            imp["emplacement"] = await get_location_by_id(imp["emplacement_id"])
+        if imp.get("equipement_id"):
+            imp["equipement"] = await get_equipment_by_id(imp["equipement_id"])
+        
+        if imp.get("createdBy"):
+            try:
+                creator = await db.users.find_one({"id": imp["createdBy"]})
+                if creator:
+                    imp["createdByName"] = f"{creator.get('prenom', '')} {creator.get('nom', '')}".strip()
+            except Exception as e:
+                logger.error(f"Erreur recherche créateur: {e}")
+        
+        if "numero" not in imp or not imp["numero"]:
+            imp["numero"] = "N/A"
+        
+        return Improvement(**imp)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@api_router.post("/improvements", response_model=Improvement)
+async def create_improvement(imp_create: ImprovementCreate, current_user: dict = Depends(get_current_user)):
+    """Créer une nouvelle amélioration"""
+    count = await db.improvements.count_documents({})
+    numero = str(7000 + count + 1)
+    
+    improvement_id = str(uuid.uuid4())
+    improvement_data = imp_create.model_dump()
+    improvement_data["id"] = improvement_id
+    improvement_data["numero"] = numero
+    improvement_data["statut"] = "OUVERT"
+    improvement_data["dateCreation"] = datetime.utcnow()
+    improvement_data["createdBy"] = current_user["id"]
+    improvement_data["createdByName"] = f"{current_user.get('prenom', '')} {current_user.get('nom', '')}"
+    improvement_data["tempsReel"] = None
+    improvement_data["dateTermine"] = None
+    improvement_data["attachments"] = []
+    improvement_data["comments"] = []
+    
+    if improvement_data.get("assigne_a_id"):
+        assignee = await db.users.find_one({"id": improvement_data["assigne_a_id"]})
+        if assignee:
+            improvement_data["assigneA"] = {
+                "id": assignee["id"],
+                "nom": assignee["nom"],
+                "prenom": assignee["prenom"]
+            }
+    
+    if improvement_data.get("equipement_id"):
+        equipment = await db.equipments.find_one({"id": improvement_data["equipement_id"]})
+        if equipment:
+            improvement_data["equipement"] = {"id": equipment["id"], "nom": equipment["nom"]}
+    
+    if improvement_data.get("emplacement_id"):
+        location = await db.locations.find_one({"id": improvement_data["emplacement_id"]})
+        if location:
+            improvement_data["emplacement"] = {"id": location["id"], "nom": location["nom"]}
+    
+    await db.improvements.insert_one(improvement_data)
+    
+    await audit_service.log_action(
+        user_id=current_user["id"],
+        user_name=f"{current_user.get('nom', '')} {current_user.get('prenom', '')}",
+        user_email=current_user["email"],
+        action=ActionType.CREATE,
+        entity_type=EntityType.WORK_ORDER,
+        entity_id=improvement_id,
+        entity_name=imp_create.titre,
+        details="Création amélioration"
+    )
+    
+    return Improvement(**improvement_data)
+
+@api_router.put("/improvements/{imp_id}", response_model=Improvement)
+async def update_improvement(
+    imp_id: str,
+    imp_update: ImprovementUpdate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Mettre à jour une amélioration"""
+    imp = await db.improvements.find_one({"id": imp_id})
+    if not imp:
+        raise HTTPException(status_code=404, detail="Amélioration non trouvée")
+    
+    update_data = {k: v for k, v in imp_update.model_dump().items() if v is not None}
+    
+    if update_data.get("statut") == "TERMINE" and "dateTermine" not in update_data:
+        update_data["dateTermine"] = datetime.utcnow()
+    
+    if "assigne_a_id" in update_data:
+        if update_data["assigne_a_id"]:
+            assignee = await db.users.find_one({"id": update_data["assigne_a_id"]})
+            if assignee:
+                update_data["assigneA"] = {
+                    "id": assignee["id"],
+                    "nom": assignee["nom"],
+                    "prenom": assignee["prenom"]
+                }
+        else:
+            update_data["assigneA"] = None
+    
+    if "equipement_id" in update_data:
+        if update_data["equipement_id"]:
+            equipment = await db.equipments.find_one({"id": update_data["equipement_id"]})
+            if equipment:
+                update_data["equipement"] = {"id": equipment["id"], "nom": equipment["nom"]}
+        else:
+            update_data["equipement"] = None
+    
+    if "emplacement_id" in update_data:
+        if update_data["emplacement_id"]:
+            location = await db.locations.find_one({"id": update_data["emplacement_id"]})
+            if location:
+                update_data["emplacement"] = {"id": location["id"], "nom": location["nom"]}
+        else:
+            update_data["emplacement"] = None
+    
+    await db.improvements.update_one({"id": imp_id}, {"$set": update_data})
+    updated_imp = await db.improvements.find_one({"id": imp_id})
+    
+    updated_imp = serialize_doc(updated_imp)
+    if updated_imp.get("assigne_a_id"):
+        updated_imp["assigneA"] = await get_user_by_id(updated_imp["assigne_a_id"])
+    if updated_imp.get("emplacement_id"):
+        updated_imp["emplacement"] = await get_location_by_id(updated_imp["emplacement_id"])
+    if updated_imp.get("equipement_id"):
+        updated_imp["equipement"] = await get_equipment_by_id(updated_imp["equipement_id"])
+    
+    await audit_service.log_action(
+        user_id=current_user["id"],
+        user_name=f"{current_user.get('nom', '')} {current_user.get('prenom', '')}",
+        user_email=current_user["email"],
+        action=ActionType.UPDATE,
+        entity_type=EntityType.WORK_ORDER,
+        entity_id=imp_id,
+        entity_name=updated_imp["titre"],
+        details="Modification amélioration"
+    )
+    
+    return Improvement(**updated_imp)
+
+@api_router.delete("/improvements/{imp_id}")
+async def delete_improvement(imp_id: str, current_user: dict = Depends(get_current_user)):
+    """Supprimer une amélioration"""
+    imp = await db.improvements.find_one({"id": imp_id})
+    if not imp:
+        raise HTTPException(status_code=404, detail="Amélioration non trouvée")
+    
+    await db.improvements.delete_one({"id": imp_id})
+    
+    await audit_service.log_action(
+        user_id=current_user["id"],
+        user_name=f"{current_user.get('nom', '')} {current_user.get('prenom', '')}",
+        user_email=current_user["email"],
+        action=ActionType.DELETE,
+        entity_type=EntityType.WORK_ORDER,
+        entity_id=imp_id,
+        entity_name=imp["titre"],
+        details="Suppression amélioration"
+    )
+    
+    return {"message": "Amélioration supprimée"}
+
+
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
