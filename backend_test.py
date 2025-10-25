@@ -354,7 +354,7 @@ class BackendTester:
         
         update_data = {
             "statut": "EN_COURS",
-            "priorite": "CRITIQUE"
+            "priorite": "HAUTE"
         }
         
         try:
