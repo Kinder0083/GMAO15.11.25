@@ -64,36 +64,36 @@ class BackendTester:
     # ==================== IMPROVEMENT REQUESTS TESTS ====================
     
     def test_create_improvement_request(self):
-        """Test POST /api/meters - Create a new meter"""
-        self.log("Testing create meter endpoint...")
+        """Test POST /api/improvement-requests - Create a new improvement request"""
+        self.log("Testing create improvement request endpoint...")
         
-        meter_data = {
-            "nom": "Compteur électrique principal",
-            "type": "ELECTRICITE",
-            "numero_serie": "ELEC001",
-            "unite": "kWh",
-            "prix_unitaire": 0.15,
-            "abonnement_mensuel": 50.0,
-            "notes": "Compteur de test"
+        request_data = {
+            "titre": "Amélioration système éclairage",
+            "description": "Demande d'amélioration pour moderniser le système d'éclairage du bâtiment principal",
+            "priorite": "MOYENNE",
+            "type_demande": "AMELIORATION_INFRASTRUCTURE",
+            "demandeur": "Jean Dupont",
+            "service_demandeur": "Maintenance",
+            "justification": "Réduction de la consommation énergétique et amélioration de l'éclairage"
         }
         
         try:
             response = self.session.post(
-                f"{BACKEND_URL}/meters",
-                json=meter_data,
+                f"{BACKEND_URL}/improvement-requests",
+                json=request_data,
                 timeout=10
             )
             
             if response.status_code == 201:
-                meter = response.json()
-                self.log(f"✅ Create meter successful - ID: {meter.get('id')}, Name: {meter.get('nom')}")
-                return meter
+                request = response.json()
+                self.log(f"✅ Create improvement request successful - ID: {request.get('id')}, Title: {request.get('titre')}")
+                return request
             else:
-                self.log(f"❌ Create meter failed - Status: {response.status_code}, Response: {response.text}", "ERROR")
+                self.log(f"❌ Create improvement request failed - Status: {response.status_code}, Response: {response.text}", "ERROR")
                 return None
                 
         except requests.exceptions.RequestException as e:
-            self.log(f"❌ Create meter request failed - Error: {str(e)}", "ERROR")
+            self.log(f"❌ Create improvement request failed - Error: {str(e)}", "ERROR")
             return None
     
     def test_get_meters(self):
