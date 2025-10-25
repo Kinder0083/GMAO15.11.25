@@ -93,3 +93,47 @@ def can_edit_work_order_status(current_user: dict, work_order: dict) -> bool:
         return assigne_a_id == user_id
     
     return False
+
+
+def check_permission(current_user: dict, module: str, permission_type: str) -> bool:
+    """
+    Vérifie si l'utilisateur a la permission demandée pour un module.
+    
+    Args:
+        current_user: Dict contenant les infos de l'utilisateur avec ses permissions
+        module: Nom du module (ex: 'workOrders', 'assets', 'interventionRequests')
+        permission_type: Type de permission ('view', 'edit', 'delete')
+    
+    Returns:
+        bool: True si l'utilisateur a la permission, False sinon
+    """
+    # Les admins ont toujours toutes les permissions
+    if current_user.get("role") == "ADMIN":
+        return True
+    
+    # Récupérer les permissions de l'utilisateur
+    permissions = current_user.get("permissions", {})
+    
+    # Récupérer les permissions du module
+    module_permissions = permissions.get(module, {})
+    
+    # Vérifier la permission demandée
+    return module_permissions.get(permission_type, False)
+
+def require_permission(module: str, permission_type: str):
+    """
+    Decorator pour vérifier les permissions sur un endpoint.
+    
+    Usage:
+        @api_router.get("/work-orders")
+        async def get_work_orders(current_user: dict = Depends(require_permission("workOrders", "view"))):
+            ...
+    """
+    async def permission_checker(current_user: dict = Depends(get_current_user)):
+        if not check_permission(current_user, module, permission_type):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Vous n'avez pas la permission '{permission_type}' pour le module '{module}'"
+            )
+        return current_user
+    return permission_checker
