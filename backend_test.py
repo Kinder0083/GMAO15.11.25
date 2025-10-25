@@ -535,13 +535,17 @@ class BackendTester:
                     # Test 15: Delete improvement (test with converted improvement)
                     results["delete_improvement"] = self.test_delete_improvement(improvement_id)
         
-        # Test 8: Create improvement directly
+        # Test 9: Create improvement directly
         direct_improvement = self.test_create_improvement()
         results["create_improvement"] = direct_improvement is not None
         
-        # Test 9: Get improvements
+        # Test 10: Get improvements
         improvements = self.test_get_improvements()
         results["get_improvements"] = improvements is not None
+        
+        # Test 14: Delete improvement request (test with original request)
+        if improvement_request:
+            results["delete_improvement_request"] = self.test_delete_improvement_request(request_id)
         
         # Summary
         self.log("=" * 60)
