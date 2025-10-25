@@ -738,3 +738,88 @@ agent_communication:
       
       La nouvelle fonctionnalité "Compteurs" est prête pour utilisation en production.
       Tous les calculs automatiques, la persistance des données et les statistiques fonctionnent correctement.
+
+  - agent: "main"
+    message: |
+      🆕 NOUVELLES FONCTIONNALITÉS IMPLÉMENTÉES - Demandes d'amélioration et Améliorations
+      
+      📦 BACKEND - Endpoints API créés et corrigés:
+      1. Improvement Requests (Demandes d'amélioration):
+         - POST /api/improvement-requests - Créer une demande
+         - GET /api/improvement-requests - Liste des demandes
+         - GET /api/improvement-requests/{id} - Détails d'une demande
+         - PUT /api/improvement-requests/{id} - Modifier une demande
+         - DELETE /api/improvement-requests/{id} - Supprimer une demande
+         - POST /api/improvement-requests/{id}/convert-to-improvement - Convertir en amélioration
+         - POST /api/improvement-requests/{id}/attachments - Upload fichier
+         - GET /api/improvement-requests/{id}/attachments/{filename} - Télécharger fichier
+         - POST /api/improvement-requests/{id}/comments - Ajouter commentaire
+         - GET /api/improvement-requests/{id}/comments - Liste commentaires
+      
+      2. Improvements (Améliorations):
+         - POST /api/improvements - Créer une amélioration
+         - GET /api/improvements - Liste des améliorations
+         - GET /api/improvements/{id} - Détails d'une amélioration
+         - PUT /api/improvements/{id} - Modifier une amélioration
+         - DELETE /api/improvements/{id} - Supprimer une amélioration
+         - POST /api/improvements/{id}/attachments - Upload fichier
+         - GET /api/improvements/{id}/attachments/{filename} - Télécharger fichier
+         - POST /api/improvements/{id}/comments - Ajouter commentaire
+         - GET /api/improvements/{id}/comments - Liste commentaires
+      
+      3. Modèles Pydantic (models.py):
+         - ImprovementRequest, ImprovementRequestCreate, ImprovementRequestUpdate
+         - Improvement, ImprovementCreate, ImprovementUpdate
+         - EntityType.IMPROVEMENT_REQUEST et EntityType.IMPROVEMENT ajoutés
+      
+      4. Corrections critiques:
+         - Endpoint convert-to-improvement restructuré (code mal placé corrigé)
+         - Tous les audit logs utilisent EntityType.IMPROVEMENT_REQUEST ou IMPROVEMENT
+         - Numérotation des améliorations commence à 7000
+      
+      💻 FRONTEND - Pages et composants créés:
+      1. Pages principales:
+         - /app/frontend/src/pages/ImprovementRequests.jsx
+         - /app/frontend/src/pages/Improvements.jsx
+      
+      2. Composants ImprovementRequests:
+         - ImprovementRequestDialog.jsx
+         - ImprovementRequestFormDialog.jsx
+         - ConvertToImprovementDialog.jsx
+      
+      3. Composants Improvements:
+         - ImprovementDialog.jsx
+         - ImprovementFormDialog.jsx
+         - StatusChangeDialog.jsx
+      
+      4. Services API (api.js):
+         - improvementRequestsAPI (getAll, getById, create, update, delete, convertToImprovement, attachments, comments)
+         - improvementsAPI (getAll, getById, create, update, delete, attachments, comments)
+      
+      5. Navigation et menu:
+         - Routes ajoutées dans App.js (/improvement-requests, /improvements)
+         - Menu items ajoutés dans MainLayout.jsx avec icônes Lightbulb et Sparkles
+      
+      6. Import/Export:
+         - Modules "improvement-requests" et "improvements" ajoutés à ImportExport.jsx
+         - EXPORT_MODULES mis à jour dans server.py
+      
+      🧪 TESTS À EFFECTUER:
+      Backend:
+      1. Tester création de demande d'amélioration
+      2. Tester conversion demande → amélioration
+      3. Tester CRUD complet sur improvement_requests
+      4. Tester CRUD complet sur improvements
+      5. Tester attachments et comments pour les deux entités
+      
+      Frontend:
+      1. Navigation vers /improvement-requests et /improvements
+      2. Créer une demande d'amélioration
+      3. Convertir demande → amélioration
+      4. Vérifier affichage et interactions
+      5. Tester import/export
+      
+      📋 TÂCHES RESTANTES:
+      1. Ajouter tooltips sur tous les boutons d'action
+      2. Vérifier notification count pour work orders
+
