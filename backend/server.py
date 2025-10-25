@@ -1899,6 +1899,19 @@ async def get_user_permissions(user_id: str, current_user: dict = Depends(get_cu
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+
+@api_router.get("/users/default-permissions/{role}")
+async def get_default_permissions_for_role(
+    role: str,
+    current_user: dict = Depends(get_current_admin_user)
+):
+    """Obtenir les permissions par défaut pour un rôle spécifique (admin uniquement)"""
+    try:
+        default_permissions = get_default_permissions_by_role(role)
+        return {"role": role, "permissions": default_permissions.model_dump()}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Erreur lors de la récupération des permissions: {str(e)}")
+
 @api_router.put("/users/{user_id}/permissions", response_model=User)
 async def update_user_permissions(
     user_id: str, 
