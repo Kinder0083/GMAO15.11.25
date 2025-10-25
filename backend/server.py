@@ -3801,7 +3801,7 @@ async def update_improvement_request(
         user_name=current_user.get("nom", "") + " " + current_user.get("prenom", ""),
         user_email=current_user["email"],
         action=ActionType.UPDATE,
-        entity_type=EntityType.WORK_ORDER,
+        entity_type=EntityType.IMPROVEMENT_REQUEST,
         entity_id=request_id,
         entity_name=updated_req['titre'],
         details=f"Modification demande d'amélioration"
@@ -3823,7 +3823,7 @@ async def delete_improvement_request(request_id: str, current_user: dict = Depen
         user_name=current_user.get("nom", "") + " " + current_user.get("prenom", ""),
         user_email=current_user["email"],
         action=ActionType.DELETE,
-        entity_type=EntityType.WORK_ORDER,
+        entity_type=EntityType.IMPROVEMENT_REQUEST,
         entity_id=request_id,
         entity_name=req['titre'],
         details=f"Suppression demande d'amélioration"
