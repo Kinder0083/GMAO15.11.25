@@ -156,26 +156,26 @@ class BackendTester:
             self.log(f"❌ Convert to improvement failed - Error: {str(e)}", "ERROR")
             return None
     
-    def test_get_readings(self, meter_id):
-        """Test GET /api/meters/{meter_id}/readings - Get meter readings"""
-        self.log(f"Testing get readings for meter {meter_id}...")
+    def test_get_improvement_request_details(self, request_id):
+        """Test GET /api/improvement-requests/{id} - Get improvement request details"""
+        self.log(f"Testing get improvement request details {request_id}...")
         
         try:
             response = self.session.get(
-                f"{BACKEND_URL}/meters/{meter_id}/readings",
+                f"{BACKEND_URL}/improvement-requests/{request_id}",
                 timeout=10
             )
             
             if response.status_code == 200:
-                readings = response.json()
-                self.log(f"✅ Get readings successful - Found {len(readings)} readings")
-                return readings
+                request = response.json()
+                self.log(f"✅ Get improvement request details successful - Title: {request.get('titre')}")
+                return request
             else:
-                self.log(f"❌ Get readings failed - Status: {response.status_code}, Response: {response.text}", "ERROR")
+                self.log(f"❌ Get improvement request details failed - Status: {response.status_code}, Response: {response.text}", "ERROR")
                 return None
                 
         except requests.exceptions.RequestException as e:
-            self.log(f"❌ Get readings request failed - Error: {str(e)}", "ERROR")
+            self.log(f"❌ Get improvement request details failed - Error: {str(e)}", "ERROR")
             return None
     
     def test_get_statistics(self, meter_id, period="month"):
