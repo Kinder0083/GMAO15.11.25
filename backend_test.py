@@ -511,20 +511,29 @@ class BackendTester:
             
             if conversion_result:
                 improvement_id = conversion_result.get("improvement_id")
+                improvement_numero = conversion_result.get("improvement_numero")
+                
+                # Test 8: Verify conversion update
+                results["verify_conversion_update"] = self.test_verify_conversion_update(
+                    request_id, improvement_id, improvement_numero
+                )
                 
                 # Test improvement endpoints with converted improvement
                 if improvement_id:
-                    # Test 10: Get improvement details
+                    # Test 11: Get improvement details
                     improvement_details = self.test_get_improvement_details(improvement_id)
                     results["get_improvement_details"] = improvement_details is not None
                     
-                    # Test 11: Update improvement
+                    # Test 12: Update improvement
                     updated_improvement = self.test_update_improvement(improvement_id)
                     results["update_improvement"] = updated_improvement is not None
                     
-                    # Test 12: Add comment to improvement
+                    # Test 13: Add comment to improvement
                     improvement_comment = self.test_add_improvement_comment(improvement_id)
                     results["add_improvement_comment"] = improvement_comment is not None
+                    
+                    # Test 15: Delete improvement (test with converted improvement)
+                    results["delete_improvement"] = self.test_delete_improvement(improvement_id)
         
         # Test 8: Create improvement directly
         direct_improvement = self.test_create_improvement()
