@@ -96,26 +96,26 @@ class BackendTester:
             self.log(f"❌ Create improvement request failed - Error: {str(e)}", "ERROR")
             return None
     
-    def test_get_meters(self):
-        """Test GET /api/meters - Get all meters"""
-        self.log("Testing get meters endpoint...")
+    def test_get_improvement_requests(self):
+        """Test GET /api/improvement-requests - Get all improvement requests"""
+        self.log("Testing get improvement requests endpoint...")
         
         try:
             response = self.session.get(
-                f"{BACKEND_URL}/meters",
+                f"{BACKEND_URL}/improvement-requests",
                 timeout=10
             )
             
             if response.status_code == 200:
-                meters = response.json()
-                self.log(f"✅ Get meters successful - Found {len(meters)} meters")
-                return meters
+                requests_list = response.json()
+                self.log(f"✅ Get improvement requests successful - Found {len(requests_list)} requests")
+                return requests_list
             else:
-                self.log(f"❌ Get meters failed - Status: {response.status_code}, Response: {response.text}", "ERROR")
+                self.log(f"❌ Get improvement requests failed - Status: {response.status_code}, Response: {response.text}", "ERROR")
                 return None
                 
         except requests.exceptions.RequestException as e:
-            self.log(f"❌ Get meters request failed - Error: {str(e)}", "ERROR")
+            self.log(f"❌ Get improvement requests failed - Error: {str(e)}", "ERROR")
             return None
     
     def test_create_reading(self, meter_id, value, notes="Premier relevé"):
