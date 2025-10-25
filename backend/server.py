@@ -3911,7 +3911,7 @@ async def convert_to_improvement(
             user_name=f"{current_user.get('prenom', '')} {current_user.get('nom', '')}",
             user_email=current_user.get("email", ""),
             action=ActionType.CREATE,
-            entity_type=EntityType.WORK_ORDER,
+            entity_type=EntityType.IMPROVEMENT,
             entity_id=improvement_id,
             entity_name=f"Amélioration #{numero}",
             details=f"Converti depuis demande: {req['titre']}"
