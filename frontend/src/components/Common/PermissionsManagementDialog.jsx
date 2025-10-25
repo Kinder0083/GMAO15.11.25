@@ -113,4 +113,4 @@ const PermissionsManagementDialog = ({ open, onOpenChange, user, onSuccess }) =>
   );
 };
 
-export default EditPermissionsDialog;
+export default PermissionsManagementDialog;
