@@ -270,27 +270,27 @@ class BackendTester:
             self.log(f"❌ Get improvements failed - Error: {str(e)}", "ERROR")
             return None
     
-    def test_delete_reading(self, reading_id):
-        """Test DELETE /api/readings/{reading_id} - Delete a reading"""
-        self.log(f"Testing delete reading {reading_id}...")
+    def test_get_improvement_details(self, improvement_id):
+        """Test GET /api/improvements/{id} - Get improvement details"""
+        self.log(f"Testing get improvement details {improvement_id}...")
         
         try:
-            response = self.session.delete(
-                f"{BACKEND_URL}/readings/{reading_id}",
+            response = self.session.get(
+                f"{BACKEND_URL}/improvements/{improvement_id}",
                 timeout=10
             )
             
             if response.status_code == 200:
-                result = response.json()
-                self.log(f"✅ Delete reading successful - {result.get('message')}")
-                return True
+                improvement = response.json()
+                self.log(f"✅ Get improvement details successful - Title: {improvement.get('titre')}")
+                return improvement
             else:
-                self.log(f"❌ Delete reading failed - Status: {response.status_code}, Response: {response.text}", "ERROR")
-                return False
+                self.log(f"❌ Get improvement details failed - Status: {response.status_code}, Response: {response.text}", "ERROR")
+                return None
                 
         except requests.exceptions.RequestException as e:
-            self.log(f"❌ Delete reading request failed - Error: {str(e)}", "ERROR")
-            return False
+            self.log(f"❌ Get improvement details failed - Error: {str(e)}", "ERROR")
+            return None
     
     def test_meter_soft_delete(self, meter_id):
         """Test DELETE /api/meters/{meter_id} - Soft delete a meter"""
