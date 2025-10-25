@@ -91,13 +91,13 @@ const MainLayout = () => {
       
       if (response.ok) {
         const data = await response.json();
-        // Compter les ordres de travail assignés à l'utilisateur
+        // Compter les ordres de travail assignés à l'utilisateur avec statut OUVERT uniquement
         // Vérifier à la fois assigne_a_id (string) et assigneA.id (objet)
         const assignedOrders = data.filter(order => {
           const isAssigned = order.assigne_a_id === userId || 
                            (order.assigneA && order.assigneA.id === userId);
-          const isNotCompleted = order.statut !== 'TERMINE';
-          return isAssigned && isNotCompleted;
+          const isOpen = order.statut === 'OUVERT';
+          return isAssigned && isOpen;
         });
         setWorkOrdersCount(assignedOrders.length);
       }
