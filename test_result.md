@@ -124,6 +124,14 @@ user_problem_statement: |
      - Changer "Date de création" en "Créé le DD/MM/YY par [Nom Créateur]"
      - Ajouter section "Rapport Détaillé" avec système de commentaires horodatés (comme un chat)
   4. Permissions : Les techniciens ne peuvent supprimer que ce qu'ils ont créé
+  
+  PHASE 3: Test complet du nouveau système de rôles et permissions [EN COURS]
+  
+  Nouveau système de rôles et permissions implémenté:
+  - 11 rôles au total (ADMIN, DIRECTEUR, QHSE, RSP_PROD, PROD, INDUS, LOGISTIQUE, LABO, ADV, TECHNICIEN, VISUALISEUR)
+  - Grille de permissions par module (17 modules)
+  - Permissions par défaut selon le rôle
+  - Possibilité de personnaliser les permissions
 
 backend:
   - task: "Configuration SMTP/Postfix pour envoi d'emails"
