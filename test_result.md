@@ -816,6 +816,69 @@ frontend:
           - Numérotation >= 7000 confirmée (#7001-#7005 visibles)
           - Nécessite tests manuels pour compléter la validation CRUD
 
+  - task: "Système de rôles et permissions - Page Équipes"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/People.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          - 11 rôles implémentés avec badges de couleurs distinctives
+          - Filtres de rôles dans la page Équipes
+          - Gestion des permissions par utilisateur
+          - Boutons de gestion des permissions pour les admins
+
+  - task: "Système de rôles et permissions - Création de membre"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/Common/CreateMemberDialog.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          - Dialog "Créer un membre" avec liste déroulante des 11 rôles
+          - Grille de permissions intégrée (PermissionsGrid)
+          - Permissions par défaut chargées selon le rôle sélectionné
+          - Possibilité de personnaliser les permissions avant création
+
+  - task: "Système de rôles et permissions - Invitation de membre"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/Common/InviteMemberDialog.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          - Dialog "Inviter un membre" avec sélection des 11 rôles
+          - Rôle attribué lors de l'invitation
+          - Permissions par défaut selon le rôle sélectionné
+
+  - task: "Système de rôles et permissions - Backend API"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          - API endpoints pour permissions: GET/PUT /users/{id}/permissions
+          - API endpoint pour permissions par défaut: GET /users/default-permissions/{role}
+          - Permissions par défaut définies pour chaque rôle
+          - 17 modules de permissions implémentés
+
 metadata:
   created_by: "main_agent"
   version: "4.0"
