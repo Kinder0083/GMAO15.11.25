@@ -22,7 +22,7 @@ import pytz
 from models import *
 from auth import get_password_hash, verify_password, create_access_token, decode_access_token
 import dependencies
-from dependencies import get_current_user, get_current_admin_user
+from dependencies import get_current_user, get_current_admin_user, check_permission, require_permission
 import email_service
 from audit_service import AuditService
 
