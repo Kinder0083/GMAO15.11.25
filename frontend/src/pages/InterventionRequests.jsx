@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom';
 
 const InterventionRequests = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
