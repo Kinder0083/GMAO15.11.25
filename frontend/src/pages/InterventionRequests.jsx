@@ -184,6 +184,7 @@ const InterventionRequests = () => {
               <table className="w-full">
                 <thead>
                   <tr className="border-b">
+                    <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Créé par</th>
                     <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Titre</th>
                     <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Priorité</th>
                     <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Équipement</th>
@@ -197,6 +198,7 @@ const InterventionRequests = () => {
                 <tbody>
                   {filteredRequests.map((req) => (
                     <tr key={req.id} className="border-b hover:bg-gray-50">
+                      <td className="py-3 px-4 text-sm text-gray-600">{req.created_by_name || 'N/A'}</td>
                       <td className="py-3 px-4 text-sm text-gray-900 font-medium">{req.titre}</td>
                       <td className="py-3 px-4">{getPriorityBadge(req.priorite)}</td>
                       <td className="py-3 px-4 text-sm text-gray-600">
