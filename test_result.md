@@ -757,7 +757,13 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "Navigation et menu - Demandes d'amélioration et Améliorations"
+    - "Page Demandes d'amélioration - Interface utilisateur"
+    - "Page Demandes d'amélioration - CRUD complet"
+    - "Page Demandes d'amélioration - Conversion vers amélioration"
+    - "Page Améliorations - Interface utilisateur"
+    - "Page Améliorations - CRUD complet"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
