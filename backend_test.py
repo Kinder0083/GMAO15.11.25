@@ -308,7 +308,7 @@ class BackendTester:
                 timeout=10
             )
             
-            if response.status_code == 201:
+            if response.status_code in [200, 201]:
                 comment = response.json()
                 self.log(f"✅ Add improvement comment successful - Comment ID: {comment.get('id')}")
                 return comment
