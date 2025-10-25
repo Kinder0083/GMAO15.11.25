@@ -20,7 +20,9 @@ import {
   RefreshCw,
   FileText,
   Gauge,
-  MessageSquare
+  MessageSquare,
+  Lightbulb,
+  Sparkles
 } from 'lucide-react';
 import FirstLoginPasswordDialog from '../Common/FirstLoginPasswordDialog';
 
