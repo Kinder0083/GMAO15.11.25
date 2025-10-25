@@ -979,11 +979,11 @@ frontend:
 
   - task: "Test modification des permissions d'un membre existant"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/components/Common/PermissionsManagementDialog.jsx, /app/frontend/src/pages/People.jsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
