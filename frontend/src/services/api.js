@@ -126,7 +126,8 @@ export const usersAPI = {
   inviteMember: (data) => api.post('/users/invite-member', data),
   createMember: (data) => api.post('/users/create-member', data),
   getPermissions: (id) => api.get(`/users/${id}/permissions`),
-  updatePermissions: (id, permissions) => api.put(`/users/${id}/permissions`, permissions)
+  updatePermissions: (id, permissions) => api.put(`/users/${id}/permissions`, permissions),
+  getDefaultPermissionsByRole: (role) => api.get(`/users/default-permissions/${role}`)
 };
 
 // ==================== VENDORS ====================
