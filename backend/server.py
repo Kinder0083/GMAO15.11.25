@@ -3449,7 +3449,7 @@ async def create_intervention_request(
         raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.get("/intervention-requests", response_model=List[InterventionRequest])
-async def get_all_intervention_requests(current_user: dict = Depends(get_current_user)):
+async def get_all_intervention_requests(current_user: dict = Depends(require_permission("interventionRequests", "view"))):
     """Récupérer toutes les demandes d'intervention"""
     try:
         requests = []
