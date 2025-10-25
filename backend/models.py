@@ -43,6 +43,218 @@ class UserPermissions(BaseModel):
     importExport: ModulePermission = ModulePermission(view=False, edit=False, delete=False)
     journal: ModulePermission = ModulePermission(view=False, edit=False, delete=False)
 
+# Fonction helper pour obtenir les permissions par défaut selon le rôle
+def get_default_permissions_by_role(role: str) -> UserPermissions:
+    """Retourne les permissions par défaut selon le rôle de l'utilisateur"""
+    
+    # Permissions complètes pour ADMIN
+    if role == "ADMIN":
+        return UserPermissions(
+            dashboard=ModulePermission(view=True, edit=True, delete=True),
+            interventionRequests=ModulePermission(view=True, edit=True, delete=True),
+            workOrders=ModulePermission(view=True, edit=True, delete=True),
+            improvementRequests=ModulePermission(view=True, edit=True, delete=True),
+            improvements=ModulePermission(view=True, edit=True, delete=True),
+            preventiveMaintenance=ModulePermission(view=True, edit=True, delete=True),
+            assets=ModulePermission(view=True, edit=True, delete=True),
+            inventory=ModulePermission(view=True, edit=True, delete=True),
+            locations=ModulePermission(view=True, edit=True, delete=True),
+            meters=ModulePermission(view=True, edit=True, delete=True),
+            vendors=ModulePermission(view=True, edit=True, delete=True),
+            reports=ModulePermission(view=True, edit=True, delete=True),
+            people=ModulePermission(view=True, edit=True, delete=True),
+            planning=ModulePermission(view=True, edit=True, delete=True),
+            purchaseHistory=ModulePermission(view=True, edit=True, delete=True),
+            importExport=ModulePermission(view=True, edit=True, delete=True),
+            journal=ModulePermission(view=True, edit=False, delete=False)
+        )
+    
+    # DIRECTEUR : Demande d'inter./Demandes d'amél. en visualisation et modification
+    # Ordres de travail/Améliorations/Maintenance prev./Compteurs/Historique Achat en visualisation seulement
+    elif role == "DIRECTEUR":
+        return UserPermissions(
+            dashboard=ModulePermission(view=True, edit=False, delete=False),
+            interventionRequests=ModulePermission(view=True, edit=True, delete=False),
+            workOrders=ModulePermission(view=True, edit=False, delete=False),
+            improvementRequests=ModulePermission(view=True, edit=True, delete=False),
+            improvements=ModulePermission(view=True, edit=False, delete=False),
+            preventiveMaintenance=ModulePermission(view=True, edit=False, delete=False),
+            assets=ModulePermission(view=True, edit=False, delete=False),
+            inventory=ModulePermission(view=True, edit=False, delete=False),
+            locations=ModulePermission(view=True, edit=False, delete=False),
+            meters=ModulePermission(view=True, edit=False, delete=False),
+            vendors=ModulePermission(view=True, edit=False, delete=False),
+            reports=ModulePermission(view=True, edit=False, delete=False),
+            people=ModulePermission(view=True, edit=False, delete=False),
+            planning=ModulePermission(view=True, edit=False, delete=False),
+            purchaseHistory=ModulePermission(view=True, edit=False, delete=False),
+            importExport=ModulePermission(view=False, edit=False, delete=False),
+            journal=ModulePermission(view=False, edit=False, delete=False)
+        )
+    
+    # QHSE : Demande d'inter./Demandes d'amél. en visualisation et modification
+    # Ordres de travail/Améliorations/Compteurs en visualisation seulement
+    elif role == "QHSE":
+        return UserPermissions(
+            dashboard=ModulePermission(view=True, edit=False, delete=False),
+            interventionRequests=ModulePermission(view=True, edit=True, delete=False),
+            workOrders=ModulePermission(view=True, edit=False, delete=False),
+            improvementRequests=ModulePermission(view=True, edit=True, delete=False),
+            improvements=ModulePermission(view=True, edit=False, delete=False),
+            preventiveMaintenance=ModulePermission(view=True, edit=False, delete=False),
+            assets=ModulePermission(view=True, edit=False, delete=False),
+            inventory=ModulePermission(view=True, edit=False, delete=False),
+            locations=ModulePermission(view=True, edit=False, delete=False),
+            meters=ModulePermission(view=True, edit=False, delete=False),
+            vendors=ModulePermission(view=False, edit=False, delete=False),
+            reports=ModulePermission(view=True, edit=False, delete=False),
+            people=ModulePermission(view=False, edit=False, delete=False),
+            planning=ModulePermission(view=False, edit=False, delete=False),
+            purchaseHistory=ModulePermission(view=False, edit=False, delete=False),
+            importExport=ModulePermission(view=False, edit=False, delete=False),
+            journal=ModulePermission(view=False, edit=False, delete=False)
+        )
+    
+    # LABO et ADV : Demande d'inter. en visualisation et modification
+    # Fournisseurs/Compteurs/Historique Achat en visualisation seulement
+    elif role in ["LABO", "ADV"]:
+        return UserPermissions(
+            dashboard=ModulePermission(view=True, edit=False, delete=False),
+            interventionRequests=ModulePermission(view=True, edit=True, delete=False),
+            workOrders=ModulePermission(view=False, edit=False, delete=False),
+            improvementRequests=ModulePermission(view=False, edit=False, delete=False),
+            improvements=ModulePermission(view=False, edit=False, delete=False),
+            preventiveMaintenance=ModulePermission(view=False, edit=False, delete=False),
+            assets=ModulePermission(view=False, edit=False, delete=False),
+            inventory=ModulePermission(view=False, edit=False, delete=False),
+            locations=ModulePermission(view=False, edit=False, delete=False),
+            meters=ModulePermission(view=True, edit=False, delete=False),
+            vendors=ModulePermission(view=True, edit=False, delete=False),
+            reports=ModulePermission(view=True, edit=False, delete=False),
+            people=ModulePermission(view=False, edit=False, delete=False),
+            planning=ModulePermission(view=False, edit=False, delete=False),
+            purchaseHistory=ModulePermission(view=True, edit=False, delete=False),
+            importExport=ModulePermission(view=False, edit=False, delete=False),
+            journal=ModulePermission(view=False, edit=False, delete=False)
+        )
+    
+    # PROD (RSP_PROD et PROD) : Demande d'inter./Demandes d'amél./Ordres de travail/Améliorations/Equipement en visualisation et modification
+    # Inventaire/Maintenance prev. en visualisation seulement
+    elif role in ["RSP_PROD", "PROD"]:
+        return UserPermissions(
+            dashboard=ModulePermission(view=True, edit=False, delete=False),
+            interventionRequests=ModulePermission(view=True, edit=True, delete=False),
+            workOrders=ModulePermission(view=True, edit=True, delete=False),
+            improvementRequests=ModulePermission(view=True, edit=True, delete=False),
+            improvements=ModulePermission(view=True, edit=True, delete=False),
+            preventiveMaintenance=ModulePermission(view=True, edit=False, delete=False),
+            assets=ModulePermission(view=True, edit=True, delete=False),
+            inventory=ModulePermission(view=True, edit=False, delete=False),
+            locations=ModulePermission(view=True, edit=False, delete=False),
+            meters=ModulePermission(view=False, edit=False, delete=False),
+            vendors=ModulePermission(view=False, edit=False, delete=False),
+            reports=ModulePermission(view=True, edit=False, delete=False),
+            people=ModulePermission(view=False, edit=False, delete=False),
+            planning=ModulePermission(view=False, edit=False, delete=False),
+            purchaseHistory=ModulePermission(view=False, edit=False, delete=False),
+            importExport=ModulePermission(view=False, edit=False, delete=False),
+            journal=ModulePermission(view=False, edit=False, delete=False)
+        )
+    
+    # INDUS : Demande d'inter./Demandes d'amél./Ordres de travail/Améliorations/Equipement en visualisation et modification
+    # Inventaire/Maintenance prev./Compteurs en visualisation seulement
+    elif role == "INDUS":
+        return UserPermissions(
+            dashboard=ModulePermission(view=True, edit=False, delete=False),
+            interventionRequests=ModulePermission(view=True, edit=True, delete=False),
+            workOrders=ModulePermission(view=True, edit=True, delete=False),
+            improvementRequests=ModulePermission(view=True, edit=True, delete=False),
+            improvements=ModulePermission(view=True, edit=True, delete=False),
+            preventiveMaintenance=ModulePermission(view=True, edit=False, delete=False),
+            assets=ModulePermission(view=True, edit=True, delete=False),
+            inventory=ModulePermission(view=True, edit=False, delete=False),
+            locations=ModulePermission(view=True, edit=False, delete=False),
+            meters=ModulePermission(view=True, edit=False, delete=False),
+            vendors=ModulePermission(view=False, edit=False, delete=False),
+            reports=ModulePermission(view=True, edit=False, delete=False),
+            people=ModulePermission(view=False, edit=False, delete=False),
+            planning=ModulePermission(view=False, edit=False, delete=False),
+            purchaseHistory=ModulePermission(view=False, edit=False, delete=False),
+            importExport=ModulePermission(view=False, edit=False, delete=False),
+            journal=ModulePermission(view=False, edit=False, delete=False)
+        )
+    
+    # LOGISTIQUE : Même que PROD mais peut-être avec accès Fournisseurs
+    elif role == "LOGISTIQUE":
+        return UserPermissions(
+            dashboard=ModulePermission(view=True, edit=False, delete=False),
+            interventionRequests=ModulePermission(view=True, edit=True, delete=False),
+            workOrders=ModulePermission(view=True, edit=True, delete=False),
+            improvementRequests=ModulePermission(view=True, edit=True, delete=False),
+            improvements=ModulePermission(view=True, edit=True, delete=False),
+            preventiveMaintenance=ModulePermission(view=True, edit=False, delete=False),
+            assets=ModulePermission(view=True, edit=True, delete=False),
+            inventory=ModulePermission(view=True, edit=True, delete=False),
+            locations=ModulePermission(view=True, edit=False, delete=False),
+            meters=ModulePermission(view=False, edit=False, delete=False),
+            vendors=ModulePermission(view=True, edit=False, delete=False),
+            reports=ModulePermission(view=True, edit=False, delete=False),
+            people=ModulePermission(view=False, edit=False, delete=False),
+            planning=ModulePermission(view=False, edit=False, delete=False),
+            purchaseHistory=ModulePermission(view=True, edit=False, delete=False),
+            importExport=ModulePermission(view=False, edit=False, delete=False),
+            journal=ModulePermission(view=False, edit=False, delete=False)
+        )
+    
+    # TECHNICIEN : Permissions complètes sur les modules opérationnels
+    elif role == "TECHNICIEN":
+        return UserPermissions(
+            dashboard=ModulePermission(view=True, edit=False, delete=False),
+            interventionRequests=ModulePermission(view=True, edit=True, delete=True),
+            workOrders=ModulePermission(view=True, edit=True, delete=True),
+            improvementRequests=ModulePermission(view=True, edit=True, delete=True),
+            improvements=ModulePermission(view=True, edit=True, delete=True),
+            preventiveMaintenance=ModulePermission(view=True, edit=True, delete=True),
+            assets=ModulePermission(view=True, edit=True, delete=True),
+            inventory=ModulePermission(view=True, edit=True, delete=True),
+            locations=ModulePermission(view=True, edit=True, delete=True),
+            meters=ModulePermission(view=True, edit=True, delete=True),
+            vendors=ModulePermission(view=True, edit=True, delete=True),
+            reports=ModulePermission(view=True, edit=False, delete=False),
+            people=ModulePermission(view=True, edit=False, delete=False),
+            planning=ModulePermission(view=True, edit=True, delete=False),
+            purchaseHistory=ModulePermission(view=True, edit=True, delete=True),
+            importExport=ModulePermission(view=False, edit=False, delete=False),
+            journal=ModulePermission(view=False, edit=False, delete=False)
+        )
+    
+    # VISUALISEUR : Visualisation uniquement sur tout
+    elif role == "VISUALISEUR":
+        return UserPermissions(
+            dashboard=ModulePermission(view=True, edit=False, delete=False),
+            interventionRequests=ModulePermission(view=True, edit=False, delete=False),
+            workOrders=ModulePermission(view=True, edit=False, delete=False),
+            improvementRequests=ModulePermission(view=True, edit=False, delete=False),
+            improvements=ModulePermission(view=True, edit=False, delete=False),
+            preventiveMaintenance=ModulePermission(view=True, edit=False, delete=False),
+            assets=ModulePermission(view=True, edit=False, delete=False),
+            inventory=ModulePermission(view=True, edit=False, delete=False),
+            locations=ModulePermission(view=True, edit=False, delete=False),
+            meters=ModulePermission(view=True, edit=False, delete=False),
+            vendors=ModulePermission(view=True, edit=False, delete=False),
+            reports=ModulePermission(view=True, edit=False, delete=False),
+            people=ModulePermission(view=True, edit=False, delete=False),
+            planning=ModulePermission(view=True, edit=False, delete=False),
+            purchaseHistory=ModulePermission(view=True, edit=False, delete=False),
+            importExport=ModulePermission(view=False, edit=False, delete=False),
+            journal=ModulePermission(view=False, edit=False, delete=False)
+        )
+    
+    # Par défaut : permissions minimales
+    else:
+        return UserPermissions()
+
+
 class WorkOrderStatus(str, Enum):
     OUVERT = "OUVERT"
     EN_COURS = "EN_COURS"
