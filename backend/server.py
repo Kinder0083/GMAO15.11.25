@@ -3612,6 +3612,13 @@ async def convert_to_work_order(
         count = await db.work_orders.count_documents({})
         numero = str(5800 + count + 1)
         
+        # Utiliser la date limite fournie ou celle de la demande
+        date_limite_ordre = None
+        if date_limite:
+            date_limite_ordre = datetime.fromisoformat(date_limite.replace('Z', '+00:00'))
+        elif req.get("date_limite_desiree"):
+            date_limite_ordre = req.get("date_limite_desiree")
+        
         work_order_data = {
             "id": work_order_id,
             "numero": numero,
@@ -3625,7 +3632,7 @@ async def convert_to_work_order(
             "emplacement": req.get("emplacement"),
             "assigne_a_id": assignee_id,
             "assigneA": None,
-            "dateLimite": req.get("date_limite_desiree"),
+            "dateLimite": date_limite_ordre,
             "tempsEstime": None,
             "dateCreation": datetime.utcnow(),
             "createdBy": req["created_by"],
