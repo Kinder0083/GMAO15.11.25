@@ -772,7 +772,8 @@ async def get_work_orders(
 async def get_work_order(wo_id: str, current_user: dict = Depends(get_current_user)):
     """Détails d'un ordre de travail"""
     try:
-        wo = await db.work_orders.find_one({"_id": ObjectId(wo_id)})
+        # Chercher par le champ id (UUID) au lieu de _id
+        wo = await db.work_orders.find_one({"id": wo_id})
         if not wo:
             raise HTTPException(status_code=404, detail="Ordre de travail non trouvé")
         
