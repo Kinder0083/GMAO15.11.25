@@ -247,4 +247,60 @@ export const interventionRequestsAPI = {
   })
 };
 
+// ==================== IMPROVEMENT REQUESTS (DEMANDES D'AMÉLIORATION) ====================
+export const improvementRequestsAPI = {
+  getAll: () => api.get('/improvement-requests'),
+  getById: (id) => api.get(`/improvement-requests/${id}`),
+  create: (data) => api.post('/improvement-requests', data),
+  update: (id, data) => api.put(`/improvement-requests/${id}`, data),
+  delete: (id) => api.delete(`/improvement-requests/${id}`),
+  convertToImprovement: (id, assigneeId, dateLimite) => api.post(`/improvement-requests/${id}/convert-to-improvement`, null, { 
+    params: { 
+      assignee_id: assigneeId,
+      date_limite: dateLimite
+    } 
+  }),
+  
+  // Attachments
+  uploadAttachment: (id, file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post(`/improvement-requests/${id}/attachments`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  },
+  downloadAttachment: (id, filename) => api.get(`/improvement-requests/${id}/attachments/${filename}`, {
+    responseType: 'blob'
+  }),
+  
+  // Comments
+  addComment: (id, text) => api.post(`/improvement-requests/${id}/comments`, { text }),
+  getComments: (id) => api.get(`/improvement-requests/${id}/comments`)
+};
+
+// ==================== IMPROVEMENTS (AMÉLIORATIONS) ====================
+export const improvementsAPI = {
+  getAll: (params) => api.get('/improvements', { params }),
+  getById: (id) => api.get(`/improvements/${id}`),
+  create: (data) => api.post('/improvements', data),
+  update: (id, data) => api.put(`/improvements/${id}`, data),
+  delete: (id) => api.delete(`/improvements/${id}`),
+  
+  // Attachments
+  uploadAttachment: (id, file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post(`/improvements/${id}/attachments`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  },
+  downloadAttachment: (id, filename) => api.get(`/improvements/${id}/attachments/${filename}`, {
+    responseType: 'blob'
+  }),
+  
+  // Comments
+  addComment: (id, text) => api.post(`/improvements/${id}/comments`, { text }),
+  getComments: (id) => api.get(`/improvements/${id}/comments`)
+};
+
 export default api;
