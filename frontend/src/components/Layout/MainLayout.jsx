@@ -111,23 +111,31 @@ const MainLayout = () => {
   };
 
   const menuItems = [
-    { icon: LayoutDashboard, label: 'Tableau de bord', path: '/dashboard' },
-    { icon: MessageSquare, label: 'Demandes d\'inter.', path: '/intervention-requests' },
-    { icon: ClipboardList, label: 'Ordres de travail', path: '/work-orders' },
-    { icon: Lightbulb, label: 'Demandes d\'amél.', path: '/improvement-requests' },
-    { icon: Sparkles, label: 'Améliorations', path: '/improvements' },
-    { icon: Calendar, label: 'Maintenance prev.', path: '/preventive-maintenance' },
-    { icon: Wrench, label: 'Équipements', path: '/assets' },
-    { icon: Package, label: 'Inventaire', path: '/inventory' },
-    { icon: MapPin, label: 'Zones', path: '/locations' },
-    { icon: Gauge, label: 'Compteurs', path: '/meters' },
-    { icon: BarChart3, label: 'Rapports', path: '/reports' },
-    { icon: Users, label: 'Équipes', path: '/people' },
-    { icon: Calendar, label: 'Planning', path: '/planning' },
-    { icon: ShoppingCart, label: 'Fournisseurs', path: '/vendors' },
-    { icon: ShoppingBag, label: 'Historique Achat', path: '/purchase-history' },
-    { icon: Database, label: 'Import / Export', path: '/import-export', adminOnly: true }
-  ];
+    { icon: LayoutDashboard, label: 'Tableau de bord', path: '/dashboard', module: 'dashboard' },
+    { icon: MessageSquare, label: 'Demandes d\'inter.', path: '/intervention-requests', module: 'interventionRequests' },
+    { icon: ClipboardList, label: 'Ordres de travail', path: '/work-orders', module: 'workOrders' },
+    { icon: Lightbulb, label: 'Demandes d\'amél.', path: '/improvement-requests', module: 'improvementRequests' },
+    { icon: Sparkles, label: 'Améliorations', path: '/improvements', module: 'improvements' },
+    { icon: Calendar, label: 'Maintenance prev.', path: '/preventive-maintenance', module: 'preventiveMaintenance' },
+    { icon: Wrench, label: 'Équipements', path: '/assets', module: 'assets' },
+    { icon: Package, label: 'Inventaire', path: '/inventory', module: 'inventory' },
+    { icon: MapPin, label: 'Zones', path: '/locations', module: 'locations' },
+    { icon: Gauge, label: 'Compteurs', path: '/meters', module: 'meters' },
+    { icon: BarChart3, label: 'Rapports', path: '/reports', module: 'reports' },
+    { icon: Users, label: 'Équipes', path: '/people', module: 'people' },
+    { icon: Calendar, label: 'Planning', path: '/planning', module: 'planning' },
+    { icon: ShoppingCart, label: 'Fournisseurs', path: '/vendors', module: 'vendors' },
+    { icon: ShoppingBag, label: 'Historique Achat', path: '/purchase-history', module: 'purchaseHistory' },
+    { icon: Database, label: 'Import / Export', path: '/import-export', module: 'importExport' },
+    { icon: FileText, label: 'Journal', path: '/journal', module: 'journal' }
+  ].filter(item => {
+    // Si le menu item a un module défini, vérifier la permission view
+    if (item.module) {
+      return canView(item.module);
+    }
+    // Si pas de module (ancien système), afficher par défaut
+    return true;
+  });
 
   const handleLogout = () => {
     localStorage.removeItem('token');
