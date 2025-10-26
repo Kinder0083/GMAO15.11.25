@@ -453,25 +453,29 @@ const WorkOrders = () => {
                           >
                             <Eye size={16} />
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              setSelectedWorkOrder(wo);
-                              setFormDialogOpen(true);
-                            }}
-                            className="hover:bg-green-50 hover:text-green-600"
-                          >
-                            <Pencil size={16} />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDelete(wo.id)}
-                            className="hover:bg-red-50 hover:text-red-600"
-                          >
-                            <Trash2 size={16} />
-                          </Button>
+                          {canEdit('workOrders') && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setSelectedWorkOrder(wo);
+                                setFormDialogOpen(true);
+                              }}
+                              className="hover:bg-green-50 hover:text-green-600"
+                            >
+                              <Pencil size={16} />
+                            </Button>
+                          )}
+                          {canDelete('workOrders') && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDelete(wo.id)}
+                              className="hover:bg-red-50 hover:text-red-600"
+                            >
+                              <Trash2 size={16} />
+                            </Button>
+                          )}
                         </div>
                       </td>
                     </tr>
