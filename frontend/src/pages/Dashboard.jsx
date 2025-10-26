@@ -115,38 +115,50 @@ const Dashboard = () => {
 
   // Calculer les stats dynamiquement
   const stats = React.useMemo(() => {
-    if (!analytics || !workOrders || !equipments) return [];
+    const baseStats = [];
     
-    return [
-      {
+    // Toujours afficher les stats basées sur les données disponibles
+    if (workOrders) {
+      baseStats.push({
         title: 'Ordres de travail actifs',
         value: workOrders.filter(wo => wo.statut !== 'TERMINE').length,
         icon: ClipboardList,
         color: 'bg-blue-500',
         change: '+12%'
-      },
-      {
+      });
+    }
+    
+    if (equipments) {
+      baseStats.push({
         title: 'Équipements en maintenance',
         value: equipments.filter(e => e.statut === 'EN_MAINTENANCE').length,
         icon: Wrench,
         color: 'bg-orange-500',
         change: '+5%'
-      },
-      {
-        title: 'Taux de réalisation',
-        value: `${analytics.tauxRealisation}%`,
-        icon: TrendingUp,
-        color: 'bg-green-500',
-        change: '+8%'
-      },
-      {
-        title: 'Temps de réponse moyen',
-        value: `${analytics.tempsReponse.moyen}h`,
-        icon: Clock,
-        color: 'bg-purple-500',
-        change: '-15%'
-      }
-    ];
+      });
+    }
+    
+    // Ajouter les stats analytics seulement si disponibles
+    if (analytics) {
+      baseStats.push(
+        {
+          title: 'Taux de réalisation',
+          value: `${analytics.tauxRealisation}%`,
+          icon: TrendingUp,
+          color: 'bg-green-500',
+          change: '+8%'
+        },
+        {
+          title: 'Temps de réponse moyen',
+          value: `${analytics.tempsReponse.moyen}h`,
+          icon: Clock,
+          color: 'bg-purple-500',
+          change: '-15%'
+        }
+      );
+    }
+    
+    return baseStats;
   }, [analytics, workOrders, equipments]);
 
   if (loading) {
