@@ -287,6 +287,84 @@ const PreventiveMaintenance = () => {
           ))
         )}
       </div>
+      ) : (
+        /* Vue Arborescence - Groupée par fréquence */
+        <Card>
+          <CardContent className="pt-6">
+            {loading ? (
+              <div className="text-center py-8">
+                <p className="text-gray-500">Chargement...</p>
+              </div>
+            ) : maintenance.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-gray-500">Aucune maintenance préventive trouvée</p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {['QUOTIDIEN', 'HEBDOMADAIRE', 'MENSUEL', 'TRIMESTRIEL', 'ANNUEL'].map((freq) => {
+                  const items = maintenance.filter(m => m.frequence === freq);
+                  if (items.length === 0) return null;
+                  
+                  const freqLabels = {
+                    'QUOTIDIEN': 'Quotidien',
+                    'HEBDOMADAIRE': 'Hebdomadaire',
+                    'MENSUEL': 'Mensuel',
+                    'TRIMESTRIEL': 'Trimestriel',
+                    'ANNUEL': 'Annuel'
+                  };
+                  
+                  return (
+                    <div key={freq} className="border rounded-lg p-4">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                        <Calendar size={20} className="text-blue-600" />
+                        {freqLabels[freq]} ({items.length})
+                      </h3>
+                      <div className="space-y-3 pl-6">
+                        {items.map((item) => (
+                          <div key={item.id} className="border-l-4 border-blue-500 pl-4 py-2 bg-gray-50 rounded-r-lg hover:bg-gray-100 transition-colors">
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1">
+                                <p className="font-semibold text-gray-900">{item.titre}</p>
+                                <p className="text-sm text-gray-600 mt-1">{item.description}</p>
+                                <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                                  <span>Équipement: {item.equipement?.nom || 'Non assigné'}</span>
+                                  <span>Prochaine: {new Date(item.prochaineMaintenance).toLocaleDateString()}</span>
+                                  {getStatusBadge(item.statut)}
+                                </div>
+                              </div>
+                              <div className="flex gap-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    setSelectedMaintenance(item);
+                                    setFormDialogOpen(true);
+                                  }}
+                                  className="hover:bg-blue-50"
+                                >
+                                  Modifier
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleExecuteNow(item)}
+                                  className="hover:bg-green-50"
+                                >
+                                  Exécuter
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       <PreventiveMaintenanceFormDialog
         open={formDialogOpen}
