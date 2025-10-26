@@ -201,8 +201,7 @@ const MainLayout = () => {
     { icon: Calendar, label: 'Planning', path: '/planning', module: 'planning' },
     { icon: ShoppingCart, label: 'Fournisseurs', path: '/vendors', module: 'vendors' },
     { icon: ShoppingBag, label: 'Historique Achat', path: '/purchase-history', module: 'purchaseHistory' },
-    { icon: Database, label: 'Import / Export', path: '/import-export', module: 'importExport' },
-    { icon: FileText, label: 'Journal', path: '/journal', module: 'journal' }
+    { icon: Database, label: 'Import / Export', path: '/import-export', module: 'importExport' }
   ].filter(item => {
     // Si le menu item a un module défini, vérifier la permission view
     if (item.module) {
