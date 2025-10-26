@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Backend API Testing Script for GMAO Application
-Tests the permissions system functionality
+Tests the QHSE permissions system functionality after corrections
 """
 
 import requests
@@ -18,9 +18,9 @@ ADMIN_PASSWORD_1 = "password123"
 ADMIN_EMAIL_2 = "admin@gmao-iris.local"
 ADMIN_PASSWORD_2 = "Admin123!"
 
-# Test viewer credentials (to be created)
-VIEWER_EMAIL = "test_viewer@test.com"
-VIEWER_PASSWORD = "Test123!"
+# QHSE test credentials (to be created)
+QHSE_EMAIL = "test_qhse@test.com"
+QHSE_PASSWORD = "Test123!"
 
 class PermissionsTester:
     def __init__(self):
