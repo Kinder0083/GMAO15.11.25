@@ -106,13 +106,35 @@ const PreventiveMaintenance = () => {
           <h1 className="text-3xl font-bold text-gray-900">Maintenance Préventive</h1>
           <p className="text-gray-600 mt-1">Planifiez et suivez vos maintenances programmées</p>
         </div>
-        <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={() => {
-          setSelectedMaintenance(null);
-          setFormDialogOpen(true);
-        }}>
-          <Plus size={20} className="mr-2" />
-          Nouvelle planification
-        </Button>
+        <div className="flex gap-2">
+          <div className="flex gap-1 border rounded-lg p-1">
+            <Button
+              variant={viewMode === 'list' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setViewMode('list')}
+              className={viewMode === 'list' ? 'bg-blue-600 hover:bg-blue-700' : ''}
+            >
+              <List size={16} className="mr-1" />
+              Liste
+            </Button>
+            <Button
+              variant={viewMode === 'tree' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setViewMode('tree')}
+              className={viewMode === 'tree' ? 'bg-blue-600 hover:bg-blue-700' : ''}
+            >
+              <Grid size={16} className="mr-1" />
+              Arborescence
+            </Button>
+          </div>
+          <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={() => {
+            setSelectedMaintenance(null);
+            setFormDialogOpen(true);
+          }}>
+            <Plus size={20} className="mr-2" />
+            Nouvelle planification
+          </Button>
+        </div>
       </div>
 
       {/* Stats */}
