@@ -1166,7 +1166,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Test critique - Tableau de bord pour utilisateur QHSE avec permissions limitées"
+    - "Test de l'histogramme à colonnes - Historique Achat Évolution Mensuelle"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
