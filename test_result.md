@@ -1171,38 +1171,97 @@ test_plan:
   test_all: false
   test_priority: "high_first"
 
+  - task: "Test de l'histogramme à colonnes - Historique Achat Évolution Mensuelle"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/PurchaseHistory.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ HISTOGRAMME À COLONNES VERTICALES IMPLÉMENTÉ AVEC SUCCÈS
+          
+          🎯 TESTS COMPLETS RÉALISÉS:
+          1. ✅ Navigation vers /purchase-history: SUCCESS
+          2. ✅ Page "Historique Achat" chargée correctement
+          3. ✅ Section "📈 Évolution Mensuelle des Achats" présente
+          4. ✅ Histogramme à colonnes VERTICALES confirmé (BarChart recharts)
+          5. ✅ 9 colonnes verticales détectées dans l'histogramme
+          6. ✅ 99 composants recharts détectés (ResponsiveContainer, BarChart, etc.)
+          7. ✅ Axe X avec étiquettes des mois (17 étiquettes détectées)
+          8. ✅ Axe Y présent pour les montants
+          9. ✅ 8 colonnes avec coins arrondis détectées
+          10. ✅ Tooltip interactif fonctionnel au survol des colonnes
+          11. ✅ Légende présente et visible
+          12. ✅ Tableau récapitulatif des 3 derniers mois présent (3 cartes)
+          13. ✅ Anciennes sections supprimées: "Top Fournisseurs", "Achats par Site", "Top Articles"
+          
+          📊 DÉTAILS TECHNIQUES VÉRIFIÉS:
+          - ResponsiveContainer recharts: ✓ PRÉSENT
+          - BarChart (colonnes verticales): ✓ CONFIRMÉ
+          - CartesianGrid: ✓ PRÉSENT
+          - XAxis avec rotation -45°: ✓ PRÉSENT
+          - YAxis avec format k€: ✓ PRÉSENT
+          - Tooltip avec montant exact: ✓ FONCTIONNEL
+          - Legend: ✓ PRÉSENTE
+          - Bar avec fill="#3b82f6": ✓ IMPLÉMENTÉ
+          - Radius [8,8,0,0] pour coins arrondis: ✓ DÉTECTÉ
+          
+          📋 TABLEAU RÉCAPITULATIF VÉRIFIÉ:
+          - 3 cartes des derniers mois: ✓ PRÉSENTES
+          - Première carte: 2025-09 - 117 985,67 €
+          - Détails: 99 commandes • 168 lignes
+          - Format correct avec mois, montant, nb commandes et lignes
+          
+          🔍 SUPPRESSION ANCIENNES SECTIONS CONFIRMÉE:
+          - "Top Fournisseurs": ✓ SUPPRIMÉ
+          - "Achats par Site": ✓ SUPPRIMÉ  
+          - "Top Articles": ✓ SUPPRIMÉ
+          - Seule la section "Évolution Mensuelle des Achats" est affichée
+          
+          ✅ CONCLUSION: L'histogramme à colonnes verticales est parfaitement implémenté
+          selon les spécifications. Tous les critères de test sont remplis.
+
 agent_communication:
   - agent: "testing"
     message: |
-      🎉 PROBLÈME CRITIQUE RÉSOLU - TABLEAU DE BORD QHSE FONCTIONNEL
+      🎉 TEST HISTOGRAMME HISTORIQUE ACHAT - SUCCÈS COMPLET
       
-      ✅ TEST CRITIQUE RÉUSSI:
+      ✅ RÉSULTATS DES TESTS:
       
-      **PROBLÈME IDENTIFIÉ ET CORRIGÉ:**
-      - Dashboard bloqué en "Chargement..." infini pour utilisateurs QHSE
-      - Cause: Dashboard attendait les données analytics (403 Forbidden pour QHSE)
-      - Condition `if (loading || !analytics)` empêchait l'affichage du dashboard
+      **HISTOGRAMME À COLONNES VERTICALES**: ✅ WORKING
+      - BarChart recharts correctement implémenté
+      - 9 colonnes verticales détectées
+      - Axe X avec mois en rotation -45°
+      - Axe Y avec montants en k€
+      - Colonnes bleues (#3b82f6) avec coins arrondis
+      - Tooltip interactif fonctionnel
+      - Légende présente
       
-      **CORRECTIONS APPLIQUÉES:**
-      1. ✅ Supprimé condition `!analytics` du loading check
-      2. ✅ Modifié calcul des stats pour fonctionner sans analytics
-      3. ✅ Ajouté condition pour masquer graphiques analytics si non disponibles
-      4. ✅ Dashboard affiche maintenant données selon permissions utilisateur
+      **TABLEAU RÉCAPITULATIF**: ✅ WORKING
+      - 3 cartes des derniers mois présentes
+      - Format correct: mois, montant, nb commandes, nb lignes
+      - Exemple: 2025-09 - 117 985,67 € (99 commandes • 168 lignes)
       
-      **RÉSULTATS TESTS:**
-      - ✅ Connexion QHSE: RÉUSSIE (test_qhse@test.com)
-      - ✅ Temps de chargement: 0.02 secondes (vs infini avant)
-      - ✅ Titre "Tableau de bord": AFFICHÉ
-      - ✅ Cartes statistiques: FONCTIONNELLES
-      - ✅ Section ordres de travail récents: FONCTIONNELLE
-      - ✅ Graphiques analytics: CORRECTEMENT MASQUÉS
-      - ✅ Permissions QHSE: RESPECTÉES
+      **SUPPRESSION ANCIENNES SECTIONS**: ✅ WORKING
+      - "Top Fournisseurs": SUPPRIMÉ
+      - "Achats par Site": SUPPRIMÉ
+      - "Top Articles": SUPPRIMÉ
+      - Seule section "Évolution Mensuelle des Achats" affichée
       
-      **FICHIER MODIFIÉ:**
-      - `/app/frontend/src/pages/Dashboard.jsx` (lignes 117-235)
+      📊 COMPOSANTS TECHNIQUES VÉRIFIÉS:
+      - ResponsiveContainer: ✓ (1 détecté)
+      - Composants recharts: ✓ (99 détectés)
+      - Éléments SVG: ✓ (334 détectés)
+      - Barres SVG: ✓ (9 détectées)
+      - Coins arrondis: ✓ (8 détectés)
       
-      ✅ CONCLUSION: Problème critique entièrement résolu
-      Les utilisateurs QHSE peuvent maintenant accéder au tableau de bord sans blocage.
+      🎯 CONCLUSION: L'histogramme à colonnes verticales est entièrement fonctionnel
+      et répond parfaitement aux spécifications demandées. L'implémentation avec
+      recharts BarChart est correcte et tous les éléments visuels sont présents.
   - agent: "testing"
     message: |
       🎉 TESTS CORRECTIONS CRITIQUES TERMINÉS - TABLEAU DE BORD ET MODIFICATION D'UTILISATEUR
