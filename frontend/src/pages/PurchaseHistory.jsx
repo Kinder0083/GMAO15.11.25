@@ -346,47 +346,64 @@ const PurchaseHistory = () => {
           </CardHeader>
           <CardContent>
             {stats?.par_mois && stats.par_mois.length > 0 ? (
-              <ResponsiveContainer width="100%" height={400}>
-                <BarChart
-                  data={stats.par_mois.slice(-12)}
-                  margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis 
-                    dataKey="mois" 
-                    angle={-45}
-                    textAnchor="end"
-                    height={80}
-                    style={{ fontSize: '12px' }}
-                  />
-                  <YAxis 
-                    tickFormatter={(value) => `${(value / 1000).toFixed(0)}k €`}
-                    style={{ fontSize: '12px' }}
-                  />
-                  <Tooltip 
-                    formatter={(value) => [`${value.toLocaleString('fr-FR')} €`, 'Montant']}
-                    labelStyle={{ fontWeight: 'bold' }}
-                    contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', border: '1px solid #ccc', borderRadius: '8px' }}
-                  />
-                  <Legend />
-                  <Bar 
-                    dataKey="montant_total" 
-                    fill="#3b82f6"
-                    radius={[8, 8, 0, 0]}
-                    name="Montant Total"
+              <>
+                <ResponsiveContainer width="100%" height={400}>
+                  <BarChart
+                    data={stats.par_mois.slice(-12)}
+                    margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+                    barSize={50}
                   >
-                    {stats.par_mois.slice(-12).map((entry, index) => {
-                      const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
-                      return (
-                        <Cell 
-                          key={`cell-${index}`} 
-                          fill={colors[index % 6]}
-                        />
-                      );
-                    })}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <XAxis 
+                      dataKey="mois" 
+                      angle={-45}
+                      textAnchor="end"
+                      height={80}
+                      style={{ fontSize: '12px', fill: '#374151' }}
+                    />
+                    <YAxis 
+                      tickFormatter={(value) => `${(value / 1000).toFixed(0)}k €`}
+                      style={{ fontSize: '12px', fill: '#374151' }}
+                    />
+                    <Tooltip 
+                      formatter={(value) => [`${value.toLocaleString('fr-FR')} €`, 'Montant']}
+                      labelStyle={{ fontWeight: 'bold', color: '#000' }}
+                      contentStyle={{ 
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                        border: '1px solid #ccc', 
+                        borderRadius: '8px',
+                        padding: '10px'
+                      }}
+                    />
+                    <Legend />
+                    {/* Barres avec couleurs alternées */}
+                    <Bar 
+                      dataKey="montant_total"
+                      name="Montant Total"
+                      radius={[8, 8, 0, 0]}
+                      isAnimationActive={false}
+                    >
+                      {stats.par_mois.slice(-12).map((entry, index) => {
+                        const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+                        const color = colors[index % colors.length];
+                        return (
+                          <Cell 
+                            key={`cell-${index}`} 
+                            fill={color}
+                            stroke={color}
+                            strokeWidth={0}
+                          />
+                        );
+                      })}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+                
+                {/* Debug: Afficher les valeurs */}
+                <div className="mt-2 text-xs text-gray-500 text-center">
+                  {stats.par_mois.slice(-12).length} mois affichés
+                </div>
+              </>
             ) : (
               <div className="text-center py-8 text-gray-500">
                 Aucune donnée d'achat disponible pour le moment
