@@ -350,7 +350,34 @@ const PurchaseHistory = () => {
                 data={stats?.par_mois?.slice(-12) || []}
                 margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
               >
-                <CartesianGrid strokeDasharray="3 3" />
+                <defs>
+                  {/* Définir des couleurs alternées pour chaque barre */}
+                  <linearGradient id="colorBar0" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.9}/>
+                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.7}/>
+                  </linearGradient>
+                  <linearGradient id="colorBar1" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.9}/>
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0.7}/>
+                  </linearGradient>
+                  <linearGradient id="colorBar2" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.9}/>
+                    <stop offset="95%" stopColor="#f59e0b" stopOpacity={0.7}/>
+                  </linearGradient>
+                  <linearGradient id="colorBar3" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#ef4444" stopOpacity={0.9}/>
+                    <stop offset="95%" stopColor="#ef4444" stopOpacity={0.7}/>
+                  </linearGradient>
+                  <linearGradient id="colorBar4" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.9}/>
+                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.7}/>
+                  </linearGradient>
+                  <linearGradient id="colorBar5" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#ec4899" stopOpacity={0.9}/>
+                    <stop offset="95%" stopColor="#ec4899" stopOpacity={0.7}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis 
                   dataKey="mois" 
                   angle={-45}
@@ -365,15 +392,20 @@ const PurchaseHistory = () => {
                 <Tooltip 
                   formatter={(value) => [`${value.toLocaleString('fr-FR')} €`, 'Montant']}
                   labelStyle={{ fontWeight: 'bold' }}
-                  contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', border: '1px solid #ccc' }}
+                  contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', border: '1px solid #ccc', borderRadius: '8px' }}
                 />
                 <Legend />
                 <Bar 
                   dataKey="montant_total" 
-                  fill="#3b82f6" 
                   name="Montant Total"
                   radius={[8, 8, 0, 0]}
-                />
+                >
+                  {(stats?.par_mois?.slice(-12) || []).map((entry, index) => {
+                    const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+                    const gradients = ['url(#colorBar0)', 'url(#colorBar1)', 'url(#colorBar2)', 'url(#colorBar3)', 'url(#colorBar4)', 'url(#colorBar5)'];
+                    return <Cell key={`cell-${index}`} fill={gradients[index % 6]} />;
+                  })}
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
             
