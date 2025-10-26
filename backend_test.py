@@ -535,7 +535,6 @@ if __name__ == "__main__":
         exit(0)  # Success
     else:
         exit(1)  # Failure
-        """Test GET /api/improvement-requests - Get all improvement requests"""
         self.log("Testing get improvement requests endpoint...")
         
         try:
