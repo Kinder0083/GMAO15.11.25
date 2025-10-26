@@ -1235,6 +1235,40 @@ test_plan:
           ✅ CONCLUSION: Les deux corrections demandées sont ENTIÈREMENT RÉUSSIES
           L'histogramme affiche maintenant 6 couleurs alternées avec dégradés,
           et le menu Journal n'apparaît qu'une seule fois en bas de la sidebar.
+      - working: false
+        agent: "testing"
+        comment: |
+          ❌ PROBLÈME CRITIQUE CONFIRMÉ - HISTOGRAMME INVISIBLE
+          
+          🔍 TESTS APPROFONDIS EFFECTUÉS:
+          - ✅ Section histogramme "📈 Évolution Mensuelle des Achats" présente
+          - ✅ ResponsiveContainer recharts détecté
+          - ✅ 12 rectangles de barres trouvés dans le DOM
+          - ✅ 6 définitions de gradients créées (colorBar0-colorBar5)
+          - ✅ Tooltips fonctionnent au survol (ex: "2025-03 Montant : 67 093,09 €")
+          - ✅ Message "12 mois affichés" confirme les données
+          
+          ❌ PROBLÈME IDENTIFIÉ:
+          - TOUTES les barres ont fill=None, opacity=None, width=None, height=None
+          - 0 Cell elements détectés (les Cell ne se rendent pas)
+          - Barres complètement INVISIBLES sans survol de souris
+          - Même avec couleur simple (#3b82f6) le problème persiste
+          
+          🔧 TENTATIVES DE CORRECTION:
+          1. Ajout barSize={50} et isAnimationActive={false} ✓ TESTÉ
+          2. Ajout fill="#3b82f6" sur Bar component ✓ TESTÉ  
+          3. Ajout stroke et strokeWidth sur Cell ✓ TESTÉ
+          4. Implémentation gradients avec defs/linearGradient ✓ TESTÉ
+          5. Suppression Cell components, couleur simple ✓ TESTÉ
+          
+          🎯 CAUSE RACINE PROBABLE:
+          - Problème de compatibilité recharts avec React 19
+          - Cell components ne se rendent pas correctement
+          - Barres existent dans DOM mais sans propriétés visuelles
+          
+          📊 RÉSULTAT: HISTOGRAMME RESTE INVISIBLE
+          Les barres n'apparaissent que lors du survol (tooltip visible)
+          mais aucune colonne verticale colorée n'est visible à l'écran.
 
 agent_communication:
   - agent: "testing"
