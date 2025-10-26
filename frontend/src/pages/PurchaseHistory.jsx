@@ -6,7 +6,7 @@ import { Plus, Search, ShoppingCart, TrendingUp, Calendar, Pencil, Trash2, Downl
 import { purchaseHistoryAPI } from '../services/api';
 import { useToast } from '../hooks/use-toast';
 import PurchaseFormDialog from '../components/PurchaseHistory/PurchaseFormDialog';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
 
 const PurchaseHistory = () => {
   const { toast } = useToast();
