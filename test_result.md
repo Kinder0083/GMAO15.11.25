@@ -1239,40 +1239,44 @@ test_plan:
 agent_communication:
   - agent: "testing"
     message: |
-      🎉 TEST HISTOGRAMME HISTORIQUE ACHAT - SUCCÈS COMPLET
+      🎉 TESTS CORRECTIONS TERMINÉS - HISTOGRAMME MULTI-COULEURS ET MENU JOURNAL UNIQUE
       
-      ✅ RÉSULTATS DES TESTS:
+      ✅ RÉSULTATS DES TESTS COMPLETS:
       
-      **HISTOGRAMME À COLONNES VERTICALES**: ✅ WORKING
-      - BarChart recharts correctement implémenté
-      - 9 colonnes verticales détectées
-      - Axe X avec mois en rotation -45°
-      - Axe Y avec montants en k€
-      - Colonnes bleues (#3b82f6) avec coins arrondis
-      - Tooltip interactif fonctionnel
-      - Légende présente
+      **1. HISTOGRAMME MULTI-COULEURS**: ✅ SUCCESS
+      - 6 couleurs différentes implémentées: Bleu, Vert, Orange, Rouge, Violet, Rose
+      - Couleurs exactes vérifiées: #3b82f6, #10b981, #f59e0b, #ef4444, #8b5cf6, #ec4899
+      - Dégradés avec opacité (0.9 → 0.7) appliqués sur chaque colonne
+      - 6 gradients colorBar définis (colorBar0 à colorBar5)
+      - 12 colonnes d'histogramme détectées avec couleurs alternées
+      - Fini les colonnes toutes bleues - maintenant couleurs variées
       
-      **TABLEAU RÉCAPITULATIF**: ✅ WORKING
-      - 3 cartes des derniers mois présentes
-      - Format correct: mois, montant, nb commandes, nb lignes
-      - Exemple: 2025-09 - 117 985,67 € (99 commandes • 168 lignes)
+      **2. MENU JOURNAL UNIQUE**: ✅ SUCCESS
+      - Journal supprimé du menu principal: ✓ CONFIRMÉ
+      - "Import / Export" reste dans menu principal: ✓ PRÉSENT
+      - Journal accessible uniquement en bas de sidebar: ✓ VÉRIFIÉ
+      - Un seul bouton Journal total: ✓ CONFIRMÉ (1/1)
+      - Navigation vers /journal fonctionnelle: ✓ TESTÉE
       
-      **SUPPRESSION ANCIENNES SECTIONS**: ✅ WORKING
-      - "Top Fournisseurs": SUPPRIMÉ
-      - "Achats par Site": SUPPRIMÉ
-      - "Top Articles": SUPPRIMÉ
-      - Seule section "Évolution Mensuelle des Achats" affichée
+      **3. TABLEAU RÉCAPITULATIF**: ✅ SUCCESS
+      - 3 cartes des derniers mois présentes: ✓ VÉRIFIÉ
+      - Format correct (mois - montant): ✓ CONFIRMÉ
+      - Données récentes: 2025-09, 2025-08, 2025-07
       
-      📊 COMPOSANTS TECHNIQUES VÉRIFIÉS:
-      - ResponsiveContainer: ✓ (1 détecté)
-      - Composants recharts: ✓ (99 détectés)
-      - Éléments SVG: ✓ (334 détectés)
-      - Barres SVG: ✓ (9 détectées)
-      - Coins arrondis: ✓ (8 détectés)
+      📊 DÉTAILS TECHNIQUES VÉRIFIÉS:
+      - ResponsiveContainer recharts: ✓ PRÉSENT
+      - BarChart avec Cell components: ✓ FONCTIONNEL
+      - LinearGradient definitions: ✓ 6 GRADIENTS DÉFINIS
+      - Couleurs alternées via Cell fill: ✓ IMPLÉMENTÉ
+      - Sidebar menu structure: ✓ CORRIGÉE
       
-      🎯 CONCLUSION: L'histogramme à colonnes verticales est entièrement fonctionnel
-      et répond parfaitement aux spécifications demandées. L'implémentation avec
-      recharts BarChart est correcte et tous les éléments visuels sont présents.
+      🎯 CONCLUSION FINALE:
+      Les deux corrections demandées sont PARFAITEMENT RÉUSSIES:
+      ✅ L'histogramme affiche maintenant 6 couleurs différentes avec dégradés
+      ✅ Le menu Journal n'apparaît qu'une seule fois (en bas de la sidebar)
+      ✅ Toutes les fonctionnalités testées sont opérationnelles
+      
+      Les problèmes signalés dans la demande sont ENTIÈREMENT RÉSOLUS.
   - agent: "testing"
     message: |
       🎉 TESTS CORRECTIONS CRITIQUES TERMINÉS - TABLEAU DE BORD ET MODIFICATION D'UTILISATEUR
