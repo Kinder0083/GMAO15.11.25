@@ -1364,6 +1364,46 @@ agent_communication:
       Les problèmes reportés par le client sont RÉSOLUS.
   - agent: "testing"
     message: |
+      🚨 PROBLÈME CRITIQUE CONFIRMÉ - HISTOGRAMME INVISIBLE SUR /purchase-history
+      
+      ❌ ISSUE VALIDÉE:
+      L'histogramme sur /purchase-history ne montre AUCUNE barre visible comme reporté.
+      Les barres n'apparaissent que lors du survol (tooltips fonctionnent) mais sont invisibles visuellement.
+      
+      🔍 DIAGNOSTIC TECHNIQUE COMPLET:
+      - Recharts ResponsiveContainer: ✅ PRÉSENT
+      - BarChart component: ✅ PRÉSENT  
+      - 12 bar rectangles dans DOM: ✅ DÉTECTÉS
+      - Gradients définis: ✅ 6 GRADIENTS (colorBar0-colorBar5)
+      - Données chargées: ✅ "12 mois affichés"
+      - Tooltips au survol: ✅ FONCTIONNELS
+      
+      ❌ PROBLÈME IDENTIFIÉ:
+      - Toutes les barres: fill=None, opacity=None, width=None, height=None
+      - Cell components: 0 détectés (ne se rendent pas)
+      - Barres complètement invisibles sans interaction souris
+      
+      🔧 CORRECTIONS TENTÉES (TOUTES ÉCHOUÉES):
+      1. ✅ Ajout barSize={50} + isAnimationActive={false}
+      2. ✅ Ajout fill="#3b82f6" sur Bar component
+      3. ✅ Ajout stroke/strokeWidth sur Cell components  
+      4. ✅ Implémentation gradients avec linearGradient
+      5. ✅ Suppression Cell, couleur simple uniquement
+      
+      🎯 CAUSE PROBABLE:
+      - Incompatibilité recharts 3.3.0 avec React 19.0.0
+      - Cell components ne se rendent pas dans cette version
+      - Barres existent structurellement mais sans propriétés visuelles
+      
+      📋 RECOMMANDATIONS URGENTES:
+      1. **WEBSEARCH REQUIS**: Rechercher "recharts Cell invisible React 19 2025 fix"
+      2. Considérer downgrade recharts ou upgrade vers version compatible
+      3. Alternative: Remplacer par autre librairie de graphiques (Chart.js, Victory, etc.)
+      4. Ou implémenter barres SVG manuellement
+      
+      ⚠️ PRIORITÉ CRITIQUE: L'histogramme est complètement inutilisable dans l'état actuel.
+  - agent: "testing"
+    message: |
       🎉 TESTS NOUVELLES FONCTIONNALITÉS TERMINÉS - DEMANDES D'AMÉLIORATION ET AMÉLIORATIONS
       
       ✅ TESTS RÉUSSIS:
