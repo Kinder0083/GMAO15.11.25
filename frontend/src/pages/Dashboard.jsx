@@ -324,7 +324,8 @@ const Dashboard = () => {
             </div>
           </CardContent>
         </Card>
-      </div>
+        </div>
+      )}
 
       {/* Recent Work Orders */}
       <Card>
