@@ -345,41 +345,56 @@ const PurchaseHistory = () => {
             <CardTitle>📈 Évolution Mensuelle des Achats</CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={400}>
-              <BarChart
-                data={stats?.par_mois?.slice(-12) || []}
-                margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis 
-                  dataKey="mois" 
-                  angle={-45}
-                  textAnchor="end"
-                  height={80}
-                  style={{ fontSize: '12px' }}
-                />
-                <YAxis 
-                  tickFormatter={(value) => `${(value / 1000).toFixed(0)}k €`}
-                  style={{ fontSize: '12px' }}
-                />
-                <Tooltip 
-                  formatter={(value) => [`${value.toLocaleString('fr-FR')} €`, 'Montant']}
-                  labelStyle={{ fontWeight: 'bold' }}
-                  contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', border: '1px solid #ccc', borderRadius: '8px' }}
-                />
-                <Legend />
-                <Bar 
-                  dataKey="montant_total" 
-                  name="Montant Total"
-                  radius={[8, 8, 0, 0]}
+            {stats?.par_mois && stats.par_mois.length > 0 ? (
+              <ResponsiveContainer width="100%" height={400}>
+                <BarChart
+                  data={stats.par_mois.slice(-12).map((item, index) => ({
+                    ...item,
+                    color: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'][index % 6]
+                  }))}
+                  margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
                 >
-                  {(stats?.par_mois?.slice(-12) || []).map((entry, index) => {
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis 
+                    dataKey="mois" 
+                    angle={-45}
+                    textAnchor="end"
+                    height={80}
+                    style={{ fontSize: '12px' }}
+                  />
+                  <YAxis 
+                    tickFormatter={(value) => `${(value / 1000).toFixed(0)}k €`}
+                    style={{ fontSize: '12px' }}
+                  />
+                  <Tooltip 
+                    formatter={(value) => [`${value.toLocaleString('fr-FR')} €`, 'Montant']}
+                    labelStyle={{ fontWeight: 'bold' }}
+                    contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', border: '1px solid #ccc', borderRadius: '8px' }}
+                  />
+                  <Legend />
+                  {/* Créer une barre pour chaque mois avec sa propre couleur */}
+                  {stats.par_mois.slice(-12).map((item, index) => {
                     const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
-                    return <Cell key={`cell-${index}`} fill={colors[index % 6]} stroke="#ffffff" strokeWidth={2} />;
+                    const color = colors[index % 6];
+                    return (
+                      <Bar 
+                        key={`bar-${index}`}
+                        dataKey={index === 0 ? 'montant_total' : null}
+                        data={[item]}
+                        fill={color}
+                        radius={[8, 8, 0, 0]}
+                        name={index === 0 ? 'Montant Total' : ''}
+                        legendType={index === 0 ? 'rect' : 'none'}
+                      />
+                    );
                   })}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                Aucune donnée d'achat disponible pour le moment
+              </div>
+            )}
             
             {/* Tableau récapitulatif sous le graphique */}
             <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
