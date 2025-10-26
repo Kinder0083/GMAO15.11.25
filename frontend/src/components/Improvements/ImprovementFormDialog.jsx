@@ -88,7 +88,7 @@ const ImprovementFormDialog = ({ open, onOpenChange, workOrder, onSuccess }) => 
       ]);
       setEquipments(equipRes.data);
       setLocations(locRes.data);
-      setUsers(userRes.data.filter(u => u.role === 'TECHNICIEN' || u.role === 'ADMIN'));
+      setUsers(userRes.data);
     } catch (error) {
       console.error('Erreur de chargement:', error);
     }
