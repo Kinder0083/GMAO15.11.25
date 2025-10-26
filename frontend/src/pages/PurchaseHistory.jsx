@@ -347,70 +347,57 @@ const PurchaseHistory = () => {
           <CardContent>
             {stats?.par_mois && stats.par_mois.length > 0 ? (
               <>
-                <ResponsiveContainer width="100%" height={400}>
-                  <BarChart
-                    data={stats.par_mois.slice(-12)}
-                    margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
-                    barSize={50}
-                  >
-                    <defs>
-                      <linearGradient id="colorBar0" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.9}/>
-                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.7}/>
-                      </linearGradient>
-                      <linearGradient id="colorBar1" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.9}/>
-                        <stop offset="95%" stopColor="#10b981" stopOpacity={0.7}/>
-                      </linearGradient>
-                      <linearGradient id="colorBar2" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.9}/>
-                        <stop offset="95%" stopColor="#f59e0b" stopOpacity={0.7}/>
-                      </linearGradient>
-                      <linearGradient id="colorBar3" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#ef4444" stopOpacity={0.9}/>
-                        <stop offset="95%" stopColor="#ef4444" stopOpacity={0.7}/>
-                      </linearGradient>
-                      <linearGradient id="colorBar4" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.9}/>
-                        <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.7}/>
-                      </linearGradient>
-                      <linearGradient id="colorBar5" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#ec4899" stopOpacity={0.9}/>
-                        <stop offset="95%" stopColor="#ec4899" stopOpacity={0.7}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                    <XAxis 
-                      dataKey="mois" 
-                      angle={-45}
-                      textAnchor="end"
-                      height={80}
-                      style={{ fontSize: '12px', fill: '#374151' }}
-                    />
-                    <YAxis 
-                      tickFormatter={(value) => `${(value / 1000).toFixed(0)}k €`}
-                      style={{ fontSize: '12px', fill: '#374151' }}
-                    />
-                    <Tooltip 
-                      formatter={(value) => [`${value.toLocaleString('fr-FR')} €`, 'Montant']}
-                      labelStyle={{ fontWeight: 'bold', color: '#000' }}
-                      contentStyle={{ 
-                        backgroundColor: 'rgba(255, 255, 255, 0.95)', 
-                        border: '1px solid #ccc', 
-                        borderRadius: '8px',
-                        padding: '10px'
-                      }}
-                    />
-                    <Legend />
-                    {/* Barres avec couleur unique - TEST BASIQUE */}
-                    <Bar 
-                      dataKey="montant_total"
-                      name="Montant Total"
-                      fill="#3b82f6"
-                      radius={[8, 8, 0, 0]}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
+                {/* Parent container avec hauteur fixe - ESSENTIEL POUR RECHARTS */}
+                <div style={{ width: '100%', height: 400 }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={stats.par_mois.slice(-12)}
+                      margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                      <XAxis 
+                        dataKey="mois" 
+                        angle={-45}
+                        textAnchor="end"
+                        height={80}
+                        style={{ fontSize: '12px', fill: '#374151' }}
+                      />
+                      <YAxis 
+                        tickFormatter={(value) => `${(value / 1000).toFixed(0)}k €`}
+                        style={{ fontSize: '12px', fill: '#374151' }}
+                      />
+                      <Tooltip 
+                        formatter={(value) => [`${value.toLocaleString('fr-FR')} €`, 'Montant']}
+                        labelStyle={{ fontWeight: 'bold', color: '#000' }}
+                        contentStyle={{ 
+                          backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                          border: '1px solid #ccc', 
+                          borderRadius: '8px',
+                          padding: '10px'
+                        }}
+                      />
+                      <Legend />
+                      {/* Bar avec minPointSize pour forcer la visibilité */}
+                      <Bar 
+                        dataKey="montant_total"
+                        name="Montant Total"
+                        fill="#3b82f6"
+                        radius={[8, 8, 0, 0]}
+                        minPointSize={5}
+                      >
+                        {stats.par_mois.slice(-12).map((entry, index) => {
+                          const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+                          return (
+                            <Cell 
+                              key={`cell-${index}`} 
+                              fill={colors[index % colors.length]}
+                            />
+                          );
+                        })}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
                 
                 {/* Debug: Afficher les valeurs */}
                 <div className="mt-2 text-xs text-gray-500 text-center">
