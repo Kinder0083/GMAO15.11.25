@@ -149,7 +149,7 @@ const Dashboard = () => {
     ];
   }, [analytics, workOrders, equipments]);
 
-  if (loading || !analytics) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <p className="text-gray-500">Chargement...</p>
