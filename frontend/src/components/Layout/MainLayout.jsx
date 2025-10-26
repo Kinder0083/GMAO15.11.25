@@ -111,6 +111,77 @@ const MainLayout = () => {
     }
   };
 
+  const loadOverdueCount = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const backend_url = process.env.REACT_APP_BACKEND_URL;
+      
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      let total = 0;
+      
+      // Charger les ordres de travail en retard
+      try {
+        const woResponse = await fetch(`${backend_url}/api/work-orders`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (woResponse.ok) {
+          const workOrders = await woResponse.json();
+          const overdueWO = workOrders.filter(wo => {
+            if (!wo.dateLimite || wo.statut === 'TERMINE') return false;
+            const dueDate = new Date(wo.dateLimite);
+            return dueDate < today;
+          });
+          total += overdueWO.length;
+        }
+      } catch (err) {
+        console.error('Erreur work orders:', err);
+      }
+      
+      // Charger les améliorations en retard
+      try {
+        const impResponse = await fetch(`${backend_url}/api/improvements`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (impResponse.ok) {
+          const improvements = await impResponse.json();
+          const overdueImp = improvements.filter(imp => {
+            if (!imp.dateLimite || imp.statut === 'TERMINE') return false;
+            const dueDate = new Date(imp.dateLimite);
+            return dueDate < today;
+          });
+          total += overdueImp.length;
+        }
+      } catch (err) {
+        console.error('Erreur improvements:', err);
+      }
+      
+      // Charger les maintenances préventives arrivées à échéance
+      try {
+        const pmResponse = await fetch(`${backend_url}/api/preventive-maintenance`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (pmResponse.ok) {
+          const pms = await pmResponse.json();
+          const overduePM = pms.filter(pm => {
+            if (!pm.prochaineMaintenance || pm.statut !== 'ACTIF') return false;
+            const nextDate = new Date(pm.prochaineMaintenance);
+            return nextDate < today;
+          });
+          total += overduePM.length;
+        }
+      } catch (err) {
+        console.error('Erreur preventive maintenance:', err);
+      }
+      
+      setOverdueCount(total);
+    } catch (error) {
+      console.error('Erreur lors du chargement des échéances:', error);
+    }
+  };
+
+
   const menuItems = [
     { icon: LayoutDashboard, label: 'Tableau de bord', path: '/dashboard', module: 'dashboard' },
     { icon: MessageSquare, label: 'Demandes d\'inter.', path: '/intervention-requests', module: 'interventionRequests' },
