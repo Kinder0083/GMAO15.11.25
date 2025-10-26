@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
-import { Plus, Calendar, Clock, CheckCircle } from 'lucide-react';
+import { Plus, Calendar, Clock, CheckCircle, List, Grid } from 'lucide-react';
 import PreventiveMaintenanceFormDialog from '../components/PreventiveMaintenance/PreventiveMaintenanceFormDialog';
 import { preventiveMaintenanceAPI, workOrdersAPI } from '../services/api';
 import { useToast } from '../hooks/use-toast';
@@ -12,6 +12,7 @@ const PreventiveMaintenance = () => {
   const [loading, setLoading] = useState(true);
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [selectedMaintenance, setSelectedMaintenance] = useState(null);
+  const [viewMode, setViewMode] = useState('list'); // 'list' ou 'tree'
 
   useEffect(() => {
     loadMaintenance();
