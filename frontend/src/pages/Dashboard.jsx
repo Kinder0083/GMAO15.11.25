@@ -231,19 +231,20 @@ const Dashboard = () => {
         })}
       </div>
 
-      {/* Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Work Orders by Status */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Activity className="text-blue-600" size={20} />
-              Ordres de travail par statut
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {Object.entries(analytics.workOrdersParStatut).map(([statut, count]) => {
+      {/* Charts Row - Only show if analytics available */}
+      {analytics && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Work Orders by Status */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Activity className="text-blue-600" size={20} />
+                Ordres de travail par statut
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {Object.entries(analytics.workOrdersParStatut).map(([statut, count]) => {
                 const total = Object.values(analytics.workOrdersParStatut).reduce((a, b) => a + b, 0);
                 const percentage = total > 0 ? ((count / total) * 100).toFixed(0) : 0;
                 const labels = {
