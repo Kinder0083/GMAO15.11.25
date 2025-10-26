@@ -214,37 +214,25 @@ class QHSEPermissionsTester:
             self.log(f"❌ QHSE GET reports/analytics request failed - Error: {str(e)}", "ERROR")
             return False
     
-    def test_admin_post_work_orders(self):
-        """Test admin can POST /api/work-orders"""
-        self.log("Testing admin POST /api/work-orders...")
-        
-        work_order_data = {
-            "titre": "Test Work Order - Admin Permission Test",
-            "description": "Test work order created by admin to test permissions",
-            "priorite": "MOYENNE",
-            "statut": "OUVERT",
-            "type": "CORRECTIVE",
-            "dateLimite": (datetime.now() + timedelta(days=7)).isoformat()
-        }
+    def test_qhse_vendors_forbidden(self):
+        """Test QHSE CANNOT GET /api/vendors (should return 403 - no view permission)"""
+        self.log("Testing QHSE GET /api/vendors (should be forbidden)...")
         
         try:
-            response = self.admin_session.post(
-                f"{BACKEND_URL}/work-orders",
-                json=work_order_data,
+            response = self.qhse_session.get(
+                f"{BACKEND_URL}/vendors",
                 timeout=10
             )
             
-            if response.status_code in [200, 201]:
-                work_order = response.json()
-                self.created_work_order_id = work_order.get('id')
-                self.log(f"✅ Admin POST work-orders successful - Created work order ID: {self.created_work_order_id}")
+            if response.status_code == 403:
+                self.log("✅ QHSE GET vendors correctly forbidden (403)")
                 return True
             else:
-                self.log(f"❌ Admin POST work-orders failed - Status: {response.status_code}, Response: {response.text}", "ERROR")
+                self.log(f"❌ QHSE GET vendors should be forbidden but got - Status: {response.status_code}, Response: {response.text}", "ERROR")
                 return False
                 
         except requests.exceptions.RequestException as e:
-            self.log(f"❌ Admin POST work-orders request failed - Error: {str(e)}", "ERROR")
+            self.log(f"❌ QHSE GET vendors request failed - Error: {str(e)}", "ERROR")
             return False
     
     def test_admin_delete_work_orders(self):
