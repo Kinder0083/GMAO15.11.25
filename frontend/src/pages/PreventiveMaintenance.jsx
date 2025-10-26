@@ -183,18 +183,19 @@ const PreventiveMaintenance = () => {
         </Card>
       </div>
 
-      {/* Maintenance Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {loading ? (
-          <div className="col-span-full text-center py-8">
-            <p className="text-gray-500">Chargement...</p>
-          </div>
-        ) : maintenance.length === 0 ? (
-          <div className="col-span-full text-center py-8">
-            <p className="text-gray-500">Aucune maintenance préventive trouvée</p>
-          </div>
-        ) : (
-          maintenance.map((item) => (
+      {/* Maintenance Cards ou Arborescence */}
+      {viewMode === 'list' ? (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {loading ? (
+            <div className="col-span-full text-center py-8">
+              <p className="text-gray-500">Chargement...</p>
+            </div>
+          ) : maintenance.length === 0 ? (
+            <div className="col-span-full text-center py-8">
+              <p className="text-gray-500">Aucune maintenance préventive trouvée</p>
+            </div>
+          ) : (
+            maintenance.map((item) => (
             <Card key={item.id} className="hover:shadow-xl transition-all duration-300">
               <CardHeader>
                 <div className="flex items-start justify-between">
