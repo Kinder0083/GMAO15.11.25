@@ -25,16 +25,29 @@ const Dashboard = () => {
       if (initialLoad) {
         setLoading(true);
       }
-      const [woRes, eqRes, analyticsRes] = await Promise.all([
-        workOrdersAPI.getAll(),
-        equipmentsAPI.getAll(),
-        reportsAPI.getAnalytics()
-      ]);
+      
+      // Charger les données de manière conditionnelle selon les permissions
+      const promises = [];
+      const dataKeys = [];
+      
+      // Toujours essayer de charger les work orders
+      promises.push(workOrdersAPI.getAll().catch(() => ({ data: [] })));
+      dataKeys.push('workOrders');
+      
+      // Essayer de charger les équipements
+      promises.push(equipmentsAPI.getAll().catch(() => ({ data: [] })));
+      dataKeys.push('equipments');
+      
+      // Essayer de charger les analytics
+      promises.push(reportsAPI.getAnalytics().catch(() => ({ data: null })));
+      dataKeys.push('analytics');
+      
+      const results = await Promise.all(promises);
       
       // Mise à jour silencieuse : comparer avant de mettre à jour
-      const newWorkOrders = woRes.data;
-      const newEquipments = eqRes.data;
-      const newAnalytics = analyticsRes.data;
+      const newWorkOrders = results[0].data || [];
+      const newEquipments = results[1].data || [];
+      const newAnalytics = results[2].data;
       
       // Pour le premier chargement ou si les données ont changé
       if (initialLoad || JSON.stringify(newWorkOrders) !== JSON.stringify(workOrders)) {
@@ -48,6 +61,7 @@ const Dashboard = () => {
       }
     } catch (error) {
       console.error('Erreur de chargement:', error);
+      // Même en cas d'erreur, on affiche le dashboard avec les données disponibles
     } finally {
       if (initialLoad) {
         setLoading(false);
