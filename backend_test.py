@@ -525,8 +525,16 @@ class QHSEPermissionsTester:
             self.log(f"❌ Failed tests: {', '.join(failed_tests)}")
         
         return results
+
+if __name__ == "__main__":
+    tester = QHSEPermissionsTester()
+    results = tester.run_qhse_permissions_tests()
     
-    def test_get_improvement_requests(self):
+    # Exit with appropriate code
+    if all(results.values()):
+        exit(0)  # Success
+    else:
+        exit(1)  # Failure
         """Test GET /api/improvement-requests - Get all improvement requests"""
         self.log("Testing get improvement requests endpoint...")
         
