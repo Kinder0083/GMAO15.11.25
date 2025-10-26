@@ -1112,7 +1112,8 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "Test critique - Tableau de bord pour utilisateur QHSE avec permissions limitées"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
