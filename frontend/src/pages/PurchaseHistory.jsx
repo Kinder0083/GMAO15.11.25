@@ -357,70 +357,95 @@ const PurchaseHistory = () => {
                     return (
                       <div className="space-y-4">
                         {/* Graphique en barres */}
-                        <div className="flex items-end justify-between gap-2 h-80 bg-gradient-to-b from-gray-50 to-white p-4 rounded-lg border border-gray-200">
-                          {data.map((item, index) => {
-                            const heightPercent = (item.montant_total / maxValue) * 100;
-                            const color = colors[index % colors.length];
+                        <div className="bg-white rounded-lg border border-gray-200 p-6">
+                          {/* Axe Y avec échelle */}
+                          <div className="flex gap-4">
+                            {/* Labels Y */}
+                            <div className="flex flex-col justify-between text-xs text-gray-500 py-2" style={{ minWidth: '60px' }}>
+                              <div className="text-right">{(maxValue).toLocaleString('fr-FR')} €</div>
+                              <div className="text-right">{(maxValue * 0.75).toLocaleString('fr-FR', { maximumFractionDigits: 0 })} €</div>
+                              <div className="text-right">{(maxValue * 0.5).toLocaleString('fr-FR', { maximumFractionDigits: 0 })} €</div>
+                              <div className="text-right">{(maxValue * 0.25).toLocaleString('fr-FR', { maximumFractionDigits: 0 })} €</div>
+                              <div className="text-right">0 €</div>
+                            </div>
                             
-                            return (
-                              <div key={index} className="flex-1 flex flex-col items-center justify-end group">
-                                {/* Barre */}
-                                <div 
-                                  className="w-full rounded-t-lg transition-all duration-300 hover:opacity-80 relative cursor-pointer shadow-md"
-                                  style={{ 
-                                    height: `${heightPercent}%`,
-                                    backgroundColor: color,
-                                    minHeight: '4px'
-                                  }}
-                                >
-                                  {/* Tooltip au survol */}
-                                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
-                                    <div className="font-bold">{item.mois}</div>
-                                    <div>{item.montant_total.toLocaleString('fr-FR')} €</div>
-                                    <div className="text-gray-300 text-xs">{item.nb_commandes} commande{item.nb_commandes > 1 ? 's' : ''}</div>
-                                  </div>
-                                </div>
+                            {/* Zone du graphique */}
+                            <div className="flex-1">
+                              {/* Lignes de grille horizontales */}
+                              <div className="relative" style={{ height: '320px' }}>
+                                {[0, 25, 50, 75, 100].map((percent) => (
+                                  <div 
+                                    key={percent}
+                                    className="absolute w-full border-t border-gray-200"
+                                    style={{ bottom: `${percent}%` }}
+                                  ></div>
+                                ))}
                                 
-                                {/* Label du mois */}
-                                <div className="text-xs text-gray-600 mt-2 transform -rotate-45 origin-top-left whitespace-nowrap">
-                                  {item.mois}
+                                {/* Barres */}
+                                <div className="absolute inset-0 flex items-end justify-between gap-1">
+                                  {data.map((item, index) => {
+                                    const heightPercent = ((item.montant_total / maxValue) * 100) || 0;
+                                    const color = colors[index % colors.length];
+                                    
+                                    return (
+                                      <div key={index} className="flex-1 flex flex-col items-center justify-end group relative">
+                                        {/* Valeur au-dessus de la barre */}
+                                        <div className="absolute bottom-full mb-1 text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: color }}>
+                                          {(item.montant_total / 1000).toFixed(0)}k
+                                        </div>
+                                        
+                                        {/* Barre */}
+                                        <div 
+                                          className="w-full rounded-t-lg transition-all duration-300 hover:opacity-80 relative cursor-pointer shadow-sm hover:shadow-md"
+                                          style={{ 
+                                            height: `${heightPercent}%`,
+                                            backgroundColor: color,
+                                            minHeight: heightPercent > 0 ? '8px' : '0px'
+                                          }}
+                                        >
+                                          {/* Tooltip au survol */}
+                                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10 shadow-xl">
+                                            <div className="font-bold text-center">{item.mois}</div>
+                                            <div className="text-center mt-1">{item.montant_total.toLocaleString('fr-FR')} €</div>
+                                            <div className="text-gray-300 text-xs text-center mt-1">{item.nb_commandes} commande{item.nb_commandes > 1 ? 's' : ''}</div>
+                                            <div className="text-gray-400 text-xs text-center">{item.nb_lignes} ligne{item.nb_lignes > 1 ? 's' : ''}</div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
                                 </div>
                               </div>
-                            );
-                          })}
+                              
+                              {/* Labels X (mois) */}
+                              <div className="flex justify-between gap-1 mt-3 pt-2 border-t border-gray-300">
+                                {data.map((item, index) => (
+                                  <div key={index} className="flex-1 text-center">
+                                    <div className="text-xs text-gray-600 font-medium transform -rotate-45 origin-center whitespace-nowrap">
+                                      {item.mois}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
                         </div>
                         
                         {/* Légende */}
                         <div className="flex items-center justify-center gap-6 text-sm flex-wrap">
-                          <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 rounded" style={{ backgroundColor: '#3b82f6' }}></div>
-                            <span className="text-gray-600">Bleu</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 rounded" style={{ backgroundColor: '#10b981' }}></div>
-                            <span className="text-gray-600">Vert</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 rounded" style={{ backgroundColor: '#f59e0b' }}></div>
-                            <span className="text-gray-600">Orange</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 rounded" style={{ backgroundColor: '#ef4444' }}></div>
-                            <span className="text-gray-600">Rouge</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 rounded" style={{ backgroundColor: '#8b5cf6' }}></div>
-                            <span className="text-gray-600">Violet</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 rounded" style={{ backgroundColor: '#ec4899' }}></div>
-                            <span className="text-gray-600">Rose</span>
-                          </div>
+                          {colors.map((color, idx) => (
+                            <div key={idx} className="flex items-center gap-2">
+                              <div className="w-4 h-4 rounded shadow-sm" style={{ backgroundColor: color }}></div>
+                              <span className="text-gray-600">
+                                {['Bleu', 'Vert', 'Orange', 'Rouge', 'Violet', 'Rose'][idx]}
+                              </span>
+                            </div>
+                          ))}
                         </div>
                         
                         {/* Info */}
                         <div className="text-center text-sm text-gray-500">
-                          {data.length} mois affichés • Maximum: {maxValue.toLocaleString('fr-FR')} €
+                          📊 {data.length} mois affichés • Maximum: {maxValue.toLocaleString('fr-FR')} €
                         </div>
                       </div>
                     );
