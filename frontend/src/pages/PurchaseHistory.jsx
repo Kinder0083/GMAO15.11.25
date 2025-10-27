@@ -347,118 +347,88 @@ const PurchaseHistory = () => {
           <CardContent>
             {stats?.par_mois && stats.par_mois.length > 0 ? (
               <>
-                {/* Histogramme personnalisé HTML/CSS */}
-                <div className="w-full">
+                {/* Histogramme ULTRA SIMPLE */}
+                <div className="w-full bg-white p-6 rounded-lg border">
                   {(() => {
                     const data = stats.par_mois.slice(-12);
                     const maxValue = Math.max(...data.map(d => d.montant_total));
                     const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
                     
                     return (
-                      <div className="space-y-4">
-                        {/* Graphique en barres */}
-                        <div className="bg-white rounded-lg border border-gray-200 p-6">
-                          <div className="flex gap-4">
-                            {/* Labels Y */}
-                            <div className="flex flex-col justify-between text-xs text-gray-500" style={{ height: '320px', minWidth: '70px' }}>
-                              <div className="text-right">{(maxValue).toLocaleString('fr-FR')} €</div>
-                              <div className="text-right">{(maxValue * 0.75).toLocaleString('fr-FR', { maximumFractionDigits: 0 })} €</div>
-                              <div className="text-right">{(maxValue * 0.5).toLocaleString('fr-FR', { maximumFractionDigits: 0 })} €</div>
-                              <div className="text-right">{(maxValue * 0.25).toLocaleString('fr-FR', { maximumFractionDigits: 0 })} €</div>
-                              <div className="text-right">0 €</div>
-                            </div>
+                      <div>
+                        {/* Graphique */}
+                        <div style={{ display: 'flex', alignItems: 'flex-end', height: '350px', gap: '8px', padding: '20px', border: '1px solid #e5e7eb', borderRadius: '8px', backgroundColor: '#fafafa' }}>
+                          {data.map((item, index) => {
+                            const heightPx = Math.max((item.montant_total / maxValue) * 300, 10);
+                            const color = colors[index % colors.length];
                             
-                            {/* Zone du graphique */}
-                            <div className="flex-1 relative" style={{ height: '320px' }}>
-                              {/* Lignes de grille horizontales */}
-                              {[0, 25, 50, 75, 100].map((percent) => (
-                                <div 
-                                  key={percent}
-                                  className="absolute w-full border-t border-gray-200"
-                                  style={{ bottom: `${percent}%` }}
-                                ></div>
-                              ))}
-                              
-                              {/* Conteneur des barres */}
-                              <div className="absolute inset-0 flex items-end gap-1 px-2">
-                                {data.map((item, index) => {
-                                  const heightPercent = Math.max(((item.montant_total / maxValue) * 100), 2);
-                                  const color = colors[index % colors.length];
-                                  
-                                  return (
-                                    <div 
-                                      key={index} 
-                                      className="flex-1 flex items-end justify-center group relative"
-                                    >
-                                      {/* Barre */}
-                                      <div 
-                                        className="w-full rounded-t-lg transition-all duration-300 hover:brightness-110 cursor-pointer shadow-sm hover:shadow-md relative"
-                                        style={{ 
-                                          height: `${heightPercent}%`,
-                                          backgroundColor: color,
-                                          maxWidth: '100%'
-                                        }}
-                                      >
-                                        {/* Tooltip au survol */}
-                                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20 shadow-xl">
-                                          <div className="font-bold text-center">{item.mois}</div>
-                                          <div className="text-center mt-1">{item.montant_total.toLocaleString('fr-FR')} €</div>
-                                          <div className="text-gray-300 text-xs text-center mt-1">{item.nb_commandes} commande{item.nb_commandes > 1 ? 's' : ''}</div>
-                                          <div className="text-gray-400 text-xs text-center">{item.nb_lignes} ligne{item.nb_lignes > 1 ? 's' : ''}</div>
-                                          {/* Flèche du tooltip */}
-                                          <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
-                                            <div className="border-4 border-transparent border-t-gray-900"></div>
-                                          </div>
-                                        </div>
-                                        
-                                        {/* Valeur au-dessus de la barre au hover */}
-                                        <div 
-                                          className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap"
-                                          style={{ color: color }}
-                                        >
-                                          {(item.montant_total / 1000).toFixed(0)}k €
-                                        </div>
-                                      </div>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          </div>
-                          
-                          {/* Labels X (mois) */}
-                          <div className="flex gap-1 mt-4 ml-[70px] pl-2 pr-2">
-                            {data.map((item, index) => (
-                              <div key={index} className="flex-1 flex justify-center">
-                                <div 
-                                  className="text-xs text-gray-600 font-medium whitespace-nowrap"
-                                  style={{ 
-                                    transform: 'rotate(-45deg)',
-                                    transformOrigin: 'center',
-                                    marginTop: '20px'
+                            return (
+                              <div 
+                                key={index}
+                                style={{ 
+                                  flex: 1,
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  alignItems: 'center',
+                                  justifyContent: 'flex-end'
+                                }}
+                              >
+                                {/* Barre */}
+                                <div
+                                  title={`${item.mois}: ${item.montant_total.toLocaleString('fr-FR')} € (${item.nb_commandes} commandes)`}
+                                  style={{
+                                    width: '100%',
+                                    height: `${heightPx}px`,
+                                    backgroundColor: color,
+                                    borderRadius: '8px 8px 0 0',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s',
+                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
                                   }}
-                                >
-                                  {item.mois}
-                                </div>
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.opacity = '0.8';
+                                    e.currentTarget.style.transform = 'translateY(-4px)';
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.opacity = '1';
+                                    e.currentTarget.style.transform = 'translateY(0)';
+                                  }}
+                                />
                               </div>
-                            ))}
-                          </div>
+                            );
+                          })}
                         </div>
                         
-                        {/* Légende */}
-                        <div className="flex items-center justify-center gap-6 text-sm flex-wrap">
-                          {colors.map((color, idx) => (
-                            <div key={idx} className="flex items-center gap-2">
-                              <div className="w-4 h-4 rounded shadow-sm" style={{ backgroundColor: color }}></div>
-                              <span className="text-gray-600">
-                                {['Bleu', 'Vert', 'Orange', 'Rouge', 'Violet', 'Rose'][idx]}
-                              </span>
+                        {/* Labels des mois */}
+                        <div style={{ display: 'flex', gap: '8px', marginTop: '10px', paddingLeft: '20px', paddingRight: '20px' }}>
+                          {data.map((item, index) => (
+                            <div 
+                              key={index}
+                              style={{ 
+                                flex: 1,
+                                textAlign: 'center',
+                                fontSize: '11px',
+                                color: '#666',
+                                fontWeight: '600'
+                              }}
+                            >
+                              {item.mois}
+                            </div>
+                          ))}
+                        </div>
+                        
+                        {/* Légende des couleurs */}
+                        <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginTop: '30px', flexWrap: 'wrap' }}>
+                          {['Bleu', 'Vert', 'Orange', 'Rouge', 'Violet', 'Rose'].map((name, idx) => (
+                            <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <div style={{ width: '16px', height: '16px', backgroundColor: colors[idx], borderRadius: '4px' }}></div>
+                              <span style={{ fontSize: '13px', color: '#666' }}>{name}</span>
                             </div>
                           ))}
                         </div>
                         
                         {/* Info */}
-                        <div className="text-center text-sm text-gray-500">
+                        <div style={{ textAlign: 'center', marginTop: '20px', fontSize: '13px', color: '#888' }}>
                           📊 {data.length} mois affichés • Maximum: {maxValue.toLocaleString('fr-FR')} €
                         </div>
                       </div>
