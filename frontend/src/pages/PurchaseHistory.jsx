@@ -350,11 +350,9 @@ const PurchaseHistory = () => {
                 {/* Histogramme avec Nivo - Compatible React 19 */}
                 <div className="w-full" style={{ height: '450px' }}>
                   <ResponsiveBar
-                    data={stats.par_mois.slice(-12).map((item, index) => ({
+                    data={stats.par_mois.slice(-12).map((item) => ({
                       mois: item.mois,
-                      montant: item.montant_total,
-                      montantLabel: `${item.montant_total.toLocaleString('fr-FR')} €`,
-                      color: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'][index % 6]
+                      montant: item.montant_total
                     }))}
                     keys={['montant']}
                     indexBy="mois"
@@ -362,7 +360,7 @@ const PurchaseHistory = () => {
                     padding={0.3}
                     valueScale={{ type: 'linear' }}
                     indexScale={{ type: 'band', round: true }}
-                    colors={(bar) => bar.data.color}
+                    colors={['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899']}
                     borderRadius={8}
                     borderColor={{
                       from: 'color',
