@@ -422,56 +422,6 @@ const PurchaseHistory = () => {
                     />
                   </div>
                 </div>
-                    borderColor={{
-                      from: 'color',
-                      modifiers: [['darker', 0.3]]
-                    }}
-                    axisTop={null}
-                    axisRight={null}
-                    axisBottom={{
-                      tickSize: 5,
-                      tickPadding: 5,
-                      tickRotation: -45,
-                      legend: '',
-                      legendPosition: 'middle',
-                      legendOffset: 60,
-                      truncateTickAt: 0
-                    }}
-                    axisLeft={{
-                      tickSize: 5,
-                      tickPadding: 5,
-                      tickRotation: 0,
-                      legend: 'Montant (€)',
-                      legendPosition: 'middle',
-                      legendOffset: -60,
-                      format: value => `${(value / 1000).toFixed(0)}k`
-                    }}
-                    labelSkipWidth={12}
-                    labelSkipHeight={12}
-                    labelTextColor={{
-                      from: 'color',
-                      modifiers: [['darker', 1.6]]
-                    }}
-                    tooltip={({ indexValue, value }) => (
-                      <div
-                        style={{
-                          padding: '12px',
-                          background: 'rgba(255, 255, 255, 0.95)',
-                          border: '1px solid #ccc',
-                          borderRadius: '8px',
-                        }}
-                      >
-                        <strong style={{ color: '#000' }}>{indexValue}</strong>
-                        <br />
-                        <span>
-                          Montant: {value.toLocaleString('fr-FR')} €
-                        </span>
-                      </div>
-                    )}
-                    animate={true}
-                    motionConfig="gentle"
-                  />
-                </div>
                 
                 {/* Debug: Afficher les valeurs */}
                 <div className="mt-2 text-xs text-gray-500 text-center">
