@@ -347,8 +347,14 @@ const PurchaseHistory = () => {
           <CardContent>
             {stats?.par_mois && stats.par_mois.length > 0 ? (
               <>
+                {/* Debug: afficher les données */}
+                <div className="mb-4 p-4 bg-gray-100 rounded text-xs">
+                  <strong>DEBUG - Données disponibles :</strong>
+                  <pre>{JSON.stringify(stats.par_mois.slice(-12), null, 2)}</pre>
+                </div>
+                
                 {/* Histogramme avec Nivo - Compatible React 19 */}
-                <div className="w-full" style={{ height: '450px' }}>
+                <div className="w-full bg-white border border-gray-300 rounded" style={{ height: '450px' }}>
                   <ResponsiveBar
                     data={stats.par_mois.slice(-12).map((item) => ({
                       mois: item.mois,
