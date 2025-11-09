@@ -259,24 +259,53 @@ GIT_URL="https://${GITHUB_TOKEN}@github.com/${GITHUB_USER}/${REPO_NAME}.git"
 echo ""
 msg "Création du container..."
 
+# Nettoyer les variables (enlever espaces)
+CONTAINER_IP=$(echo "$CONTAINER_IP" | tr -d ' ')
+CONTAINER_CIDR=$(echo "$CONTAINER_CIDR" | tr -d ' ')
+CONTAINER_GW=$(echo "$CONTAINER_GW" | tr -d ' ')
+
 # Commande de création adaptée avec le bridge choisi
-PCT_CREATE_CMD="pct create $CTID local:vztmpl/$TEMPLATE \
+if [[ "$NET_MODE" == "1" ]]; then
+    # IP Statique
+    PCT_CREATE_CMD="pct create $CTID local:vztmpl/$TEMPLATE \
   --arch amd64 \
   --cores $CORES \
   --hostname gmao-iris \
   --memory $RAM \
-  --net0 name=eth0,bridge=$SELECTED_BRIDGE,$NET \
+  --net0 name=eth0,bridge=$SELECTED_BRIDGE,ip=${CONTAINER_IP}/${CONTAINER_CIDR},gw=${CONTAINER_GW} \
   --onboot 1 \
   --ostype debian \
   --rootfs ${STORAGE}:${DISK_SIZE} \
   --unprivileged 1 \
   --features nesting=1 \
-  --password \"$ROOT_PASS\""
+  --password '$ROOT_PASS'"
+else
+    # DHCP
+    PCT_CREATE_CMD="pct create $CTID local:vztmpl/$TEMPLATE \
+  --arch amd64 \
+  --cores $CORES \
+  --hostname gmao-iris \
+  --memory $RAM \
+  --net0 name=eth0,bridge=$SELECTED_BRIDGE,ip=dhcp \
+  --onboot 1 \
+  --ostype debian \
+  --rootfs ${STORAGE}:${DISK_SIZE} \
+  --unprivileged 1 \
+  --features nesting=1 \
+  --password '$ROOT_PASS'"
+fi
+
+# Debug: afficher la commande
+echo ""
+echo "DEBUG - Commande qui sera exécutée:"
+echo "$PCT_CREATE_CMD"
+echo ""
+read -p "Appuyez sur Entrée pour continuer..."
 
 # Exécuter avec gestion d'erreur détaillée
-if ! eval $PCT_CREATE_CMD 2>&1 | tee /tmp/pct_create_error.log; then
+if ! eval "$PCT_CREATE_CMD" 2>&1 | tee /tmp/pct_create_error.log; then
     echo ""
-    err "Échec création container. Détails de l'erreur:"
+    echo "Erreur lors de la création. Détails:"
     cat /tmp/pct_create_error.log
     exit 1
 fi
