@@ -173,9 +173,55 @@ CORES=${CORES:-2}
 read -p "Taille disque (Go) [20]: " DISK_SIZE
 DISK_SIZE=${DISK_SIZE:-20}
 
-read -p "IP [dhcp]: " IP_CONFIG
-IP_CONFIG=${IP_CONFIG:-dhcp}
-[[ $IP_CONFIG == "dhcp" ]] && NET="ip=dhcp" || NET="ip=$IP_CONFIG"
+echo ""
+msg "Configuration réseau du container..."
+echo ""
+
+# Détecter la config du bridge sélectionné
+BRIDGE_IP=$(ip addr show $SELECTED_BRIDGE | grep "inet " | awk '{print $2}' | cut -d'/' -f1)
+BRIDGE_CIDR=$(ip addr show $SELECTED_BRIDGE | grep "inet " | awk '{print $2}' | cut -d'/' -f2)
+BRIDGE_GW=$(ip route | grep "default.*$SELECTED_BRIDGE" | awk '{print $3}')
+
+if [[ -z "$BRIDGE_GW" ]]; then
+    BRIDGE_GW=$BRIDGE_IP
+fi
+
+echo "Configuration détectée sur $SELECTED_BRIDGE:"
+echo "  IP Proxmox: $BRIDGE_IP/$BRIDGE_CIDR"
+echo "  Gateway: $BRIDGE_GW"
+echo ""
+
+# Proposer IP statique ou DHCP
+NETWORK_PREFIX=$(echo $BRIDGE_IP | cut -d'.' -f1-3)
+SUGGESTED_IP="${NETWORK_PREFIX}.150"
+
+echo "Choisissez le mode de configuration réseau:"
+echo "  1) IP Statique (recommandé si pas de serveur DHCP)"
+echo "  2) DHCP (nécessite un serveur DHCP fonctionnel)"
+echo ""
+read -p "Votre choix [1]: " NET_MODE
+NET_MODE=${NET_MODE:-1}
+
+if [[ "$NET_MODE" == "1" ]]; then
+    # IP Statique
+    read -p "Adresse IP du container [$SUGGESTED_IP]: " CONTAINER_IP
+    CONTAINER_IP=${CONTAINER_IP:-$SUGGESTED_IP}
+    
+    read -p "Masque CIDR [/$BRIDGE_CIDR]: " CONTAINER_CIDR
+    CONTAINER_CIDR=${CONTAINER_CIDR:-$BRIDGE_CIDR}
+    
+    read -p "Gateway [$BRIDGE_GW]: " CONTAINER_GW
+    CONTAINER_GW=${CONTAINER_GW:-$BRIDGE_GW}
+    
+    IP_CONFIG="${CONTAINER_IP}/${CONTAINER_CIDR}"
+    NET="ip=${IP_CONFIG},gw=${CONTAINER_GW}"
+else
+    # DHCP
+    warn "Mode DHCP sélectionné - un serveur DHCP doit être disponible sur $SELECTED_BRIDGE"
+    IP_CONFIG="dhcp"
+    NET="ip=dhcp"
+    CONTAINER_IP="dhcp"
+fi
 
 echo ""
 msg "Configuration administrateur..."
