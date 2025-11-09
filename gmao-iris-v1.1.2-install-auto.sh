@@ -349,8 +349,18 @@ systemctl enable postfix >/dev/null 2>&1
 ok "Système installé"
 
 # Obtenir IP du container
-CONTAINER_IP=$(pct exec $CTID -- hostname -I | awk '{print $1}')
-ok "IP du container: $CONTAINER_IP"
+if [[ "$CONTAINER_IP" == "dhcp" ]]; then
+    CONTAINER_IP=$(pct exec $CTID -- hostname -I | awk '{print $1}')
+    
+    if [[ -z "$CONTAINER_IP" || "$CONTAINER_IP" == "127.0.0.1" ]]; then
+        warn "Le DHCP n'a pas attribué d'IP. Configuration manuelle nécessaire."
+        CONTAINER_IP="AUCUNE_IP"
+    else
+        ok "IP du container (DHCP): $CONTAINER_IP"
+    fi
+else
+    ok "IP du container (Statique): $CONTAINER_IP"
+fi
 
 msg "Clonage de l'application depuis GitHub..."
 
