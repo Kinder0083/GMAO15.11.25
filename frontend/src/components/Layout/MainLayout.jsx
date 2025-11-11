@@ -68,7 +68,7 @@ const MainLayout = () => {
           loadOverdueCount();
         }, 60000); // 60 secondes
         
-        // Écouter les événements de création/modification d'ordres de travail
+        // Écouter les événements de création/modification/suppression
         const handleWorkOrderChange = () => {
           loadWorkOrdersCount(parsedUser.id);
           loadOverdueCount(); // Aussi rafraîchir les échéances
@@ -76,12 +76,20 @@ const MainLayout = () => {
         
         window.addEventListener('workOrderCreated', handleWorkOrderChange);
         window.addEventListener('workOrderUpdated', handleWorkOrderChange);
+        window.addEventListener('workOrderDeleted', handleWorkOrderChange);
+        window.addEventListener('improvementCreated', handleWorkOrderChange);
+        window.addEventListener('improvementUpdated', handleWorkOrderChange);
+        window.addEventListener('improvementDeleted', handleWorkOrderChange);
         
         // Nettoyer les listeners et l'intervalle au démontage
         return () => {
           clearInterval(intervalId);
           window.removeEventListener('workOrderCreated', handleWorkOrderChange);
           window.removeEventListener('workOrderUpdated', handleWorkOrderChange);
+          window.removeEventListener('workOrderDeleted', handleWorkOrderChange);
+          window.removeEventListener('improvementCreated', handleWorkOrderChange);
+          window.removeEventListener('improvementUpdated', handleWorkOrderChange);
+          window.removeEventListener('improvementDeleted', handleWorkOrderChange);
         };
       } catch (error) {
         console.error('Erreur lors du parsing des infos utilisateur:', error);
