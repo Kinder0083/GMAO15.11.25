@@ -57,6 +57,27 @@ const PreventiveMaintenance = () => {
     }
   };
 
+  const handleDelete = async () => {
+    if (!maintenanceToDelete) return;
+
+    try {
+      await preventiveMaintenanceAPI.delete(maintenanceToDelete.id);
+      toast({
+        title: 'Succès',
+        description: 'Maintenance préventive supprimée'
+      });
+      setDeleteDialogOpen(false);
+      setMaintenanceToDelete(null);
+      loadMaintenance();
+    } catch (error) {
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de supprimer la maintenance préventive',
+        variant: 'destructive'
+      });
+    }
+  };
+
   const handleExecuteNow = async (pm) => {
     if (window.confirm('Voulez-vous créer un ordre de travail pour cette maintenance ?')) {
       try {
