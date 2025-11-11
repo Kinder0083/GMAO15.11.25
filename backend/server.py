@@ -2492,7 +2492,7 @@ async def get_analytics(current_user: dict = Depends(require_permission("reports
             "max": 6
         },
         "tauxRealisation": 87,
-        "nombreMaintenancesPrev": await db.preventive_maintenance.count_documents({"statut": "ACTIF"}),
+        "nombreMaintenancesPrev": await db.preventive_maintenances.count_documents({"statut": "ACTIF"}),
         "nombreMaintenancesCorrectives": await db.work_orders.count_documents({"priorite": {"$ne": "AUCUNE"}})
     }
     
