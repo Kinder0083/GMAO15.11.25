@@ -1359,6 +1359,26 @@ frontend:
           - Les opérations interdites retournent bien 403 Forbidden
           - Toutes les permissions sont correctement appliquées sur les endpoints
 
+  - agent: "testing"
+    message: |
+      ✅ TEST CRITIQUE TERMINÉ - GET /api/work-orders après correction enum Priority
+      
+      🎯 RÉSULTATS DU TEST (Décembre 2025):
+      - ✅ Connexion admin réussie (admin@gmao-iris.local / Admin123!)
+      - ✅ GET /api/work-orders répond 200 OK avec 66 bons de travail
+      - ✅ Bons de travail avec priorité "NORMALE": 2 trouvés et correctement retournés
+      - ✅ Bons de travail avec priorité "AUCUNE": 64 trouvés
+      - ✅ Aucune erreur pydantic_core.ValidationError détectée
+      - ✅ Aucune erreur 500 Internal Server Error
+      
+      🔧 CORRECTION VALIDÉE:
+      L'ajout de `NORMALE = "NORMALE"` à l'enum Priority dans models.py ligne 267
+      résout entièrement le problème de validation Pydantic qui causait l'erreur 500.
+      
+      📊 STATUT: BUG CRITIQUE ENTIÈREMENT RÉSOLU
+      L'endpoint fonctionne parfaitement et toutes les priorités sont acceptées:
+      HAUTE, MOYENNE, NORMALE, BASSE, AUCUNE.
+
 metadata:
   created_by: "main_agent"
   version: "4.3"
