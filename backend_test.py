@@ -372,39 +372,111 @@ class ImportExportTester:
                 except:
                     pass
     
-    def test_qhse_login(self):
-        """Test QHSE login"""
-        self.log("Testing QHSE login...")
+    def run_import_export_tests(self):
+        """Run all import/export tests for the GMAO application"""
+        self.log("=" * 80)
+        self.log("STARTING IMPORT/EXPORT MODULE TESTS - CORRECTION VALIDATION")
+        self.log("=" * 80)
         
-        try:
-            response = self.qhse_session.post(
-                f"{BACKEND_URL}/auth/login",
-                json={
-                    "email": QHSE_EMAIL,
-                    "password": QHSE_PASSWORD
-                },
-                timeout=10
-            )
-            
-            if response.status_code == 200:
-                data = response.json()
-                self.qhse_token = data.get("access_token")
-                self.qhse_data = data.get("user")
-                
-                # Set authorization header for future requests
-                self.qhse_session.headers.update({
-                    "Authorization": f"Bearer {self.qhse_token}"
-                })
-                
-                self.log(f"✅ QHSE login successful - User: {self.qhse_data.get('prenom')} {self.qhse_data.get('nom')} (Role: {self.qhse_data.get('role')})")
-                return True
-            else:
-                self.log(f"❌ QHSE login failed - Status: {response.status_code}, Response: {response.text}", "ERROR")
-                return False
-                
-        except requests.exceptions.RequestException as e:
-            self.log(f"❌ QHSE login request failed - Error: {str(e)}", "ERROR")
-            return False
+        results = {
+            "admin_login": False,
+            "import_all_multi_sheet": False,
+            "column_mapping_validation": False
+        }
+        
+        # Add individual module tests
+        modules_to_test = ["work-orders", "equipments", "users", "inventory", "vendors", 
+                          "intervention-requests", "improvement-requests", "improvements", 
+                          "locations", "meters"]
+        
+        for module in modules_to_test:
+            results[f"import_{module.replace('-', '_')}"] = False
+        
+        # Test 1: Admin Login
+        results["admin_login"] = self.test_admin_login()
+        
+        if not results["admin_login"]:
+            self.log("❌ Cannot proceed with other tests - Admin login failed", "ERROR")
+            return results
+        
+        # Test 2: Import "Toutes les données" multi-sheet Excel (CRITICAL TEST)
+        results["import_all_multi_sheet"] = self.test_import_all_multi_sheet()
+        
+        # Test 3: Individual module imports
+        for module in modules_to_test:
+            if module != "purchase-history":  # Skip purchase-history as mentioned in requirements
+                results[f"import_{module.replace('-', '_')}"] = self.test_individual_module_import(module)
+        
+        # Test 4: Column mapping validation
+        results["column_mapping_validation"] = self.test_column_mapping_validation()
+        
+        # Summary
+        self.log("=" * 70)
+        self.log("IMPORT/EXPORT TEST RESULTS SUMMARY")
+        self.log("=" * 70)
+        
+        passed = sum(results.values())
+        total = len(results)
+        
+        # Critical test results
+        self.log("\n🎯 CRITICAL TESTS (User-reported issues):")
+        critical_tests = ["import_all_multi_sheet"]
+        for test in critical_tests:
+            if test in results:
+                status = "✅ PASS" if results[test] else "❌ FAIL"
+                self.log(f"  {test}: {status}")
+        
+        # Individual module tests
+        self.log("\n📋 INDIVIDUAL MODULE IMPORTS:")
+        failed_modules = []
+        passed_modules = []
+        
+        for module in modules_to_test:
+            test_key = f"import_{module.replace('-', '_')}"
+            if test_key in results:
+                status = "✅ PASS" if results[test_key] else "❌ FAIL"
+                self.log(f"  {module}: {status}")
+                if results[test_key]:
+                    passed_modules.append(module)
+                else:
+                    failed_modules.append(module)
+        
+        # Other tests
+        self.log("\n🔧 OTHER TESTS:")
+        other_tests = ["admin_login", "column_mapping_validation"]
+        for test in other_tests:
+            if test in results:
+                status = "✅ PASS" if results[test] else "❌ FAIL"
+                self.log(f"  {test}: {status}")
+        
+        self.log(f"\n📊 Overall: {passed}/{total} tests passed")
+        
+        # Detailed analysis
+        if results.get("import_all_multi_sheet", False):
+            self.log("🎉 CRITICAL SUCCESS: Import 'Toutes les données' is working!")
+            self.log("✅ Fixed: 'can only use .str accessor with string value !' error resolved")
+        else:
+            self.log("🚨 CRITICAL FAILURE: Import 'Toutes les données' still failing!")
+            self.log("❌ The pandas string accessor error may still exist")
+        
+        if len(passed_modules) > 0:
+            self.log(f"✅ Individual imports working for: {', '.join(passed_modules)}")
+        
+        if len(failed_modules) > 0:
+            self.log(f"❌ Individual imports failing for: {', '.join(failed_modules)}")
+            self.log("❌ These modules may still show 'impossible de charger les données'")
+        
+        if passed == total:
+            self.log("🎉 ALL IMPORT/EXPORT TESTS PASSED!")
+            self.log("✅ Both user-reported issues have been resolved:")
+            self.log("  1. Import 'Toutes les données' works without pandas errors")
+            self.log("  2. Individual module imports work without loading errors")
+        else:
+            self.log("⚠️ Some import/export tests failed - Issues may still exist")
+            failed_tests = [test for test, result in results.items() if not result]
+            self.log(f"❌ Failed tests: {', '.join(failed_tests)}")
+        
+        return results
     
     def create_qhse_user(self):
         """Create a QHSE user with specific permissions"""
