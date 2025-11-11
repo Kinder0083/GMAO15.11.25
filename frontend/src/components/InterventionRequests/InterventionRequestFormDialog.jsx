@@ -18,6 +18,7 @@ import { validateDateNotPast } from '../../utils/dateValidation';
 
 const InterventionRequestFormDialog = ({ open, onOpenChange, request, onSuccess }) => {
   const { toast } = useToast();
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
   const [loading, setLoading] = useState(false);
   const [equipments, setEquipments] = useState([]);
   const [locations, setLocations] = useState([]);
