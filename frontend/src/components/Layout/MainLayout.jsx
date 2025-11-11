@@ -586,6 +586,15 @@ const MainLayout = () => {
           <Outlet />
         </div>
       </div>
+      
+      {/* Popups */}
+      <FirstLoginPasswordDialog 
+        open={firstLoginDialogOpen}
+        onClose={() => setFirstLoginDialogOpen(false)}
+      />
+      
+      {/* Popup de mise à jour récente (tous les utilisateurs) */}
+      <RecentUpdatePopup />
     </div>
   );
 };
