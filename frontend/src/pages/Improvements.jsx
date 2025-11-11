@@ -178,7 +178,7 @@ const Improvements = () => {
     }
   };
 
-  const filteredImprovements = workOrders.filter(wo => {
+  const filteredImprovements = improvements.filter(wo => {
     const matchesSearch = wo.titre.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (wo.numero && wo.numero.toString().includes(searchTerm));
     const matchesStatus = filterStatus === 'ALL' || wo.statut === filterStatus;
