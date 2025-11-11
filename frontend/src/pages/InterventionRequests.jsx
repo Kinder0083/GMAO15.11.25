@@ -119,6 +119,14 @@ const InterventionRequests = () => {
     return new Date(dateString).toLocaleDateString('fr-FR');
   };
 
+  const isOverdue = (dateString, statut) => {
+    if (!dateString || statut === 'TERMINE' || statut === 'ANNULE') return false;
+    const dueDate = new Date(dateString);
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+    return dueDate < today;
+  };
+
   const canConvert = user && (user.role === 'ADMIN' || user.role === 'TECHNICIEN');
 
   return (
