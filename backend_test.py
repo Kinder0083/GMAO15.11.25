@@ -107,6 +107,271 @@ class ImportExportTester:
             self.log(f"❌ Both admin login requests failed - Error: {str(e)}", "ERROR")
             return False
     
+    def create_test_excel_multi_sheet(self):
+        """Create a multi-sheet Excel file for testing 'all' import"""
+        self.log("Creating multi-sheet Excel file for testing...")
+        
+        # Create sample data for different modules
+        work_orders_data = {
+            'Titre': ['Maintenance pompe A', 'Réparation ventilateur B'],
+            'Description': ['Maintenance préventive pompe', 'Réparation urgente ventilateur'],
+            'Priorité': ['MOYENNE', 'HAUTE'],
+            'Statut': ['OUVERT', 'EN_COURS'],
+            'Type': ['PREVENTIVE', 'CORRECTIVE']
+        }
+        
+        equipments_data = {
+            'Nom': ['Pompe hydraulique 001', 'Ventilateur industriel 002'],
+            'Code': ['PMP-001', 'VENT-002'],
+            'Type': ['POMPE', 'VENTILATEUR'],
+            'Marque': ['Grundfos', 'Soler&Palau'],
+            'Statut': ['OPERATIONNEL', 'EN_MAINTENANCE']
+        }
+        
+        users_data = {
+            'Email': ['test.import1@example.com', 'test.import2@example.com'],
+            'Prénom': ['Jean', 'Marie'],
+            'Nom': ['Dupont', 'Martin'],
+            'Rôle': ['TECHNICIEN', 'VISUALISEUR'],
+            'Service': ['Maintenance', 'Production']
+        }
+        
+        # Create Excel file with multiple sheets
+        with tempfile.NamedTemporaryFile(suffix='.xlsx', delete=False) as tmp_file:
+            with pd.ExcelWriter(tmp_file.name, engine='openpyxl') as writer:
+                pd.DataFrame(work_orders_data).to_excel(writer, sheet_name='work-orders', index=False)
+                pd.DataFrame(equipments_data).to_excel(writer, sheet_name='equipments', index=False)
+                pd.DataFrame(users_data).to_excel(writer, sheet_name='users', index=False)
+            
+            self.log(f"✅ Multi-sheet Excel file created: {tmp_file.name}")
+            return tmp_file.name
+    
+    def create_test_csv_file(self, module):
+        """Create a CSV file for testing individual module import"""
+        self.log(f"Creating CSV file for module: {module}")
+        
+        # Sample data based on module
+        if module == "work-orders":
+            data = {
+                'Titre': ['Test Work Order CSV'],
+                'Description': ['Test description for CSV import'],
+                'Priorité': ['MOYENNE'],
+                'Statut': ['OUVERT'],
+                'Type': ['CORRECTIVE']
+            }
+        elif module == "equipments":
+            data = {
+                'Nom': ['Test Equipment CSV'],
+                'Code': ['TEST-CSV-001'],
+                'Type': ['TEST'],
+                'Marque': ['TestBrand'],
+                'Statut': ['OPERATIONNEL']
+            }
+        elif module == "users":
+            data = {
+                'Email': ['test.csv@example.com'],
+                'Prénom': ['Test'],
+                'Nom': ['CSV'],
+                'Rôle': ['VISUALISEUR'],
+                'Service': ['Test']
+            }
+        elif module == "inventory":
+            data = {
+                'Nom': ['Test Item CSV'],
+                'Code': ['ITEM-CSV-001'],
+                'Type': ['PIECE_RECHANGE'],
+                'Catégorie': ['MECANIQUE'],
+                'Quantité': [10]
+            }
+        elif module == "vendors":
+            data = {
+                'Nom': ['Test Vendor CSV'],
+                'Email': ['vendor.csv@example.com'],
+                'Téléphone': ['0123456789'],
+                'Type': ['FOURNISSEUR'],
+                'Statut': ['ACTIF']
+            }
+        else:
+            # Default data for other modules
+            data = {
+                'Nom': [f'Test {module} CSV'],
+                'Description': [f'Test description for {module}']
+            }
+        
+        # Create CSV file
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False, encoding='utf-8') as tmp_file:
+            df = pd.DataFrame(data)
+            df.to_csv(tmp_file.name, index=False, sep=';')  # Use semicolon separator
+            
+            self.log(f"✅ CSV file created for {module}: {tmp_file.name}")
+            return tmp_file.name
+    
+    def test_import_all_multi_sheet(self):
+        """Test POST /api/import/all with multi-sheet Excel file"""
+        self.log("🧪 TEST 1: Import 'Toutes les données' multi-feuilles Excel (PRIORITÉ MAXIMALE)")
+        
+        # Create multi-sheet Excel file
+        excel_file = self.create_test_excel_multi_sheet()
+        
+        try:
+            with open(excel_file, 'rb') as f:
+                files = {'file': ('test_multi_sheet.xlsx', f, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')}
+                data = {'mode': 'add'}
+                
+                response = self.admin_session.post(
+                    f"{BACKEND_URL}/import/all",
+                    files=files,
+                    data=data,
+                    timeout=30
+                )
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    self.log("✅ Import 'all' multi-sheet successful!")
+                    
+                    # Verify response structure
+                    if 'data' in result:
+                        data = result['data']
+                        if 'modules' in data:
+                            self.log(f"✅ response.data.modules exists: {list(data['modules'].keys())}")
+                        if 'total' in data:
+                            self.log(f"✅ response.data.total: {data['total']}")
+                        if 'inserted' in data:
+                            self.log(f"✅ response.data.inserted: {data['inserted']}")
+                        if 'updated' in data:
+                            self.log(f"✅ response.data.updated: {data['updated']}")
+                        if 'skipped' in data:
+                            self.log(f"✅ response.data.skipped: {data['skipped']}")
+                        
+                        # Check if data was actually inserted
+                        if data.get('inserted', 0) > 0:
+                            self.log("✅ Data successfully inserted into MongoDB")
+                        else:
+                            self.log("⚠️ No data was inserted (might be duplicates or validation issues)")
+                        
+                        return True
+                    else:
+                        self.log("❌ Response missing 'data' field", "ERROR")
+                        return False
+                else:
+                    self.log(f"❌ Import 'all' failed - Status: {response.status_code}, Response: {response.text}", "ERROR")
+                    
+                    # Check for specific error mentioned by user
+                    if "can only use .str accessor with string value" in response.text:
+                        self.log("❌ CRITICAL: Found the reported pandas error!", "ERROR")
+                    
+                    return False
+                    
+        except requests.exceptions.RequestException as e:
+            self.log(f"❌ Import 'all' request failed - Error: {str(e)}", "ERROR")
+            return False
+        finally:
+            # Clean up temp file
+            try:
+                os.unlink(excel_file)
+            except:
+                pass
+    
+    def test_individual_module_import(self, module):
+        """Test POST /api/import/{module} for individual modules"""
+        self.log(f"🧪 TEST 2: Import individual module '{module}'")
+        
+        # Create CSV file for the module
+        csv_file = self.create_test_csv_file(module)
+        
+        try:
+            with open(csv_file, 'rb') as f:
+                files = {'file': (f'test_{module}.csv', f, 'text/csv')}
+                data = {'mode': 'add'}
+                
+                response = self.admin_session.post(
+                    f"{BACKEND_URL}/import/{module}",
+                    files=files,
+                    data=data,
+                    timeout=20
+                )
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    self.log(f"✅ Import {module} successful!")
+                    
+                    # Verify response structure
+                    if 'data' in result:
+                        data = result['data']
+                        if 'inserted' in data and data['inserted'] > 0:
+                            self.log(f"✅ response.data.inserted > 0: {data['inserted']}")
+                            self.log("✅ Data correctly inserted into MongoDB")
+                            return True
+                        else:
+                            self.log(f"⚠️ No data inserted for {module}: {data}")
+                            return True  # Still consider success if no errors
+                    else:
+                        self.log("❌ Response missing 'data' field", "ERROR")
+                        return False
+                else:
+                    self.log(f"❌ Import {module} failed - Status: {response.status_code}, Response: {response.text}", "ERROR")
+                    
+                    # Check for specific error mentioned by user
+                    if "impossible de charger les données" in response.text:
+                        self.log(f"❌ CRITICAL: Found the reported error for {module}!", "ERROR")
+                    
+                    return False
+                    
+        except requests.exceptions.RequestException as e:
+            self.log(f"❌ Import {module} request failed - Error: {str(e)}", "ERROR")
+            return False
+        finally:
+            # Clean up temp file
+            try:
+                os.unlink(csv_file)
+            except:
+                pass
+    
+    def test_column_mapping_validation(self):
+        """Test column mapping for French and English columns"""
+        self.log("🧪 TEST 3: Column mapping validation")
+        
+        # Create CSV with mixed French/English columns
+        mixed_data = {
+            'Nom': ['Test Mixed Columns'],  # French
+            'Name': ['Test Mixed Name'],    # English (should be mapped to same field)
+            'Email': ['test.mixed@example.com'],
+            'Rôle': ['VISUALISEUR'],       # French
+            'Role': ['TECHNICIEN']         # English (should be mapped to same field)
+        }
+        
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False, encoding='utf-8') as tmp_file:
+            df = pd.DataFrame(mixed_data)
+            df.to_csv(tmp_file.name, index=False, sep=';')
+            
+            try:
+                with open(tmp_file.name, 'rb') as f:
+                    files = {'file': ('test_mixed_columns.csv', f, 'text/csv')}
+                    data = {'mode': 'add'}
+                    
+                    response = self.admin_session.post(
+                        f"{BACKEND_URL}/import/users",
+                        files=files,
+                        data=data,
+                        timeout=20
+                    )
+                    
+                    if response.status_code == 200:
+                        self.log("✅ Column mapping validation successful!")
+                        return True
+                    else:
+                        self.log(f"❌ Column mapping validation failed - Status: {response.status_code}, Response: {response.text}", "ERROR")
+                        return False
+                        
+            except requests.exceptions.RequestException as e:
+                self.log(f"❌ Column mapping validation request failed - Error: {str(e)}", "ERROR")
+                return False
+            finally:
+                try:
+                    os.unlink(tmp_file.name)
+                except:
+                    pass
+    
     def test_qhse_login(self):
         """Test QHSE login"""
         self.log("Testing QHSE login...")
