@@ -2675,7 +2675,7 @@ async def import_data(
                 "Valeur actuelle": "currentValue",
                 "Current Value": "currentValue"
             },
-            "people": {
+            "users": {
                 "ID": "id",
                 "Email": "email",
                 "Prénom": "prenom",
