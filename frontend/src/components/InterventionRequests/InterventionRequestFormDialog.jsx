@@ -71,6 +71,20 @@ const InterventionRequestFormDialog = ({ open, onOpenChange, request, onSuccess 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validation de la date limite désirée
+    if (formData.date_limite_desiree) {
+      const dateValidation = validateDateNotPast(formData.date_limite_desiree, user);
+      if (!dateValidation.valid) {
+        toast({
+          title: 'Erreur',
+          description: dateValidation.message,
+          variant: 'destructive'
+        });
+        return;
+      }
+    }
+    
     setLoading(true);
 
     try {
