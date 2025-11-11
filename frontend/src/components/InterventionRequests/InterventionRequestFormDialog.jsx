@@ -14,6 +14,7 @@ import { Textarea } from '../ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { useToast } from '../../hooks/use-toast';
 import { interventionRequestsAPI, equipmentsAPI, locationsAPI } from '../../services/api';
+import { validateDateNotPast } from '../../utils/dateValidation';
 
 const InterventionRequestFormDialog = ({ open, onOpenChange, request, onSuccess }) => {
   const { toast } = useToast();
