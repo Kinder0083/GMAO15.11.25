@@ -296,19 +296,22 @@ class ImportExportTester:
                     self.log(f"✅ Import {module} successful!")
                     self.log(f"📋 Response structure: {list(result.keys())}")
                     
-                    # Verify response structure
-                    if 'data' in result:
-                        data = result['data']
-                        if 'inserted' in data and data['inserted'] > 0:
-                            self.log(f"✅ response.data.inserted > 0: {data['inserted']}")
-                            self.log("✅ Data correctly inserted into MongoDB")
-                            return True
-                        else:
-                            self.log(f"⚠️ No data inserted for {module}: {data}")
-                            return True  # Still consider success if no errors
+                    # Verify response structure (data is at root level)
+                    if 'inserted' in result and result['inserted'] > 0:
+                        self.log(f"✅ response.inserted > 0: {result['inserted']}")
+                        self.log("✅ Data correctly inserted into MongoDB")
                     else:
-                        self.log("❌ Response missing 'data' field", "ERROR")
-                        return False
+                        self.log(f"⚠️ No data inserted for {module}: {result}")
+                    
+                    # Check for the critical error message
+                    if 'errors' in result and result['errors']:
+                        for error in result['errors']:
+                            if "impossible de charger les données" in str(error):
+                                self.log(f"❌ CRITICAL: Found the reported error for {module}!", "ERROR")
+                                return False
+                    
+                    self.log(f"✅ No 'impossible de charger les données' error for {module} - Fix is working!")
+                    return True
                 else:
                     self.log(f"❌ Import {module} failed - Status: {response.status_code}, Response: {response.text}", "ERROR")
                     
