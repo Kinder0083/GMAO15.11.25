@@ -2546,7 +2546,11 @@ async def import_data(
         if module not in EXPORT_MODULES and module != "all":
             raise HTTPException(status_code=400, detail="Module invalide")
         
-        collection_name = EXPORT_MODULES[module]
+        # Déterminer les modules à traiter
+        if module == "all":
+            modules_to_import = EXPORT_MODULES
+        else:
+            modules_to_import = {module: EXPORT_MODULES[module]}
         
         # Lire le fichier
         content = await file.read()
