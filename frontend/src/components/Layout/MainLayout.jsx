@@ -25,6 +25,8 @@ import {
   Sparkles
 } from 'lucide-react';
 import FirstLoginPasswordDialog from '../Common/FirstLoginPasswordDialog';
+import UpdateNotificationBadge from '../Common/UpdateNotificationBadge';
+import RecentUpdatePopup from '../Common/RecentUpdatePopup';
 import { usePermissions } from '../../hooks/usePermissions';
 
 const MainLayout = () => {
