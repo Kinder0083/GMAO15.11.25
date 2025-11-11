@@ -48,6 +48,85 @@ app = FastAPI(title="GMAO Atlas API", version="1.0.0")
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
+# Initialiser le scheduler pour les tâches automatiques
+scheduler = AsyncIOScheduler()
+
+# Fonction pour vérifier et créer automatiquement les bons de travail pour les maintenances échues
+async def auto_check_preventive_maintenance():
+    """Fonction exécutée automatiquement chaque jour pour vérifier les maintenances échues"""
+    try:
+        logger.info("🔄 Vérification automatique des maintenances préventives échues...")
+        
+        today = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+        
+        # Trouver toutes les maintenances actives dont la date est aujourd'hui ou passée
+        pm_list = await db.preventive_maintenances.find({
+            "statut": "ACTIF",
+            "prochaineMaintenance": {"$lte": today + timedelta(days=1)}
+        }).to_list(length=None)
+        
+        created_count = 0
+        updated_count = 0
+        errors = []
+        
+        for pm in pm_list:
+            try:
+                # Récupérer l'équipement
+                equipement = await db.equipments.find_one({"_id": ObjectId(pm["equipement_id"])})
+                
+                # Créer le bon de travail
+                wo_id = str(uuid.uuid4())
+                work_order = {
+                    "_id": ObjectId(),
+                    "id": wo_id,
+                    "numero": f"PM-{datetime.utcnow().strftime('%Y%m%d')}-{secrets.token_hex(3).upper()}",
+                    "titre": f"Maintenance préventive: {pm['titre']}",
+                    "description": f"Maintenance automatique générée depuis la planification préventive '{pm['titre']}'",
+                    "type": "PREVENTIF",
+                    "priorite": "NORMALE",
+                    "statut": "OUVERT",
+                    "equipement_id": pm["equipement_id"],
+                    "emplacement_id": equipement.get("emplacement_id") if equipement else None,
+                    "assigne_a_id": pm.get("assigne_a_id"),
+                    "tempsEstime": pm.get("duree"),
+                    "dateLimite": datetime.utcnow() + timedelta(days=7),
+                    "dateCreation": datetime.utcnow(),
+                    "createdBy": "system-auto",
+                    "comments": [],
+                    "attachments": [],
+                    "historique": []
+                }
+                
+                await db.work_orders.insert_one(work_order)
+                created_count += 1
+                logger.info(f"✅ Bon de travail créé: {work_order['numero']} pour PM '{pm['titre']}'")
+                
+                # Calculer la prochaine date de maintenance
+                next_date = calculate_next_maintenance_date(pm["prochaineMaintenance"], pm["frequence"])
+                
+                # Mettre à jour la maintenance préventive
+                await db.preventive_maintenances.update_one(
+                    {"_id": pm["_id"]},
+                    {
+                        "$set": {
+                            "prochaineMaintenance": next_date,
+                            "derniereMaintenance": datetime.utcnow()
+                        }
+                    }
+                )
+                updated_count += 1
+                logger.info(f"✅ Prochaine maintenance mise à jour: {next_date.strftime('%Y-%m-%d')} (fréquence: {pm['frequence']})")
+                
+            except Exception as e:
+                error_msg = f"Erreur pour PM '{pm.get('titre', 'Unknown')}': {str(e)}"
+                errors.append(error_msg)
+                logger.error(f"❌ {error_msg}")
+        
+        logger.info(f"✅ Vérification terminée: {created_count} bons créés, {updated_count} maintenances mises à jour, {len(errors)} erreurs")
+        
+    except Exception as e:
+        logger.error(f"❌ Erreur lors de la vérification automatique des maintenances: {str(e)}")
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
