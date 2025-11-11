@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Backend API Testing Script for GMAO Application
-Tests Import/Export functionality - Module Import/Export Error Corrections
+Tests Preventive Maintenance endpoint after Pydantic model correction
 """
 
 import requests
@@ -15,11 +15,9 @@ from datetime import datetime, timedelta
 # Use the correct backend URL from frontend .env
 BACKEND_URL = "https://fixitnow-20.preview.emergentagent.com/api"
 
-# Test credentials - try both admin accounts
-ADMIN_EMAIL_1 = "admin@gmao-iris.local"
-ADMIN_PASSWORD_1 = "Admin123!"
-ADMIN_EMAIL_2 = "buenogy@gmail.com"
-ADMIN_PASSWORD_2 = "nmrojvbvgb"
+# Test credentials - admin account as specified in the request
+ADMIN_EMAIL = "admin@gmao-iris.local"
+ADMIN_PASSWORD = "Iris2024!"
 
 class ImportExportTester:
     def __init__(self):
