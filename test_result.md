@@ -601,11 +601,11 @@ backend:
 
   - task: "API Import/Export - Fix errors for all modules and multi-sheet imports"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "critical"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: false
         agent: "user"
@@ -637,6 +637,46 @@ backend:
           FICHIERS MODIFIÉS:
           - /app/backend/server.py: Lignes 2836, 2678-2720, 2729-2746
           - /app/frontend/src/pages/ImportExport.jsx: Lignes 82-94
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ CORRECTIONS VALIDÉES - TESTS COMPLETS RÉUSSIS (13/13)
+          
+          🎯 TEST CRITIQUE 1: Import "Toutes les données" multi-feuilles Excel
+          - ✅ POST /api/import/all avec fichier Excel multi-feuilles: SUCCESS (200 OK)
+          - ✅ Pas d'erreur "can only use .str accessor with string value !": CONFIRMÉ
+          - ✅ response.modules existe: ['work-orders', 'equipments', 'users']
+          - ✅ response.total: 6, inserted: 6, updated: 0, skipped: 0
+          - ✅ Données réellement insérées dans MongoDB: CONFIRMÉ
+          - ✅ Fix ligne 2836 fonctionne parfaitement
+          
+          🎯 TEST CRITIQUE 2: Imports individuels pour TOUS les modules
+          Testés avec succès (10/10 modules):
+          - ✅ work-orders: SUCCESS (inserted: 1)
+          - ✅ equipments: SUCCESS (inserted: 1)
+          - ✅ users: SUCCESS (inserted: 1)
+          - ✅ inventory: SUCCESS (inserted: 1)
+          - ✅ vendors: SUCCESS (inserted: 1)
+          - ✅ intervention-requests: SUCCESS (inserted: 1)
+          - ✅ improvement-requests: SUCCESS (inserted: 1)
+          - ✅ improvements: SUCCESS (inserted: 1)
+          - ✅ locations: SUCCESS (inserted: 1)
+          - ✅ meters: SUCCESS (inserted: 1)
+          
+          🎯 TEST CRITIQUE 3: Column mapping validation
+          - ✅ Fichier avec colonnes françaises ET anglaises: SUCCESS
+          - ✅ Mapping pour nouveaux modules (inventory, vendors): FONCTIONNEL
+          - ✅ "people" et "users" tous deux acceptés: CONFIRMÉ
+          
+          📊 RÉSULTATS FINAUX:
+          - ✅ Pas d'erreur 500 sur aucun module
+          - ✅ Pas de message "impossible de charger les données"
+          - ✅ Toutes les données correctement insérées dans MongoDB
+          - ✅ Column mappings fonctionnent pour tous les modules
+          
+          🎉 CONCLUSION: Les 2 problèmes reportés par l'utilisateur sont ENTIÈREMENT RÉSOLUS
+          1. Import "Toutes les données" fonctionne sans erreurs pandas
+          2. Imports individuels fonctionnent sans erreurs de chargement
 
 frontend:
   - task: "Test critique - Tableau de bord pour utilisateur QHSE avec permissions limitées"
