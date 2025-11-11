@@ -1577,6 +1577,27 @@ agent_communication:
       
       📊 STATUT: BUG CRITIQUE ENTIÈREMENT RÉSOLU
       La page fonctionne parfaitement et respecte tous les critères du cahier des charges.
+  - agent: "testing"
+    message: |
+      ✅ TEST CRITIQUE TERMINÉ - Page Bons de Travail après correction enum Priority
+      
+      🎯 RÉSULTATS DU TEST (Novembre 2025):
+      - ✅ Connexion admin réussie (admin@gmao-iris.local / Admin123!)
+      - ✅ Navigation vers /work-orders: SUCCESS
+      - ✅ AUCUN message d'erreur "impossible de charger les bons de travail"
+      - ✅ Titre "Ordres de travail" affiché correctement
+      - ✅ Tableau des ordres de travail présent avec 3 ordres visibles
+      - ✅ Priorités "Normale" correctement affichées (pas d'erreur de validation)
+      - ✅ API /api/work-orders répond 200 OK avec 66 bons de travail
+      - ✅ Page complètement chargée sans blocage
+      
+      🔧 CORRECTION VALIDÉE:
+      L'ajout de `NORMALE = "NORMALE"` à l'enum Priority dans models.py ligne 267
+      résout entièrement le problème de validation Pydantic qui causait l'erreur 500.
+      
+      📊 STATUT: BUG CRITIQUE ENTIÈREMENT RÉSOLU
+      La page Bons de Travail se charge parfaitement et toutes les priorités sont acceptées:
+      HAUTE, MOYENNE, NORMALE, BASSE, AUCUNE.
 
   - agent: "testing"
     message: |
