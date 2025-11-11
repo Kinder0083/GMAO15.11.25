@@ -1918,6 +1918,57 @@ agent_communication:
       💻 FRONTEND - Pages et composants créés:
       1. Pages principales:
          - /app/frontend/src/pages/ImprovementRequests.jsx
+  - agent: "main"
+    message: |
+      🔧 CORRECTIONS IMPORT/EXPORT MODULE EFFECTUÉES - PRÊT POUR TESTS
+      
+      ✅ PROBLÈMES IDENTIFIÉS ET CORRIGÉS:
+      
+      **1. ERREUR "can only use .str accessor with string value !"**:
+      - CAUSE: df.columns.str.strip() échouait quand les colonnes n'étaient pas des strings
+      - FIX: Conversion explicite en string: [str(col).strip() if col is not None else f'col_{i}' for i, col in enumerate(df.columns)]
+      - IMPACT: Import "Toutes les données" devrait maintenant fonctionner
+      
+      **2. MODULES MANQUANTS - Column Mappings**:
+      - AJOUTÉ: inventory (nom, code, type, catégorie, quantité, zone)
+      - AJOUTÉ: vendors (nom, email, téléphone, adresse, type, statut)
+      - CORRIGÉ: "people" → "users" pour cohérence avec EXPORT_MODULES
+      
+      **3. SHEET MAPPING AMÉLIORÉ**:
+      - AJOUTÉ: Support "users" ET "people" → mappent vers "users"
+      - AJOUTÉ: Support "vendors" ET "fournisseurs" → mappent vers "vendors"
+      - IMPACT: Import multi-feuilles Excel plus flexible
+      
+      **4. FRONTEND IMPORT "ALL"**:
+      - SUPPRIMÉ: Blocage artificiel d'import "all"
+      - AJOUTÉ: Validation pour fichier .xlsx requis pour "all"
+      
+      📋 TESTS À EFFECTUER PAR BACKEND TESTING AGENT:
+      
+      **TEST 1: Import "Toutes les données" (multi-feuilles Excel)**
+      - Créer fichier Excel avec feuilles: work-orders, equipments, users, etc.
+      - POST /api/import/all avec fichier .xlsx
+      - VÉRIFIER: Pas d'erreur "can only use .str accessor"
+      - VÉRIFIER: response.data.modules contient stats pour chaque feuille
+      - VÉRIFIER: response.data.total, inserted, updated, skipped corrects
+      
+      **TEST 2: Imports individuels pour tous les modules**
+      - Tester: work-orders, equipments, intervention-requests, improvements, meters, users, vendors, inventory, locations
+      - Pour chaque module: POST /api/import/{module} avec CSV ou Excel
+      - VÉRIFIER: Pas d'erreur "impossible de charger les données"
+      - VÉRIFIER: Données correctement importées dans MongoDB
+      
+      **TEST 3: Column mapping validation**
+      - Tester avec fichiers ayant colonnes françaises ET anglaises
+      - VÉRIFIER: Mapping correct pour inventory et vendors
+      - VÉRIFIER: "people" et "users" tous deux acceptés
+      
+      🎯 FICHIERS MODIFIÉS:
+      - /app/backend/server.py (ligne 2836, 2678-2720, 2729-2746)
+      - /app/frontend/src/pages/ImportExport.jsx (lignes 82-94)
+      
+      Backend redémarré avec succès. Prêt pour tests approfondis.
+
          - /app/frontend/src/pages/Improvements.jsx
       
       2. Composants ImprovementRequests:
