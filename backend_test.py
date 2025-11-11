@@ -25,7 +25,7 @@ ADMIN_PASSWORD_2 = "Admin123!"
 QHSE_EMAIL = "test_qhse@test.com"
 QHSE_PASSWORD = "Test123!"
 
-class QHSEPermissionsTester:
+class ImportExportTester:
     def __init__(self):
         self.admin_session = requests.Session()
         self.qhse_session = requests.Session()
