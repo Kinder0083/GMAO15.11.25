@@ -213,8 +213,10 @@ const InterventionRequests = () => {
                       <td className="py-3 px-4 text-sm text-gray-600">
                         {req.equipement ? req.equipement.nom : '-'}
                       </td>
-                      <td className="py-3 px-4 text-sm text-gray-600">
-                        {formatDate(req.date_limite_desiree)}
+                      <td className="py-3 px-4 text-sm">
+                        <span className={isOverdue(req.date_limite_desiree, req.statut) ? 'text-red-600 font-medium' : 'text-gray-600'}>
+                          {formatDate(req.date_limite_desiree)}
+                        </span>
                       </td>
                       <td className="py-3 px-4 text-sm text-gray-600">
                         {formatDate(req.date_creation)}
