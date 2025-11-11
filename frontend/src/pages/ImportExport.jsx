@@ -79,10 +79,11 @@ const ImportExport = () => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (selectedModule === 'all') {
+    // Vérifier le format pour "all"
+    if (selectedModule === 'all' && !file.name.endsWith('.xlsx')) {
       toast({
         title: 'Erreur',
-        description: 'Veuillez sélectionner un module spécifique pour l\'import',
+        description: 'Pour importer toutes les données, utilisez un fichier Excel (.xlsx) multi-feuilles',
         variant: 'destructive'
       });
       event.target.value = '';
