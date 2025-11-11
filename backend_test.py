@@ -477,8 +477,16 @@ class ImportExportTester:
             self.log(f"❌ Failed tests: {', '.join(failed_tests)}")
         
         return results
+
+if __name__ == "__main__":
+    tester = ImportExportTester()
+    results = tester.run_import_export_tests()
     
-    def create_qhse_user(self):
+    # Exit with appropriate code
+    if all(results.values()):
+        exit(0)  # Success
+    else:
+        exit(1)  # Failure
         """Create a QHSE user with specific permissions"""
         self.log("Creating QHSE user with QHSE role and specific permissions...")
         
