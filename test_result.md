@@ -752,6 +752,54 @@ backend:
           - La page Maintenance Préventive fonctionne parfaitement
           - Tous les critères de test du cahier des charges sont respectés
 
+  - task: "API GET /api/work-orders - Correction enum Priority pour valeur NORMALE"
+    implemented: true
+    working: true
+    file: "/app/backend/models.py"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "user"
+        comment: |
+          PROBLÈME CRITIQUE REPORTÉ:
+          - L'endpoint GET /api/work-orders retournait une erreur 500 avec ValidationError
+          - Message: "Input should be 'HAUTE', 'MOYENNE', 'BASSE' or 'AUCUNE' [type=enum, input_value='NORMALE', input_type=str]"
+          - Certains bons de travail dans la base de données avaient la priorité "NORMALE"
+          - Cette valeur n'était pas définie dans l'enum Priority
+      - working: "NA"
+        agent: "main"
+        comment: |
+          CORRECTION EFFECTUÉE:
+          - Ajout de `NORMALE = "NORMALE"` à l'enum Priority dans /app/backend/models.py ligne 267
+          - L'enum Priority contient maintenant: HAUTE, MOYENNE, NORMALE, BASSE, AUCUNE
+          - Permet aux bons de travail avec priorité "NORMALE" d'être correctement sérialisés
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ CORRECTION VALIDÉE - TESTS COMPLETS RÉUSSIS (3/3)
+          
+          🎯 TEST CRITIQUE: GET /api/work-orders après correction enum Priority
+          - ✅ Connexion admin réussie (admin@gmao-iris.local / Admin123!)
+          - ✅ GET /api/work-orders: SUCCESS (200 OK)
+          - ✅ Réponse JSON valide avec 66 bons de travail
+          - ✅ Bons de travail avec priorité "NORMALE": 2 trouvés
+          - ✅ Bons de travail avec priorité "AUCUNE": 64 trouvés
+          - ✅ Aucune erreur pydantic_core.ValidationError détectée
+          - ✅ Aucune erreur 500 Internal Server Error
+          
+          📊 VÉRIFICATIONS TECHNIQUES:
+          - ✅ Enum Priority ligne 267: NORMALE = "NORMALE" présent
+          - ✅ Les bons de travail avec priorité "NORMALE" sont inclus dans la réponse
+          - ✅ Sérialisation Pydantic fonctionne correctement
+          - ✅ Toutes les priorités acceptées: HAUTE, MOYENNE, NORMALE, BASSE, AUCUNE
+          
+          🎉 CONCLUSION: La correction de l'enum Priority est ENTIÈREMENT RÉUSSIE
+          - L'endpoint GET /api/work-orders fonctionne sans erreurs de validation
+          - Les bons de travail avec priorité "NORMALE" sont correctement retournés
+          - Plus d'erreur ValidationError pour le champ priorite
+
 frontend:
   - task: "Test critique - Tableau de bord pour utilisateur QHSE avec permissions limitées"
     implemented: true
