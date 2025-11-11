@@ -77,3 +77,9 @@ watchfiles==1.1.0
 xlrd==2.0.2
 xlsxwriter==3.2.9
 apscheduler
+tzlocal==5.3.1
+attrs==25.4.0
+frozenlist==1.8.0
+multidict==6.7.0
+propcache==0.4.1
+yarl==1.22.0
