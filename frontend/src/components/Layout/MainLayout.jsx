@@ -204,7 +204,7 @@ const MainLayout = () => {
       }
       
       // Charger les maintenances préventives arrivées à échéance (si permission)
-      if (canView('preventiveMaintenance')) {
+      if (canViewModule('preventiveMaintenance')) {
         try {
           const pmResponse = await fetch(`${backend_url}/api/preventive-maintenance`, {
             headers: { Authorization: `Bearer ${token}` }
