@@ -131,13 +131,13 @@ const Improvements = () => {
       
       // Mise à jour silencieuse : comparer avant de mettre à jour
       const newImprovements = response.data;
-      if (JSON.stringify(newImprovements) !== JSON.stringify(workOrders)) {
+      if (JSON.stringify(newImprovements) !== JSON.stringify(improvements)) {
         setImprovements(newImprovements);
       }
     } catch (error) {
       toast({
         title: 'Erreur',
-        description: 'Impossible de charger les ordres de travail',
+        description: 'Impossible de charger les améliorations',
         variant: 'destructive'
       });
     } finally {
