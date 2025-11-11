@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
-import { Plus, Search, Eye, Pencil, Trash2, Wrench } from 'lucide-react';
+import { Plus, Search, Eye, Pencil, Trash2, Wrench, AlertCircle } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../components/ui/tooltip';
 import ImprovementRequestDialog from '../components/ImprovementRequests/ImprovementRequestDialog';
 import ImprovementRequestFormDialog from '../components/ImprovementRequests/ImprovementRequestFormDialog';
