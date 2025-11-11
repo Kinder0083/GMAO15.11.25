@@ -232,8 +232,8 @@ const MainLayout = () => {
           if (irResponse.ok) {
             const interventionRequests = await irResponse.json();
             const overdueIR = interventionRequests.filter(ir => {
-              if (!ir.dateSouhaitee || ir.statut === 'TERMINE' || ir.statut === 'ANNULE') return false;
-              const dueDate = new Date(ir.dateSouhaitee);
+              if (!ir.date_limite_desiree || ir.statut === 'TERMINE' || ir.statut === 'ANNULE') return false;
+              const dueDate = new Date(ir.date_limite_desiree);
               return dueDate < today;
             });
             if (overdueIR.length > 0) {
