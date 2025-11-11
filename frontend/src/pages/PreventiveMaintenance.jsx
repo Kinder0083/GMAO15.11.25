@@ -8,11 +8,17 @@ import { useToast } from '../hooks/use-toast';
 
 const PreventiveMaintenance = () => {
   const { toast } = useToast();
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
   const [maintenance, setMaintenance] = useState([]);
   const [loading, setLoading] = useState(true);
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [selectedMaintenance, setSelectedMaintenance] = useState(null);
   const [viewMode, setViewMode] = useState('list'); // 'list' ou 'tree'
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [maintenanceToDelete, setMaintenanceToDelete] = useState(null);
+
+  // Vérifier les permissions
+  const canDelete = user?.permissions?.preventiveMaintenance?.delete === true;
 
   // Fonction pour afficher le badge de statut
   const getStatusBadge = (statut) => {
