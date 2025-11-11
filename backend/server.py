@@ -2551,42 +2551,151 @@ async def import_data(
         # Lire le fichier
         content = await file.read()
         
-        # Mapping des colonnes pour purchase-history (basé sur Requêteur.xlsx)
-        purchase_column_mapping = {
-            # Colonnes avec espaces en trop
-            "Fournisseur": "fournisseur",
-            "N° Commande ": "numeroCommande",  # Espace à la fin
-            "N° Commande": "numeroCommande",
-            "N° reception": "numeroReception",
-            "Date de création": "dateCreation",
-            "Article": "article",
-            "Description 1": "description",  # Nom exact du CSV
-            "Description": "description",
-            "Groupe statistique": "groupeStatistique",
-            "Groupe statistique STK": "groupeStatistique",
-            "STK quantité": "quantite",  # Nom exact du CSV
-            "quantité": "quantite",
-            "Quantité": "quantite",
-            "Montant ligne HT": "montantLigneHT",
-            "Quantité retournée": "quantiteRetournee",
-            "Site ": "site",  # Espace à la fin
-            "Site": "site",
-            "Creation user": "creationUser"
+        # Mappings de colonnes pour chaque module
+        column_mappings = {
+            "purchase-history": {
+                "Fournisseur": "fournisseur",
+                "N° Commande ": "numeroCommande",
+                "N° Commande": "numeroCommande",
+                "N° reception": "numeroReception",
+                "Date de création": "dateCreation",
+                "Article": "article",
+                "Description 1": "description",
+                "Description": "description",
+                "Groupe statistique": "groupeStatistique",
+                "Groupe statistique STK": "groupeStatistique",
+                "STK quantité": "quantite",
+                "quantité": "quantite",
+                "Quantité": "quantite",
+                "Montant ligne HT": "montantLigneHT",
+                "Quantité retournée": "quantiteRetournee",
+                "Site ": "site",
+                "Site": "site",
+                "Creation user": "creationUser"
+            },
+            "work-orders": {
+                "ID": "id",
+                "Titre": "title",
+                "Title": "title",
+                "Description": "description",
+                "Priorité": "priority",
+                "Priority": "priority",
+                "Statut": "status",
+                "Status": "status",
+                "Date création": "dateCreation",
+                "Date début": "dateDebut",
+                "Date fin": "dateFin",
+                "Équipement": "equipment",
+                "Equipment": "equipment",
+                "Assigné à": "assignedTo",
+                "Assigned To": "assignedTo",
+                "Type": "type"
+            },
+            "equipments": {
+                "ID": "id",
+                "Nom": "name",
+                "Name": "name",
+                "Code": "code",
+                "Type": "type",
+                "Marque": "brand",
+                "Brand": "brand",
+                "Modèle": "model",
+                "Model": "model",
+                "Numéro de série": "serialNumber",
+                "Serial Number": "serialNumber",
+                "Zone": "location",
+                "Location": "location",
+                "Statut": "status",
+                "Status": "status",
+                "Date installation": "installDate"
+            },
+            "intervention-requests": {
+                "ID": "id",
+                "Titre": "title",
+                "Title": "title",
+                "Description": "description",
+                "Priorité": "priority",
+                "Priority": "priority",
+                "Statut": "status",
+                "Status": "status",
+                "Date création": "dateCreation",
+                "Équipement": "equipment",
+                "Equipment": "equipment",
+                "Demandeur": "requestedBy",
+                "Requested By": "requestedBy"
+            },
+            "improvement-requests": {
+                "ID": "id",
+                "Titre": "title",
+                "Title": "title",
+                "Description": "description",
+                "Priorité": "priority",
+                "Priority": "priority",
+                "Statut": "status",
+                "Status": "status",
+                "Date création": "dateCreation",
+                "Demandeur": "requestedBy"
+            },
+            "improvements": {
+                "ID": "id",
+                "Titre": "title",
+                "Title": "title",
+                "Description": "description",
+                "Priorité": "priority",
+                "Priority": "priority",
+                "Statut": "status",
+                "Status": "status",
+                "Date création": "dateCreation",
+                "Date début": "dateDebut",
+                "Date fin": "dateFin",
+                "Assigné à": "assignedTo"
+            },
+            "locations": {
+                "ID": "id",
+                "Nom": "name",
+                "Name": "name",
+                "Code": "code",
+                "Type": "type",
+                "Parent": "parent",
+                "Description": "description"
+            },
+            "meters": {
+                "ID": "id",
+                "Nom": "name",
+                "Name": "name",
+                "Type": "type",
+                "Équipement": "equipment",
+                "Equipment": "equipment",
+                "Unité": "unit",
+                "Unit": "unit",
+                "Valeur actuelle": "currentValue",
+                "Current Value": "currentValue"
+            },
+            "people": {
+                "ID": "id",
+                "Email": "email",
+                "Prénom": "prenom",
+                "First Name": "prenom",
+                "Nom": "nom",
+                "Last Name": "nom",
+                "Rôle": "role",
+                "Role": "role",
+                "Téléphone": "telephone",
+                "Phone": "telephone",
+                "Service": "service"
+            }
         }
         
         try:
             if file.filename.endswith('.csv'):
                 # Détecter automatiquement le séparateur CSV
                 content_str = content.decode('utf-8', errors='ignore')
-                # Essayer de détecter le séparateur
                 first_line = content_str.split('\n')[0] if content_str else ""
                 
-                # Compter les séparateurs potentiels
                 comma_count = first_line.count(',')
                 semicolon_count = first_line.count(';')
                 tab_count = first_line.count('\t')
                 
-                # Choisir le séparateur le plus fréquent
                 if semicolon_count > comma_count and semicolon_count > tab_count:
                     separator = ';'
                 elif tab_count > comma_count:
@@ -2594,18 +2703,15 @@ async def import_data(
                 else:
                     separator = ','
                 
-                logger.info(f"📋 Séparateur détecté: '{separator}' (virgule={comma_count}, point-virgule={semicolon_count}, tab={tab_count})")
-                
+                logger.info(f"📋 Séparateur détecté: '{separator}'")
                 df = pd.read_csv(io.BytesIO(content), sep=separator, encoding='utf-8')
-                logger.info(f"✅ CSV lu avec succès: {len(df)} lignes, {len(df.columns)} colonnes")
-                logger.info(f"📋 Colonnes: {list(df.columns)}")
+                logger.info(f"✅ CSV lu: {len(df)} lignes, {len(df.columns)} colonnes")
                 
             elif file.filename.endswith(('.xlsx', '.xls', '.xlsb')):
-                # Stratégie multi-tentatives pour les fichiers Excel
                 df = None
                 errors = []
                 
-                # Tentative 1: openpyxl (moderne, .xlsx)
+                # Tentatives multiples de lecture
                 if file.filename.endswith('.xlsx'):
                     try:
                         df = pd.read_excel(io.BytesIO(content), engine='openpyxl')
@@ -2613,7 +2719,6 @@ async def import_data(
                     except Exception as e1:
                         errors.append(f"openpyxl: {str(e1)[:100]}")
                 
-                # Tentative 2: xlrd (ancien format .xls)
                 if df is None:
                     try:
                         df = pd.read_excel(io.BytesIO(content), engine='xlrd')
@@ -2621,7 +2726,6 @@ async def import_data(
                     except Exception as e2:
                         errors.append(f"xlrd: {str(e2)[:100]}")
                 
-                # Tentative 3: pyxlsb (format binaire .xlsb)
                 if df is None and file.filename.endswith('.xlsb'):
                     try:
                         df = pd.read_excel(io.BytesIO(content), engine='pyxlsb')
@@ -2629,7 +2733,6 @@ async def import_data(
                     except Exception as e3:
                         errors.append(f"pyxlsb: {str(e3)[:100]}")
                 
-                # Tentative 4: Méthode par défaut (sans engine spécifique)
                 if df is None:
                     try:
                         df = pd.read_excel(io.BytesIO(content))
@@ -2637,30 +2740,29 @@ async def import_data(
                     except Exception as e4:
                         errors.append(f"default: {str(e4)[:100]}")
                 
-                # Si toutes les tentatives ont échoué
                 if df is None:
                     error_msg = "Impossible de lire le fichier Excel. Erreurs:\n" + "\n".join(errors)
                     error_msg += "\n\n💡 Solutions:\n"
                     error_msg += "1. Ouvrez le fichier dans Excel et sauvegardez-le à nouveau\n"
-                    error_msg += "2. Exportez en CSV depuis Excel: Fichier > Enregistrer sous > CSV\n"
-                    error_msg += "3. Utilisez un fichier Excel plus simple sans styles complexes"
+                    error_msg += "2. Exportez en CSV depuis Excel\n"
+                    error_msg += "3. Utilisez un fichier Excel plus simple"
                     raise HTTPException(status_code=400, detail=error_msg)
             else:
-                raise HTTPException(status_code=400, detail="Format de fichier non supporté (CSV, XLSX, XLS ou XLSB uniquement)")
+                raise HTTPException(status_code=400, detail="Format non supporté (CSV, XLSX, XLS ou XLSB)")
         except HTTPException:
             raise
         except Exception as e:
             raise HTTPException(
                 status_code=400, 
-                detail=f"Erreur de lecture: {str(e)}. Essayez de sauvegarder le fichier en CSV depuis Excel."
+                detail=f"Erreur de lecture: {str(e)}. Essayez CSV."
             )
         
-        # Appliquer le mapping des colonnes pour purchase-history
-        if module == "purchase-history":
-            df = df.rename(columns=purchase_column_mapping)
-            
-            # Nettoyer les noms de colonnes (enlever espaces en trop)
-            df.columns = df.columns.str.strip()
+        # Appliquer le mapping des colonnes si disponible
+        if module in column_mappings:
+            df = df.rename(columns=column_mappings[module])
+        
+        # Nettoyer les noms de colonnes
+        df.columns = df.columns.str.strip()
         
         # Convertir en dictionnaires
         items_to_import = df.to_dict('records')
@@ -2678,47 +2780,63 @@ async def import_data(
                 # Nettoyer les NaN
                 cleaned_item = {k: v for k, v in item.items() if pd.notna(v)}
                 
-                # Traitement spécifique pour purchase-history
+                # Traitement spécifique purchase-history
                 if module == "purchase-history":
-                    # S'assurer que les champs numériques sont corrects
                     for num_field in ["quantite", "montantLigneHT", "quantiteRetournee"]:
                         if num_field in cleaned_item:
                             try:
-                                # Convertir les virgules en points pour les nombres français
                                 value = cleaned_item[num_field]
                                 if isinstance(value, str):
-                                    # Remplacer virgule par point et enlever espaces
                                     value = value.replace(',', '.').replace(' ', '')
                                 cleaned_item[num_field] = float(value)
                             except:
                                 if num_field == "quantiteRetournee":
                                     cleaned_item[num_field] = 0.0
                                 elif num_field == "quantite":
-                                    logger.warning(f"Ligne {idx+1}: quantite invalide '{cleaned_item.get(num_field)}'")
                                     cleaned_item[num_field] = 0.0
                     
-                    # Convertir les dates (format français DD/MM/YYYY)
+                    # Convertir dates françaises
                     if "dateCreation" in cleaned_item:
                         try:
                             date_val = cleaned_item["dateCreation"]
                             if isinstance(date_val, str):
-                                # Format français DD/MM/YYYY
                                 if '/' in date_val:
                                     parts = date_val.split('/')
                                     if len(parts) == 3:
-                                        # Créer date au format ISO
                                         cleaned_item["dateCreation"] = f"{parts[2]}-{parts[1].zfill(2)}-{parts[0].zfill(2)}"
                                 cleaned_item["dateCreation"] = datetime.fromisoformat(cleaned_item["dateCreation"])
                             elif hasattr(date_val, 'to_pydatetime'):
                                 cleaned_item["dateCreation"] = date_val.to_pydatetime()
                         except Exception as e:
-                            logger.warning(f"Ligne {idx+1}: date invalide '{cleaned_item.get('dateCreation')}': {e}")
+                            logger.warning(f"Ligne {idx+1}: date invalide")
                             pass
                     
-                    # Ajouter dateEnregistrement et creationUser
                     cleaned_item["dateEnregistrement"] = datetime.utcnow()
                     if "creationUser" not in cleaned_item or not cleaned_item["creationUser"]:
                         cleaned_item["creationUser"] = current_user.get("email", "import")
+                
+                # Traitement générique pour les autres modules
+                else:
+                    # Convertir les dates
+                    date_fields = ["dateCreation", "dateDebut", "dateFin", "installDate", "dateEnregistrement"]
+                    for date_field in date_fields:
+                        if date_field in cleaned_item:
+                            try:
+                                date_val = cleaned_item[date_field]
+                                if isinstance(date_val, str):
+                                    if '/' in date_val:
+                                        parts = date_val.split('/')
+                                        if len(parts) == 3:
+                                            cleaned_item[date_field] = f"{parts[2]}-{parts[1].zfill(2)}-{parts[0].zfill(2)}"
+                                    cleaned_item[date_field] = datetime.fromisoformat(cleaned_item[date_field])
+                                elif hasattr(date_val, 'to_pydatetime'):
+                                    cleaned_item[date_field] = date_val.to_pydatetime()
+                            except:
+                                pass
+                    
+                    # Ajouter métadonnées
+                    if "dateCreation" not in cleaned_item:
+                        cleaned_item["dateCreation"] = datetime.utcnow()
                 
                 # Gérer l'ID
                 item_id = cleaned_item.get('id')
@@ -2726,23 +2844,28 @@ async def import_data(
                     del cleaned_item['id']
                 
                 if mode == "replace" and item_id:
-                    # Vérifier si l'item existe
-                    existing = await db[collection_name].find_one({"_id": ObjectId(item_id)})
-                    
-                    if existing:
-                        # Mettre à jour
-                        await db[collection_name].replace_one(
-                            {"_id": ObjectId(item_id)},
-                            cleaned_item
-                        )
-                        stats["updated"] += 1
-                    else:
-                        # Insérer avec l'ID spécifié
-                        cleaned_item["_id"] = ObjectId(item_id)
+                    try:
+                        existing = await db[collection_name].find_one({"_id": ObjectId(item_id)})
+                        
+                        if existing:
+                            await db[collection_name].replace_one(
+                                {"_id": ObjectId(item_id)},
+                                cleaned_item
+                            )
+                            stats["updated"] += 1
+                        else:
+                            cleaned_item["_id"] = ObjectId(item_id)
+                            await db[collection_name].insert_one(cleaned_item)
+                            stats["inserted"] += 1
+                    except:
+                        # Si l'ID n'est pas valide, insérer comme nouveau
+                        if "_id" in cleaned_item:
+                            del cleaned_item["_id"]
+                        cleaned_item["_id"] = ObjectId()
                         await db[collection_name].insert_one(cleaned_item)
                         stats["inserted"] += 1
                 else:
-                    # Mode add - toujours insérer un nouveau
+                    # Mode add
                     if "_id" in cleaned_item:
                         del cleaned_item["_id"]
                     cleaned_item["_id"] = ObjectId()
@@ -2751,13 +2874,16 @@ async def import_data(
             
             except Exception as e:
                 stats["skipped"] += 1
-                stats["errors"].append(f"Ligne {stats['inserted'] + stats['updated'] + stats['skipped']}: {str(e)}")
+                error_msg = f"Ligne {stats['inserted'] + stats['updated'] + stats['skipped']}: {str(e)[:100]}"
+                stats["errors"].append(error_msg)
+                logger.warning(error_msg)
         
         return stats
     
     except HTTPException:
         raise
     except Exception as e:
+        logger.error(f"Erreur import: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 # ==================== UPDATE ROUTES ====================
