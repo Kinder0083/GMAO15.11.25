@@ -19,18 +19,11 @@ BACKEND_URL = "https://fixitnow-20.preview.emergentagent.com/api"
 ADMIN_EMAIL = "admin@gmao-iris.local"
 ADMIN_PASSWORD = "Iris2024!"
 
-class ImportExportTester:
+class PreventiveMaintenanceTester:
     def __init__(self):
         self.admin_session = requests.Session()
         self.admin_token = None
         self.admin_data = None
-        
-        # Available modules for import/export
-        self.available_modules = [
-            "intervention-requests", "work-orders", "improvement-requests", 
-            "improvements", "equipments", "meters", "meter-readings", 
-            "users", "inventory", "locations", "vendors", "purchase-history"
-        ]
         
     def log(self, message, level="INFO"):
         """Log test messages with timestamp"""
