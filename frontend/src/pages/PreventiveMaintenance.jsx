@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from '../components/ui/dialog';
 import { Plus, Calendar, Clock, CheckCircle, List, Grid, Trash2 } from 'lucide-react';
 import PreventiveMaintenanceFormDialog from '../components/PreventiveMaintenance/PreventiveMaintenanceFormDialog';
 import { preventiveMaintenanceAPI, workOrdersAPI } from '../services/api';
