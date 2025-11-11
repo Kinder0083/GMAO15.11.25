@@ -4725,6 +4725,106 @@ async def delete_improvement(imp_id: str, current_user: dict = Depends(require_p
     return {"message": "Amélioration supprimée"}
 
 
+# ==================== UPDATE MANAGEMENT ENDPOINTS ====================
+from update_service import UpdateService
+
+# Initialiser le service de mise à jour
+update_service = UpdateService(db)
+
+@api_router.get("/updates/check")
+async def check_updates(current_user: dict = Depends(get_current_admin_user)):
+    """
+    Vérifie si une mise à jour est disponible (Admin uniquement)
+    """
+    try:
+        update_info = await update_service.check_for_updates()
+        return update_info if update_info else {"available": False, "current_version": update_service.current_version}
+    except Exception as e:
+        logger.error(f"❌ Erreur vérification mises à jour: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/updates/status")
+async def get_update_status(current_user: dict = Depends(get_current_admin_user)):
+    """
+    Récupère le statut actuel des mises à jour (Admin uniquement)
+    """
+    try:
+        status = await update_service.get_update_status()
+        return status
+    except Exception as e:
+        logger.error(f"❌ Erreur récupération statut: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/updates/dismiss/{version}")
+async def dismiss_update(version: str, current_user: dict = Depends(get_current_admin_user)):
+    """
+    Marque une notification de mise à jour comme dismissée (Admin uniquement)
+    """
+    try:
+        await update_service.dismiss_update_notification(version)
+        return {"message": "Notification dismissée"}
+    except Exception as e:
+        logger.error(f"❌ Erreur dismiss notification: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/updates/apply")
+async def apply_update(
+    version: str,
+    current_user: dict = Depends(get_current_admin_user)
+):
+    """
+    Applique une mise à jour (Admin uniquement)
+    Crée une sauvegarde complète, puis applique la MAJ et redémarre les services
+    """
+    try:
+        logger.info(f"🚀 Demande d'application de la mise à jour vers {version} par {current_user.get('email')}")
+        
+        # Enregistrer dans l'audit
+        await audit_service.log_action(
+            user_id=current_user.get("id"),
+            user_name=f"{current_user.get('prenom')} {current_user.get('nom')}",
+            user_email=current_user.get("email"),
+            action=ActionType.UPDATE,
+            entity_type=EntityType.SYSTEM,
+            entity_id="system",
+            entity_name=f"Mise à jour vers {version}"
+        )
+        
+        result = await update_service.apply_update(version)
+        
+        if result.get("success"):
+            return result
+        else:
+            raise HTTPException(status_code=500, detail=result.get("message"))
+            
+    except Exception as e:
+        logger.error(f"❌ Erreur application mise à jour: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/updates/recent-info")
+async def get_recent_update_info(current_user: dict = Depends(get_current_user)):
+    """
+    Récupère les informations des mises à jour récentes (pour le popup utilisateur)
+    Disponible pour tous les utilisateurs connectés
+    """
+    try:
+        info = await update_service.get_recent_updates_info(days=3)
+        return info
+    except Exception as e:
+        logger.error(f"❌ Erreur récupération info MAJ récente: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/updates/version")
+async def get_current_version():
+    """
+    Retourne la version actuelle de l'application (public)
+    """
+    return {
+        "version": update_service.current_version,
+        "app_name": "GMAO Iris"
+    }
+
+
 # Include the router in the main app (MUST be after all endpoint definitions)
 app.include_router(api_router)
 
