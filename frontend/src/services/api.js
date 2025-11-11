@@ -174,70 +174,76 @@ export const purchaseHistoryAPI = {
       params: { format },
       responseType: 'blob'
     }),
-  import: (file, format = 'csv') => {
+  deleteAll: () => api.delete('/purchase-history/all'),
+  create: (data) => api.post('/purchase-history', data),
+  update: (id, data) => api.put(`/purchase-history/${id}`, data),
+  delete: (id) => api.delete(`/purchase-history/${id}`)
+};
+
+// ==================== REPORTS ====================
+export const reportsAPI = {
+  getAnalytics: () => api.get('/reports/analytics')
+};
+
+// ==================== IMPORT/EXPORT ====================
+export const importExportAPI = {
+  exportData: (module, format = 'xlsx') => 
+    api.get(`/export/${module}`, { 
+      params: { format },
+      responseType: 'blob' 
+    }),
+  importData: (module, file, mode = 'add') => {
     const formData = new FormData();
     formData.append('file', file);
-    return api.post('/purchase-history/import', formData, {
-      params: { format },
+    return api.post(`/import/${module}`, formData, {
+      params: { mode },
       headers: { 'Content-Type': 'multipart/form-data' }
     });
   }
 };
 
-// ==================== REPORTS ====================
-export const reportsAPI = {
-  getAnalytics: () => api.get('/reports/analytics'),
-  getWorkOrdersReport: (params) => api.get('/reports/work-orders', { params }),
-  getEquipmentsReport: () => api.get('/reports/equipments'),
-  getMaintenanceReport: (params) => api.get('/reports/maintenance', { params }),
-  exportPDF: (reportType, params) => 
-    api.get(`/reports/${reportType}/pdf`, {
+// ==================== AUDIT LOGS (JOURNAL) ====================
+export const auditAPI = {
+  getAuditLogs: async (params) => {
+    const response = await api.get('/audit-logs', { params });
+    return response.data;
+  },
+  getEntityHistory: async (entityType, entityId) => {
+    const response = await api.get(`/audit-logs/entity/${entityType}/${entityId}`);
+    return response.data;
+  },
+  exportAuditLogs: async (params) => {
+    const response = await api.get('/audit-logs/export', {
       params,
       responseType: 'blob'
-    }),
-  exportExcel: (reportType, params) =>
-    api.get(`/reports/${reportType}/excel`, {
-      params,
-      responseType: 'blob'
-    })
+    });
+    
+    // Créer un lien de téléchargement
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `audit_logs_${new Date().getTime()}.${params.format || 'csv'}`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    
+    return response;
+  }
 };
 
-// ==================== INTERVENTION REQUESTS ====================
-export const interventionRequestsAPI = {
-  getAll: (params) => api.get('/intervention-requests', { params }),
-  getById: (id) => api.get(`/intervention-requests/${id}`),
-  create: (data) => api.post('/intervention-requests', data),
-  update: (id, data) => api.put(`/intervention-requests/${id}`, data),
-  delete: (id) => api.delete(`/intervention-requests/${id}`),
-  convertToWorkOrder: (id, data) => api.post(`/intervention-requests/${id}/convert`, data),
-  addComment: (id, comment) => api.post(`/intervention-requests/${id}/comments`, { text: comment }),
-  getComments: (id) => api.get(`/intervention-requests/${id}/comments`)
+// ==================== WORK ORDER COMMENTS ====================
+export const commentsAPI = {
+  addWorkOrderComment: async (workOrderId, text) => {
+    const response = await api.post(`/work-orders/${workOrderId}/comments`, { text });
+    return response.data;
+  },
+  getWorkOrderComments: async (workOrderId) => {
+    const response = await api.get(`/work-orders/${workOrderId}/comments`);
+    return response.data;
+  }
 };
 
-// ==================== IMPROVEMENT REQUESTS ====================
-export const improvementRequestsAPI = {
-  getAll: (params) => api.get('/improvement-requests', { params }),
-  getById: (id) => api.get(`/improvement-requests/${id}`),
-  create: (data) => api.post('/improvement-requests', data),
-  update: (id, data) => api.put(`/improvement-requests/${id}`, data),
-  delete: (id) => api.delete(`/improvement-requests/${id}`),
-  convertToImprovement: (id, data) => api.post(`/improvement-requests/${id}/convert-to-improvement`, data),
-  addComment: (id, comment) => api.post(`/improvement-requests/${id}/comments`, { text: comment }),
-  getComments: (id) => api.get(`/improvement-requests/${id}/comments`)
-};
-
-// ==================== IMPROVEMENTS ====================
-export const improvementsAPI = {
-  getAll: (params) => api.get('/improvements', { params }),
-  getById: (id) => api.get(`/improvements/${id}`),
-  create: (data) => api.post('/improvements', data),
-  update: (id, data) => api.put(`/improvements/${id}`, data),
-  delete: (id) => api.delete(`/improvements/${id}`),
-  addComment: (id, comment) => api.post(`/improvements/${id}/comments`, { text: comment }),
-  getComments: (id) => api.get(`/improvements/${id}/comments`)
-};
-
-// ==================== METERS ====================
+// ==================== METERS (COMPTEURS) ====================
 export const metersAPI = {
   getAll: () => api.get('/meters'),
   getById: (id) => api.get(`/meters/${id}`),
@@ -245,40 +251,82 @@ export const metersAPI = {
   update: (id, data) => api.put(`/meters/${id}`, data),
   delete: (id) => api.delete(`/meters/${id}`),
   
-  // Readings
+  // Readings (Relevés)
   getReadings: (meterId, params) => api.get(`/meters/${meterId}/readings`, { params }),
   createReading: (meterId, data) => api.post(`/meters/${meterId}/readings`, data),
   deleteReading: (readingId) => api.delete(`/readings/${readingId}`),
-  
-  // Statistics
-  getStatistics: (meterId, params) => api.get(`/meters/${meterId}/statistics`, { params })
+  getStatistics: (meterId, period = 'month') => api.get(`/meters/${meterId}/statistics`, { params: { period } })
 };
 
-// ==================== IMPORT/EXPORT ====================
-export const importExportAPI = {
-  exportData: (module) => 
-    api.get(`/export/${module}`, {
-      responseType: 'blob'
-    }),
-  importData: (module, file) => {
+// ==================== INTERVENTION REQUESTS (DEMANDES D'INTERVENTION) ====================
+export const interventionRequestsAPI = {
+  getAll: () => api.get('/intervention-requests'),
+  getById: (id) => api.get(`/intervention-requests/${id}`),
+  create: (data) => api.post('/intervention-requests', data),
+  update: (id, data) => api.put(`/intervention-requests/${id}`, data),
+  delete: (id) => api.delete(`/intervention-requests/${id}`),
+  convertToWorkOrder: (id, assigneeId, dateLimite) => api.post(`/intervention-requests/${id}/convert-to-work-order`, null, { 
+    params: { 
+      assignee_id: assigneeId,
+      date_limite: dateLimite
+    } 
+  })
+};
+
+// ==================== IMPROVEMENT REQUESTS (DEMANDES D'AMÉLIORATION) ====================
+export const improvementRequestsAPI = {
+  getAll: () => api.get('/improvement-requests'),
+  getById: (id) => api.get(`/improvement-requests/${id}`),
+  create: (data) => api.post('/improvement-requests', data),
+  update: (id, data) => api.put(`/improvement-requests/${id}`, data),
+  delete: (id) => api.delete(`/improvement-requests/${id}`),
+  convertToImprovement: (id, assigneeId, dateLimite) => api.post(`/improvement-requests/${id}/convert-to-improvement`, null, { 
+    params: { 
+      assignee_id: assigneeId,
+      date_limite: dateLimite
+    } 
+  }),
+  
+  // Attachments
+  uploadAttachment: (id, file) => {
     const formData = new FormData();
     formData.append('file', file);
-    return api.post(`/import/${module}`, formData, {
+    return api.post(`/improvement-requests/${id}/attachments`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
-  }
+  },
+  downloadAttachment: (id, filename) => api.get(`/improvement-requests/${id}/attachments/${filename}`, {
+    responseType: 'blob'
+  }),
+  
+  // Comments
+  addComment: (id, text) => api.post(`/improvement-requests/${id}/comments`, { text }),
+  getComments: (id) => api.get(`/improvement-requests/${id}/comments`)
 };
 
-// ==================== AUDIT LOG ====================
-export const auditAPI = {
-  getAll: (params) => api.get('/audit', { params }),
-  getByUser: (userId, params) => api.get(`/audit/user/${userId}`, { params }),
-  getByEntity: (entityType, entityId, params) => api.get(`/audit/entity/${entityType}/${entityId}`, { params }),
-  exportLog: (params) => 
-    api.get('/audit/export', {
-      params,
-      responseType: 'blob'
-    })
+// ==================== IMPROVEMENTS (AMÉLIORATIONS) ====================
+export const improvementsAPI = {
+  getAll: (params) => api.get('/improvements', { params }),
+  getById: (id) => api.get(`/improvements/${id}`),
+  create: (data) => api.post('/improvements', data),
+  update: (id, data) => api.put(`/improvements/${id}`, data),
+  delete: (id) => api.delete(`/improvements/${id}`),
+  
+  // Attachments
+  uploadAttachment: (id, file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post(`/improvements/${id}/attachments`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  },
+  downloadAttachment: (id, filename) => api.get(`/improvements/${id}/attachments/${filename}`, {
+    responseType: 'blob'
+  }),
+  
+  // Comments
+  addComment: (id, text) => api.post(`/improvements/${id}/comments`, { text }),
+  getComments: (id) => api.get(`/improvements/${id}/comments`)
 };
 
 export default api;
