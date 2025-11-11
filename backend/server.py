@@ -1877,7 +1877,17 @@ def calculate_next_maintenance_date(current_date: datetime, frequency: str) -> d
 
 @api_router.post("/preventive-maintenance/check-and-execute")
 async def check_and_execute_due_maintenances(current_user: dict = Depends(get_current_admin_user)):
-    """Vérifie et exécute automatiquement les maintenances échues (admin uniquement)"""
+    """Vérifie et exécute MANUELLEMENT les maintenances échues (admin uniquement)"""
+    try:
+        logger.info(f"🔄 Vérification MANUELLE déclenchée par {current_user.get('email', 'Unknown')}")
+        await auto_check_preventive_maintenance()
+        return {"success": True, "message": "Vérification manuelle effectuée - Consultez les logs pour les détails"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/preventive-maintenance/check-and-execute-OLD")
+async def check_and_execute_due_maintenances_old(current_user: dict = Depends(get_current_admin_user)):
+    """Version détaillée pour debug (admin uniquement)"""
     try:
         today = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
         
