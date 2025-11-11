@@ -2740,7 +2740,8 @@ async def import_data(
                             "purchase-history": "purchase-history",
                             "purchase_history": "purchase-history",
                             "meters": "meters",
-                            "people": "people"
+                            "users": "users",
+                            "people": "users"  # Support both names
                         }
                         
                         for sheet_name, df in all_sheets.items():
