@@ -433,26 +433,36 @@ const MainLayout = () => {
                   <p className="text-xs text-gray-500 mt-1">{overdueCount} élément{overdueCount > 1 ? 's' : ''} en retard</p>
                 </div>
                 <div className="py-2 max-h-80 overflow-y-auto">
-                  {Object.entries(overdueDetails).map(([key, detail]) => (
-                    <button
-                      key={key}
-                      onClick={() => {
-                        navigate(detail.route);
-                        setOverdueMenuOpen(false);
-                      }}
-                      className="w-full px-4 py-3 hover:bg-gray-50 transition-colors flex items-center justify-between group"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                        <span className="text-sm text-gray-700 group-hover:text-orange-600 font-medium">
-                          {detail.label}
+                  {Object.entries(overdueDetails).map(([key, detail]) => {
+                    // Couleur selon la catégorie
+                    const categoryColors = {
+                      execution: { dot: 'bg-orange-500', text: 'text-orange-500', hover: 'group-hover:text-orange-600' },
+                      requests: { dot: 'bg-yellow-500', text: 'text-yellow-600', hover: 'group-hover:text-yellow-700' },
+                      maintenance: { dot: 'bg-blue-500', text: 'text-blue-500', hover: 'group-hover:text-blue-600' }
+                    };
+                    const colors = categoryColors[detail.category] || categoryColors.execution;
+                    
+                    return (
+                      <button
+                        key={key}
+                        onClick={() => {
+                          navigate(detail.route);
+                          setOverdueMenuOpen(false);
+                        }}
+                        className="w-full px-4 py-3 hover:bg-gray-50 transition-colors flex items-center justify-between group"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`w-2 h-2 ${colors.dot} rounded-full`}></div>
+                          <span className={`text-sm text-gray-700 ${colors.hover} font-medium`}>
+                            {detail.label}
+                          </span>
+                        </div>
+                        <span className={`text-sm font-semibold ${colors.text}`}>
+                          {detail.count}
                         </span>
-                      </div>
-                      <span className="text-sm font-semibold text-orange-500">
-                        {detail.count}
-                      </span>
-                    </button>
-                  ))}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
