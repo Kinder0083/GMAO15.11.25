@@ -158,6 +158,20 @@ const WorkOrderFormDialog = ({ open, onOpenChange, workOrder, onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validation de la date limite (pas dans le passé sauf pour admin)
+    if (formData.dateLimite) {
+      const dateValidation = validateDateNotPast(formData.dateLimite, user);
+      if (!dateValidation.valid) {
+        toast({
+          title: 'Erreur',
+          description: dateValidation.message,
+          variant: 'destructive'
+        });
+        return;
+      }
+    }
+    
     setLoading(true);
 
     try {
