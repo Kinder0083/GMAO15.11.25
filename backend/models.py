@@ -264,6 +264,7 @@ class WorkOrderStatus(str, Enum):
 class Priority(str, Enum):
     HAUTE = "HAUTE"
     MOYENNE = "MOYENNE"
+    NORMALE = "NORMALE"
     BASSE = "BASSE"
     AUCUNE = "AUCUNE"
 
