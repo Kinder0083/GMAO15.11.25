@@ -394,7 +394,7 @@ const MainLayout = () => {
         </div>
 
         <div className="flex items-center gap-4">
-          {/* Icône rappel échéances avec menu déroulant */}
+          {/* Icône rappel échéances avec 3 badges */}
           <div className="relative">
             <button 
               onClick={() => setOverdueMenuOpen(!overdueMenuOpen)}
@@ -402,9 +402,25 @@ const MainLayout = () => {
               title="Échéances dépassées"
             >
               <img src="/rappel-calendrier.jpg" alt="Rappel" className="w-6 h-6 object-contain" />
-              {overdueCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                  {overdueCount > 9 ? '9+' : overdueCount}
+              
+              {/* Badge ORANGE - Coin supérieur droit - Work Orders + Improvements */}
+              {overdueExecutionCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-md">
+                  {overdueExecutionCount > 9 ? '9+' : overdueExecutionCount}
+                </span>
+              )}
+              
+              {/* Badge JAUNE - Coin supérieur gauche - Demandes d'inter. + Demandes d'amél. */}
+              {overdueRequestsCount > 0 && (
+                <span className="absolute -top-1 -left-1 w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-md">
+                  {overdueRequestsCount > 9 ? '9+' : overdueRequestsCount}
+                </span>
+              )}
+              
+              {/* Badge BLEU - Coin inférieur gauche - Maintenances préventives */}
+              {overdueMaintenanceCount > 0 && (
+                <span className="absolute -bottom-1 -left-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-md">
+                  {overdueMaintenanceCount > 9 ? '9+' : overdueMaintenanceCount}
                 </span>
               )}
             </button>
