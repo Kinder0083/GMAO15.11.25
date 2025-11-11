@@ -136,13 +136,21 @@ const MainLayout = () => {
       const token = localStorage.getItem('token');
       const backend_url = process.env.REACT_APP_BACKEND_URL;
       
+      // Récupérer les permissions depuis localStorage
+      const userInfo = localStorage.getItem('user');
+      const permissions = userInfo ? JSON.parse(userInfo).permissions : {};
+      
+      const canViewModule = (module) => {
+        return permissions[module]?.view === true;
+      };
+      
       const today = new Date();
       today.setHours(23, 59, 59, 999); // Fin de journée pour inclure aujourd'hui
       let total = 0;
       const details = {};
       
       // Charger les ordres de travail en retard (si permission)
-      if (canView('workOrders')) {
+      if (canViewModule('workOrders')) {
         try {
           const woResponse = await fetch(`${backend_url}/api/work-orders`, {
             headers: { Authorization: `Bearer ${token}` }
