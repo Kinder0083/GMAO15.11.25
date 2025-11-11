@@ -13,7 +13,7 @@ import tempfile
 from datetime import datetime, timedelta
 
 # Use the correct backend URL from frontend .env
-BACKEND_URL = "https://fixitnow-20.preview.emergentagent.com/api"
+BACKEND_URL = "https://github-auth-issue-1.preview.emergentagent.com/api"
 
 # Test credentials - admin account as specified in the request
 ADMIN_EMAIL = "admin@gmao-iris.local"
