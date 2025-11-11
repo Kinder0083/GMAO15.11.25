@@ -324,6 +324,18 @@ const PreventiveMaintenance = () => {
                     >
                       Exécuter maintenant
                     </Button>
+                    {canDelete && (
+                      <Button 
+                        variant="outline" 
+                        className="hover:bg-red-50 hover:text-red-600"
+                        onClick={() => {
+                          setMaintenanceToDelete(item);
+                          setDeleteDialogOpen(true);
+                        }}
+                      >
+                        <Trash2 size={16} />
+                      </Button>
+                    )}
                   </div>
                 </div>
               </CardContent>
