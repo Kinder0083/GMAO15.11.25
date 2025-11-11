@@ -4718,6 +4718,33 @@ async def delete_improvement(imp_id: str, current_user: dict = Depends(require_p
 # Include the router in the main app (MUST be after all endpoint definitions)
 app.include_router(api_router)
 
+@app.on_event("startup")
+async def startup_scheduler():
+    """Démarre le scheduler au démarrage de l'application"""
+    try:
+        # Configurer le scheduler pour s'exécuter chaque jour à minuit (heure locale)
+        scheduler.add_job(
+            auto_check_preventive_maintenance,
+            CronTrigger(hour=0, minute=0),  # Tous les jours à minuit
+            id='check_preventive_maintenance',
+            name='Vérification automatique maintenances préventives',
+            replace_existing=True
+        )
+        
+        scheduler.start()
+        logger.info("✅ Scheduler démarré - Vérification des maintenances préventives programmée chaque jour à minuit")
+        
+    except Exception as e:
+        logger.error(f"❌ Erreur lors du démarrage du scheduler: {str(e)}")
+
 @app.on_event("shutdown")
-async def shutdown_db_client():
+async def shutdown_services():
+    """Arrête les services lors de l'arrêt de l'application"""
+    try:
+        scheduler.shutdown()
+        logger.info("✅ Scheduler arrêté")
+    except Exception as e:
+        logger.error(f"❌ Erreur lors de l'arrêt du scheduler: {str(e)}")
+    
     client.close()
+    logger.info("✅ Connexion MongoDB fermée")
