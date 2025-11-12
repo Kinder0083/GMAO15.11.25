@@ -28,32 +28,6 @@ const API_BASE = `${BACKEND_URL}/api`;
 
 console.log('🔗 Backend URL configurée:', BACKEND_URL);
 
-// Sinon, utiliser l'URL configurée dans .env
-const getBackendURL = () => {
-  const hostname = window.location.hostname;
-  
-  // Si on accède via une IP locale (Tailscale: 100.x.x.x, LAN: 192.168.x.x, 10.x.x.x)
-  if (
-    hostname.match(/^100\./) || // Tailscale
-    hostname.match(/^192\.168\./) || // LAN
-    hostname.match(/^10\./) || // LAN
-    hostname.match(/^172\.(1[6-9]|2[0-9]|3[01])\./) || // LAN
-    hostname === 'localhost' ||
-    hostname === '127.0.0.1'
-  ) {
-    // Utiliser la même origine avec le port 8001
-    return `${window.location.protocol}//${hostname}:8001`;
-  }
-  
-  // Sinon, utiliser l'URL configurée pour la production
-  return process.env.REACT_APP_BACKEND_URL || `${window.location.protocol}//${window.location.hostname}`;
-};
-
-const BACKEND_URL = getBackendURL();
-const API_BASE = `${BACKEND_URL}/api`;
-
-console.log('🔗 Backend URL configurée:', BACKEND_URL);
-
 // Axios instance avec intercepteurs
 const api = axios.create({
   baseURL: API_BASE,
