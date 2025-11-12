@@ -31,6 +31,17 @@ log_warning() {
     echo -e "${YELLOW}[⚠]${NC} $1"
 }
 
+# Vérifier que le fichier .env existe
+if [ ! -f "/app/frontend/.env" ]; then
+    echo "❌ ERREUR: Le fichier /app/frontend/.env n'existe pas!"
+    echo ""
+    echo "Vérifiez que:"
+    echo "1. Vous êtes dans le container GMAO (pas sur Proxmox)"
+    echo "2. Le frontend est bien installé dans /app/frontend/"
+    echo ""
+    exit 1
+fi
+
 # 1. Sauvegarder l'ancien fichier
 log_info "Création de la sauvegarde..."
 BACKUP_DIR="/app/backups/env_backup_$(date +%Y%m%d_%H%M%S)"
