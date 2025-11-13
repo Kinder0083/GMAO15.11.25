@@ -2136,6 +2136,57 @@ async def update_user_permissions(
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+@api_router.post("/users/{user_id}/set-password-permanent")
+async def set_password_permanent(
+    user_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Marquer le mot de passe temporaire comme permanent (désactiver le changement obligatoire au premier login)
+    L'utilisateur peut uniquement modifier son propre statut, sauf si c'est un admin
+    """
+    try:
+        # Vérifier que l'utilisateur existe
+        user = await db.users.find_one({"_id": ObjectId(user_id)})
+        if not user:
+            raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+        
+        # Vérifier que l'utilisateur modifie son propre compte OU qu'il est admin
+        current_user_id = current_user.get("id")
+        is_admin = current_user.get("role") == "ADMIN"
+        
+        if str(user_id) != str(current_user_id) and not is_admin:
+            raise HTTPException(
+                status_code=403, 
+                detail="Vous ne pouvez modifier que votre propre statut"
+            )
+        
+        # Mettre à jour le champ firstLogin à False
+        await db.users.update_one(
+            {"_id": ObjectId(user_id)},
+            {"$set": {"firstLogin": False}}
+        )
+        
+        # Enregistrer l'action dans le journal d'audit
+        await log_action(
+            user_id=current_user_id,
+            action_type="update",
+            entity_type="user",
+            entity_id=user_id,
+            description=f"Mot de passe temporaire conservé comme permanent",
+            changes={"firstLogin": False}
+        )
+        
+        return {
+            "success": True,
+            "message": "Mot de passe conservé avec succès"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur serveur: {str(e)}")
+
+
 # ==================== VENDORS ROUTES ====================
 @api_router.get("/vendors", response_model=List[Vendor])
 async def get_vendors(current_user: dict = Depends(require_permission("vendors", "view"))):
