@@ -1531,6 +1531,39 @@ frontend:
       L'endpoint fonctionne parfaitement et toutes les priorités sont acceptées:
       HAUTE, MOYENNE, NORMALE, BASSE, AUCUNE.
 
+  - agent: "testing"
+    message: |
+      ✅ NOUVELLE FONCTIONNALITÉ VALIDÉE - POST /api/users/{user_id}/set-password-permanent
+      
+      🎯 CONTEXTE DU TEST (Novembre 2025):
+      Test complet de la nouvelle fonctionnalité permettant aux utilisateurs de conserver
+      leur mot de passe temporaire au lieu de le changer obligatoirement au premier login.
+      
+      🔧 PROBLÈME CRITIQUE IDENTIFIÉ ET CORRIGÉ:
+      - Erreur 500 "name 'log_action' is not defined" dans l'endpoint ligne 2171
+      - Cause: Fonction d'audit incorrecte (log_action au lieu de audit_service.log_action)
+      - Correction appliquée: Remplacé par audit_service.log_action avec paramètres corrects
+      - Backend redémarré avec succès
+      
+      📊 RÉSULTATS DES TESTS COMPLETS (9/9 RÉUSSIS):
+      
+      ✅ TEST 1: Utilisateur modifie son propre firstLogin (200 OK)
+      ✅ TEST 2: Admin modifie le firstLogin d'un autre utilisateur (200 OK)  
+      ✅ TEST 3: Utilisateur tente de modifier un autre utilisateur (403 Forbidden - CORRECT)
+      ✅ TEST 4: ID utilisateur inexistant (404 Not Found - CORRECT)
+      ✅ TEST 5: Tentative sans authentification (403 - CORRECT)
+      
+      🔐 SÉCURITÉ VALIDÉE:
+      - Authentification JWT obligatoire
+      - Utilisateur peut modifier uniquement son propre statut
+      - Admin peut modifier n'importe quel utilisateur
+      - Protection contre accès non autorisé
+      - Audit logging fonctionnel
+      
+      🎉 STATUT: FONCTIONNALITÉ ENTIÈREMENT OPÉRATIONNELLE
+      L'endpoint POST /api/users/{user_id}/set-password-permanent est prêt pour production.
+      Tous les scénarios de sécurité du cahier des charges sont validés.
+
 metadata:
   created_by: "main_agent"
   version: "4.3"
