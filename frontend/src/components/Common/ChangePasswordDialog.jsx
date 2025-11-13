@@ -100,10 +100,9 @@ const ChangePasswordDialog = ({ open, onOpenChange }) => {
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="old_password">Mot de passe actuel</Label>
-              <Input
+              <PasswordInput
                 id="old_password"
                 name="old_password"
-                type="password"
                 value={formData.old_password}
                 onChange={handleChange}
                 required
@@ -112,10 +111,9 @@ const ChangePasswordDialog = ({ open, onOpenChange }) => {
 
             <div className="space-y-2">
               <Label htmlFor="new_password">Nouveau mot de passe</Label>
-              <Input
+              <PasswordInput
                 id="new_password"
                 name="new_password"
-                type="password"
                 value={formData.new_password}
                 onChange={handleChange}
                 required
@@ -125,10 +123,9 @@ const ChangePasswordDialog = ({ open, onOpenChange }) => {
 
             <div className="space-y-2">
               <Label htmlFor="confirm_password">Confirmer le mot de passe</Label>
-              <Input
+              <PasswordInput
                 id="confirm_password"
                 name="confirm_password"
-                type="password"
                 value={formData.confirm_password}
                 onChange={handleChange}
                 required
