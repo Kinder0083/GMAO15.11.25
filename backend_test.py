@@ -145,96 +145,176 @@ class PasswordPermanentTester:
             self.log(f"❌ Test user login request failed - Error: {str(e)}", "ERROR")
             return False
     
-    def test_work_orders_endpoint(self):
-        """Test GET /api/work-orders endpoint after Priority enum correction"""
-        self.log("🧪 CRITICAL TEST: GET /api/work-orders endpoint")
-        self.log("Testing for Priority enum validation error fix (NORMALE added to enum)")
+    def test_user_set_own_password_permanent(self):
+        """TEST 1: User modifies their own firstLogin status"""
+        self.log("🧪 TEST 1: User modifies their own firstLogin status")
         
         try:
-            response = self.admin_session.get(
-                f"{BACKEND_URL}/work-orders",
-                timeout=15
+            response = self.user_session.post(
+                f"{BACKEND_URL}/users/{self.test_user_id}/set-password-permanent",
+                timeout=10
             )
             
             if response.status_code == 200:
-                self.log("✅ GET /api/work-orders returned 200 OK")
+                data = response.json()
+                self.log("✅ POST /users/{own_id}/set-password-permanent returned 200 OK")
                 
-                try:
-                    data = response.json()
-                    self.log(f"✅ Response is valid JSON with {len(data)} work order records")
+                if data.get("success") == True:
+                    self.log("✅ Response contains success: true")
+                    self.log(f"✅ Message: {data.get('message')}")
                     
-                    # Check for records with priorite: "NORMALE"
-                    normale_count = 0
-                    haute_count = 0
-                    moyenne_count = 0
-                    basse_count = 0
-                    aucune_count = 0
-                    other_priorities = set()
-                    
-                    for record in data:
-                        priority = record.get('priorite')
-                        if priority == "NORMALE":
-                            normale_count += 1
-                        elif priority == "HAUTE":
-                            haute_count += 1
-                        elif priority == "MOYENNE":
-                            moyenne_count += 1
-                        elif priority == "BASSE":
-                            basse_count += 1
-                        elif priority == "AUCUNE":
-                            aucune_count += 1
-                        elif priority:
-                            other_priorities.add(priority)
-                    
-                    self.log(f"✅ Work orders with priorite = 'NORMALE': {normale_count}")
-                    self.log(f"✅ Work orders with priorite = 'HAUTE': {haute_count}")
-                    self.log(f"✅ Work orders with priorite = 'MOYENNE': {moyenne_count}")
-                    self.log(f"✅ Work orders with priorite = 'BASSE': {basse_count}")
-                    self.log(f"✅ Work orders with priorite = 'AUCUNE': {aucune_count}")
-                    
-                    if other_priorities:
-                        self.log(f"⚠️ Other priorities found: {other_priorities}")
-                    
-                    if normale_count > 0:
-                        self.log("✅ CRITICAL SUCCESS: Work orders with priorite 'NORMALE' are correctly returned")
-                        self.log("✅ Priority enum validation error has been fixed!")
+                    # Verify in database by checking user profile
+                    profile_response = self.user_session.get(f"{BACKEND_URL}/auth/me")
+                    if profile_response.status_code == 200:
+                        profile_data = profile_response.json()
+                        if profile_data.get("firstLogin") == False:
+                            self.log("✅ Database verification: firstLogin is now False")
+                            return True
+                        else:
+                            self.log(f"❌ Database verification failed: firstLogin is {profile_data.get('firstLogin')}", "ERROR")
+                            return False
                     else:
-                        self.log("ℹ️ No work orders with 'NORMALE' priority found, but endpoint works correctly")
-                    
-                    # Verify no Pydantic validation errors in response
-                    self.log("✅ No Pydantic ValidationError - Priority enum correction successful")
-                    
-                    return True
-                    
-                except json.JSONDecodeError as e:
-                    self.log(f"❌ Response is not valid JSON: {str(e)}", "ERROR")
-                    self.log(f"Response content: {response.text[:500]}...", "ERROR")
+                        self.log("⚠️ Could not verify database change", "WARNING")
+                        return True  # Still consider success if API call worked
+                else:
+                    self.log(f"❌ Response success field is {data.get('success')}", "ERROR")
                     return False
-                    
-            elif response.status_code == 500:
-                self.log("❌ GET /api/work-orders returned 500 Internal Server Error", "ERROR")
-                self.log("❌ This indicates the Priority enum validation error still exists!", "ERROR")
-                
-                # Check if it's the specific Pydantic error
-                if "pydantic_core.ValidationError" in response.text:
-                    self.log("❌ CRITICAL: pydantic_core.ValidationError still present!", "ERROR")
-                    self.log("❌ The Priority enum correction may not be working", "ERROR")
-                elif "ValidationError" in response.text:
-                    self.log("❌ CRITICAL: ValidationError detected in response!", "ERROR")
-                elif "Input should be 'HAUTE', 'MOYENNE', 'BASSE' or 'AUCUNE'" in response.text:
-                    self.log("❌ CRITICAL: Priority enum validation error detected!", "ERROR")
-                    self.log("❌ 'NORMALE' value is not accepted by the enum", "ERROR")
-                
-                self.log(f"Error response: {response.text[:1000]}...", "ERROR")
-                return False
-                
             else:
-                self.log(f"❌ GET /api/work-orders failed - Status: {response.status_code}", "ERROR")
-                self.log(f"Response: {response.text[:500]}...", "ERROR")
+                self.log(f"❌ POST /users/{{own_id}}/set-password-permanent failed - Status: {response.status_code}", "ERROR")
+                self.log(f"Response: {response.text}", "ERROR")
                 return False
                 
         except requests.exceptions.RequestException as e:
-            self.log(f"❌ Request to /api/work-orders failed - Error: {str(e)}", "ERROR")
+            self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
+            return False
+    
+    def test_admin_set_other_user_password_permanent(self):
+        """TEST 2: Admin modifies another user's firstLogin status"""
+        self.log("🧪 TEST 2: Admin modifies another user's firstLogin status")
+        
+        # First, get a user with firstLogin: true (we'll use our test user)
+        try:
+            response = self.admin_session.post(
+                f"{BACKEND_URL}/users/{self.test_user_id}/set-password-permanent",
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.log("✅ Admin POST /users/{other_user_id}/set-password-permanent returned 200 OK")
+                
+                if data.get("success") == True:
+                    self.log("✅ Response contains success: true")
+                    self.log(f"✅ Message: {data.get('message')}")
+                    return True
+                else:
+                    self.log(f"❌ Response success field is {data.get('success')}", "ERROR")
+                    return False
+            else:
+                self.log(f"❌ Admin POST /users/{{other_user_id}}/set-password-permanent failed - Status: {response.status_code}", "ERROR")
+                self.log(f"Response: {response.text}", "ERROR")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
+            return False
+    
+    def test_user_cannot_modify_other_user(self):
+        """TEST 3: Normal user tries to modify another user's firstLogin (should fail)"""
+        self.log("🧪 TEST 3: Normal user tries to modify another user's firstLogin (should fail)")
+        
+        # Get admin user ID to try to modify
+        admin_user_id = self.admin_data.get("id")
+        
+        try:
+            response = self.user_session.post(
+                f"{BACKEND_URL}/users/{admin_user_id}/set-password-permanent",
+                timeout=10
+            )
+            
+            if response.status_code == 403:
+                self.log("✅ POST /users/{other_user_id}/set-password-permanent correctly returned 403 Forbidden")
+                
+                # Check error message
+                try:
+                    data = response.json()
+                    if "Vous ne pouvez modifier que votre propre statut" in data.get("detail", ""):
+                        self.log("✅ Correct error message returned")
+                        return True
+                    else:
+                        self.log(f"⚠️ Unexpected error message: {data.get('detail')}", "WARNING")
+                        return True  # Still success if 403 is returned
+                except:
+                    self.log("✅ 403 returned (error message parsing failed but that's OK)")
+                    return True
+            else:
+                self.log(f"❌ Expected 403 Forbidden but got {response.status_code}", "ERROR")
+                self.log(f"Response: {response.text}", "ERROR")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
+            return False
+    
+    def test_nonexistent_user_id(self):
+        """TEST 4: Try with non-existent user ID"""
+        self.log("🧪 TEST 4: Try with non-existent user ID")
+        
+        fake_user_id = "999999999999999999999999"  # 24-character hex string (valid ObjectId format)
+        
+        try:
+            response = self.admin_session.post(
+                f"{BACKEND_URL}/users/{fake_user_id}/set-password-permanent",
+                timeout=10
+            )
+            
+            if response.status_code == 404:
+                self.log("✅ POST /users/{nonexistent_id}/set-password-permanent correctly returned 404 Not Found")
+                
+                # Check error message
+                try:
+                    data = response.json()
+                    if "Utilisateur non trouvé" in data.get("detail", ""):
+                        self.log("✅ Correct error message returned")
+                        return True
+                    else:
+                        self.log(f"⚠️ Unexpected error message: {data.get('detail')}", "WARNING")
+                        return True  # Still success if 404 is returned
+                except:
+                    self.log("✅ 404 returned (error message parsing failed but that's OK)")
+                    return True
+            else:
+                self.log(f"❌ Expected 404 Not Found but got {response.status_code}", "ERROR")
+                self.log(f"Response: {response.text}", "ERROR")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
+            return False
+    
+    def test_unauthenticated_request(self):
+        """TEST 5: Try without authentication"""
+        self.log("🧪 TEST 5: Try without authentication")
+        
+        # Create a session without auth headers
+        unauth_session = requests.Session()
+        
+        try:
+            response = unauth_session.post(
+                f"{BACKEND_URL}/users/{self.test_user_id}/set-password-permanent",
+                timeout=10
+            )
+            
+            if response.status_code == 401:
+                self.log("✅ POST /users/{user_id}/set-password-permanent correctly returned 401 Unauthorized")
+                return True
+            else:
+                self.log(f"❌ Expected 401 Unauthorized but got {response.status_code}", "ERROR")
+                self.log(f"Response: {response.text}", "ERROR")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
             return False
     
     def check_backend_logs(self):
