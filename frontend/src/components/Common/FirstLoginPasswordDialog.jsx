@@ -114,7 +114,15 @@ const FirstLoginPasswordDialog = ({ open, onOpenChange, onSuccess, userId }) => 
 
     try {
       setLoading(true);
-      await authAPI.skipPasswordChange();
+      await usersAPI.setPasswordPermanent(userId);
+      
+      // Mettre à jour le localStorage pour retirer le flag firstLogin
+      const userInfo = localStorage.getItem('user');
+      if (userInfo) {
+        const parsedUser = JSON.parse(userInfo);
+        parsedUser.firstLogin = false;
+        localStorage.setItem('user', JSON.stringify(parsedUser));
+      }
       
       toast({
         title: 'Mot de passe conservé',
