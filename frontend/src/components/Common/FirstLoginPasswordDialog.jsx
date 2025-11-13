@@ -131,9 +131,8 @@ const FirstLoginPasswordDialog = ({ open, onOpenChange, onSuccess }) => {
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label htmlFor="oldPassword">Mot de passe actuel *</Label>
-              <Input
+              <PasswordInput
                 id="oldPassword"
-                type="password"
                 value={formData.oldPassword}
                 onChange={(e) => handleChange('oldPassword', e.target.value)}
                 className={errors.oldPassword ? 'border-red-500' : ''}
@@ -145,9 +144,8 @@ const FirstLoginPasswordDialog = ({ open, onOpenChange, onSuccess }) => {
 
             <div className="grid gap-2">
               <Label htmlFor="newPassword">Nouveau mot de passe *</Label>
-              <Input
+              <PasswordInput
                 id="newPassword"
-                type="password"
                 value={formData.newPassword}
                 onChange={(e) => handleChange('newPassword', e.target.value)}
                 className={errors.newPassword ? 'border-red-500' : ''}
@@ -160,9 +158,8 @@ const FirstLoginPasswordDialog = ({ open, onOpenChange, onSuccess }) => {
 
             <div className="grid gap-2">
               <Label htmlFor="confirmPassword">Confirmer le nouveau mot de passe *</Label>
-              <Input
+              <PasswordInput
                 id="confirmPassword"
-                type="password"
                 value={formData.confirmPassword}
                 onChange={(e) => handleChange('confirmPassword', e.target.value)}
                 className={errors.confirmPassword ? 'border-red-500' : ''}
