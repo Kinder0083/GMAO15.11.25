@@ -325,8 +325,11 @@ async def login(login_request: LoginRequest):
         entity_name=f"{user['prenom']} {user['nom']}"
     )
     
-    # Create access token
-    access_token = create_access_token(data={"sub": str(user["_id"])})
+    # Create access token (valide 1 heure)
+    access_token = create_access_token(
+        data={"sub": str(user["_id"])},
+        expires_delta=timedelta(hours=1)
+    )
     
     return Token(
         access_token=access_token,
