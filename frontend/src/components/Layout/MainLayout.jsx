@@ -597,6 +597,12 @@ const MainLayout = () => {
       
       {/* Popup de mise à jour récente (tous les utilisateurs) */}
       <RecentUpdatePopup />
+      
+      {/* Validation du token au démarrage */}
+      <TokenValidator />
+      
+      {/* Gestion de l'inactivité */}
+      <InactivityHandler />
     </div>
   );
 };
