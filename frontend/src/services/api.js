@@ -128,7 +128,8 @@ export const usersAPI = {
   createMember: (data) => api.post('/users/create-member', data),
   getPermissions: (id) => api.get(`/users/${id}/permissions`),
   updatePermissions: (id, permissions) => api.put(`/users/${id}/permissions`, permissions),
-  getDefaultPermissionsByRole: (role) => api.get(`/users/default-permissions/${role}`)
+  getDefaultPermissionsByRole: (role) => api.get(`/users/default-permissions/${role}`),
+  setPasswordPermanent: (userId) => api.post(`/users/${userId}/set-password-permanent`)
 };
 
 // ==================== VENDORS ====================
