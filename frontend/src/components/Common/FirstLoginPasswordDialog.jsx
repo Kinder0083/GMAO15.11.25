@@ -99,6 +99,42 @@ const FirstLoginPasswordDialog = ({ open, onOpenChange, onSuccess }) => {
     }
   };
 
+  const handleSkipPasswordChange = async () => {
+    // Confirmer avec l'utilisateur
+    const confirmed = window.confirm(
+      "⚠️ ATTENTION ⚠️\n\n" +
+      "Vous êtes sur le point de conserver votre mot de passe temporaire.\n\n" +
+      "Cela représente un risque de sécurité car d'autres personnes peuvent connaître ce mot de passe.\n\n" +
+      "Êtes-vous sûr de vouloir continuer à vos risques et périls ?"
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await authAPI.skipPasswordChange();
+      
+      toast({
+        title: 'Mot de passe conservé',
+        description: 'Vous avez choisi de garder votre mot de passe temporaire.',
+        variant: 'default'
+      });
+
+      onOpenChange(false);
+      if (onSuccess) onSuccess();
+    } catch (error) {
+      toast({
+        title: 'Erreur',
+        description: error.response?.data?.detail || 'Une erreur est survenue',
+        variant: 'destructive'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={(isOpen) => {
       // Empêcher la fermeture sans changer le mot de passe
