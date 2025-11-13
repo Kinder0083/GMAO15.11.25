@@ -195,7 +195,7 @@ const FirstLoginPasswordDialog = ({ open, onOpenChange, onSuccess }) => {
             </div>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="flex-col gap-2 sm:flex-col">
             <Button type="submit" disabled={loading} className="w-full bg-blue-600 hover:bg-blue-700">
               {loading ? (
                 <>
@@ -206,6 +206,26 @@ const FirstLoginPasswordDialog = ({ open, onOpenChange, onSuccess }) => {
                 <>
                   <Lock className="mr-2 h-4 w-4" />
                   Changer le mot de passe
+                </>
+              )}
+            </Button>
+            
+            <Button
+              type="button"
+              onClick={handleSkipPasswordChange}
+              disabled={loading}
+              variant="destructive"
+              className="w-full bg-red-600 hover:bg-red-700 text-white"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  En cours...
+                </>
+              ) : (
+                <>
+                  <AlertCircle className="mr-2 h-4 w-4" />
+                  Ne pas changer le mot de passe à vos risques
                 </>
               )}
             </Button>
