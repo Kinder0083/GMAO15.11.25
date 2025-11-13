@@ -27,6 +27,8 @@ import {
 import FirstLoginPasswordDialog from '../Common/FirstLoginPasswordDialog';
 import UpdateNotificationBadge from '../Common/UpdateNotificationBadge';
 import RecentUpdatePopup from '../Common/RecentUpdatePopup';
+import InactivityHandler from '../Common/InactivityHandler';
+import TokenValidator from '../Common/TokenValidator';
 import { usePermissions } from '../../hooks/usePermissions';
 
 const MainLayout = () => {
