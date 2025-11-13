@@ -829,6 +829,69 @@ backend:
           - La page Bons de Travail fonctionne parfaitement
           - Tous les critères de test du cahier des charges sont respectés
 
+  - task: "API POST /api/users/{user_id}/set-password-permanent - Rendre le changement de mot de passe optionnel"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py, /app/frontend/src/services/api.js, /app/frontend/src/components/Common/FirstLoginPasswordDialog.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          NOUVELLE FONCTIONNALITÉ IMPLÉMENTÉE - Changement de mot de passe optionnel au premier login
+          
+          CONTEXTE:
+          Le client souhaite donner le choix aux utilisateurs de conserver leur mot de passe temporaire
+          au lieu de les forcer à le changer lors de la première connexion.
+          
+          BACKEND IMPLÉMENTÉ (/app/backend/server.py):
+          1. Nouvel endpoint: POST /api/users/{user_id}/set-password-permanent (ligne 2139)
+             - Authentification requise (get_current_user)
+             - Vérifie que l'utilisateur modifie son propre compte OU qu'il est admin
+             - Met à jour firstLogin à False dans la base de données
+             - Enregistre l'action dans le journal d'audit
+             - Retourne: { "success": true, "message": "..." }
+          
+          FRONTEND IMPLÉMENTÉ:
+          1. API Service (/app/frontend/src/services/api.js):
+             - Ajout de usersAPI.setPasswordPermanent(userId) ligne 132
+             - Appelle POST /api/users/{userId}/set-password-permanent
+          
+          2. Composant FirstLoginPasswordDialog (/app/frontend/src/components/Common/FirstLoginPasswordDialog.jsx):
+             - Ajout du paramètre userId dans les props
+             - Import de usersAPI
+             - Fonction handleSkipPasswordChange() modifiée:
+               * Utilise usersAPI.setPasswordPermanent(userId)
+               * Met à jour le localStorage après succès (firstLogin: false)
+               * Affiche un toast de confirmation
+             - Bouton rouge "Ne pas changer le mot de passe à vos risques" avec icône AlertCircle
+             - Message de confirmation avec avertissement de sécurité
+          
+          3. MainLayout (/app/frontend/src/components/Layout/MainLayout.jsx):
+             - Props userId et onSuccess ajoutées au FirstLoginPasswordDialog
+             - Mise à jour de l'état local user après confirmation
+          
+          SÉCURITÉ:
+          - Message d'avertissement clair pour l'utilisateur
+          - Confirmation obligatoire avant de conserver le mot de passe temporaire
+          - Logging de l'action dans le journal d'audit
+          - Validation que seul l'utilisateur concerné (ou admin) peut faire l'action
+          
+          À TESTER:
+          1. Backend: POST /api/users/{user_id}/set-password-permanent
+             - Test avec utilisateur normal (son propre ID)
+             - Test avec admin (ID d'un autre utilisateur)
+             - Test avec utilisateur normal tentant de modifier un autre ID (doit échouer 403)
+          2. Frontend: Dialog FirstLoginPasswordDialog
+             - Affichage du bouton rouge
+             - Confirmation popup d'avertissement
+             - Appel API et fermeture du dialog
+             - Mise à jour du localStorage
+             - Plus d'affichage du dialog après rechargement de la page
+
+
 frontend:
   - task: "Test critique - Tableau de bord pour utilisateur QHSE avec permissions limitées"
     implemented: true
