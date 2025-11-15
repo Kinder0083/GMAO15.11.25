@@ -163,8 +163,42 @@ fi
 echo -e "${BLUE}Mise à jour du fichier .env...${NC}"
 
 if [ ! -f "$ENV_FILE" ]; then
-    echo -e "${YELLOW}Fichier .env non trouvé, création depuis .env.example${NC}"
-    cp "$BACKEND_DIR/.env.example" "$ENV_FILE"
+    echo -e "${YELLOW}Fichier .env non trouvé${NC}"
+    
+    if [ -f "$ENV_EXAMPLE" ]; then
+        echo "Création depuis .env.example..."
+        cp "$ENV_EXAMPLE" "$ENV_FILE"
+    else
+        echo -e "${RED}Erreur : $ENV_EXAMPLE n'existe pas${NC}"
+        echo "Création d'un fichier .env minimal..."
+        cat > "$ENV_FILE" << 'ENVEOF'
+# Configuration MongoDB
+MONGO_URL=mongodb://localhost:27017
+DB_NAME=gmao_iris
+
+# Configuration JWT
+SECRET_KEY=GENERER_UNE_CLE_SECRETE_ICI
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=10080
+
+# Configuration Serveur
+PORT=8001
+HOST=0.0.0.0
+
+# Configuration SMTP
+SMTP_SERVER=localhost
+SMTP_HOST=localhost
+SMTP_PORT=25
+SMTP_USERNAME=
+SMTP_PASSWORD=
+SMTP_SENDER_EMAIL=noreply@gmao-iris.local
+SMTP_FROM=noreply@gmao-iris.local
+SMTP_FROM_NAME=GMAO Iris
+SMTP_USER=
+SMTP_USE_TLS=false
+APP_URL=http://localhost:3000
+ENVEOF
+    fi
 fi
 
 # Fonction pour mettre à jour ou ajouter une variable
