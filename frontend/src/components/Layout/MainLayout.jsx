@@ -546,6 +546,13 @@ const MainLayout = () => {
             {user.role === 'ADMIN' && (
               <>
                 <button
+                  onClick={() => navigate('/special-settings')}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 text-gray-300 transition-all"
+                >
+                  <Shield size={20} />
+                  <span className="text-sm font-medium">Paramètres Spéciaux</span>
+                </button>
+                <button
                   onClick={() => navigate('/updates')}
                   className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 text-gray-300 transition-all"
                 >
