@@ -660,8 +660,8 @@ if [[ "$configure_smtp" == "y" || "$configure_smtp" == "Y" ]]; then
     echo ""
     msg "Configuration SMTP dans le container..."
     
-    # Exécuter le script setup-email.sh dans le container
-    pct exec $CTID -- bash -c "cd /opt/gmao-iris && bash setup-email.sh"
+    # Exécuter le script setup-email.sh dans le container avec l'IP en paramètre
+    pct exec $CTID -- bash -c "cd /opt/gmao-iris && CONTAINER_IP=${CONTAINER_IP} bash setup-email.sh"
     
     echo ""
     ok "Configuration SMTP terminée"
