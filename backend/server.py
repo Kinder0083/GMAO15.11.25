@@ -356,12 +356,26 @@ async def forgot_password(request: ForgotPasswordRequest):
             expires_delta=timedelta(hours=1)
         )
         
-        # Dans une vraie application, on enverrait un email ici
-        # Pour l'instant, on log le token (pour dev/test uniquement)
-        print(f"Reset token for {request.email}: {reset_token}")
-        print(f"Reset URL: http://localhost:3000/reset-password?token={reset_token}")
+        # Construire l'URL de réinitialisation
+        APP_URL = os.environ.get('APP_URL', 'http://localhost:3000')
+        reset_url = f"{APP_URL}/reset-password?token={reset_token}"
         
-        # Sauvegarder le token dans la base (optionnel, pour invalider après usage)
+        # Envoyer l'email de réinitialisation
+        try:
+            email_sent = email_service.send_password_reset_email(
+                to_email=request.email,
+                prenom=user.get('prenom', 'Utilisateur'),
+                reset_url=reset_url
+            )
+            
+            if email_sent:
+                logger.info(f"Email de réinitialisation envoyé à {request.email}")
+            else:
+                logger.error(f"Échec de l'envoi de l'email de réinitialisation à {request.email}")
+        except Exception as email_error:
+            logger.error(f"Erreur lors de l'envoi de l'email de réinitialisation : {str(email_error)}")
+        
+        # Sauvegarder le token dans la base (pour invalider après usage)
         await db.users.update_one(
             {"_id": user["_id"]},
             {"$set": {"reset_token": reset_token, "reset_token_created": datetime.utcnow()}}
