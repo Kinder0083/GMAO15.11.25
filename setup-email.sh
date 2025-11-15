@@ -18,13 +18,24 @@ echo "======================================"
 echo -e "${NC}"
 
 # Déterminer le chemin du backend
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 if [ -d "/opt/gmao-iris/backend" ]; then
     BACKEND_DIR="/opt/gmao-iris/backend"
-else
+elif [ -d "$SCRIPT_DIR/backend" ]; then
+    BACKEND_DIR="$SCRIPT_DIR/backend"
+elif [ -d "./backend" ]; then
     BACKEND_DIR="./backend"
+else
+    echo -e "${RED}Erreur : Impossible de trouver le répertoire backend${NC}"
+    echo "Exécutez ce script depuis le répertoire racine de l'application"
+    exit 1
 fi
 
 ENV_FILE="$BACKEND_DIR/.env"
+ENV_EXAMPLE="$BACKEND_DIR/.env.example"
+
+echo -e "${BLUE}Répertoire backend détecté : $BACKEND_DIR${NC}"
 
 echo -e "${YELLOW}Ce script va configurer l'envoi d'emails pour GMAO IRIS.${NC}"
 echo ""
