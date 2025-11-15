@@ -159,15 +159,10 @@ fi
 echo -e "${BLUE}Mise à jour du fichier .env...${NC}"
 
 if [ ! -f "$ENV_FILE" ]; then
-    echo -e "${YELLOW}Fichier .env non trouvé${NC}"
+    echo -e "${YELLOW}⚠️  Fichier .env non trouvé, création d'un nouveau fichier...${NC}"
     
-    if [ -f "$ENV_EXAMPLE" ]; then
-        echo "Création depuis .env.example..."
-        cp "$ENV_EXAMPLE" "$ENV_FILE"
-    else
-        echo -e "${RED}Erreur : $ENV_EXAMPLE n'existe pas${NC}"
-        echo "Création d'un fichier .env minimal..."
-        cat > "$ENV_FILE" << 'ENVEOF'
+    # Créer un fichier .env minimal
+    cat > "$ENV_FILE" << 'ENVEOF'
 # Configuration MongoDB
 MONGO_URL=mongodb://localhost:27017
 DB_NAME=gmao_iris
@@ -181,7 +176,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES=10080
 PORT=8001
 HOST=0.0.0.0
 
-# Configuration SMTP
+# Configuration SMTP (sera mis à jour par le script)
 SMTP_SERVER=localhost
 SMTP_HOST=localhost
 SMTP_PORT=25
@@ -194,7 +189,8 @@ SMTP_USER=
 SMTP_USE_TLS=false
 APP_URL=http://localhost:3000
 ENVEOF
-    fi
+    
+    echo -e "${GREEN}✅ Fichier .env créé${NC}"
 fi
 
 # Fonction pour mettre à jour ou ajouter une variable
