@@ -152,8 +152,14 @@ echo ""
 read -p "Nom de l'expéditeur (ex: GMAO Iris) : " from_name
 SMTP_FROM_NAME="${from_name:-GMAO Iris}"
 
-read -p "URL de l'application (ex: http://192.168.1.104) : " app_url
-APP_URL="${app_url:-http://localhost:3000}"
+# Utiliser l'IP du container si disponible (passée en variable d'environnement)
+DEFAULT_APP_URL="http://localhost:3000"
+if [ -n "$CONTAINER_IP" ] && [ "$CONTAINER_IP" != "AUCUNE_IP" ]; then
+    DEFAULT_APP_URL="http://${CONTAINER_IP}"
+fi
+
+read -p "URL de l'application (ex: http://192.168.1.104) [${DEFAULT_APP_URL}] : " app_url
+APP_URL="${app_url:-$DEFAULT_APP_URL}"
 
 echo ""
 echo -e "${BLUE}Configuration SMTP :${NC}"
