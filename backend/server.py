@@ -2193,6 +2193,77 @@ async def set_password_permanent(
         raise HTTPException(status_code=500, detail=f"Erreur serveur: {str(e)}")
 
 
+
+@api_router.post("/users/{user_id}/reset-password-admin")
+async def reset_password_admin(
+    user_id: str,
+    current_user: dict = Depends(get_current_admin_user)
+):
+    """
+    Réinitialiser le mot de passe d'un utilisateur (Admin uniquement)
+    Génère un nouveau mot de passe temporaire et force le changement au prochain login
+    """
+    try:
+        # Vérifier que l'utilisateur existe
+        user = await db.users.find_one({"_id": ObjectId(user_id)})
+        if not user:
+            raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+        
+        # Générer un nouveau mot de passe temporaire
+        temp_password = generate_temp_password()
+        
+        # Hasher le mot de passe
+        hashed_password = pwd_context.hash(temp_password)
+        
+        # Mettre à jour le mot de passe et forcer le changement au prochain login
+        await db.users.update_one(
+            {"_id": ObjectId(user_id)},
+            {
+                "$set": {
+                    "hashed_password": hashed_password,
+                    "firstLogin": True
+                }
+            }
+        )
+        
+        # Enregistrer l'action dans le journal d'audit
+        await audit_service.log_action(
+            user_id=current_user.get("id"),
+            user_name=f"{current_user['prenom']} {current_user['nom']}",
+            user_email=current_user["email"],
+            action=ActionType.UPDATE,
+            entity_type=EntityType.USER,
+            entity_id=user_id,
+            entity_name=f"{user.get('prenom', '')} {user.get('nom', '')}".strip(),
+            details=f"Réinitialisation du mot de passe par l'administrateur",
+            changes={"firstLogin": True, "password_reset": "admin_action"}
+        )
+        
+        # Envoyer un email à l'utilisateur avec le nouveau mot de passe
+        try:
+            email_sent = email_service.send_account_created_email(
+                to_email=user['email'],
+                prenom=user.get('prenom', ''),
+                temp_password=temp_password
+            )
+            
+            if email_sent:
+                logger.info(f"Email de réinitialisation envoyé à {user['email']}")
+        except Exception as email_error:
+            logger.error(f"Erreur lors de l'envoi de l'email de réinitialisation : {str(email_error)}")
+        
+        return {
+            "success": True,
+            "message": "Mot de passe réinitialisé avec succès",
+            "tempPassword": temp_password,
+            "emailSent": email_sent if 'email_sent' in locals() else False
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erreur lors de la réinitialisation du mot de passe : {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Erreur serveur: {str(e)}")
+
 # ==================== VENDORS ROUTES ====================
 @api_router.get("/vendors", response_model=List[Vendor])
 async def get_vendors(current_user: dict = Depends(require_permission("vendors", "view"))):
