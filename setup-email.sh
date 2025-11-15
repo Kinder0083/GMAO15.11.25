@@ -17,46 +17,21 @@ echo "  CONFIGURATION SMTP - GMAO IRIS"
 echo "======================================"
 echo -e "${NC}"
 
-# Déterminer le chemin du backend
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+# Demander le chemin du backend
+echo -e "${YELLOW}Où se trouve le répertoire backend de votre application ?${NC}"
+read -p "Chemin (défaut: /opt/iris-maintenance/backend) : " user_backend_dir
+BACKEND_DIR="${user_backend_dir:-/opt/iris-maintenance/backend}"
 
-# Essayer différents chemins possibles
-if [ -d "$SCRIPT_DIR/backend" ]; then
-    # Script dans le répertoire de l'app
-    BACKEND_DIR="$SCRIPT_DIR/backend"
-elif [ -d "./backend" ]; then
-    # Exécuté depuis le répertoire de l'app
-    BACKEND_DIR="./backend"
-elif [ -d "/opt/gmao-iris/backend" ]; then
-    BACKEND_DIR="/opt/gmao-iris/backend"
-elif [ -d "/opt/iris-maintenance/backend" ]; then
-    BACKEND_DIR="/opt/iris-maintenance/backend"
-else
-    # Chercher dans les sous-dossiers de /opt
-    echo -e "${YELLOW}Recherche automatique du backend...${NC}"
-    FOUND_BACKEND=$(find /opt -maxdepth 2 -type d -name "backend" 2>/dev/null | grep -E "(gmao|iris)" | head -n 1)
-    
-    if [ -n "$FOUND_BACKEND" ]; then
-        BACKEND_DIR="$FOUND_BACKEND"
-        echo -e "${GREEN}Backend trouvé : $BACKEND_DIR${NC}"
-    else
-        echo -e "${RED}Erreur : Impossible de trouver le répertoire backend${NC}"
-        echo ""
-        echo "Veuillez exécuter ce script :"
-        echo "  1. Depuis le répertoire racine de l'application"
-        echo "  2. OU copier ce script dans le répertoire de l'application"
-        echo ""
-        echo "Exemple :"
-        echo "  cd /opt/votre-app"
-        echo "  bash setup-email.sh"
-        exit 1
-    fi
+# Vérifier que le répertoire existe
+if [ ! -d "$BACKEND_DIR" ]; then
+    echo -e "${RED}Erreur : Le répertoire $BACKEND_DIR n'existe pas${NC}"
+    exit 1
 fi
 
 ENV_FILE="$BACKEND_DIR/.env"
-ENV_EXAMPLE="$BACKEND_DIR/.env.example"
 
-echo -e "${BLUE}Répertoire backend détecté : $BACKEND_DIR${NC}"
+echo -e "${GREEN}✅ Répertoire backend : $BACKEND_DIR${NC}"
+echo ""
 
 echo -e "${YELLOW}Ce script va configurer l'envoi d'emails pour GMAO IRIS.${NC}"
 echo ""
