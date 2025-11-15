@@ -93,6 +93,7 @@ function App() {
             <Route path="purchase-history" element={<PurchaseHistory />} />
             <Route path="import-export" element={<ImportExport />} />
             <Route path="settings" element={<Settings />} />
+            <Route path="special-settings" element={<SpecialSettings />} />
             <Route path="updates" element={<Updates />} />
             <Route path="journal" element={<Journal />} />
             <Route path="meters" element={<Meters />} />
