@@ -20,42 +20,32 @@ echo -e "${NC}"
 # Détection automatique du backend
 echo -e "${BLUE}🔍 Recherche automatique du backend GMAO...${NC}"
 
-# Chercher le backend (contient server.py ET email_service.py)
-BACKEND_CANDIDATES=$(find /opt -maxdepth 3 -type f -name "server.py" 2>/dev/null | while read serverfile; do
+BACKEND_DIR=""
+
+# Chercher server.py dans /opt
+for serverfile in $(find /opt -maxdepth 3 -type f -name "server.py" 2>/dev/null); do
     backend_dir=$(dirname "$serverfile")
     # Vérifier que email_service.py existe aussi
     if [ -f "$backend_dir/email_service.py" ]; then
-        echo "$backend_dir"
+        BACKEND_DIR="$backend_dir"
+        break
     fi
-done)
+done
 
-# Compter le nombre de candidats
-BACKEND_COUNT=$(echo "$BACKEND_CANDIDATES" | grep -c "^/" 2>/dev/null || echo "0")
-
-if [ "$BACKEND_COUNT" -eq 0 ]; then
+if [ -z "$BACKEND_DIR" ]; then
     echo -e "${RED}❌ Aucun backend GMAO trouvé dans /opt${NC}"
     echo ""
-    echo "Veuillez vérifier que l'application est installée dans /opt"
-    exit 1
-elif [ "$BACKEND_COUNT" -eq 1 ]; then
-    BACKEND_DIR="$BACKEND_CANDIDATES"
-    echo -e "${GREEN}✅ Backend trouvé : $BACKEND_DIR${NC}"
-else
-    echo -e "${YELLOW}⚠️  Plusieurs backends trouvés :${NC}"
-    echo "$BACKEND_CANDIDATES" | nl
+    echo "Le script recherche un répertoire contenant :"
+    echo "  - server.py"
+    echo "  - email_service.py"
     echo ""
-    read -p "Choisissez le numéro du backend à configurer : " choice
-    BACKEND_DIR=$(echo "$BACKEND_CANDIDATES" | sed -n "${choice}p")
-    
-    if [ -z "$BACKEND_DIR" ]; then
-        echo -e "${RED}Choix invalide${NC}"
-        exit 1
-    fi
+    echo "Veuillez vérifier que l'application est bien installée dans /opt"
+    exit 1
 fi
 
 ENV_FILE="$BACKEND_DIR/.env"
 
-echo -e "${GREEN}📂 Configuration de : $BACKEND_DIR${NC}"
+echo -e "${GREEN}✅ Backend trouvé : $BACKEND_DIR${NC}"
 echo ""
 
 echo -e "${YELLOW}Ce script va configurer l'envoi d'emails pour GMAO IRIS.${NC}"
