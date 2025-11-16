@@ -443,28 +443,25 @@ const WorkOrders = () => {
                           <span className="text-gray-400 text-sm">-</span>
                         )}
                       </td>
-                      <td className="py-3 px-4 text-sm text-gray-700">
+                      <td className="py-3 px-2 text-center">
                         {wo.assigneA ? (
-                          <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                              <span className="text-white text-xs font-medium">
-                                {wo.assigneA.prenom[0]}{wo.assigneA.nom[0]}
-                              </span>
-                            </div>
-                            <span>{wo.assigneA.prenom} {wo.assigneA.nom}</span>
+                          <div className="flex items-center justify-center">
+                            <AvatarInitials 
+                              prenom={wo.assigneA.prenom} 
+                              nom={wo.assigneA.nom}
+                            />
                           </div>
                         ) : (
-                          <span className="text-gray-400">Non assigné</span>
+                          <span className="text-gray-400 text-xs">-</span>
                         )}
                       </td>
-                      <td className="py-3 px-4 text-sm text-gray-700">
-                        {wo.emplacement ? wo.emplacement.nom : '-'}
-                      </td>
-                      <td className="py-3 px-4 text-sm text-gray-700">
-                        {wo.equipement ? wo.equipement.nom : '-'}
-                      </td>
+                      <td className="py-3 px-4 text-sm text-gray-700">{wo.emplacement?.nom || '-'}</td>
+                      <td className="py-3 px-4 text-sm text-gray-700">{wo.equipement?.nom || '-'}</td>
                       <td className="py-3 px-4 text-sm text-gray-700">
                         {wo.dateLimite ? new Date(wo.dateLimite).toLocaleDateString('fr-FR') : '-'}
+                      </td>
+                      <td className="py-3 px-4 text-sm text-gray-700 font-medium">
+                        {wo.tempsReel ? formatTimeToHoursMinutes(wo.tempsReel) : '-'}
                       </td>
                       <td className="py-3 px-4">
                         <div className="flex gap-2">
