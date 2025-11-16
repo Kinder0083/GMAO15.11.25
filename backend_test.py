@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Backend API Testing Script for GMAO Application
-Tests "Gestion du timeout d'inactivité" functionality
+Tests "Nouveau champ Catégorie dans les ordres de travail" functionality
 """
 
 import requests
