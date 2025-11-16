@@ -71,6 +71,101 @@ class InactivityTimeoutTester:
             self.log(f"❌ Admin login request failed - Error: {str(e)}", "ERROR")
             return False
     
+    def test_normal_user_login(self):
+        """Test login with a normal user (non-admin)"""
+        self.log("Testing normal user login...")
+        
+        # First, get a list of users to find a non-admin user
+        try:
+            response = self.admin_session.get(f"{BACKEND_URL}/users", timeout=10)
+            
+            if response.status_code == 200:
+                users = response.json()
+                
+                # Find a non-admin user
+                normal_user = None
+                for user in users:
+                    if user.get("role") != "ADMIN" and user.get("email") != ADMIN_EMAIL:
+                        normal_user = user
+                        break
+                
+                if not normal_user:
+                    self.log("⚠️ No normal user found, creating one for testing", "WARNING")
+                    return self.create_test_user()
+                
+                # Try to login with the normal user (we don't know their password, so this might fail)
+                # For testing purposes, we'll create a new user with known credentials
+                return self.create_test_user()
+            else:
+                self.log(f"❌ Failed to get users list - Status: {response.status_code}", "ERROR")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
+            return False
+    
+    def create_test_user(self):
+        """Create a test user for normal user testing"""
+        self.log("Creating test user for normal user testing...")
+        
+        # Generate unique email for test user
+        unique_id = str(uuid.uuid4())[:8]
+        self.test_user_email = f"test.settings.{unique_id}@test.local"
+        test_password = "TestPass123!"
+        
+        try:
+            response = self.admin_session.post(
+                f"{BACKEND_URL}/users/create-member",
+                json={
+                    "nom": "TestSettings",
+                    "prenom": "User",
+                    "email": self.test_user_email,
+                    "telephone": "0123456789",
+                    "role": "TECHNICIEN",
+                    "service": "Test Service",
+                    "password": test_password
+                },
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                user_data = response.json()
+                self.test_user_id = user_data.get("id")
+                self.log(f"✅ Test user created successfully - ID: {self.test_user_id}, Email: {self.test_user_email}")
+                
+                # Now login with the test user
+                login_response = requests.post(
+                    f"{BACKEND_URL}/auth/login",
+                    json={
+                        "email": self.test_user_email,
+                        "password": test_password
+                    },
+                    timeout=10
+                )
+                
+                if login_response.status_code == 200:
+                    login_data = login_response.json()
+                    self.user_token = login_data.get("access_token")
+                    self.user_data = login_data.get("user")
+                    
+                    # Set authorization header for user session
+                    self.user_session.headers.update({
+                        "Authorization": f"Bearer {self.user_token}"
+                    })
+                    
+                    self.log(f"✅ Test user login successful - User: {self.user_data.get('prenom')} {self.user_data.get('nom')} (Role: {self.user_data.get('role')})")
+                    return True
+                else:
+                    self.log(f"❌ Test user login failed - Status: {login_response.status_code}", "ERROR")
+                    return False
+            else:
+                self.log(f"❌ Test user creation failed - Status: {response.status_code}, Response: {response.text}", "ERROR")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log(f"❌ Test user creation request failed - Error: {str(e)}", "ERROR")
+            return False
+    
     def test_forgot_password_flow(self):
         """TEST 1: Forgot Password Flow (depuis page de login)"""
         self.log("🧪 TEST 1: Forgot Password Flow - POST /api/auth/forgot-password")
