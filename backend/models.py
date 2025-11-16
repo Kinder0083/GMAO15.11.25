@@ -274,6 +274,7 @@ class WorkOrderCategory(str, Enum):
     TRAVAUX_CURATIF = "TRAVAUX_CURATIF"
     TRAVAUX_DIVERS = "TRAVAUX_DIVERS"
     FORMATION = "FORMATION"
+    REGLAGE = "REGLAGE"
 
 class EquipmentStatus(str, Enum):
     OPERATIONNEL = "OPERATIONNEL"
