@@ -20,7 +20,7 @@ BACKEND_URL = "https://maintx-hub.preview.emergentagent.com/api"
 ADMIN_EMAIL = "admin@gmao-iris.local"
 ADMIN_PASSWORD = "Admin123!"
 
-class PasswordResetTester:
+class InactivityTimeoutTester:
     def __init__(self):
         self.admin_session = requests.Session()
         self.user_session = requests.Session()
