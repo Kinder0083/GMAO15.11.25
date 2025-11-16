@@ -990,6 +990,62 @@ async def update_work_order(wo_id: str, wo_update: WorkOrderUpdate, current_user
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+
+@api_router.post("/work-orders/{wo_id}/add-time")
+async def add_time_to_work_order(wo_id: str, time_data: AddTimeSpent, current_user: dict = Depends(require_permission("workOrders", "edit"))):
+    """Ajouter du temps passé à un ordre de travail"""
+    try:
+        # Récupérer l'ordre de travail existant
+        existing_wo = await db.work_orders.find_one({"_id": ObjectId(wo_id)})
+        if not existing_wo:
+            raise HTTPException(status_code=404, detail="Ordre de travail non trouvé")
+        
+        # Convertir le temps en heures décimales
+        time_to_add = time_data.hours + (time_data.minutes / 60.0)
+        
+        # Récupérer le temps réel actuel (0 si None)
+        current_time = existing_wo.get("tempsReel", 0) or 0
+        
+        # Calculer le nouveau temps réel
+        new_time = current_time + time_to_add
+        
+        # Mettre à jour l'ordre de travail
+        await db.work_orders.update_one(
+            {"_id": ObjectId(wo_id)},
+            {"$set": {"tempsReel": new_time}}
+        )
+        
+        # Log dans l'audit
+        await audit_service.log_action(
+            user_id=current_user["id"],
+            user_name=f"{current_user['prenom']} {current_user['nom']}",
+            user_email=current_user["email"],
+            action=ActionType.UPDATE,
+            entity_type=EntityType.WORK_ORDER,
+            entity_id=str(existing_wo["_id"]),
+            entity_name=existing_wo["titre"],
+            details=f"Ajout de temps passé: {time_data.hours}h{time_data.minutes:02d}min",
+            changes={"tempsReel_old": current_time, "tempsReel_new": new_time, "time_added": time_to_add}
+        )
+        
+        # Récupérer l'ordre de travail mis à jour
+        wo = await db.work_orders.find_one({"_id": ObjectId(wo_id)})
+        wo = serialize_doc(wo)
+        
+        if wo.get("assigne_a_id"):
+            wo["assigneA"] = await get_user_by_id(wo["assigne_a_id"])
+        if wo.get("emplacement_id"):
+            wo["emplacement"] = await get_location_by_id(wo["emplacement_id"])
+        if wo.get("equipement_id"):
+            wo["equipement"] = await get_equipment_by_id(wo["equipement_id"])
+        
+        return WorkOrder(**wo)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erreur lors de l'ajout de temps : {str(e)}")
+        raise HTTPException(status_code=400, detail=str(e))
+
 @api_router.delete("/work-orders/{wo_id}")
 async def delete_work_order(wo_id: str, current_user: dict = Depends(require_permission("workOrders", "delete"))):
     """Supprimer un ordre de travail"""
