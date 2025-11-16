@@ -2227,7 +2227,7 @@ async def reset_password_admin(
         temp_password = generate_temp_password()
         
         # Hasher le mot de passe
-        hashed_password = pwd_context.hash(temp_password)
+        hashed_password = get_password_hash(temp_password)
         
         # Mettre à jour le mot de passe et forcer le changement au prochain login
         await db.users.update_one(
