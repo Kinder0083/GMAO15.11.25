@@ -1,94 +1,97 @@
 <analysis>
-The trajectory details a comprehensive and iterative development process, primarily focused on bug fixing and feature enhancement of a full-stack maintenance management application. The work began by tackling a critical bug in the Import/Export module. This involved a deep dive into the backend's  data handling in , fixing issues with data type conversions (lists stored as strings), missing field initializations (especially the uid=0(root) gid=0(root) groups=0(root) field), and incorrect enum values. This phase required extensive database cleanup scripts to repair corrupted data introduced by faulty imports.
+The trajectory documents a multi-faceted development and debugging process for a full-stack CMMS application (React, FastAPI, MongoDB). The work began with solving a critical login issue, which, after extensive and misleading debugging of code and dependencies, was traced to a stopped MongoDB service on the user's Proxmox container due to permission errors.
 
-Subsequently, the engineer addressed a series of user-reported bugs and feature requests in real-time. This included fixing user loading errors (caused by stringified JSON in the  field), and a major overhaul of the Overdue Items notification icon. This feature evolved from a simple bug fix for a stale count into a sophisticated, multi-part indicator with three colored badges representing different overdue categories (Work Orders, Requests, Preventive Maintenance). Debugging this feature involved tracing issues through permissions, database inconsistencies, and a subtle but critical frontend/backend field name mismatch ( vs. ).
+Following this, the engineer implemented several features: an optional password change for new users (including a confirmation dialog), a robust session management system with an inactivity timeout to resolve a -based session hijacking issue on shared computers, and a complete overhaul of the email sending mechanism. The email debugging was particularly complex, involving a deep dive into the user's Proxmox LXC environment. After failing to fix persistent permission issues with Postfix, the engineer correctly pivoted to a more stable solution, replacing Postfix with  and configuring it to use an external Gmail SMTP relay. This required modifying the backend to support authenticated SMTP with TLS.
 
-The final phase focused on automating preventive maintenance. An  was integrated into the FastAPI backend to automatically generate work orders from due maintenance plans. A delete functionality was also added to the frontend. The work concluded mid-debug, addressing a  error on the preventive maintenance page caused by a Pydantic validation error related to a non-optional field () being  in the database.
+The most recent task involves creating a secure admin-only Special Settings page. The user initially requested to see passwords in plaintext, but the engineer successfully negotiated a secure alternative: an admin-initiated password reset. The work started on both frontend (new menu, page, route) and backend (new endpoints). The trajectory concludes as the engineer is in the process of implementing the logic for the Forgot Password? link, specifically by adding the email-sending function to the  module.
+
+The user's primary language is French (Français). The next agent must respond in French.
 </analysis>
-
 <product_requirements>
-The goal is to enhance and stabilize a maintenance management application. The work completed addressed the following user requirements:
+The project's goal is to stabilize and enhance a full-stack CMMS (GMAO) application.
 
-1.  **Import/Export Module Fix:** The initial critical task was to fix the failing Import All Data feature and ensure individual module imports/exports work reliably. This was a persistent problem, as re-importing data consistently corrupted the database by storing lists as strings and failing to initialize required fields. The fix needed to be robust across all data modules.
+**Initial Problem:** The application was inaccessible over the internet (via a Proxmox/Tailscale setup) due to a login error, which was ultimately traced to a stopped MongoDB service in the user's production environment.
 
-2.  **User & Data Loading Bug Fixes:** Users reported multiple pages (Users, Intervention Requests, Improvements) failing with an Impossible de charger... error. These were traced back to data integrity issues in MongoDB, requiring backend fixes and database cleanup.
+**Completed Work:**
+1.  **Core Stability:** The login issue was resolved by fixing service permissions in the production container.
+2.  **Session Management:** A critical security flaw, where users on a shared computer could access previous sessions, was fixed. This was solved by implementing a 15-minute inactivity timeout, a 1-hour JWT token lifespan, and a 60-second warning modal before automatic logout.
+3.  **Email Invitation System:** A non-functional email system (due to Postfix issues in the LXC container) was completely re-engineered. It now uses  to relay emails through an external, authenticated Gmail account, ensuring reliable delivery.
+4.  **Deployment Automation:** User-friendly setup scripts (, ) were created to automate the configuration of the email service and the application in the user's specific Proxmox environment.
 
-3.  **Overdue Notification Icon Overhaul:**
-    *   **Bug:** The Échéances dépassées icon showed a stale, incorrect count.
-    *   **Enhancement 1:** Transform the icon into a dropdown menu linking to overdue items.
-    *   **Enhancement 2:** Implement a multi-badge system on the icon: an orange badge for overdue Work Orders/Improvements, a yellow one for overdue Intervention/Improvement Requests, and a blue one for Preventive Maintenance. The count must respect user permissions.
-
-4.  **Date Validation Rule:** Prevent non-admin users from creating tasks with a due date in the past. An alert (Tricheur!...) should be displayed.
-
-5.  **Automated Preventive Maintenance:**
-    *   Automatically generate a Work Order when a Preventive Maintenance plan's due date is reached.
-    *   Update the plan's next due date according to its frequency.
-    *   Add a Delete button with confirmation on the Preventive Maintenance page.
+**Current Feature in Development:**
+A secure Special Settings page, accessible only by administrators.
+-   **Goal:** Allow admins to manage users and assist with lost passwords, and fix the Forgot Password? link on the login page.
+-   **Implementation:** An admin will be able to trigger a password reset for a user, which generates a new temporary password. The plaintext password is never stored or displayed. The implementation for the Forgot Password link on the login page is currently in progress.
 </product_requirements>
-
 <key_technical_concepts>
-- **Full-stack Architecture**: React frontend with Tailwind CSS and shadcn/ui, FastAPI backend, and MongoDB database.
-- **Backend**: Pydantic for data validation, extensive use of , and  for background job scheduling.
-- **Data Handling**:  for Excel/CSV import/export, requiring careful data type conversion and cleaning.
-- **Database Management**: Direct interaction with MongoDB ( driver) for complex data cleanup and migration tasks (e.g., fixing stringified lists, adding missing fields).
-- **Frontend**: Custom hooks (), dynamic UI components (e.g., multi-badge icon), and global event listeners for state synchronization.
+- **Full-Stack:** React (Frontend), FastAPI (Backend)
+- **Database:** MongoDB
+- **Authentication:** JWT,  for password hashing (bcrypt)
+- **Deployment Environment:** Proxmox LXC container, Supervisor for process management, Nginx for reverse proxy.
+- **Email Service:** Migrated from a local Postfix setup to  using an external Gmail SMTP relay (with App Password, TLS on port 587).
+- **Session Management:**  for token storage, implemented custom hooks for inactivity detection and automatic logout.
+- **Shell Scripting:** Bash scripts for diagnosis and automated setup.
 </key_technical_concepts>
-
 <code_architecture>
-The application follows a standard monorepo structure with a React frontend and a FastAPI backend.
+The application is a monorepo with  and  directories. The development environment is , but the user's production deployment is located at  or  inside a Proxmox container.
+
+**Directory Structure (User Environment):**
 
 
-- ****
-    - **Importance**: This is the core of the backend, containing all API endpoints, business logic, and database interactions.
-    - **Changes**: This file saw the most significant changes.
-        - The  and  functions were heavily modified to handle data corruption issues. Logic was added to:
-            1.  Convert list-like strings (e.g., ) back into Python lists.
-            2.  Initialize missing-but-required fields (like , , uid=0(root) gid=0(root) groups=0(root)) before database insertion.
-            3.  Correctly handle enums and data types during import.
-        - An  was integrated to run a daily job () that automatically creates work orders from preventive maintenance plans. A new helper function  was added.
-        - New endpoints like  were added for testing.
-        - Collection names were standardized (e.g., from  to ).
+**Key Files & Recent Changes:**
 
-- ****
-    - **Importance**: Defines all Pydantic models and Enums, enforcing data structure and validation.
-    - **Changes**: Was consulted frequently to fix validation errors. The final error in the trajectory indicates a change is needed here, likely making  in  an .
+-   ****
+    -   **Importance:** Main FastAPI application file. Contains all API routes.
+    -   **Changes:**
+        -   A new endpoint  was added to allow admins to reset user passwords.
+        -   The existing  endpoint was modified. The original placeholder  statement was replaced with a call to a new function, , to make it functional.
 
-- ****
-    - **Importance**: The main application shell, containing the sidebar, header, and the Overdue Items icon.
-    - **Changes**: Extensively modified to implement the multi-badge notification icon.
-        - State was changed to store separate counts for three categories of overdue items.
-        - The  function was rewritten to fetch data from multiple endpoints, filter by due date, respect user permissions, and categorize the counts.
-        - The simple icon was replaced with a complex, multi-layered component using absolute positioning for the three colored badges and a  for navigation.
-        - Event listeners (, ) were added to refresh the count dynamically.
+-   ****
+    -   **Importance:** A dedicated module for handling all email-sending logic. It was heavily modified to support authenticated SMTP with TLS for Gmail.
+    -   **Changes:** The code was made robust to handle different SMTP configurations via  variables. The **current task** requires adding a new function, , to this file to complete the Forgot Password feature.
 
-- ****
-    - **Importance**: The UI for managing preventive maintenance plans.
-    - **Changes**:
-        - A  function was added to fix a runtime crash.
-        - A Delete button ( icon) and a confirmation  were added to allow users to delete maintenance plans. A  function was implemented to call the API.
+-   ** & **
+    -   **Importance:** Manages all backend environment variables.
+    -   **Changes:** Heavily modified to support the new Gmail-based email configuration. Variables like , , , and  were added. An  file was created to serve as a template for the setup script.
 
-- ** (NEW)**
-    - **Importance**: Created to house a reusable validation function.
-    - **Changes**: Contains the  function, which is imported into various form dialogs to prevent non-admins from creating items with dates in the past.
+-   ****
+    -   **Importance:** A user-friendly script to automate the configuration of SMTP settings.
+    -   **Changes:** Created from scratch and iterated upon multiple times to be robust. It now auto-detects the backend directory, prompts the user for SMTP credentials, and updates the  file accordingly.
 
-- **Various Form Dialogs (e.g., , )**
-    - **Importance**: These are the entry points for creating new data.
-    - **Changes**: Modified to import and use the  utility function within their  logic, showing a Tricheur ! toast on validation failure.
+-   ****
+    -   **Importance:** The main application installation script for the user's Proxmox environment.
+    -   **Changes:** The script was updated to integrate and call  at the end of the installation process, asking the user if they wish to configure email settings. It was also corrected to use the container's IP dynamically and remove  commands.
+
+-   ****
+    -   **Importance:** The main layout component containing the sidebar menu.
+    -   **Changes:** A new menu item, Paramètres Spéciaux, was added for users with the 'ADMIN' role, linking to the new settings page.
+
+-   ****
+    -   **Importance:** A new page created to house the admin-specific user management features.
+    -   **Changes:** Created as a new file. It's currently a placeholder and needs to be built out with the UI for listing users and triggering password resets.
 </code_architecture>
-
 <pending_tasks>
-- **Fix Preventive Maintenance Page**: The immediate and critical task is to resolve the  that occurs when trying to load the Maintenance Préventive page.
-- **Tooltips**: A previously mentioned task to add tooltips to all action buttons across the application has not been addressed.
+- **Implement :** Create the function in  to send the password reset link.
+- **Build Special Settings UI:** Develop the user interface in  to list all users and include a Reset Password button for each.
+- **Connect Frontend to Backend:** Wire up the Reset Password button to call the  API endpoint.
+- **Display Temporary Password:** Implement the frontend logic to securely display the newly generated temporary password to the admin *once*.
 </pending_tasks>
-
 <current_work>
-The engineer was in the final stages of implementing an automated system for preventive maintenance. The user had chosen an -based solution, which was implemented in the backend to run daily. This scheduler is designed to find due maintenance plans, automatically create corresponding work orders, and update the plan's next due date. A Delete button with a confirmation dialog was also successfully added to the frontend  page.
+The engineer is in the final stages of implementing the Special Settings page for administrators and fixing the Forgot Password? functionality.
 
-However, after implementing these changes, a regression occurred. The user reported, Tu as fait une erreur !!!!!! Maintenant lorsque jessai de visualiser la page de "maintenance prev." cela me renvoi le message derreur Impossible de charger les maintenances préventives.
+**Progress so far:**
+1.  **Security Negotiation:** Convinced the user to adopt a secure password reset mechanism (generating a new temporary password) instead of storing/displaying plaintext passwords.
+2.  **Frontend Scaffolding:**
+    -   Added a new Paramètres Spéciaux link to the sidebar in  for admins.
+    -   Created the placeholder page component .
+    -   Added the corresponding route in .
+3.  **API Implementation:**
+    -   Added the frontend API call  in .
+    -   Created the backend endpoint  in  to handle the admin-initiated reset.
+    -   **Fixed the Forgot Password link:** Modified the  endpoint in  to call a new, yet-to-be-created function: .
 
-The engineer diagnosed the issue as a  on the  endpoint. The backend logs revealed a  indicating a  error. This was traced back to the  field in a  document being , while the Pydantic model ( in ) defines it as a non-optional . The engineer correctly identified that the model definition needed to be fixed to allow for optional assignment.
+The work was paused immediately before the final step of this sub-task: creating the  function inside . This is the last piece of backend logic required to make the Forgot Password? link on the login page functional.
 </current_work>
-
 <optional_next_step>
-Fix the Pydantic validation error by modifying the  model in  to make the  field optional ().
+Add the  function to the  file to complete the Forgot Password feature logic.
 </optional_next_step>
