@@ -207,42 +207,47 @@ const TimeByCategoryChart = () => {
           {chartData && chartData.months && (
             <div className="flex items-end justify-start h-full gap-4 overflow-x-auto">
               {chartData.months.map((monthData, index) => {
-                const totalTime = Object.values(monthData.categories).reduce((sum, val) => sum + val, 0);
+                // Calculer le total uniquement pour les catégories visibles
+                const totalTime = Object.entries(monthData.categories)
+                  .filter(([cat]) => visibleCategories[cat])
+                  .reduce((sum, [_, val]) => sum + val, 0);
                 
                 return (
                   <div key={index} className="flex flex-col items-center min-w-[120px]">
                     {/* Groupe de barres côte à côte */}
                     <div className="flex items-end justify-center gap-1 h-64 w-full mb-2">
                       {/* Ordre fixe des catégories pour cohérence visuelle */}
-                      {['CHANGEMENT_FORMAT', 'TRAVAUX_PREVENTIFS', 'TRAVAUX_CURATIF', 'TRAVAUX_DIVERS', 'FORMATION', 'REGLAGE'].map((category) => {
-                        const time = monthData.categories[category] || 0;
-                        const heightPercent = maxValue > 0 ? (time / maxValue) * 100 : 0;
-                        
-                        // Calculer le pourcentage par rapport au total du mois
-                        const percentOfMonth = totalTime > 0 ? ((time / totalTime) * 100).toFixed(1) : 0;
-                        
-                        return (
-                          <div
-                            key={category}
-                            className="relative group cursor-pointer hover:opacity-80 transition-opacity w-3"
-                            style={{
-                              height: `${heightPercent}%`,
-                              backgroundColor: categoryColors[category],
-                              minHeight: time > 0 ? '4px' : '0px'
-                            }}
-                          >
-                            {/* Tooltip */}
-                            {time > 0 && (
-                              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block z-10">
-                                <div className="bg-gray-900 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
-                                  <div className="font-semibold">{categoryLabels[category]}</div>
-                                  <div>{formatTime(time)} ({percentOfMonth}%)</div>
+                      {['CHANGEMENT_FORMAT', 'TRAVAUX_PREVENTIFS', 'TRAVAUX_CURATIF', 'TRAVAUX_DIVERS', 'FORMATION', 'REGLAGE']
+                        .filter(category => visibleCategories[category]) // Filtrer les catégories masquées
+                        .map((category) => {
+                          const time = monthData.categories[category] || 0;
+                          const heightPercent = maxValue > 0 ? (time / maxValue) * 100 : 0;
+                          
+                          // Calculer le pourcentage par rapport au total des catégories visibles
+                          const percentOfMonth = totalTime > 0 ? ((time / totalTime) * 100).toFixed(1) : 0;
+                          
+                          return (
+                            <div
+                              key={category}
+                              className="relative group cursor-pointer hover:opacity-80 transition-opacity w-3"
+                              style={{
+                                height: `${heightPercent}%`,
+                                backgroundColor: categoryColors[category],
+                                minHeight: time > 0 ? '4px' : '0px'
+                              }}
+                            >
+                              {/* Tooltip */}
+                              {time > 0 && (
+                                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block z-10">
+                                  <div className="bg-gray-900 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+                                    <div className="font-semibold">{categoryLabels[category]}</div>
+                                    <div>{formatTime(time)} ({percentOfMonth}%)</div>
+                                  </div>
                                 </div>
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
+                              )}
+                            </div>
+                          );
+                        })}
                     </div>
                     
                     {/* Label du mois */}
@@ -250,7 +255,7 @@ const TimeByCategoryChart = () => {
                       {formatMonthLabel(monthData.month)}
                     </div>
                     
-                    {/* Total */}
+                    {/* Total des catégories visibles */}
                     {totalTime > 0 && (
                       <div className="text-xs font-semibold text-gray-700 mt-1">
                         {formatTime(totalTime)}
