@@ -10,7 +10,9 @@ import { Badge } from '../ui/badge';
 import { Separator } from '../ui/separator';
 import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
-import { Calendar, Clock, User, MapPin, Wrench, FileText, MessageSquare, Send } from 'lucide-react';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
+import { Calendar, Clock, User, MapPin, Wrench, FileText, MessageSquare, Send, Plus } from 'lucide-react';
 import AttachmentsList from './AttachmentsList';
 import AttachmentUploader from './AttachmentUploader';
 import StatusChangeDialog from './StatusChangeDialog';
@@ -26,6 +28,9 @@ const WorkOrderDialog = ({ open, onOpenChange, workOrder, onSuccess }) => {
   const [sendingComment, setSendingComment] = useState(false);
   const [showStatusDialog, setShowStatusDialog] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+  const [timeHours, setTimeHours] = useState('');
+  const [timeMinutes, setTimeMinutes] = useState('');
+  const [addingTime, setAddingTime] = useState(false);
 
   const loadComments = async () => {
     if (!workOrder) return;
