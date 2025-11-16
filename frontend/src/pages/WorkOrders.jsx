@@ -430,6 +430,15 @@ const WorkOrders = () => {
                       <td className="py-3 px-4">{getStatusBadge(wo.statut)}</td>
                       <td className="py-3 px-4 text-sm text-gray-900 font-medium">{wo.titre}</td>
                       <td className="py-3 px-4">{getPriorityBadge(wo.priorite)}</td>
+                      <td className="py-3 px-4">
+                        {wo.categorie ? (
+                          <span className="px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-700">
+                            {getCategoryLabel(wo.categorie)}
+                          </span>
+                        ) : (
+                          <span className="text-gray-400 text-sm">-</span>
+                        )}
+                      </td>
                       <td className="py-3 px-4 text-sm text-gray-700">
                         {wo.assigneA ? (
                           <div className="flex items-center gap-2">
