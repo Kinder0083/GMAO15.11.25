@@ -289,37 +289,49 @@ class WorkOrderTimeTrackingTester:
             return False
     
     def test_get_work_order_final(self):
-        """TEST 6: Récupérer l'ordre et vérifier le temps final"""
-        self.log("🧪 TEST 6: Récupérer l'ordre et vérifier le temps final")
+        """TEST 6: Récupérer l'ordre et vérifier le temps final via la liste"""
+        self.log("🧪 TEST 6: Récupérer l'ordre et vérifier le temps final via la liste")
         
         if not self.test_work_order_id:
             self.log("❌ Pas d'ordre de travail de test disponible", "ERROR")
             return False
         
         try:
+            # Utiliser l'endpoint de liste pour trouver notre ordre de travail
             response = self.admin_session.get(
-                f"{BACKEND_URL}/work-orders/{self.test_work_order_id}",
+                f"{BACKEND_URL}/work-orders",
                 timeout=10
             )
             
             if response.status_code == 200:
-                data = response.json()
-                self.log("✅ Récupération de l'ordre réussie (Status 200)")
+                work_orders = response.json()
+                self.log("✅ Récupération de la liste des ordres réussie (Status 200)")
                 
-                # Vérifier que tempsReel = 7.5 heures
-                temps_reel = data.get("tempsReel")
-                expected_time = 7.5
+                # Chercher notre ordre de travail par ID
+                test_order = None
+                for wo in work_orders:
+                    if wo.get("id") == self.test_work_order_id:
+                        test_order = wo
+                        break
                 
-                if temps_reel == expected_time:
-                    self.log(f"✅ tempsReel = {temps_reel} heures (7h30min comme attendu)")
-                    self.log("✅ Le temps total est correct après tous les ajouts")
-                    return True
+                if test_order:
+                    # Vérifier que tempsReel = 7.5 heures
+                    temps_reel = test_order.get("tempsReel")
+                    expected_time = 7.5
+                    
+                    if temps_reel == expected_time:
+                        self.log(f"✅ tempsReel = {temps_reel} heures (7h30min comme attendu)")
+                        self.log("✅ Le temps total est correct après tous les ajouts")
+                        return True
+                    else:
+                        self.log(f"❌ tempsReel = {temps_reel}, attendu {expected_time}", "ERROR")
+                        return False
                 else:
-                    self.log(f"❌ tempsReel = {temps_reel}, attendu {expected_time}", "ERROR")
+                    self.log("❌ Ordre de travail de test non trouvé dans la liste", "ERROR")
                     return False
                     
             else:
-                self.log(f"❌ Récupération de l'ordre échouée - Status: {response.status_code}", "ERROR")
+                self.log(f"❌ Récupération de la liste échouée - Status: {response.status_code}", "ERROR")
                 self.log(f"Response: {response.text}", "ERROR")
                 return False
                 
