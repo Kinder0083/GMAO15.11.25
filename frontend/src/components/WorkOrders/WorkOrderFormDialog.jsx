@@ -320,6 +320,22 @@ const WorkOrderFormDialog = ({ open, onOpenChange, workOrder, onSuccess }) => {
           </div>
 
           <div className="space-y-2">
+            <Label htmlFor="categorie">Catégorie</Label>
+            <Select value={formData.categorie} onValueChange={(value) => setFormData({ ...formData, categorie: value })}>
+              <SelectTrigger>
+                <SelectValue placeholder="Sélectionner une catégorie" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="CHANGEMENT_FORMAT">Changement de Format</SelectItem>
+                <SelectItem value="TRAVAUX_PREVENTIFS">Travaux Préventifs</SelectItem>
+                <SelectItem value="TRAVAUX_CURATIF">Travaux Curatif</SelectItem>
+                <SelectItem value="TRAVAUX_DIVERS">Travaux Divers</SelectItem>
+                <SelectItem value="FORMATION">Formation</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="equipement_id">Équipement</Label>
             <Select value={formData.equipement_id} onValueChange={(value) => setFormData({ ...formData, equipement_id: value })}>
               <SelectTrigger>
