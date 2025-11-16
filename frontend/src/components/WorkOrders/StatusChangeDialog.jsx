@@ -25,8 +25,11 @@ const StatusChangeDialog = ({ open, onOpenChange, currentStatus, onStatusChange,
   ];
 
   const handleConfirm = () => {
+    const hours = parseInt(timeHours) || 0;
+    const minutes = parseInt(timeMinutes) || 0;
+    
     if (selectedStatus !== currentStatus) {
-      onStatusChange(selectedStatus);
+      onStatusChange(selectedStatus, hours, minutes);
     } else {
       onSkip();
     }
