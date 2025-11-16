@@ -281,7 +281,7 @@ const WorkOrderDialog = ({ open, onOpenChange, workOrder, onSuccess }) => {
               <div>
                 <p className="text-sm text-gray-600">Temps réel</p>
                 <p className="font-medium text-gray-900">
-                  {workOrder.tempsReel ? `${workOrder.tempsReel}h` : 'Non démarré'}
+                  {workOrder.tempsReel ? formatTimeToHoursMinutes(workOrder.tempsReel) : 'Non démarré'}
                 </p>
               </div>
             </div>
