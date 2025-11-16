@@ -380,21 +380,12 @@ const WorkOrderDialog = ({ open, onOpenChange, workOrder, onSuccess }) => {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <Clock size={20} className="text-gray-600" />
-              <h3 className="text-lg font-semibold text-gray-900">Temps Passé</h3>
-            </div>
-            
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-              <p className="text-sm text-blue-800 mb-1">
-                <strong>Temps réel total :</strong> {workOrder.tempsReel ? `${workOrder.tempsReel.toFixed(2)}h` : '0h'}
-              </p>
-              <p className="text-xs text-blue-600">
-                Ajoutez le temps passé sur cette intervention au fur et à mesure
-              </p>
+              <h3 className="text-lg font-semibold text-gray-900">Ajouter du Temps Passé</h3>
             </div>
 
             {/* Zone de saisie du temps */}
             <div className="space-y-2">
-              <Label>Ajouter du temps passé</Label>
+              <Label>Enregistrer le temps passé sur cette intervention</Label>
               <div className="flex gap-2 items-end">
                 <div className="flex-1">
                   <Input
