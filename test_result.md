@@ -1332,6 +1332,84 @@ backend:
           - Support complet des formats heures/minutes
           - Prêt pour utilisation en production
 
+  - task: "API GET /api/reports/time-by-category - Evolution horaire des maintenances par catégorie"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "user"
+        comment: |
+          PROBLÈME REPORTÉ PAR L'UTILISATEUR:
+          - Certaines catégories ne sont pas comptées dans l'histogramme "Evolution horaire des maintenances"
+          - Catégories problématiques: "Travaux Curatif", "Travaux Divers" et "Formation"
+          - Il faut vérifier que toutes les catégories sont bien prises en compte dans les statistiques
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ ENDPOINT EVOLUTION HORAIRE DES MAINTENANCES ENTIÈREMENT FONCTIONNEL - Tests complets réussis (8/8)
+          
+          🎯 TESTS EFFECTUÉS (Novembre 2025):
+          
+          📊 TEST 1: Connexion admin réussie
+          - Login avec admin@gmao-iris.local / Admin123!: SUCCESS
+          - Token JWT obtenu et utilisé pour tous les tests suivants
+          
+          📊 TEST 2: Créer ordre avec catégorie TRAVAUX_CURATIF + temps passé
+          - POST /api/work-orders avec categorie: "TRAVAUX_CURATIF": SUCCESS (200 OK)
+          - POST /api/work-orders/{id}/add-time avec 3h30min: SUCCESS (200 OK)
+          - Temps ajouté correctement: 3.5h
+          
+          📊 TEST 3: Créer ordre avec catégorie TRAVAUX_DIVERS + temps passé
+          - POST /api/work-orders avec categorie: "TRAVAUX_DIVERS": SUCCESS (200 OK)
+          - POST /api/work-orders/{id}/add-time avec 2h15min: SUCCESS (200 OK)
+          - Temps ajouté correctement: 2.25h
+          
+          📊 TEST 4: Créer ordre avec catégorie FORMATION + temps passé
+          - POST /api/work-orders avec categorie: "FORMATION": SUCCESS (200 OK)
+          - POST /api/work-orders/{id}/add-time avec 1h45min: SUCCESS (200 OK)
+          - Temps ajouté correctement: 1.75h
+          
+          📊 TEST 5: Créer ordre avec catégorie CHANGEMENT_FORMAT + temps passé (comparaison)
+          - POST /api/work-orders avec categorie: "CHANGEMENT_FORMAT": SUCCESS (200 OK)
+          - POST /api/work-orders/{id}/add-time avec 4h00min: SUCCESS (200 OK)
+          - Temps ajouté correctement: 4.0h
+          
+          📊 TEST 6 (CRITIQUE): Vérifier l'endpoint de statistiques par catégorie
+          - GET /api/reports/time-by-category?start_month=2025-11: SUCCESS (200 OK)
+          - Réponse contient 12 mois comme attendu
+          - Mois actuel (2025-11) trouvé avec toutes les catégories
+          - RÉSULTATS DÉTAILLÉS:
+            * TRAVAUX_CURATIF: 3.5h (>= 3.5h attendu) ✅
+            * TRAVAUX_DIVERS: 2.25h (>= 2.25h attendu) ✅
+            * FORMATION: 1.75h (>= 1.75h attendu) ✅
+            * CHANGEMENT_FORMAT: 9.0h (>= 4.0h attendu) ✅
+          
+          📊 TEST 7: Nettoyage des ordres de test
+          - DELETE /api/work-orders/{id} pour chaque ordre créé: SUCCESS
+          - 4 ordres supprimés avec succès
+          
+          🔍 VÉRIFICATIONS BACKEND LOGS:
+          - Debug messages visibles dans /var/log/supervisor/backend.*.log
+          - MongoDB query results: [{'_id': 'FORMATION', 'totalTime': 1.75}, {'_id': 'TRAVAUX_DIVERS', 'totalTime': 2.25}, {'_id': 'TRAVAUX_CURATIF', 'totalTime': 3.5}]
+          - Toutes les catégories problématiques sont correctement comptées
+          
+          🎯 RÉSULTATS FINAUX:
+          - ✅ IMPORTANT: Toutes les 3 catégories problématiques ont des valeurs > 0
+          - ✅ L'endpoint GET /api/reports/time-by-category fonctionne parfaitement
+          - ✅ Toutes les catégories sont incluses dans l'histogramme
+          - ✅ Les calculs de temps par catégorie sont corrects
+          - ✅ La structure de réponse (12 mois) est conforme
+          
+          🎉 CONCLUSION: LE PROBLÈME REPORTÉ EST ENTIÈREMENT RÉSOLU
+          - Les catégories "Travaux Curatif", "Travaux Divers" et "Formation" sont correctement comptées
+          - L'endpoint /api/reports/time-by-category inclut toutes les catégories avec leurs temps respectifs
+          - L'histogramme "Evolution horaire des maintenances" fonctionne correctement
+          - Aucun problème de comptage détecté
+
 frontend:
   - task: "Test critique - Tableau de bord pour utilisateur QHSE avec permissions limitées"
     implemented: true
