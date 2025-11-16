@@ -522,6 +522,7 @@ class WorkOrderBase(BaseModel):
     description: str
     statut: WorkOrderStatus = WorkOrderStatus.OUVERT
     priorite: Priority = Priority.AUCUNE
+    categorie: Optional[WorkOrderCategory] = None
     equipement_id: Optional[str] = None
     assigne_a_id: Optional[str] = None
     emplacement_id: Optional[str] = None
