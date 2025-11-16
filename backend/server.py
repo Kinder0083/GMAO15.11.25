@@ -2337,12 +2337,14 @@ async def update_system_settings(
         # Journaliser l'action
         await audit_service.log_action(
             user_id=current_user["id"],
-            action_type="UPDATE",
-            module="SETTINGS",
-            details={
-                "action": "Modification des paramètres système",
-                "changes": update_data
-            }
+            user_name=f"{current_user['prenom']} {current_user['nom']}",
+            user_email=current_user["email"],
+            action=ActionType.UPDATE,
+            entity_type=EntityType.SETTINGS,
+            entity_id="default",
+            entity_name="System Settings",
+            details="Modification des paramètres système",
+            changes=update_data
         )
         
         return SystemSettings(**settings)
