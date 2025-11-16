@@ -261,53 +261,34 @@ class InactivityTimeoutTester:
             self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
             return False
     
-    def test_admin_reset_password(self):
-        """TEST 2: Admin Reset Password - POST /api/users/{user_id}/reset-password-admin"""
-        self.log("🧪 TEST 2: Admin Reset Password - POST /api/users/{user_id}/reset-password-admin")
-        
-        if not self.test_user_id:
-            self.log("❌ No test user available for password reset", "ERROR")
-            return False
+    def test_validation_too_low(self):
+        """TEST 4: Test de validation - Valeur trop basse"""
+        self.log("🧪 TEST 4: Validation test - Value too low (0 minutes)")
         
         try:
-            response = self.admin_session.post(
-                f"{BACKEND_URL}/users/{self.test_user_id}/reset-password-admin",
+            response = self.admin_session.put(
+                f"{BACKEND_URL}/settings",
+                json={"inactivity_timeout_minutes": 0},
                 timeout=10
             )
             
-            if response.status_code == 200:
-                data = response.json()
-                self.log("✅ POST /api/users/{user_id}/reset-password-admin returned 200 OK")
+            if response.status_code == 400:
+                self.log("✅ PUT /api/settings correctly returned 400 Bad Request for value 0")
                 
-                # Check required fields in response
-                if data.get("success") == True:
-                    self.log("✅ Response contains 'success': true")
-                else:
-                    self.log(f"❌ Response success field is {data.get('success')}", "ERROR")
-                    return False
-                
-                if "tempPassword" in data:
-                    self.temp_password = data.get("tempPassword")
-                    self.log(f"✅ Response contains 'tempPassword': {self.temp_password}")
-                else:
-                    self.log("❌ Response missing 'tempPassword' field", "ERROR")
-                    return False
-                
-                # Verify firstLogin field is set to True in database
-                user_response = self.admin_session.get(f"{BACKEND_URL}/users/{self.test_user_id}")
-                if user_response.status_code == 200:
-                    user_data = user_response.json()
-                    if user_data.get("firstLogin") == True:
-                        self.log("✅ User firstLogin field correctly set to True in database")
+                # Check error message
+                try:
+                    data = response.json()
+                    detail = data.get("detail", "")
+                    if "1 et 120" in detail or "entre" in detail.lower():
+                        self.log(f"✅ Appropriate error message: {detail}")
                     else:
-                        self.log(f"❌ User firstLogin field is {user_data.get('firstLogin')}, expected True", "ERROR")
-                        return False
-                else:
-                    self.log("⚠️ Could not verify firstLogin field in database", "WARNING")
+                        self.log(f"⚠️ Error message: {detail}", "WARNING")
+                except:
+                    self.log("⚠️ Could not parse error message", "WARNING")
                 
                 return True
             else:
-                self.log(f"❌ POST /api/users/{{user_id}}/reset-password-admin failed - Status: {response.status_code}", "ERROR")
+                self.log(f"❌ Expected 400 Bad Request but got {response.status_code}", "ERROR")
                 self.log(f"Response: {response.text}", "ERROR")
                 return False
                 
