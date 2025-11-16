@@ -389,33 +389,33 @@ class WorkOrderTimeTrackingTester:
     
     # Removed old methods - replaced with work order time tracking tests
     
-    def run_inactivity_timeout_tests(self):
-        """Run comprehensive tests for inactivity timeout settings functionality"""
+    def run_work_order_time_tracking_tests(self):
+        """Run comprehensive tests for work order time tracking functionality"""
         self.log("=" * 80)
-        self.log("TESTING INACTIVITY TIMEOUT SETTINGS FUNCTIONALITY")
+        self.log("TESTING WORK ORDER TIME TRACKING FUNCTIONALITY")
         self.log("=" * 80)
-        self.log("CONTEXTE: Test complet de la fonctionnalité 'Gestion du timeout d'inactivité'")
+        self.log("CONTEXTE: Test complet du système d'ajout de temps passé sur les ordres de travail")
         self.log("")
         self.log("TESTS À EFFECTUER:")
-        self.log("1. GET /api/settings - Récupérer les paramètres système (utilisateur normal)")
-        self.log("2. PUT /api/settings - Mettre à jour les paramètres (admin uniquement)")
-        self.log("3. Vérifier que les paramètres sont persistés")
-        self.log("4. Test de validation - Valeur trop basse (0)")
-        self.log("5. Test de validation - Valeur trop haute (150)")
-        self.log("6. Test de sécurité - Non-admin")
+        self.log("1. Créer un ordre de travail de test")
+        self.log("2. Ajouter du temps passé (première fois) - 2h30min")
+        self.log("3. Ajouter du temps passé (incrémentation) - 1h15min")
+        self.log("4. Ajouter uniquement des minutes - 45min")
+        self.log("5. Ajouter uniquement des heures - 3h")
+        self.log("6. Récupérer l'ordre et vérifier le temps final")
+        self.log("7. Nettoyer (supprimer l'ordre de test)")
         self.log("=" * 80)
         
         results = {
             "admin_login": False,
-            "normal_user_setup": False,
-            "get_settings_normal_user": False,
-            "update_settings_admin": False,
-            "verify_settings_persistence": False,
-            "validation_too_low": False,
-            "validation_too_high": False,
-            "non_admin_security": False,
-            "restore_settings": False,
-            "cleanup": False
+            "create_work_order": False,
+            "add_time_first": False,
+            "add_time_increment": False,
+            "add_minutes_only": False,
+            "add_hours_only": False,
+            "get_work_order_final": False,
+            "cleanup_work_order": False,
+            "cleanup_remaining": False
         }
         
         # Test 1: Admin Login
@@ -425,40 +425,37 @@ class WorkOrderTimeTrackingTester:
             self.log("❌ Cannot proceed with other tests - Admin login failed", "ERROR")
             return results
         
-        # Test 2: Setup normal user
-        results["normal_user_setup"] = self.test_normal_user_login()
+        # Test 2: Create work order
+        results["create_work_order"] = self.test_create_work_order()
         
-        if not results["normal_user_setup"]:
-            self.log("❌ Cannot proceed with normal user tests - User setup failed", "ERROR")
+        if not results["create_work_order"]:
+            self.log("❌ Cannot proceed with time tracking tests - Work order creation failed", "ERROR")
             return results
         
-        # Test 3: Get settings as normal user
-        results["get_settings_normal_user"] = self.test_get_settings_normal_user()
+        # Test 3: Add time first time
+        results["add_time_first"] = self.test_add_time_first()
         
-        # Test 4: Update settings as admin
-        results["update_settings_admin"] = self.test_update_settings_admin()
+        # Test 4: Add time increment
+        results["add_time_increment"] = self.test_add_time_increment()
         
-        # Test 5: Verify settings persistence
-        results["verify_settings_persistence"] = self.test_verify_settings_persistence()
+        # Test 5: Add minutes only
+        results["add_minutes_only"] = self.test_add_minutes_only()
         
-        # Test 6: Validation - too low
-        results["validation_too_low"] = self.test_validation_too_low()
+        # Test 6: Add hours only
+        results["add_hours_only"] = self.test_add_hours_only()
         
-        # Test 7: Validation - too high
-        results["validation_too_high"] = self.test_validation_too_high()
+        # Test 7: Get work order final
+        results["get_work_order_final"] = self.test_get_work_order_final()
         
-        # Test 8: Security - non-admin
-        results["non_admin_security"] = self.test_non_admin_security()
+        # Test 8: Cleanup work order
+        results["cleanup_work_order"] = self.test_cleanup_work_order()
         
-        # Test 9: Restore original settings
-        results["restore_settings"] = self.restore_original_settings()
-        
-        # Test 10: Cleanup
-        results["cleanup"] = self.cleanup_test_user()
+        # Test 9: Cleanup remaining
+        results["cleanup_remaining"] = self.cleanup_remaining_work_orders()
         
         # Summary
         self.log("=" * 70)
-        self.log("INACTIVITY TIMEOUT SETTINGS TEST RESULTS SUMMARY")
+        self.log("WORK ORDER TIME TRACKING TEST RESULTS SUMMARY")
         self.log("=" * 70)
         
         passed = sum(results.values())
@@ -471,31 +468,32 @@ class WorkOrderTimeTrackingTester:
         self.log(f"\n📊 Overall: {passed}/{total} tests passed")
         
         # Detailed analysis for critical tests
-        critical_tests = ["get_settings_normal_user", "update_settings_admin", "verify_settings_persistence", 
-                         "validation_too_low", "validation_too_high", "non_admin_security"]
+        critical_tests = ["create_work_order", "add_time_first", "add_time_increment", 
+                         "add_minutes_only", "add_hours_only", "get_work_order_final"]
         critical_passed = sum(results.get(test, False) for test in critical_tests)
         
         if critical_passed == len(critical_tests):
-            self.log("🎉 CRITICAL SUCCESS: All main inactivity timeout tests passed!")
-            self.log("✅ GET /api/settings works for normal users")
-            self.log("✅ PUT /api/settings works for admin users")
-            self.log("✅ Settings are properly persisted")
-            self.log("✅ Validation works for invalid values")
-            self.log("✅ Security restrictions work for non-admin users")
+            self.log("🎉 CRITICAL SUCCESS: All main time tracking tests passed!")
+            self.log("✅ POST /api/work-orders works correctly")
+            self.log("✅ POST /api/work-orders/{id}/add-time works for first time")
+            self.log("✅ Time incrementation works correctly")
+            self.log("✅ Minutes-only addition works")
+            self.log("✅ Hours-only addition works")
+            self.log("✅ GET /api/work-orders/{id} returns correct final time")
         else:
-            self.log("🚨 CRITICAL FAILURE: Some main inactivity timeout tests failed!")
+            self.log("🚨 CRITICAL FAILURE: Some main time tracking tests failed!")
             failed_critical = [test for test in critical_tests if not results.get(test, False)]
             self.log(f"❌ Failed critical tests: {', '.join(failed_critical)}")
         
-        if passed >= total - 2:  # Allow cleanup and restore to fail
-            self.log("🎉 INACTIVITY TIMEOUT SETTINGS FUNCTIONALITY IS WORKING CORRECTLY!")
-            self.log("✅ All endpoints respond correctly")
-            self.log("✅ Proper validation in place")
-            self.log("✅ Security restrictions enforced")
-            self.log("✅ Settings persistence works")
+        if passed >= total - 2:  # Allow cleanup to fail
+            self.log("🎉 WORK ORDER TIME TRACKING FUNCTIONALITY IS WORKING CORRECTLY!")
+            self.log("✅ Time addition works correctly")
+            self.log("✅ Time incrementation is accurate")
+            self.log("✅ All time formats (hours, minutes, both) supported")
+            self.log("✅ Final time calculation is correct (7.5 hours)")
         else:
-            self.log("⚠️ Some tests failed - The inactivity timeout settings functionality may have issues")
-            failed_tests = [test for test, result in results.items() if not result and test not in ["cleanup", "restore_settings"]]
+            self.log("⚠️ Some tests failed - The work order time tracking functionality may have issues")
+            failed_tests = [test for test, result in results.items() if not result and test not in ["cleanup_work_order", "cleanup_remaining"]]
             self.log(f"❌ Failed tests: {', '.join(failed_tests)}")
         
         return results
