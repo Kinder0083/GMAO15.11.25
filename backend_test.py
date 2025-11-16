@@ -202,30 +202,32 @@ class InactivityTimeoutTester:
             self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
             return False
     
-    def get_existing_user_for_reset(self):
-        """Get an existing user (not admin) for password reset testing"""
-        self.log("Getting existing user for password reset testing...")
+    def test_update_settings_admin(self):
+        """TEST 2: Mettre à jour les paramètres (PUT /api/settings) - Admin uniquement"""
+        self.log("🧪 TEST 2: PUT /api/settings - Admin user")
         
         try:
-            # Get list of users
-            response = self.admin_session.get(f"{BACKEND_URL}/users", timeout=10)
+            # Test updating timeout to 30 minutes
+            response = self.admin_session.put(
+                f"{BACKEND_URL}/settings",
+                json={"inactivity_timeout_minutes": 30},
+                timeout=10
+            )
             
             if response.status_code == 200:
-                users = response.json()
+                data = response.json()
+                self.log("✅ PUT /api/settings returned 200 OK for admin user")
                 
-                # Find a non-admin user
-                for user in users:
-                    if user.get("role") != "ADMIN" and user.get("email") != ADMIN_EMAIL:
-                        self.test_user_id = user.get("id")
-                        self.test_user_email = user.get("email")
-                        self.log(f"✅ Found existing user for testing: {user.get('prenom')} {user.get('nom')} (ID: {self.test_user_id})")
-                        return True
-                
-                # If no non-admin user found, create one
-                self.log("No suitable existing user found, creating test user...")
-                return self.create_test_user()
+                # Check that the new value is returned
+                if data.get("inactivity_timeout_minutes") == 30:
+                    self.log("✅ Response contains the new value (30 minutes)")
+                    return True
+                else:
+                    self.log(f"❌ Response contains wrong value: {data.get('inactivity_timeout_minutes')}, expected 30", "ERROR")
+                    return False
             else:
-                self.log(f"❌ Failed to get users list - Status: {response.status_code}", "ERROR")
+                self.log(f"❌ PUT /api/settings failed - Status: {response.status_code}", "ERROR")
+                self.log(f"Response: {response.text}", "ERROR")
                 return False
                 
         except requests.exceptions.RequestException as e:
