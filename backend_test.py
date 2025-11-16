@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Backend API Testing Script for GMAO Application
-Tests "Système d'ajout de temps passé sur les ordres de travail" functionality
+Tests "Evolution horaire des maintenances" endpoint for category counting
 """
 
 import requests
