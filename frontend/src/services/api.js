@@ -306,4 +306,10 @@ export const improvementsAPI = {
   getComments: (id) => api.get(`/improvements/${id}/comments`)
 };
 
+// System Settings API
+api.settings = {
+  getSettings: () => api.get('/settings'),
+  updateSettings: (data) => api.put('/settings', data)
+};
+
 export default api;
