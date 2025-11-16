@@ -8,9 +8,11 @@ import {
   EyeOff, 
   Mail,
   AlertTriangle,
-  CheckCircle
+  CheckCircle,
+  Clock,
+  Save
 } from 'lucide-react';
-import { usersAPI } from '../services/api';
+import api, { usersAPI } from '../services/api';
 import { useToast } from '../hooks/use-toast';
 
 const SpecialSettings = () => {
@@ -19,6 +21,9 @@ const SpecialSettings = () => {
   const [resetting, setResetting] = useState(null);
   const [tempPassword, setTempPassword] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [inactivityTimeout, setInactivityTimeout] = useState(15);
+  const [loadingSettings, setLoadingSettings] = useState(true);
+  const [savingSettings, setSavingSettings] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
