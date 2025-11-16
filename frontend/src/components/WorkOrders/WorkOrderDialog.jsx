@@ -60,6 +60,44 @@ const WorkOrderDialog = ({ open, onOpenChange, workOrder, onSuccess }) => {
     }
   };
 
+  const handleAddTime = async () => {
+    const hours = parseInt(timeHours) || 0;
+    const minutes = parseInt(timeMinutes) || 0;
+
+    if (hours === 0 && minutes === 0) {
+      toast({
+        title: 'Erreur',
+        description: 'Veuillez saisir un temps valide',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    try {
+      setAddingTime(true);
+      await workOrdersAPI.addTimeSpent(workOrder.id, hours, minutes);
+      
+      toast({
+        title: 'Temps ajouté',
+        description: `${hours}h${minutes.toString().padStart(2, '0')}min ajouté avec succès`
+      });
+
+      setTimeHours('');
+      setTimeMinutes('');
+      
+      // Rafraîchir les données
+      if (onSuccess) onSuccess();
+    } catch (error) {
+      toast({
+        title: 'Erreur',
+        description: 'Impossible d\'ajouter le temps',
+        variant: 'destructive'
+      });
+    } finally {
+      setAddingTime(false);
+    }
+  };
+
   const handleUploadComplete = () => {
     setRefreshAttachments(prev => prev + 1);
   };
