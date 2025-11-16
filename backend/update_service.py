@@ -322,7 +322,7 @@ class UpdateService:
             log_detailed(f"✅ Backup créé: {backup_result.get('backup_name')}")
             
             # 2. Git pull
-            logger.info("📥 Téléchargement de la mise à jour depuis GitHub...")
+            log_detailed("📥 Étape 2/7: Téléchargement de la mise à jour depuis GitHub...")
             result = subprocess.run(
                 ["git", "pull", "origin", self.github_branch],
                 cwd="/app",
@@ -331,10 +331,15 @@ class UpdateService:
                 timeout=60
             )
             
+            log_detailed(f"Git pull returncode: {result.returncode}")
+            log_detailed(f"Git pull stdout: {result.stdout}")
+            log_detailed(f"Git pull stderr: {result.stderr}")
+            
             if result.returncode != 0:
+                log_detailed(f"❌ ÉCHEC GIT PULL: {result.stderr}", "ERROR")
                 raise Exception(f"Erreur git pull: {result.stderr}")
             
-            logger.info(f"✅ Mise à jour téléchargée: {result.stdout}")
+            log_detailed(f"✅ Mise à jour téléchargée")
             
             # 3. Installer les dépendances backend si requirements.txt a changé
             logger.info("📦 Installation des dépendances backend...")
