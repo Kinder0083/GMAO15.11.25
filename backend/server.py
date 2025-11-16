@@ -2863,6 +2863,76 @@ async def get_analytics(current_user: dict = Depends(require_permission("reports
     
     return analytics
 
+
+@api_router.get("/reports/time-by-category")
+async def get_time_by_category(start_month: str, current_user: dict = Depends(require_permission("reports", "view"))):
+    """
+    Obtenir le temps passé par catégorie sur 12 mois glissants
+    start_month format: YYYY-MM (ex: 2025-09)
+    """
+    try:
+        from datetime import datetime
+        from dateutil.relativedelta import relativedelta
+        
+        # Parser le mois de départ
+        start_date = datetime.strptime(start_month + "-01", "%Y-%m-%d")
+        
+        # Créer 12 mois de données
+        months_data = []
+        for i in range(12):
+            current_month = start_date + relativedelta(months=i)
+            month_start = current_month.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            month_end = (month_start + relativedelta(months=1)) - relativedelta(seconds=1)
+            
+            # Requête pour récupérer tous les ordres de travail terminés dans ce mois
+            pipeline = [
+                {
+                    "$match": {
+                        "dateCreation": {
+                            "$gte": month_start,
+                            "$lte": month_end
+                        }
+                    }
+                },
+                {
+                    "$group": {
+                        "_id": "$categorie",
+                        "totalTime": {"$sum": {"$ifNull": ["$tempsReel", 0]}}
+                    }
+                }
+            ]
+            
+            results = await db.work_orders.aggregate(pipeline).to_list(length=None)
+            
+            # Organiser par catégorie
+            time_by_category = {
+                "CHANGEMENT_FORMAT": 0,
+                "TRAVAUX_PREVENTIFS": 0,
+                "TRAVAUX_CURATIF": 0,
+                "TRAVAUX_DIVERS": 0,
+                "FORMATION": 0,
+                "REGLAGE": 0
+            }
+            
+            for result in results:
+                if result["_id"] and result["_id"] in time_by_category:
+                    time_by_category[result["_id"]] = round(result["totalTime"], 2)
+            
+            months_data.append({
+                "month": current_month.strftime("%Y-%m"),
+                "monthLabel": current_month.strftime("%B %Y"),
+                "categories": time_by_category
+            })
+        
+        return {
+            "startMonth": start_month,
+            "months": months_data
+        }
+    except Exception as e:
+        logger.error(f"Erreur lors de la récupération des stats par catégorie : {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # ==================== IMPORT/EXPORT ROUTES ====================
 EXPORT_MODULES = {
     "intervention-requests": "intervention_requests",
