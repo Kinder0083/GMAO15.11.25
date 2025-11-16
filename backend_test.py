@@ -90,7 +90,7 @@ class WorkOrderTimeTrackingTester:
                 self.test_work_order_id = data.get("id")
                 self.created_work_orders.append(self.test_work_order_id)
                 
-                self.log("✅ Ordre de travail créé avec succès (Status 201)")
+                self.log(f"✅ Ordre de travail créé avec succès (Status {response.status_code})")
                 self.log(f"✅ ID de l'ordre: {self.test_work_order_id}")
                 self.log(f"✅ Titre: {data.get('titre')}")
                 
