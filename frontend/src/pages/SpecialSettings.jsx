@@ -309,6 +309,90 @@ const SpecialSettings = () => {
         </div>
       </div>
 
+      {/* Section Paramètres de sécurité */}
+      <div className="mt-6 bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="border-b border-gray-200 px-6 py-4">
+          <div className="flex items-center gap-2">
+            <Clock className="h-5 w-5 text-gray-600" />
+            <h2 className="text-lg font-semibold text-gray-900">Déconnexion Automatique</h2>
+          </div>
+          <p className="text-sm text-gray-600 mt-1">
+            Configurer le temps d'inactivité avant déconnexion automatique
+          </p>
+        </div>
+
+        <div className="p-6">
+          {loadingSettings ? (
+            <div className="text-center py-8">
+              <RefreshCw className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-2" />
+              <p className="text-gray-600">Chargement des paramètres...</p>
+            </div>
+          ) : (
+            <div className="max-w-2xl">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <div className="flex items-start gap-2">
+                  <Clock className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-blue-800">
+                    <p className="font-semibold mb-1">Fonctionnement :</p>
+                    <ul className="list-disc list-inside space-y-1">
+                      <li>Les utilisateurs inactifs seront avertis 60 secondes avant la déconnexion</li>
+                      <li>Ils peuvent cliquer sur "Rester connecté" pour prolonger leur session</li>
+                      <li>Cette mesure améliore la sécurité des postes partagés</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-end gap-4">
+                <div className="flex-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Temps d'inactivité (minutes)
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="120"
+                    value={inactivityTimeout}
+                    onChange={(e) => setInactivityTimeout(parseInt(e.target.value))}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Valeur actuelle : {inactivityTimeout} minute{inactivityTimeout > 1 ? 's' : ''}
+                    {' '}(min: 1, max: 120)
+                  </p>
+                </div>
+
+                <button
+                  onClick={handleSaveSettings}
+                  disabled={savingSettings || inactivityTimeout < 1 || inactivityTimeout > 120}
+                  className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                >
+                  {savingSettings ? (
+                    <>
+                      <RefreshCw className="h-5 w-5 animate-spin" />
+                      <span>Sauvegarde...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-5 w-5" />
+                      <span>Sauvegarder</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {(inactivityTimeout < 1 || inactivityTimeout > 120) && (
+                <div className="mt-3 bg-red-50 border border-red-200 rounded-lg p-3">
+                  <p className="text-sm text-red-800">
+                    ⚠️ Le temps doit être entre 1 et 120 minutes
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Autres sections futures */}
       <div className="mt-6 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
         <Shield className="h-12 w-12 text-gray-400 mx-auto mb-3" />
