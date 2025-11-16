@@ -144,49 +144,9 @@ class CategoryTimeTrackingTester:
         """TEST 4: Créer ordre avec catégorie FORMATION + temps passé"""
         return self.test_create_work_order_with_category("FORMATION", "Test Formation", 1, 45)
     
-    def test_add_hours_only(self):
-        """TEST 5: Ajouter uniquement des heures - 3h"""
-        self.log("🧪 TEST 5: Ajouter uniquement des heures - 3h")
-        
-        if not self.test_work_order_id:
-            self.log("❌ Pas d'ordre de travail de test disponible", "ERROR")
-            return False
-        
-        try:
-            time_data = {
-                "hours": 3,
-                "minutes": 0
-            }
-            
-            response = self.admin_session.post(
-                f"{BACKEND_URL}/work-orders/{self.test_work_order_id}/add-time",
-                json=time_data,
-                timeout=10
-            )
-            
-            if response.status_code == 200:
-                data = response.json()
-                self.log("✅ Ajout de temps réussi (Status 200)")
-                
-                # Vérifier que tempsReel = 7.5 heures (4.5 + 3)
-                temps_reel = data.get("tempsReel")
-                expected_time = 7.5  # 4.5 + 3 = 7.5 heures
-                
-                if temps_reel == expected_time:
-                    self.log(f"✅ tempsReel = {temps_reel} heures (7h30min comme attendu)")
-                    return True
-                else:
-                    self.log(f"❌ tempsReel = {temps_reel}, attendu {expected_time}", "ERROR")
-                    return False
-                    
-            else:
-                self.log(f"❌ Ajout de temps échoué - Status: {response.status_code}", "ERROR")
-                self.log(f"Response: {response.text}", "ERROR")
-                return False
-                
-        except requests.exceptions.RequestException as e:
-            self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
-            return False
+    def test_create_changement_format_order(self):
+        """TEST 5: Créer ordre avec catégorie CHANGEMENT_FORMAT + temps passé (pour comparaison)"""
+        return self.test_create_work_order_with_category("CHANGEMENT_FORMAT", "Test Format", 4, 0)
     
     def test_get_work_order_final(self):
         """TEST 6: Récupérer l'ordre et vérifier le temps final via la liste"""
