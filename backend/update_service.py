@@ -291,18 +291,35 @@ class UpdateService:
     
     async def apply_update(self, version: str) -> Dict:
         """Applique la mise à jour (git pull + restart)"""
+        
+        # Fonction helper pour logger dans un fichier ET dans le logger
+        def log_detailed(message, level="INFO"):
+            logger.info(message)
+            try:
+                from datetime import datetime
+                with open("/tmp/update_process.log", "a") as f:
+                    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    f.write(f"[{timestamp}] [{level}] {message}\n")
+            except Exception as e:
+                logger.error(f"Erreur écriture log: {e}")
+        
         try:
-            logger.info(f"🚀 Application de la mise à jour vers {version}...")
+            log_detailed(f"🚀 Application de la mise à jour vers {version}...")
+            log_detailed(f"Current version: {self.current_version}")
+            log_detailed(f"Branch: {self.github_branch}")
             
             # 1. Créer une sauvegarde
+            log_detailed("📋 Étape 1/7: Création du backup de la base de données...")
             backup_result = await self.create_backup()
             if not backup_result.get("success"):
+                log_detailed(f"❌ ÉCHEC BACKUP: {backup_result.get('error')}", "ERROR")
                 return {
                     "success": False,
                     "step": "backup",
                     "error": backup_result.get("error"),
                     "message": "Échec de la sauvegarde"
                 }
+            log_detailed(f"✅ Backup créé: {backup_result.get('backup_name')}")
             
             # 2. Git pull
             logger.info("📥 Téléchargement de la mise à jour depuis GitHub...")
