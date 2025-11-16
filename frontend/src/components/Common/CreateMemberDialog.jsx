@@ -207,9 +207,12 @@ const CreateMemberDialog = ({ open, onOpenChange, onSuccess }) => {
               </div>
             </div>
 
-            {/* Grille de permissions - pleine largeur */}
-            <div>
-              <h3 className="text-sm font-semibold text-gray-700 mb-3">Permissions personnalisées</h3>
+            {/* Grille de permissions - pleine largeur avec hauteur limitée */}
+            <div className="border-t pt-4">
+              <h3 className="text-sm font-semibold text-gray-700 mb-2">Permissions personnalisées</h3>
+              <p className="text-xs text-gray-500 mb-3">
+                Personnalisez les accès selon vos besoins (par défaut basé sur le rôle)
+              </p>
               <PermissionsGrid
                 role={formData.role}
                 permissions={formData.permissions}
