@@ -30,6 +30,7 @@ const WorkOrderFormDialog = ({ open, onOpenChange, workOrder, onSuccess }) => {
     description: '',
     statut: 'OUVERT',
     priorite: 'AUCUNE',
+    categorie: '',
     equipement_id: '',
     assigne_a_id: '',
     emplacement_id: '',
