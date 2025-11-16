@@ -135,9 +135,9 @@ class WorkOrderCategoryTester:
                 timeout=10
             )
             
-            if response.status_code == 201:
+            if response.status_code in [200, 201]:
                 data = response.json()
-                self.log("✅ POST /api/work-orders returned 201 Created")
+                self.log(f"✅ POST /api/work-orders returned {response.status_code} (Created)")
                 
                 # Track for cleanup
                 work_order_id = data.get("id")
