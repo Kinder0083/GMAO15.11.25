@@ -78,7 +78,7 @@ const InactivityHandler = () => {
     const checkInactivity = setInterval(() => {
       const inactiveTime = Date.now() - lastActivity;
       
-      if (inactiveTime >= INACTIVITY_TIMEOUT && !showWarning) {
+      if (inactiveTime >= inactivityTimeout && !showWarning) {
         // Afficher le popup d'avertissement
         setShowWarning(true);
         setCountdown(60);
@@ -86,7 +86,7 @@ const InactivityHandler = () => {
     }, 1000); // Vérifier toutes les secondes
 
     return () => clearInterval(checkInactivity);
-  }, [lastActivity, showWarning, INACTIVITY_TIMEOUT]);
+  }, [lastActivity, showWarning, inactivityTimeout]);
 
   // Compte à rebours du popup
   useEffect(() => {
