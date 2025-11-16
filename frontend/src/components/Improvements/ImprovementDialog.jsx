@@ -432,6 +432,7 @@ const ImprovementDialog = ({ open, onOpenChange, workOrder, onSuccess }) => {
       open={showStatusDialog}
       onOpenChange={setShowStatusDialog}
       currentStatus={workOrder.statut}
+      workOrderId={workOrder.id}
       onStatusChange={handleStatusChange}
       onSkip={handleSkipStatusChange}
     />
