@@ -1016,3 +1016,11 @@ class ImprovementUpdate(BaseModel):
     tempsEstime: Optional[int] = None
     tempsReel: Optional[int] = None
 
+
+# ==================== SETTINGS MODELS ====================
+class SystemSettings(BaseModel):
+    inactivity_timeout_minutes: int = 15  # Temps d'inactivité en minutes avant déconnexion
+
+class SystemSettingsUpdate(BaseModel):
+    inactivity_timeout_minutes: Optional[int] = None
+
