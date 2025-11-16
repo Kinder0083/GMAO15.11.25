@@ -200,31 +200,43 @@ class WorkOrderTimeTrackingTester:
             self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
             return False
     
-    def test_update_settings_admin(self):
-        """TEST 2: Mettre à jour les paramètres (PUT /api/settings) - Admin uniquement"""
-        self.log("🧪 TEST 2: PUT /api/settings - Admin user")
+    def test_add_minutes_only(self):
+        """TEST 4: Ajouter uniquement des minutes - 45min"""
+        self.log("🧪 TEST 4: Ajouter uniquement des minutes - 45min")
+        
+        if not self.test_work_order_id:
+            self.log("❌ Pas d'ordre de travail de test disponible", "ERROR")
+            return False
         
         try:
-            # Test updating timeout to 30 minutes
-            response = self.admin_session.put(
-                f"{BACKEND_URL}/settings",
-                json={"inactivity_timeout_minutes": 30},
+            time_data = {
+                "hours": 0,
+                "minutes": 45
+            }
+            
+            response = self.admin_session.post(
+                f"{BACKEND_URL}/work-orders/{self.test_work_order_id}/add-time",
+                json=time_data,
                 timeout=10
             )
             
             if response.status_code == 200:
                 data = response.json()
-                self.log("✅ PUT /api/settings returned 200 OK for admin user")
+                self.log("✅ Ajout de temps réussi (Status 200)")
                 
-                # Check that the new value is returned
-                if data.get("inactivity_timeout_minutes") == 30:
-                    self.log("✅ Response contains the new value (30 minutes)")
+                # Vérifier que tempsReel = 4.5 heures (3.75 + 0.75)
+                temps_reel = data.get("tempsReel")
+                expected_time = 4.5  # 3.75 + 0.75 = 4.5 heures
+                
+                if temps_reel == expected_time:
+                    self.log(f"✅ tempsReel = {temps_reel} heures (4h30min comme attendu)")
                     return True
                 else:
-                    self.log(f"❌ Response contains wrong value: {data.get('inactivity_timeout_minutes')}, expected 30", "ERROR")
+                    self.log(f"❌ tempsReel = {temps_reel}, attendu {expected_time}", "ERROR")
                     return False
+                    
             else:
-                self.log(f"❌ PUT /api/settings failed - Status: {response.status_code}", "ERROR")
+                self.log(f"❌ Ajout de temps échoué - Status: {response.status_code}", "ERROR")
                 self.log(f"Response: {response.text}", "ERROR")
                 return False
                 
