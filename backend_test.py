@@ -387,57 +387,7 @@ class WorkOrderTimeTrackingTester:
         self.log(f"Nettoyage terminé: {success_count} ordres supprimés")
         return True
     
-    def restore_original_settings(self):
-        """Restore original settings after testing"""
-        self.log("🧹 Restoring original settings...")
-        
-        if self.original_timeout is None:
-            self.log("⚠️ No original timeout value to restore", "WARNING")
-            return True
-        
-        try:
-            response = self.admin_session.put(
-                f"{BACKEND_URL}/settings",
-                json={"inactivity_timeout_minutes": self.original_timeout},
-                timeout=10
-            )
-            
-            if response.status_code == 200:
-                self.log(f"✅ Original settings restored - timeout: {self.original_timeout} minutes")
-                return True
-            else:
-                self.log(f"⚠️ Could not restore original settings - Status: {response.status_code}")
-                return True  # Don't fail tests for cleanup issues
-                
-        except Exception as e:
-            self.log(f"⚠️ Could not restore original settings: {str(e)}")
-            return True  # Don't fail tests for cleanup issues
-    
-    def cleanup_test_user(self):
-        """Clean up the test user after tests"""
-        self.log("🧹 Cleaning up test user...")
-        
-        if not self.test_user_id:
-            self.log("No test user to clean up")
-            return True
-        
-        try:
-            # Try to delete the test user (if endpoint exists)
-            response = self.admin_session.delete(
-                f"{BACKEND_URL}/users/{self.test_user_id}",
-                timeout=10
-            )
-            
-            if response.status_code in [200, 204, 404]:
-                self.log("✅ Test user cleaned up successfully")
-                return True
-            else:
-                self.log(f"⚠️ Could not clean up test user - Status: {response.status_code}")
-                return True  # Don't fail tests for cleanup issues
-                
-        except Exception as e:
-            self.log(f"⚠️ Could not clean up test user: {str(e)}")
-            return True  # Don't fail tests for cleanup issues
+    # Removed old methods - replaced with work order time tracking tests
     
     def run_inactivity_timeout_tests(self):
         """Run comprehensive tests for inactivity timeout settings functionality"""
