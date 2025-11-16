@@ -234,41 +234,31 @@ class InactivityTimeoutTester:
             self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
             return False
     
-    def create_test_user(self):
-        """Create a test user for password reset testing"""
-        self.log("Creating test user for password reset testing...")
-        
-        # Generate unique email for test user
-        unique_id = str(uuid.uuid4())[:8]
-        self.test_user_email = f"test.reset.{unique_id}@test.local"
-        initial_password = "InitialPass123!"
+    def test_verify_settings_persistence(self):
+        """TEST 3: Vérifier que les paramètres sont persistés"""
+        self.log("🧪 TEST 3: Verify settings persistence - GET /api/settings after update")
         
         try:
-            response = self.admin_session.post(
-                f"{BACKEND_URL}/users/create-member",
-                json={
-                    "nom": "TestReset",
-                    "prenom": "User",
-                    "email": self.test_user_email,
-                    "telephone": "0123456789",
-                    "role": "TECHNICIEN",
-                    "service": "Test Service",
-                    "password": initial_password
-                },
-                timeout=10
-            )
+            response = self.admin_session.get(f"{BACKEND_URL}/settings", timeout=10)
             
             if response.status_code == 200:
-                user_data = response.json()
-                self.test_user_id = user_data.get("id")
-                self.log(f"✅ Test user created successfully - ID: {self.test_user_id}, Email: {self.test_user_email}")
-                return True
+                data = response.json()
+                self.log("✅ GET /api/settings returned 200 OK")
+                
+                # Check that the value is still 30
+                if data.get("inactivity_timeout_minutes") == 30:
+                    self.log("✅ Settings are persisted correctly - value is still 30 minutes")
+                    return True
+                else:
+                    self.log(f"❌ Settings not persisted - value is {data.get('inactivity_timeout_minutes')}, expected 30", "ERROR")
+                    return False
             else:
-                self.log(f"❌ Test user creation failed - Status: {response.status_code}, Response: {response.text}", "ERROR")
+                self.log(f"❌ GET /api/settings failed - Status: {response.status_code}", "ERROR")
+                self.log(f"Response: {response.text}", "ERROR")
                 return False
                 
         except requests.exceptions.RequestException as e:
-            self.log(f"❌ Test user creation request failed - Error: {str(e)}", "ERROR")
+            self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
             return False
     
     def test_admin_reset_password(self):
