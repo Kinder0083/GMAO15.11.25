@@ -81,7 +81,7 @@ const PermissionsGrid = ({ role, permissions, onChange }) => {
           <div className="text-center">Suppression</div>
         </div>
         
-        <div className="divide-y max-h-[400px] overflow-y-scroll bg-white" style={{ scrollbarWidth: 'thin', scrollbarColor: '#cbd5e1 #f1f5f9' }}>
+        <div className="divide-y max-h-[250px] overflow-y-scroll bg-white" style={{ scrollbarWidth: 'thin', scrollbarColor: '#cbd5e1 #f1f5f9' }}>
           {modules.map((module) => {
             const modulePermissions = permissions[module.key] || { view: false, edit: false, delete: false };
             
