@@ -104,101 +104,112 @@ const CreateMemberDialog = ({ open, onOpenChange, onSuccess }) => {
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex flex-col h-full">
-          <div className="grid gap-4 py-4 overflow-y-auto flex-1">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="prenom">Prénom *</Label>
-                <Input
-                  id="prenom"
-                  value={formData.prenom}
-                  onChange={(e) => handleChange('prenom', e.target.value)}
-                  placeholder="Jean"
-                  required
-                />
+          <div className="grid gap-4 py-4 overflow-y-auto flex-1 pr-2">
+            {/* Informations personnelles - sur 2 colonnes */}
+            <div className="border-b pb-4">
+              <h3 className="text-sm font-semibold text-gray-700 mb-3">Informations personnelles</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="prenom">Prénom *</Label>
+                  <Input
+                    id="prenom"
+                    value={formData.prenom}
+                    onChange={(e) => handleChange('prenom', e.target.value)}
+                    placeholder="Jean"
+                    required
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="nom">Nom *</Label>
+                  <Input
+                    id="nom"
+                    value={formData.nom}
+                    onChange={(e) => handleChange('nom', e.target.value)}
+                    placeholder="Dupont"
+                    required
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="email">Email *</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => handleChange('email', e.target.value)}
+                    placeholder="jean.dupont@example.com"
+                    required
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="telephone">Téléphone</Label>
+                  <Input
+                    id="telephone"
+                    value={formData.telephone}
+                    onChange={(e) => handleChange('telephone', e.target.value)}
+                    placeholder="+33 6 12 34 56 78"
+                  />
+                </div>
               </div>
+            </div>
 
-              <div className="grid gap-2">
-                <Label htmlFor="nom">Nom *</Label>
-                <Input
-                  id="nom"
-                  value={formData.nom}
-                  onChange={(e) => handleChange('nom', e.target.value)}
-                  placeholder="Dupont"
-                  required
-                />
+            {/* Rôle et accès - sur 2 colonnes */}
+            <div className="border-b pb-4">
+              <h3 className="text-sm font-semibold text-gray-700 mb-3">Rôle et accès</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="service">Service</Label>
+                  <Input
+                    id="service"
+                    value={formData.service}
+                    onChange={(e) => handleChange('service', e.target.value)}
+                    placeholder="Ex: Maintenance, Production, Logistique..."
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="role">Rôle *</Label>
+                  <Select value={formData.role} onValueChange={(value) => handleChange('role', value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner un rôle" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ADMIN">Administrateur - Accès complet</SelectItem>
+                      <SelectItem value="DIRECTEUR">Directeur</SelectItem>
+                      <SelectItem value="QHSE">QHSE</SelectItem>
+                      <SelectItem value="RSP_PROD">Responsable Production</SelectItem>
+                      <SelectItem value="PROD">Production</SelectItem>
+                      <SelectItem value="INDUS">Industrialisation</SelectItem>
+                      <SelectItem value="LOGISTIQUE">Logistique</SelectItem>
+                      <SelectItem value="LABO">Laboratoire</SelectItem>
+                      <SelectItem value="ADV">ADV</SelectItem>
+                      <SelectItem value="TECHNICIEN">Technicien</SelectItem>
+                      <SelectItem value="VISUALISEUR">Visualiseur - Accès en lecture seule</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="grid gap-2 col-span-2">
+                  <Label htmlFor="password">Mot de passe temporaire *</Label>
+                  <PasswordInput
+                    id="password"
+                    value={formData.password}
+                    onChange={(e) => handleChange('password', e.target.value)}
+                    placeholder="Minimum 8 caractères"
+                    required
+                  />
+                  <p className="text-xs text-gray-500">
+                    Le membre devra changer ce mot de passe lors de sa première connexion
+                  </p>
+                </div>
               </div>
             </div>
 
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email *</Label>
-              <Input
-                id="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => handleChange('email', e.target.value)}
-                placeholder="jean.dupont@example.com"
-                required
-              />
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="telephone">Téléphone</Label>
-              <Input
-                id="telephone"
-                value={formData.telephone}
-                onChange={(e) => handleChange('telephone', e.target.value)}
-                placeholder="+33 6 12 34 56 78"
-              />
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="service">Service</Label>
-              <Input
-                id="service"
-                value={formData.service}
-                onChange={(e) => handleChange('service', e.target.value)}
-                placeholder="Ex: Maintenance, Production, Logistique..."
-              />
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="role">Rôle *</Label>
-              <Select value={formData.role} onValueChange={(value) => handleChange('role', value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner un rôle" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ADMIN">Administrateur - Accès complet</SelectItem>
-                  <SelectItem value="DIRECTEUR">Directeur</SelectItem>
-                  <SelectItem value="QHSE">QHSE</SelectItem>
-                  <SelectItem value="RSP_PROD">Responsable Production</SelectItem>
-                  <SelectItem value="PROD">Production</SelectItem>
-                  <SelectItem value="INDUS">Industrialisation</SelectItem>
-                  <SelectItem value="LOGISTIQUE">Logistique</SelectItem>
-                  <SelectItem value="LABO">Laboratoire</SelectItem>
-                  <SelectItem value="ADV">ADV</SelectItem>
-                  <SelectItem value="TECHNICIEN">Technicien</SelectItem>
-                  <SelectItem value="VISUALISEUR">Visualiseur - Accès en lecture seule</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="password">Mot de passe temporaire *</Label>
-              <PasswordInput
-                id="password"
-                value={formData.password}
-                onChange={(e) => handleChange('password', e.target.value)}
-                placeholder="Minimum 8 caractères"
-                required
-              />
-              <p className="text-xs text-gray-500">
-                Le membre devra changer ce mot de passe lors de sa première connexion
-              </p>
-            </div>
-
-            {/* Grille de permissions */}
-            <div className="col-span-2 mt-4">
+            {/* Grille de permissions - pleine largeur */}
+            <div>
+              <h3 className="text-sm font-semibold text-gray-700 mb-3">Permissions personnalisées</h3>
               <PermissionsGrid
                 role={formData.role}
                 permissions={formData.permissions}
