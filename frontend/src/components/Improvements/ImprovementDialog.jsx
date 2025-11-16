@@ -29,6 +29,9 @@ const ImprovementDialog = ({ open, onOpenChange, workOrder, onSuccess }) => {
   const [sendingComment, setSendingComment] = useState(false);
   const [showStatusDialog, setShowStatusDialog] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+  const [timeHours, setTimeHours] = useState('');
+  const [timeMinutes, setTimeMinutes] = useState('');
+  const [addingTime, setAddingTime] = useState(false);
 
   const loadComments = async () => {
     if (!workOrder) return;
