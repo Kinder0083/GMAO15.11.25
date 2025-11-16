@@ -183,7 +183,9 @@ const TimeByCategoryChart = () => {
                   <div key={index} className="flex flex-col items-center min-w-[120px]">
                     {/* Groupe de barres côte à côte */}
                     <div className="flex items-end justify-center gap-1 h-64 w-full mb-2">
-                      {Object.entries(monthData.categories).map(([category, time]) => {
+                      {/* Ordre fixe des catégories pour cohérence visuelle */}
+                      {['CHANGEMENT_FORMAT', 'TRAVAUX_PREVENTIFS', 'TRAVAUX_CURATIF', 'TRAVAUX_DIVERS', 'FORMATION', 'REGLAGE'].map((category) => {
+                        const time = monthData.categories[category] || 0;
                         const heightPercent = maxValue > 0 ? (time / maxValue) * 100 : 0;
                         
                         return (
