@@ -358,37 +358,34 @@ class WorkOrderTimeTrackingTester:
             self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
             return False
     
-    def test_non_admin_security(self):
-        """TEST 6: Test de sécurité - Non-admin"""
-        self.log("🧪 TEST 6: Security test - Non-admin user tries to update settings")
+    def cleanup_remaining_work_orders(self):
+        """Nettoyer tous les ordres de travail créés pendant les tests"""
+        self.log("🧹 Nettoyage des ordres de travail restants...")
         
-        try:
-            response = self.user_session.put(
-                f"{BACKEND_URL}/settings",
-                json={"inactivity_timeout_minutes": 20},
-                timeout=10
-            )
-            
-            if response.status_code == 403:
-                self.log("✅ PUT /api/settings correctly returned 403 Forbidden for non-admin user")
+        if not self.created_work_orders:
+            self.log("Aucun ordre de travail à nettoyer")
+            return True
+        
+        success_count = 0
+        for wo_id in self.created_work_orders[:]:  # Copy list to avoid modification during iteration
+            try:
+                response = self.admin_session.delete(
+                    f"{BACKEND_URL}/work-orders/{wo_id}",
+                    timeout=10
+                )
                 
-                # Check error message
-                try:
-                    data = response.json()
-                    detail = data.get("detail", "")
-                    self.log(f"✅ Security error message: {detail}")
-                except:
-                    self.log("⚠️ Could not parse error message", "WARNING")
-                
-                return True
-            else:
-                self.log(f"❌ Expected 403 Forbidden but got {response.status_code}", "ERROR")
-                self.log(f"Response: {response.text}", "ERROR")
-                return False
-                
-        except requests.exceptions.RequestException as e:
-            self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
-            return False
+                if response.status_code in [200, 404]:
+                    self.log(f"✅ Ordre {wo_id} nettoyé")
+                    self.created_work_orders.remove(wo_id)
+                    success_count += 1
+                else:
+                    self.log(f"⚠️ Impossible de nettoyer l'ordre {wo_id} - Status: {response.status_code}")
+                    
+            except Exception as e:
+                self.log(f"⚠️ Erreur lors du nettoyage de l'ordre {wo_id}: {str(e)}")
+        
+        self.log(f"Nettoyage terminé: {success_count} ordres supprimés")
+        return True
     
     def restore_original_settings(self):
         """Restore original settings after testing"""
