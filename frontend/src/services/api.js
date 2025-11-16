@@ -58,6 +58,10 @@ export const workOrdersAPI = {
   update: (id, data) => api.put(`/work-orders/${id}`, data),
   delete: (id) => api.delete(`/work-orders/${id}`),
   
+  // Add time spent
+  addTimeSpent: (workOrderId, hours, minutes) => 
+    api.post(`/work-orders/${workOrderId}/add-time`, { hours, minutes }),
+  
   // Attachments
   uploadAttachment: (workOrderId, file) => {
     const formData = new FormData();
