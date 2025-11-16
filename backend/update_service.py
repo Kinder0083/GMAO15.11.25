@@ -342,7 +342,7 @@ class UpdateService:
             log_detailed(f"✅ Mise à jour téléchargée")
             
             # 3. Installer les dépendances backend si requirements.txt a changé
-            logger.info("📦 Installation des dépendances backend...")
+            log_detailed("📦 Étape 3/7: Installation des dépendances backend...")
             result = subprocess.run(
                 ["/root/.venv/bin/pip", "install", "-r", "requirements.txt"],
                 cwd="/app/backend",
@@ -351,8 +351,11 @@ class UpdateService:
                 timeout=300
             )
             
+            log_detailed(f"Pip install returncode: {result.returncode}")
             if result.returncode != 0:
-                logger.warning(f"⚠️ Attention lors de l'installation des dépendances: {result.stderr}")
+                log_detailed(f"⚠️ Warning pip install: {result.stderr}", "WARNING")
+            else:
+                log_detailed(f"✅ Dépendances backend installées")
             
             # 4. Installer les dépendances frontend si package.json a changé
             logger.info("📦 Installation des dépendances frontend...")
