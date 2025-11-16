@@ -166,34 +166,35 @@ class InactivityTimeoutTester:
             self.log(f"❌ Test user creation request failed - Error: {str(e)}", "ERROR")
             return False
     
-    def test_forgot_password_flow(self):
-        """TEST 1: Forgot Password Flow (depuis page de login)"""
-        self.log("🧪 TEST 1: Forgot Password Flow - POST /api/auth/forgot-password")
+    def test_get_settings_normal_user(self):
+        """TEST 1: Récupérer les paramètres système (GET /api/settings) - Utilisateur normal"""
+        self.log("🧪 TEST 1: GET /api/settings - Utilisateur normal")
         
         try:
-            response = requests.post(
-                f"{BACKEND_URL}/auth/forgot-password",
-                json={
-                    "email": ADMIN_EMAIL
-                },
-                timeout=10
-            )
+            response = self.user_session.get(f"{BACKEND_URL}/settings", timeout=10)
             
             if response.status_code == 200:
                 data = response.json()
-                self.log("✅ POST /api/auth/forgot-password returned 200 OK")
+                self.log("✅ GET /api/settings returned 200 OK for normal user")
                 
-                # Check for confirmation message
-                message = data.get("message", "")
-                if "lien de réinitialisation" in message or "reset" in message.lower():
-                    self.log(f"✅ Confirmation message received: {message}")
-                    self.log("✅ IMPORTANT: Email sending not tested (as requested)")
+                # Check for required field
+                if "inactivity_timeout_minutes" in data:
+                    timeout_value = data.get("inactivity_timeout_minutes")
+                    self.original_timeout = timeout_value  # Store for restoration later
+                    self.log(f"✅ Response contains 'inactivity_timeout_minutes': {timeout_value}")
+                    
+                    # Check if it's the default value (15) for first time
+                    if timeout_value == 15:
+                        self.log("✅ Default value is 15 minutes (as expected for first time)")
+                    else:
+                        self.log(f"ℹ️ Current timeout value: {timeout_value} minutes")
+                    
                     return True
                 else:
-                    self.log(f"⚠️ Unexpected message format: {message}", "WARNING")
-                    return True  # Still consider success if 200 OK
+                    self.log("❌ Response missing 'inactivity_timeout_minutes' field", "ERROR")
+                    return False
             else:
-                self.log(f"❌ POST /api/auth/forgot-password failed - Status: {response.status_code}", "ERROR")
+                self.log(f"❌ GET /api/settings failed - Status: {response.status_code}", "ERROR")
                 self.log(f"Response: {response.text}", "ERROR")
                 return False
                 
