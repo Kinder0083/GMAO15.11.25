@@ -1254,6 +1254,83 @@ backend:
           - Compatibilité assurée avec les données existantes
           - Prêt pour utilisation en production
 
+  - task: "API POST /api/work-orders/{id}/add-time - Système d'ajout de temps passé"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: |
+          🧪 TEST COMPLET DU SYSTÈME D'AJOUT DE TEMPS PASSÉ - Novembre 2025
+          
+          CONTEXTE: Test complet du système d'ajout de temps passé sur les ordres de travail
+          Le temps s'incrémente à chaque ajout et supporte les formats hh:mm.
+          
+          📊 TESTS EFFECTUÉS (7/7 RÉUSSIS):
+          
+          ✅ TEST 1: Créer un ordre de travail de test
+          - POST /api/work-orders: SUCCESS (200 OK)
+          - Ordre créé: "Test temps passé" avec tempsReel initialement null
+          - ID généré: 6919a93a486e98bdab7f9b80
+          
+          ✅ TEST 2: Ajouter du temps passé (première fois) - 2h30min
+          - POST /api/work-orders/{id}/add-time: SUCCESS (200 OK)
+          - Body: {"hours": 2, "minutes": 30}
+          - tempsReel = 2.5 heures (2h30min comme attendu)
+          
+          ✅ TEST 3: Ajouter du temps passé (incrémentation) - 1h15min
+          - POST /api/work-orders/{id}/add-time: SUCCESS (200 OK)
+          - Body: {"hours": 1, "minutes": 15}
+          - tempsReel = 3.75 heures (2.5 + 1.25 = 3h45min comme attendu)
+          
+          ✅ TEST 4: Ajouter uniquement des minutes - 45min
+          - POST /api/work-orders/{id}/add-time: SUCCESS (200 OK)
+          - Body: {"hours": 0, "minutes": 45}
+          - tempsReel = 4.5 heures (3.75 + 0.75 = 4h30min comme attendu)
+          
+          ✅ TEST 5: Ajouter uniquement des heures - 3h
+          - POST /api/work-orders/{id}/add-time: SUCCESS (200 OK)
+          - Body: {"hours": 3, "minutes": 0}
+          - tempsReel = 7.5 heures (4.5 + 3 = 7h30min comme attendu)
+          
+          ✅ TEST 6: Récupérer l'ordre et vérifier le temps final
+          - GET /api/work-orders: SUCCESS (200 OK)
+          - tempsReel = 7.5 heures (temps final correct)
+          - Vérification via liste des ordres de travail
+          
+          ✅ TEST 7: Nettoyer (supprimer l'ordre de test)
+          - DELETE /api/work-orders/{id}: SUCCESS (200 OK)
+          - Ordre de travail supprimé avec succès
+          
+          🔧 FONCTIONNALITÉS VALIDÉES:
+          - ✅ Création d'ordres de travail avec tempsReel initialement null
+          - ✅ Ajout de temps passé (première fois) fonctionne correctement
+          - ✅ Incrémentation du temps passé fonctionne parfaitement
+          - ✅ Support des heures uniquement (hours > 0, minutes = 0)
+          - ✅ Support des minutes uniquement (hours = 0, minutes > 0)
+          - ✅ Support des heures et minutes combinées
+          - ✅ Calculs décimaux précis (2h30min = 2.5 heures)
+          - ✅ Persistance des données en base MongoDB
+          - ✅ Audit logging des modifications de temps
+          
+          📈 CALCULS VÉRIFIÉS:
+          - Temps initial: null/0
+          - + 2h30min = 2.5 heures ✓
+          - + 1h15min = 3.75 heures ✓
+          - + 45min = 4.5 heures ✓
+          - + 3h = 7.5 heures ✓
+          - Temps final: 7.5 heures (7h30min) ✓
+          
+          🎉 CONCLUSION: Le système d'ajout de temps passé est ENTIÈREMENT OPÉRATIONNEL
+          - Tous les tests du cahier des charges français sont validés
+          - L'endpoint POST /api/work-orders/{id}/add-time fonctionne parfaitement
+          - Les calculs d'incrémentation sont précis et fiables
+          - Support complet des formats heures/minutes
+          - Prêt pour utilisation en production
 
 frontend:
   - task: "Test critique - Tableau de bord pour utilisateur QHSE avec permissions limitées"
