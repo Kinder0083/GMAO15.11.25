@@ -18,9 +18,6 @@ const LocationFormDialog = ({ open, onOpenChange, location, parentLocation, onSu
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     nom: '',
-    adresse: '',
-    ville: '',
-    codePostal: '',
     type: '',
     parent_id: null
   });
