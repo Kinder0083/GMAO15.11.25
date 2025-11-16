@@ -170,6 +170,17 @@ const WorkOrderDialog = ({ open, onOpenChange, workOrder, onSuccess }) => {
         </DialogHeader>
 
         <div className="space-y-6 mt-4">
+          {/* Catégorie */}
+          {workOrder.categorie && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <div className="flex items-center gap-2">
+                <Badge variant="default" className="bg-blue-600">
+                  {getCategoryLabel(workOrder.categorie)}
+                </Badge>
+              </div>
+            </div>
+          )}
+
           {/* Description */}
           <div>
             <div className="flex items-center gap-2 mb-2">
