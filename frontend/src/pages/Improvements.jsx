@@ -394,10 +394,11 @@ const Improvements = () => {
                     <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Statut</th>
                     <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Titre</th>
                     <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Priorité</th>
-                    <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Assigné à</th>
+                    <th className="text-center py-3 px-2 text-sm font-semibold text-gray-700">Assigné</th>
                     <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Emplacement</th>
                     <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Équipement</th>
                     <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Date limite</th>
+                    <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Temps réel</th>
                     <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Actions</th>
                   </tr>
                 </thead>
