@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Backend API Testing Script for GMAO Application
-Tests "Mot de passe oublié" et "Réinitialisation admin" functionality
+Tests "Gestion du timeout d'inactivité" functionality
 """
 
 import requests
