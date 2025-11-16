@@ -13,6 +13,8 @@ import { useAutoRefresh } from '../hooks/useAutoRefresh';
 import { useSearchParams } from 'react-router-dom';
 import { usePermissions } from '../hooks/usePermissions';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../components/ui/tooltip';
+import AvatarInitials from '../components/ui/avatar-initials';
+import { formatTimeToHoursMinutes } from '../utils/timeFormat';
 
 const WorkOrders = () => {
   const { toast } = useToast();
