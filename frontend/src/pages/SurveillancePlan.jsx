@@ -167,12 +167,12 @@ function SurveillancePlan() {
       )}
 
       <div className="flex gap-2 mb-4">
-        <Select value={filters.category} onValueChange={(val) => setFilters(prev => ({ ...prev, category: val }))}>
+        <Select value={filters.category || "all"} onValueChange={(val) => setFilters(prev => ({ ...prev, category: val === "all" ? "" : val }))}>
           <SelectTrigger className="w-[200px]">
             <SelectValue placeholder="Catégorie" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Toutes</SelectItem>
+            <SelectItem value="all">Toutes</SelectItem>
             <SelectItem value="MMRI">MMRI</SelectItem>
             <SelectItem value="INCENDIE">Incendie</SelectItem>
             <SelectItem value="SECURITE_ENVIRONNEMENT">Sécurité/Env.</SelectItem>
