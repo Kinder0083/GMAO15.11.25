@@ -14,6 +14,7 @@ import { surveillanceAPI } from '../../services/api';
 import { useToast } from '../../hooks/use-toast';
 
 function SurveillanceItemForm({ open, item, onClose }) {
+  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     classe_type: '',
