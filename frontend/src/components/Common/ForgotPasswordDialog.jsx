@@ -12,6 +12,7 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { useToast } from '../../hooks/use-toast';
 import axios from 'axios';
+import { getBackendURL } from '../../utils/config';
 
 const ForgotPasswordDialog = ({ open, onClose }) => {
   const [email, setEmail] = useState('');
