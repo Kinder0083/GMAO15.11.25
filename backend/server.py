@@ -5309,8 +5309,8 @@ async def apply_update(
             user_name=f"{current_user.get('prenom')} {current_user.get('nom')}",
             user_email=current_user.get("email"),
             action=ActionType.UPDATE,
-            entity_type=EntityType.SYSTEM,
-            entity_id="system",
+            entity_type=EntityType.SETTINGS,
+            entity_id="system_update",
             entity_name=f"Mise à jour vers {version}"
         )
         
