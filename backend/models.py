@@ -1040,3 +1040,25 @@ class SystemSettings(BaseModel):
 class SystemSettingsUpdate(BaseModel):
     inactivity_timeout_minutes: Optional[int] = None
 
+# SMTP Configuration Models
+class SMTPConfig(BaseModel):
+    smtp_host: str = "smtp.gmail.com"
+    smtp_port: int = 587
+    smtp_user: str = ""
+    smtp_password: str = ""
+    smtp_from_email: str = ""
+    smtp_from_name: str = "GMAO Iris"
+    smtp_use_tls: bool = True
+
+class SMTPConfigUpdate(BaseModel):
+    smtp_host: Optional[str] = None
+    smtp_port: Optional[int] = None
+    smtp_user: Optional[str] = None
+    smtp_password: Optional[str] = None
+    smtp_from_email: Optional[str] = None
+    smtp_from_name: Optional[str] = None
+    smtp_use_tls: Optional[bool] = None
+
+class SMTPTestRequest(BaseModel):
+    test_email: EmailStr
+
