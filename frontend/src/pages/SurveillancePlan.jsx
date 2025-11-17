@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Container, Typography, Tabs, Tab, Button, TextField, MenuItem, Chip, Alert } from '@mui/material';
-import { Add as AddIcon, FileDownload, FileUpload, Notifications } from '@mui/icons-material';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { Badge } from '../components/ui/badge';
+import { Alert, AlertDescription } from '../components/ui/alert';
+import { Plus, Download, Upload, Bell } from 'lucide-react';
 import { surveillanceAPI } from '../services/api';
+import { useToast } from '../hooks/use-toast';
 import ListView from '../components/Surveillance/ListView';
 import GridView from '../components/Surveillance/GridView';
 import CalendarView from '../components/Surveillance/CalendarView';
 import SurveillanceItemForm from '../components/Surveillance/SurveillanceItemForm';
-import { useToast } from '../hooks/use-toast';
 
 function SurveillancePlan() {
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState(0);
   const [items, setItems] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
   const [stats, setStats] = useState(null);
@@ -19,11 +24,9 @@ function SurveillancePlan() {
   const [openForm, setOpenForm] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   
-  // Filtres
   const [filters, setFilters] = useState({
     category: '',
     responsable: '',
-    batiment: '',
     status: ''
   });
 
@@ -48,7 +51,7 @@ function SurveillancePlan() {
       setAlerts(alertsData.alerts || []);
     } catch (error) {
       console.error('Erreur chargement données:', error);
-      toast({ title: 'Erreur', description: 'Erreur lors du chargement des données', variant: 'destructive' });
+      toast({ title: 'Erreur', description: 'Erreur lors du chargement', variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -56,25 +59,10 @@ function SurveillancePlan() {
 
   const applyFilters = () => {
     let filtered = [...items];
-    
-    if (filters.category) {
-      filtered = filtered.filter(item => item.category === filters.category);
-    }
-    if (filters.responsable) {
-      filtered = filtered.filter(item => item.responsable === filters.responsable);
-    }
-    if (filters.batiment) {
-      filtered = filtered.filter(item => item.batiment === filters.batiment);
-    }
-    if (filters.status) {
-      filtered = filtered.filter(item => item.status === filters.status);
-    }
-    
+    if (filters.category) filtered = filtered.filter(item => item.category === filters.category);
+    if (filters.responsable) filtered = filtered.filter(item => item.responsable === filters.responsable);
+    if (filters.status) filtered = filtered.filter(item => item.status === filters.status);
     setFilteredItems(filtered);
-  };
-
-  const handleFilterChange = (field, value) => {
-    setFilters(prev => ({ ...prev, [field]: value }));
   };
 
   const handleCreate = () => {
@@ -91,7 +79,7 @@ function SurveillancePlan() {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer cet item ?')) {
       try {
         await surveillanceAPI.deleteItem(itemId);
-        toast({ title: 'Succès', description: 'Item supprimé avec succès' });
+        toast({ title: 'Succès', description: 'Item supprimé' });
         loadData();
       } catch (error) {
         toast({ title: 'Erreur', description: 'Erreur lors de la suppression', variant: 'destructive' });
@@ -102,17 +90,13 @@ function SurveillancePlan() {
   const handleFormClose = (shouldRefresh) => {
     setOpenForm(false);
     setSelectedItem(null);
-    if (shouldRefresh) {
-      loadData();
-    }
+    if (shouldRefresh) loadData();
   };
 
   const handleExportTemplate = async () => {
     try {
       const response = await fetch('/api/surveillance/export/template', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
@@ -122,179 +106,130 @@ function SurveillancePlan() {
       a.click();
       toast({ title: 'Succès', description: 'Template téléchargé' });
     } catch (error) {
-      toast({ title: 'Erreur', description: 'Erreur lors du téléchargement', variant: 'destructive' });
+      toast({ title: 'Erreur', description: 'Erreur téléchargement', variant: 'destructive' });
     }
   };
 
   const handleImport = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
-
     const formData = new FormData();
     formData.append('file', file);
-
     try {
       const result = await surveillanceAPI.importData(formData);
-      toast.success(`Import réussi: ${result.imported_count} items importés`);
-      if (result.errors && result.errors.length > 0) {
-        toast.warning(`${result.errors.length} erreurs d'import`);
-      }
+      toast({ title: 'Succès', description: `${result.imported_count} items importés` });
       loadData();
     } catch (error) {
-      toast.error('Erreur lors de l\'import');
+      toast({ title: 'Erreur', description: "Erreur lors de l'import", variant: 'destructive' });
     }
   };
 
   return (
-    <Container maxWidth="xl" sx={{ py: 3 }}>
-      {/* En-tête */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4" fontWeight="bold">
-          Plan de Surveillance
-        </Typography>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button
-            variant="outlined"
-            startIcon={<FileDownload />}
-            onClick={handleExportTemplate}
-          >
-            Template
+    <div className="p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Plan de Surveillance</h1>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleExportTemplate}>
+            <Download className="mr-2 h-4 w-4" /> Template
           </Button>
-          <Button
-            variant="outlined"
-            component="label"
-            startIcon={<FileUpload />}
-          >
-            Importer
-            <input type="file" hidden accept=".csv,.xlsx,.xls" onChange={handleImport} />
+          <Button variant="outline" asChild>
+            <label>
+              <Upload className="mr-2 h-4 w-4" /> Importer
+              <input type="file" hidden accept=".csv,.xlsx,.xls" onChange={handleImport} />
+            </label>
           </Button>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleCreate}
-          >
-            Nouveau Contrôle
+          <Button onClick={handleCreate}>
+            <Plus className="mr-2 h-4 w-4" /> Nouveau
           </Button>
-        </Box>
-      </Box>
+        </div>
+      </div>
 
-      {/* Alertes */}
       {alerts.length > 0 && (
-        <Alert severity="warning" icon={<Notifications />} sx={{ mb: 2 }}>
-          <strong>{alerts.length} contrôle(s) à échéance proche</strong>
-          {alerts.slice(0, 3).map(alert => (
-            <div key={alert.id}>
-              • {alert.classe_type} - {alert.batiment} (J-{alert.days_until})
-            </div>
-          ))}
+        <Alert className="mb-4 border-orange-500">
+          <Bell className="h-4 w-4" />
+          <AlertDescription>
+            <strong>{alerts.length} contrôle(s) à échéance proche</strong>
+            {alerts.slice(0, 3).map(alert => (
+              <div key={alert.id}>• {alert.classe_type} - {alert.batiment} (J-{alert.days_until})</div>
+            ))}
+          </AlertDescription>
         </Alert>
       )}
 
-      {/* Statistiques */}
       {stats && (
-        <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-          <Chip label={`Total: ${stats.global.total}`} color="primary" />
-          <Chip label={`Réalisés: ${stats.global.realises}`} color="success" />
-          <Chip label={`Planifiés: ${stats.global.planifies}`} color="info" />
-          <Chip label={`À planifier: ${stats.global.a_planifier}`} color="warning" />
-          <Chip label={`Taux: ${stats.global.pourcentage_realisation}%`} color="secondary" />
-        </Box>
+        <div className="flex gap-2 mb-4">
+          <Badge variant="default">Total: {stats.global.total}</Badge>
+          <Badge variant="default" className="bg-green-500">Réalisés: {stats.global.realises}</Badge>
+          <Badge variant="default" className="bg-blue-500">Planifiés: {stats.global.planifies}</Badge>
+          <Badge variant="default" className="bg-orange-500">À planifier: {stats.global.a_planifier}</Badge>
+          <Badge variant="secondary">Taux: {stats.global.pourcentage_realisation}%</Badge>
+        </div>
       )}
 
-      {/* Filtres */}
-      <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-        <TextField
-          select
-          label="Catégorie"
-          value={filters.category}
-          onChange={(e) => handleFilterChange('category', e.target.value)}
-          sx={{ minWidth: 200 }}
-          size="small"
-        >
-          <MenuItem value="">Toutes</MenuItem>
-          <MenuItem value="MMRI">MMRI</MenuItem>
-          <MenuItem value="INCENDIE">Incendie</MenuItem>
-          <MenuItem value="SECURITE_ENVIRONNEMENT">Sécurité/Environnement</MenuItem>
-          <MenuItem value="ELECTRIQUE">Électrique</MenuItem>
-          <MenuItem value="MANUTENTION">Manutention</MenuItem>
-          <MenuItem value="EXTRACTION">Extraction</MenuItem>
-          <MenuItem value="AUTRE">Autre</MenuItem>
-        </TextField>
+      <div className="flex gap-2 mb-4">
+        <Select value={filters.category} onValueChange={(val) => setFilters(prev => ({ ...prev, category: val }))}>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="Catégorie" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">Toutes</SelectItem>
+            <SelectItem value="MMRI">MMRI</SelectItem>
+            <SelectItem value="INCENDIE">Incendie</SelectItem>
+            <SelectItem value="SECURITE_ENVIRONNEMENT">Sécurité/Env.</SelectItem>
+            <SelectItem value="ELECTRIQUE">Électrique</SelectItem>
+            <SelectItem value="MANUTENTION">Manutention</SelectItem>
+            <SelectItem value="EXTRACTION">Extraction</SelectItem>
+            <SelectItem value="AUTRE">Autre</SelectItem>
+          </SelectContent>
+        </Select>
 
-        <TextField
-          select
-          label="Responsable"
-          value={filters.responsable}
-          onChange={(e) => handleFilterChange('responsable', e.target.value)}
-          sx={{ minWidth: 150 }}
-          size="small"
-        >
-          <MenuItem value="">Tous</MenuItem>
-          <MenuItem value="MAINT">MAINT</MenuItem>
-          <MenuItem value="PROD">PROD</MenuItem>
-          <MenuItem value="QHSE">QHSE</MenuItem>
-          <MenuItem value="EXTERNE">EXTERNE</MenuItem>
-        </TextField>
+        <Select value={filters.responsable} onValueChange={(val) => setFilters(prev => ({ ...prev, responsable: val }))}>
+          <SelectTrigger className="w-[150px]">
+            <SelectValue placeholder="Responsable" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">Tous</SelectItem>
+            <SelectItem value="MAINT">MAINT</SelectItem>
+            <SelectItem value="PROD">PROD</SelectItem>
+            <SelectItem value="QHSE">QHSE</SelectItem>
+            <SelectItem value="EXTERNE">EXTERNE</SelectItem>
+          </SelectContent>
+        </Select>
 
-        <TextField
-          select
-          label="Statut"
-          value={filters.status}
-          onChange={(e) => handleFilterChange('status', e.target.value)}
-          sx={{ minWidth: 150 }}
-          size="small"
-        >
-          <MenuItem value="">Tous</MenuItem>
-          <MenuItem value="PLANIFIER">À planifier</MenuItem>
-          <MenuItem value="PLANIFIE">Planifié</MenuItem>
-          <MenuItem value="REALISE">Réalisé</MenuItem>
-        </TextField>
-      </Box>
+        <Select value={filters.status} onValueChange={(val) => setFilters(prev => ({ ...prev, status: val }))}>
+          <SelectTrigger className="w-[150px]">
+            <SelectValue placeholder="Statut" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">Tous</SelectItem>
+            <SelectItem value="PLANIFIER">À planifier</SelectItem>
+            <SelectItem value="PLANIFIE">Planifié</SelectItem>
+            <SelectItem value="REALISE">Réalisé</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
-      {/* Onglets de vue */}
-      <Tabs value={activeTab} onChange={(e, newValue) => setActiveTab(newValue)} sx={{ mb: 2 }}>
-        <Tab label="Liste" />
-        <Tab label="Grille par Catégorie" />
-        <Tab label="Calendrier" />
+      <Tabs defaultValue="list" className="w-full">
+        <TabsList>
+          <TabsTrigger value="list">Liste</TabsTrigger>
+          <TabsTrigger value="grid">Grille</TabsTrigger>
+          <TabsTrigger value="calendar">Calendrier</TabsTrigger>
+        </TabsList>
+        <TabsContent value="list">
+          <ListView items={filteredItems} loading={loading} onEdit={handleEdit} onDelete={handleDelete} onRefresh={loadData} />
+        </TabsContent>
+        <TabsContent value="grid">
+          <GridView items={filteredItems} loading={loading} onEdit={handleEdit} onDelete={handleDelete} onRefresh={loadData} />
+        </TabsContent>
+        <TabsContent value="calendar">
+          <CalendarView items={filteredItems} loading={loading} onEdit={handleEdit} onRefresh={loadData} />
+        </TabsContent>
       </Tabs>
 
-      {/* Contenu des vues */}
-      {activeTab === 0 && (
-        <ListView
-          items={filteredItems}
-          loading={loading}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          onRefresh={loadData}
-        />
-      )}
-      {activeTab === 1 && (
-        <GridView
-          items={filteredItems}
-          loading={loading}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          onRefresh={loadData}
-        />
-      )}
-      {activeTab === 2 && (
-        <CalendarView
-          items={filteredItems}
-          loading={loading}
-          onEdit={handleEdit}
-          onRefresh={loadData}
-        />
-      )}
-
-      {/* Formulaire de création/édition */}
       {openForm && (
-        <SurveillanceItemForm
-          open={openForm}
-          item={selectedItem}
-          onClose={handleFormClose}
-        />
+        <SurveillanceItemForm open={openForm} item={selectedItem} onClose={handleFormClose} />
       )}
-    </Container>
+    </div>
   );
 }
 
