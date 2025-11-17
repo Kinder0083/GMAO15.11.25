@@ -170,7 +170,7 @@ async def update_surveillance_item(
             user_name=f"{current_user['prenom']} {current_user['nom']}",
             user_email=current_user["email"],
             action=ActionType.UPDATE,
-            entity_type=EntityType.OTHER,
+            entity_type=EntityType.SURVEILLANCE,
             entity_id=item_id,
             entity_name=f"Plan surveillance: {existing.get('classe_type')}"
         )
