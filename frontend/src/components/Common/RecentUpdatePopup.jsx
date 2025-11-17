@@ -10,8 +10,7 @@ import {
   DialogFooter,
 } from '../ui/dialog';
 import axios from 'axios';
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+import { BACKEND_URL } from '../../utils/config';
 
 const RecentUpdatePopup = () => {
   const [showPopup, setShowPopup] = useState(false);
