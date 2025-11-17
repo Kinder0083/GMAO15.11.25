@@ -14,8 +14,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 import axios from 'axios';
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+import { BACKEND_URL } from '../utils/config';
 
 const Updates = () => {
   const { toast } = useToast();
