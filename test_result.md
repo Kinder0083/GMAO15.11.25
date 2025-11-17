@@ -2334,8 +2334,7 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus: 
-    - "Plan de Surveillance - Interface complète avec 3 vues"
+  current_focus: []
   stuck_tasks: 
     - "Test FINAL - Vérifier si le downgrade de recharts a résolu le problème d'histogramme invisible"
   test_all: false
