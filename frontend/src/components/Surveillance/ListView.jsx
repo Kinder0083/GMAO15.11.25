@@ -1,27 +1,16 @@
 import React, { useState } from 'react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  IconButton,
-  Chip,
-  CircularProgress,
-  Box,
-  Tooltip
-} from '@mui/material';
-import { Edit, Delete, CheckCircle, Schedule, Warning } from '@mui/icons-material';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
+import { Button } from '../ui/button';
+import { Badge } from '../ui/badge';
+import { Edit, Trash2, CheckCircle } from 'lucide-react';
 import CompleteSurveillanceDialog from './CompleteSurveillanceDialog';
 
 const getStatusColor = (status) => {
   switch (status) {
-    case 'REALISE': return 'success';
-    case 'PLANIFIE': return 'info';
-    case 'PLANIFIER': return 'warning';
-    default: return 'default';
+    case 'REALISE': return 'bg-green-500';
+    case 'PLANIFIE': return 'bg-blue-500';
+    case 'PLANIFIER': return 'bg-orange-500';
+    default: return 'bg-gray-500';
   }
 };
 
@@ -34,143 +23,75 @@ const getStatusLabel = (status) => {
   }
 };
 
-const getCategoryLabel = (category) => {
-  const labels = {
-    MMRI: 'MMRI',
-    INCENDIE: 'Incendie',
-    SECURITE_ENVIRONNEMENT: 'Sécurité/Env.',
-    ELECTRIQUE: 'Électrique',
-    MANUTENTION: 'Manutention',
-    EXTRACTION: 'Extraction',
-    AUTRE: 'Autre'
-  };
-  return labels[category] || category;
-};
-
 function ListView({ items, loading, onEdit, onDelete, onRefresh }) {
   const [completeDialog, setCompleteDialog] = useState({ open: false, item: null });
 
-  const handleComplete = (item) => {
-    setCompleteDialog({ open: true, item });
-  };
-
-  const handleCompleteClose = (shouldRefresh) => {
-    setCompleteDialog({ open: false, item: null });
-    if (shouldRefresh && onRefresh) {
-      onRefresh();
-    }
-  };
-
-  if (loading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
+  if (loading) return <div className="text-center p-4">Chargement...</div>;
 
   return (
     <>
-      <TableContainer component={Paper}>
+      <div className="rounded-md border">
         <Table>
-          <TableHead>
+          <TableHeader>
             <TableRow>
-              <TableCell><strong>Type</strong></TableCell>
-              <TableCell><strong>Catégorie</strong></TableCell>
-              <TableCell><strong>Bâtiment</strong></TableCell>
-              <TableCell><strong>Périodicité</strong></TableCell>
-              <TableCell><strong>Responsable</strong></TableCell>
-              <TableCell><strong>Exécutant</strong></TableCell>
-              <TableCell><strong>Dernier contrôle</strong></TableCell>
-              <TableCell><strong>Prochain contrôle</strong></TableCell>
-              <TableCell><strong>Statut</strong></TableCell>
-              <TableCell><strong>Actions</strong></TableCell>
+              <TableHead>Type</TableHead>
+              <TableHead>Catégorie</TableHead>
+              <TableHead>Bâtiment</TableHead>
+              <TableHead>Périodicité</TableHead>
+              <TableHead>Responsable</TableHead>
+              <TableHead>Prochain contrôle</TableHead>
+              <TableHead>Statut</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
-          </TableHead>
+          </TableHeader>
           <TableBody>
             {items.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={10} align="center">
-                  Aucun contrôle trouvé
-                </TableCell>
+                <TableCell colSpan={8} className="text-center">Aucun contrôle trouvé</TableCell>
               </TableRow>
             ) : (
               items.map((item) => (
-                <TableRow key={item.id} hover>
-                  <TableCell>{item.classe_type}</TableCell>
-                  <TableCell>
-                    <Chip
-                      label={getCategoryLabel(item.category)}
-                      size="small"
-                      variant="outlined"
-                    />
-                  </TableCell>
+                <TableRow key={item.id}>
+                  <TableCell className="font-medium">{item.classe_type}</TableCell>
+                  <TableCell><Badge variant="outline">{item.category}</Badge></TableCell>
                   <TableCell>{item.batiment}</TableCell>
                   <TableCell>{item.periodicite}</TableCell>
                   <TableCell>{item.responsable}</TableCell>
-                  <TableCell>{item.executant}</TableCell>
                   <TableCell>
-                    {item.derniere_visite
-                      ? new Date(item.derniere_visite).toLocaleDateString('fr-FR')
-                      : '-'}
+                    {item.prochain_controle ? new Date(item.prochain_controle).toLocaleDateString('fr-FR') : '-'}
                   </TableCell>
                   <TableCell>
-                    {item.prochain_controle
-                      ? new Date(item.prochain_controle).toLocaleDateString('fr-FR')
-                      : '-'}
+                    <Badge className={getStatusColor(item.status)}>{getStatusLabel(item.status)}</Badge>
                   </TableCell>
                   <TableCell>
-                    <Chip
-                      label={getStatusLabel(item.status)}
-                      color={getStatusColor(item.status)}
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', gap: 0.5 }}>
+                    <div className="flex gap-1">
                       {item.status !== 'REALISE' && (
-                        <Tooltip title="Marquer comme réalisé">
-                          <IconButton
-                            size="small"
-                            color="success"
-                            onClick={() => handleComplete(item)}
-                          >
-                            <CheckCircle />
-                          </IconButton>
-                        </Tooltip>
+                        <Button size="sm" variant="ghost" onClick={() => setCompleteDialog({ open: true, item })}>
+                          <CheckCircle className="h-4 w-4" />
+                        </Button>
                       )}
-                      <Tooltip title="Modifier">
-                        <IconButton
-                          size="small"
-                          color="primary"
-                          onClick={() => onEdit(item)}
-                        >
-                          <Edit />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Supprimer">
-                        <IconButton
-                          size="small"
-                          color="error"
-                          onClick={() => onDelete(item.id)}
-                        >
-                          <Delete />
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
+                      <Button size="sm" variant="ghost" onClick={() => onEdit(item)}>
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button size="sm" variant="ghost" onClick={() => onDelete(item.id)}>
+                        <Trash2 className="h-4 w-4 text-red-500" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))
             )}
           </TableBody>
         </Table>
-      </TableContainer>
-
+      </div>
       {completeDialog.open && (
         <CompleteSurveillanceDialog
           open={completeDialog.open}
           item={completeDialog.item}
-          onClose={handleCompleteClose}
+          onClose={(refresh) => {
+            setCompleteDialog({ open: false, item: null });
+            if (refresh && onRefresh) onRefresh();
+          }}
         />
       )}
     </>

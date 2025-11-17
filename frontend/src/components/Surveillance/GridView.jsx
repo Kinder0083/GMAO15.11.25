@@ -1,26 +1,16 @@
 import React, { useState } from 'react';
-import {
-  Grid,
-  Card,
-  CardContent,
-  CardActions,
-  Typography,
-  Chip,
-  IconButton,
-  Box,
-  CircularProgress,
-  Tooltip,
-  Divider
-} from '@mui/material';
-import { Edit, Delete, CheckCircle, AttachFile } from '@mui/icons-material';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Button } from '../ui/button';
+import { Badge } from '../ui/badge';
+import { Edit, Trash2, CheckCircle, Paperclip } from 'lucide-react';
 import CompleteSurveillanceDialog from './CompleteSurveillanceDialog';
 
 const getStatusColor = (status) => {
   switch (status) {
-    case 'REALISE': return 'success';
-    case 'PLANIFIE': return 'info';
-    case 'PLANIFIER': return 'warning';
-    default: return 'default';
+    case 'REALISE': return 'bg-green-500';
+    case 'PLANIFIE': return 'bg-blue-500';
+    case 'PLANIFIER': return 'bg-orange-500';
+    default: return 'bg-gray-500';
   }
 };
 
@@ -33,166 +23,80 @@ const getStatusLabel = (status) => {
   }
 };
 
-const getCategoryLabel = (category) => {
-  const labels = {
-    MMRI: 'MMRI',
-    INCENDIE: 'Incendie',
-    SECURITE_ENVIRONNEMENT: 'Sécurité/Environnement',
-    ELECTRIQUE: 'Électrique',
-    MANUTENTION: 'Manutention',
-    EXTRACTION: 'Extraction',
-    AUTRE: 'Autre'
-  };
-  return labels[category] || category;
-};
-
 function GridView({ items, loading, onEdit, onDelete, onRefresh }) {
   const [completeDialog, setCompleteDialog] = useState({ open: false, item: null });
 
-  const handleComplete = (item) => {
-    setCompleteDialog({ open: true, item });
-  };
+  if (loading) return <div className="text-center p-4">Chargement...</div>;
 
-  const handleCompleteClose = (shouldRefresh) => {
-    setCompleteDialog({ open: false, item: null });
-    if (shouldRefresh && onRefresh) {
-      onRefresh();
-    }
-  };
-
-  if (loading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  // Grouper les items par catégorie
   const groupedItems = items.reduce((acc, item) => {
     const category = item.category || 'AUTRE';
-    if (!acc[category]) {
-      acc[category] = [];
-    }
+    if (!acc[category]) acc[category] = [];
     acc[category].push(item);
     return acc;
   }, {});
 
-  const categories = Object.keys(groupedItems).sort();
-
   return (
     <>
-      {categories.length === 0 ? (
-        <Box sx={{ textAlign: 'center', py: 4 }}>
-          <Typography color="text.secondary">Aucun contrôle trouvé</Typography>
-        </Box>
+      {Object.keys(groupedItems).length === 0 ? (
+        <div className="text-center py-8 text-gray-500">Aucun contrôle trouvé</div>
       ) : (
-        categories.map((category) => (
-          <Box key={category} sx={{ mb: 4 }}>
-            <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
-              {getCategoryLabel(category)} ({groupedItems[category].length})
-            </Typography>
-            <Grid container spacing={2}>
+        Object.keys(groupedItems).sort().map((category) => (
+          <div key={category} className="mb-6">
+            <h3 className="text-lg font-semibold mb-3">{category} ({groupedItems[category].length})</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {groupedItems[category].map((item) => (
-                <Grid item xs={12} sm={6} md={4} lg={3} key={item.id}>
-                  <Card
-                    sx={{
-                      height: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      border: item.status === 'REALISE' ? '2px solid #4caf50' : '1px solid #e0e0e0'
-                    }}
-                  >
-                    <CardContent sx={{ flexGrow: 1 }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                        <Typography variant="subtitle1" fontWeight="bold" sx={{ flex: 1 }}>
-                          {item.classe_type}
-                        </Typography>
-                        <Chip
-                          label={getStatusLabel(item.status)}
-                          color={getStatusColor(item.status)}
-                          size="small"
-                        />
-                      </Box>
-                      
-                      <Divider sx={{ my: 1 }} />
-                      
-                      <Typography variant="body2" color="text.secondary" gutterBottom>
-                        <strong>Bâtiment:</strong> {item.batiment}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" gutterBottom>
-                        <strong>Périodicité:</strong> {item.periodicite}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" gutterBottom>
-                        <strong>Responsable:</strong> {item.responsable}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" gutterBottom>
-                        <strong>Exécutant:</strong> {item.executant}
-                      </Typography>
-                      
+                <Card key={item.id}>
+                  <CardHeader className="pb-3">
+                    <div className="flex justify-between items-start">
+                      <CardTitle className="text-sm">{item.classe_type}</CardTitle>
+                      <Badge className={getStatusColor(item.status)}>{getStatusLabel(item.status)}</Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-sm space-y-1 mb-3">
+                      <p><strong>Bâtiment:</strong> {item.batiment}</p>
+                      <p><strong>Périodicité:</strong> {item.periodicite}</p>
+                      <p><strong>Responsable:</strong> {item.responsable}</p>
                       {item.prochain_controle && (
-                        <Typography variant="body2" color="primary" sx={{ mt: 1 }}>
-                          <strong>Prochain:</strong> {new Date(item.prochain_controle).toLocaleDateString('fr-FR')}
-                        </Typography>
+                        <p className="text-blue-600"><strong>Prochain:</strong> {new Date(item.prochain_controle).toLocaleDateString('fr-FR')}</p>
                       )}
-                      
                       {item.piece_jointe_url && (
-                        <Chip
-                          icon={<AttachFile />}
-                          label="Fichier joint"
-                          size="small"
-                          variant="outlined"
-                          sx={{ mt: 1 }}
-                        />
+                        <div className="flex items-center gap-1 text-gray-500">
+                          <Paperclip className="h-3 w-3" />
+                          <span className="text-xs">Fichier joint</span>
+                        </div>
                       )}
-                    </CardContent>
-                    
-                    <CardActions sx={{ justifyContent: 'space-between', px: 2, pb: 2 }}>
-                      <Box>
+                    </div>
+                    <div className="flex justify-between">
+                      <div className="flex gap-1">
                         {item.status !== 'REALISE' && (
-                          <Tooltip title="Marquer comme réalisé">
-                            <IconButton
-                              size="small"
-                              color="success"
-                              onClick={() => handleComplete(item)}
-                            >
-                              <CheckCircle />
-                            </IconButton>
-                          </Tooltip>
+                          <Button size="sm" variant="ghost" onClick={() => setCompleteDialog({ open: true, item })}>
+                            <CheckCircle className="h-4 w-4" />
+                          </Button>
                         )}
-                        <Tooltip title="Modifier">
-                          <IconButton
-                            size="small"
-                            color="primary"
-                            onClick={() => onEdit(item)}
-                          >
-                            <Edit />
-                          </IconButton>
-                        </Tooltip>
-                      </Box>
-                      <Tooltip title="Supprimer">
-                        <IconButton
-                          size="small"
-                          color="error"
-                          onClick={() => onDelete(item.id)}
-                        >
-                          <Delete />
-                        </IconButton>
-                      </Tooltip>
-                    </CardActions>
-                  </Card>
-                </Grid>
+                        <Button size="sm" variant="ghost" onClick={() => onEdit(item)}>
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      <Button size="sm" variant="ghost" onClick={() => onDelete(item.id)}>
+                        <Trash2 className="h-4 w-4 text-red-500" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
               ))}
-            </Grid>
-          </Box>
+            </div>
+          </div>
         ))
       )}
-
       {completeDialog.open && (
         <CompleteSurveillanceDialog
           open={completeDialog.open}
           item={completeDialog.item}
-          onClose={handleCompleteClose}
+          onClose={(refresh) => {
+            setCompleteDialog({ open: false, item: null });
+            if (refresh && onRefresh) onRefresh();
+          }}
         />
       )}
     </>
