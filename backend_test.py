@@ -126,73 +126,65 @@ class SurveillanceTester:
         """TEST 5: Créer item avec catégorie SECURITE_ENVIRONNEMENT"""
         return self.test_create_surveillance_item("SECURITE_ENVIRONNEMENT", "Sécurité environnement", "BATIMENT 1 ET 2", "EXTERNE")
     
-    def test_time_by_category_stats(self):
-        """TEST 6: Vérifier l'endpoint de statistiques par catégorie"""
-        self.log("🧪 TEST 6: Récupérer les stats du mois actuel (novembre 2025)")
+    def test_surveillance_list_with_filters(self):
+        """TEST 6: Tester GET /api/surveillance/items avec filtres"""
+        self.log("🧪 TEST 6: Récupérer la liste des items avec filtres")
         
         try:
-            # Test avec le mois actuel (novembre 2025)
+            # Test 1: Liste complète
             response = self.admin_session.get(
-                f"{BACKEND_URL}/reports/time-by-category?start_month=2025-11",
+                f"{BACKEND_URL}/surveillance/items",
                 timeout=10
             )
             
             if response.status_code == 200:
                 data = response.json()
-                self.log("✅ Récupération des statistiques réussie (Status 200)")
+                self.log(f"✅ Liste complète récupérée - {len(data)} items")
                 
-                # Vérifier la structure de la réponse
-                if "months" not in data:
-                    self.log("❌ Réponse manque le champ 'months'", "ERROR")
-                    return False
+                # Test 2: Filtre par catégorie INCENDIE
+                response_filtered = self.admin_session.get(
+                    f"{BACKEND_URL}/surveillance/items?category=INCENDIE",
+                    timeout=10
+                )
                 
-                months = data["months"]
-                if len(months) != 12:
-                    self.log(f"❌ Attendu 12 mois, reçu {len(months)}", "ERROR")
-                    return False
-                
-                self.log(f"✅ La réponse contient {len(months)} mois")
-                
-                # Chercher le mois actuel (novembre 2025)
-                current_month_data = None
-                for month in months:
-                    if month.get("month") == "2025-11":
-                        current_month_data = month
-                        break
-                
-                if not current_month_data:
-                    self.log("❌ Mois actuel (2025-11) non trouvé dans la réponse", "ERROR")
-                    return False
-                
-                categories = current_month_data.get("categories", {})
-                self.log(f"✅ Mois actuel trouvé avec catégories: {categories}")
-                
-                # Vérifier que les catégories problématiques ont des valeurs > 0
-                expected_categories = {
-                    "TRAVAUX_CURATIF": 3.5,  # 3h30min
-                    "TRAVAUX_DIVERS": 2.25,  # 2h15min
-                    "FORMATION": 1.75,       # 1h45min
-                    "CHANGEMENT_FORMAT": 4.0  # 4h00min
-                }
-                
-                all_categories_found = True
-                for category, expected_time in expected_categories.items():
-                    actual_time = categories.get(category, 0)
-                    if actual_time >= expected_time:
-                        self.log(f"✅ {category}: {actual_time}h (>= {expected_time}h attendu)")
-                    else:
-                        self.log(f"❌ {category}: {actual_time}h (< {expected_time}h attendu)", "ERROR")
-                        all_categories_found = False
-                
-                if all_categories_found:
-                    self.log("✅ IMPORTANT: Toutes les 3 catégories problématiques ont des valeurs > 0")
-                    return True
-                else:
-                    self.log("❌ PROBLÈME: Certaines catégories ne sont pas comptées correctement", "ERROR")
-                    return False
+                if response_filtered.status_code == 200:
+                    filtered_data = response_filtered.json()
+                    incendie_count = len([item for item in filtered_data if item.get("category") == "INCENDIE"])
+                    self.log(f"✅ Filtre catégorie INCENDIE: {incendie_count} items")
                     
+                    # Test 3: Filtre par responsable MAINT
+                    response_resp = self.admin_session.get(
+                        f"{BACKEND_URL}/surveillance/items?responsable=MAINT",
+                        timeout=10
+                    )
+                    
+                    if response_resp.status_code == 200:
+                        resp_data = response_resp.json()
+                        maint_count = len([item for item in resp_data if item.get("responsable") == "MAINT"])
+                        self.log(f"✅ Filtre responsable MAINT: {maint_count} items")
+                        
+                        # Test 4: Filtre par bâtiment
+                        response_bat = self.admin_session.get(
+                            f"{BACKEND_URL}/surveillance/items?batiment=BATIMENT 1",
+                            timeout=10
+                        )
+                        
+                        if response_bat.status_code == 200:
+                            bat_data = response_bat.json()
+                            bat_count = len([item for item in bat_data if "BATIMENT 1" in item.get("batiment", "")])
+                            self.log(f"✅ Filtre bâtiment BATIMENT 1: {bat_count} items")
+                            return True
+                        else:
+                            self.log(f"❌ Filtre bâtiment échoué - Status: {response_bat.status_code}", "ERROR")
+                            return False
+                    else:
+                        self.log(f"❌ Filtre responsable échoué - Status: {response_resp.status_code}", "ERROR")
+                        return False
+                else:
+                    self.log(f"❌ Filtre catégorie échoué - Status: {response_filtered.status_code}", "ERROR")
+                    return False
             else:
-                self.log(f"❌ Récupération des statistiques échouée - Status: {response.status_code}", "ERROR")
+                self.log(f"❌ Liste complète échouée - Status: {response.status_code}", "ERROR")
                 self.log(f"Response: {response.text}", "ERROR")
                 return False
                 
