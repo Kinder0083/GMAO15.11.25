@@ -23,7 +23,8 @@ import {
   MessageSquare,
   Lightbulb,
   Sparkles,
-  Shield
+  Shield,
+  Eye
 } from 'lucide-react';
 import FirstLoginPasswordDialog from '../Common/FirstLoginPasswordDialog';
 import UpdateNotificationBadge from '../Common/UpdateNotificationBadge';
