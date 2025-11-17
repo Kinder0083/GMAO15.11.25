@@ -1424,11 +1424,11 @@ backend:
 
   - task: "API Plan de Surveillance - Endpoints CRUD complets"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/surveillance_routes.py, /app/backend/server.py, /app/backend/models.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -1448,6 +1448,112 @@ backend:
              - PUT /api/surveillance/items/{item_id} - Mettre à jour un item
              - DELETE /api/surveillance/items/{item_id} - Supprimer un item (admin uniquement)
              - POST /api/surveillance/items/{item_id}/upload - Upload pièce jointe
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ PLAN DE SURVEILLANCE BACKEND ENTIÈREMENT FONCTIONNEL - Tests complets réussis (15/15)
+          
+          🎯 TESTS EFFECTUÉS (Novembre 2025):
+          
+          📊 TEST 1: Connexion admin ✅ RÉUSSI
+          - Connexion admin réussie (admin@gmao-iris.local / Admin123!)
+          - Token JWT valide généré
+          
+          📊 TESTS 2-5: Création d'items avec différentes catégories ✅ RÉUSSI
+          - ✅ POST /api/surveillance/items avec catégorie INCENDIE: SUCCESS (200 OK)
+          - ✅ POST /api/surveillance/items avec catégorie ELECTRIQUE: SUCCESS (200 OK)
+          - ✅ POST /api/surveillance/items avec catégorie MMRI: SUCCESS (200 OK)
+          - ✅ POST /api/surveillance/items avec catégorie SECURITE_ENVIRONNEMENT: SUCCESS (200 OK)
+          - Tous les champs requis correctement stockés et retournés
+          
+          📊 TEST 6: Filtres de liste ✅ RÉUSSI
+          - ✅ GET /api/surveillance/items: SUCCESS (200 OK) - 14 items récupérés
+          - ✅ Filtre par catégorie INCENDIE: 5 items trouvés
+          - ✅ Filtre par responsable MAINT: 5 items trouvés
+          - ✅ Filtre par bâtiment "BATIMENT 1": 8 items trouvés
+          - Tous les filtres fonctionnent correctement
+          
+          📊 TEST 7: Détails d'un item ✅ RÉUSSI
+          - ✅ GET /api/surveillance/items/{id}: SUCCESS (200 OK)
+          - Tous les champs retournés: id, classe_type, category, responsable
+          - Données cohérentes avec la création
+          
+          📊 TEST 8: Mise à jour d'un item ✅ RÉUSSI
+          - ✅ PUT /api/surveillance/items/{id}: SUCCESS (200 OK)
+          - Status mis à jour: PLANIFIER → PLANIFIE
+          - Commentaire ajouté: "Test de mise à jour - item planifié"
+          - Date de réalisation mise à jour
+          
+          📊 TEST 9: Statistiques globales ✅ RÉUSSI
+          - ✅ GET /api/surveillance/stats: SUCCESS (200 OK)
+          - Statistiques globales: Total: 14, Réalisés: 0, Planifiés: 1, À planifier: 13
+          - Pourcentage de réalisation: 0.0%
+          - Statistiques par catégorie: 7 catégories
+          - Statistiques par responsable: 4 responsables
+          
+          📊 TEST 10: Alertes d'échéance ✅ RÉUSSI
+          - ✅ GET /api/surveillance/alerts: SUCCESS (200 OK)
+          - 14 alertes récupérées
+          - Calcul des jours jusqu'à échéance fonctionnel
+          - Tri par urgence (plus proche en premier)
+          
+          📊 TEST 11: Upload de pièce jointe ✅ RÉUSSI
+          - ✅ POST /api/surveillance/items/{id}/upload: SUCCESS (200 OK)
+          - Fichier uploadé: test_surveillance.txt
+          - URL générée: /uploads/surveillance/{id}_{uuid}.txt
+          - Nom original conservé
+          
+          📊 TEST 12: Export template CSV ✅ RÉUSSI
+          - ✅ GET /api/surveillance/export/template: SUCCESS (200 OK)
+          - Type MIME correct: text/csv; charset=utf-8
+          - Taille: 380 bytes
+          - Template CSV valide généré
+          
+          📊 TEST 13: Suppression d'item (Admin uniquement) ✅ RÉUSSI
+          - ✅ DELETE /api/surveillance/items/{id}: SUCCESS (200 OK)
+          - Message de confirmation: "Item supprimé"
+          - Permissions admin respectées
+          
+          📊 TEST 14: Nettoyage des items de test ✅ RÉUSSI
+          - ✅ 3 items supprimés avec succès
+          - Nettoyage automatique fonctionnel
+          
+          📊 TEST BONUS: Import CSV ✅ RÉUSSI
+          - ✅ POST /api/surveillance/import: SUCCESS (200 OK)
+          - 2 items importés depuis CSV
+          - 0 erreurs d'import
+          - Mapping des colonnes fonctionnel
+          
+          🔧 CORRECTIONS EFFECTUÉES PENDANT LES TESTS:
+          1. Ajout import uuid manquant dans /app/backend/models.py
+          2. Correction méthodes Pydantic: .dict() → .model_dump()
+          3. Ajout EntityType.SURVEILLANCE dans models.py
+          4. Correction audit logging avec bon EntityType
+          
+          🔐 VÉRIFICATIONS DE SÉCURITÉ:
+          - ✅ Authentification JWT requise pour tous les endpoints
+          - ✅ DELETE /api/surveillance/items/{id}: admin uniquement (get_current_admin_user)
+          - ✅ Autres endpoints: utilisateurs connectés (get_current_user)
+          - ✅ Audit logging fonctionnel pour CREATE, UPDATE, DELETE
+          
+          📋 FONCTIONNALITÉS VALIDÉES:
+          - ✅ CRUD complet: Create, Read, Update, Delete
+          - ✅ Filtres multiples: category, responsable, batiment, status
+          - ✅ Statistiques globales et par catégorie/responsable
+          - ✅ Système d'alertes avec calcul d'échéances
+          - ✅ Upload de pièces jointes avec génération d'URL unique
+          - ✅ Export template CSV pour import
+          - ✅ Import CSV/Excel avec mapping automatique
+          - ✅ Audit logging complet
+          - ✅ Gestion des permissions (admin vs utilisateur)
+          
+          🎉 CONCLUSION: Le backend Plan de Surveillance est ENTIÈREMENT OPÉRATIONNEL
+          - Tous les 15 tests du cahier des charges sont validés
+          - Toutes les fonctionnalités CRUD fonctionnent parfaitement
+          - Les filtres, statistiques et alertes sont opérationnels
+          - L'upload et l'import/export fonctionnent correctement
+          - Les permissions et l'audit logging sont implémentés
+          - Le module est prêt pour utilisation en production
              - GET /api/surveillance/stats - Statistiques globales
              - GET /api/surveillance/alerts - Alertes échéances proches
              - POST /api/surveillance/import - Import CSV/Excel (admin uniquement)
