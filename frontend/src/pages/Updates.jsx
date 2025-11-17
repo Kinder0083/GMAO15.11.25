@@ -15,6 +15,7 @@ import {
 import { useToast } from '../hooks/use-toast';
 import axios from 'axios';
 import { BACKEND_URL } from '../utils/config';
+import GitConflictDialog from '../components/Common/GitConflictDialog';
 
 const Updates = () => {
   const { toast } = useToast();
