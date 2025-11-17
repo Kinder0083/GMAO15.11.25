@@ -1589,6 +1589,57 @@ backend:
           - Permissions admin
 
 frontend:
+  - task: "Plan de Surveillance - Interface complète avec 3 vues"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/SurveillancePlan.jsx, /app/frontend/src/components/Surveillance/*"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: |
+          ✅ MODULE PLAN DE SURVEILLANCE - FRONTEND COMPLET
+          
+          FICHIERS CRÉÉS:
+          1. /app/frontend/src/pages/SurveillancePlan.jsx - Page principale
+          2. /app/frontend/src/components/Surveillance/ListView.jsx - Vue tableau
+          3. /app/frontend/src/components/Surveillance/GridView.jsx - Vue cartes
+          4. /app/frontend/src/components/Surveillance/CalendarView.jsx - Vue calendrier
+          5. /app/frontend/src/components/Surveillance/SurveillanceItemForm.jsx - Formulaire création/édition
+          6. /app/frontend/src/components/Surveillance/CompleteSurveillanceDialog.jsx - Dialog complétion
+          7. /app/frontend/src/services/api.js - API surveillance ajoutée
+          8. /app/frontend/src/App.js - Route ajoutée
+          9. /app/frontend/src/components/Layout/MainLayout.jsx - Menu ajouté
+          
+          FONCTIONNALITÉS IMPLÉMENTÉES:
+          ✅ Alertes d'échéances (12 contrôles à échéance proche affichés)
+          ✅ Statistiques globales (Total, Réalisés, Planifiés, À planifier, Taux %)
+          ✅ Filtres multiples (Catégorie, Responsable, Statut)
+          ✅ 3 vues fonctionnelles:
+             - Vue Liste: Tableau complet avec actions
+             - Vue Grille: Cartes groupées par catégorie
+             - Vue Calendrier: Navigation mensuelle avec items
+          ✅ Formulaire création/édition (tous champs requis)
+          ✅ Dialog complétion avec date, commentaire, upload fichier
+          ✅ Boutons Template, Importer, Nouveau
+          ✅ Menu sidebar "Plan de Surveillance" avec icône œil
+          ✅ Actions sur items: Valider (✓), Modifier, Supprimer
+          
+          CORRECTIONS APPLIQUÉES:
+          - Remplacement Material-UI par composants ui/* existants
+          - Correction Select avec valeurs vides (erreur React)
+          - Utilisation hooks personnalisés (useToast)
+          - Intégration lucide-react pour icônes
+          
+          TESTS VISUELS RÉUSSIS:
+          ✅ Page charge correctement avec 12 items importés
+          ✅ Formulaire s'ouvre et affiche tous les champs
+          ✅ Vue Grille affiche cartes par catégorie (ELECTRIQUE, INCENDIE, etc.)
+          ✅ Vue Calendrier affiche Novembre 2025 avec navigation
+          ✅ Aucune erreur console
+
   - task: "Test critique - Tableau de bord pour utilisateur QHSE avec permissions limitées"
     implemented: true
     working: true
