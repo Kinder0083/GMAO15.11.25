@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+// Configuration adaptative : fonctionne en local ET à distance
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || window.location.origin;
 const API_BASE = `${BACKEND_URL}/api`;
 
 // Axios instance avec intercepteurs
