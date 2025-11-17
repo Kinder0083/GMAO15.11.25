@@ -1,8 +1,9 @@
 from pydantic import BaseModel, EmailStr, Field, field_validator
 from typing import Optional, List, Dict
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 import re
+import uuid
 
 # Enums
 class UserRole(str, Enum):
