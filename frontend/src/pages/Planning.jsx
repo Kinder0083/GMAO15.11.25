@@ -44,7 +44,7 @@ const Planning = () => {
       const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
       const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
       
-      const backend_url = process.env.REACT_APP_BACKEND_URL;
+      const backend_url = getBackendURL();
       const token = localStorage.getItem('token');
       
       const response = await axios.get(`${backend_url}/api/availabilities`, {
