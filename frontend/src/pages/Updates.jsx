@@ -98,6 +98,89 @@ const Updates = () => {
   };
 
   const handleApplyUpdate = async () => {
+    // D'abord, vérifier s'il y a des conflits Git
+    await checkForConflicts();
+  };
+
+  const checkForConflicts = async () => {
+    try {
+      setCheckingConflicts(true);
+      const token = localStorage.getItem('token');
+      
+      const response = await axios.get(
+        `${BACKEND_URL}/api/updates/check-conflicts`,
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      
+      if (response.data.has_conflicts) {
+        // Il y a des conflits, afficher le dialogue
+        setConflictData(response.data);
+        setShowConflictDialog(true);
+      } else {
+        // Pas de conflits, procéder directement à la mise à jour
+        proceedWithUpdate();
+      }
+    } catch (error) {
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de vérifier les conflits Git',
+        variant: 'destructive'
+      });
+    } finally {
+      setCheckingConflicts(false);
+    }
+  };
+
+  const handleResolveConflict = async (strategy) => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      if (strategy === 'abort') {
+        setShowConflictDialog(false);
+        toast({
+          title: 'Mise à jour annulée',
+          description: 'Aucune modification n\'a été effectuée',
+        });
+        return;
+      }
+      
+      // Résoudre le conflit avec la stratégie choisie
+      const response = await axios.post(
+        `${BACKEND_URL}/api/updates/resolve-conflicts?strategy=${strategy}`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      
+      if (response.data.success) {
+        setShowConflictDialog(false);
+        toast({
+          title: 'Conflits résolus',
+          description: response.data.message,
+        });
+        
+        // Maintenant procéder à la mise à jour
+        proceedWithUpdate();
+      } else {
+        toast({
+          title: 'Erreur',
+          description: response.data.message,
+          variant: 'destructive'
+        });
+      }
+    } catch (error) {
+      toast({
+        title: 'Erreur',
+        description: error.response?.data?.detail || 'Impossible de résoudre les conflits',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const proceedWithUpdate = async () => {
     if (!window.confirm('⚠️ ATTENTION !\n\nUne sauvegarde automatique de la base de données sera créée avant la mise à jour.\n\nL\'application sera indisponible pendant quelques minutes.\n\nVoulez-vous continuer ?')) {
       return;
     }
