@@ -2410,6 +2410,122 @@ async def update_system_settings(
         logger.error(f"Erreur lors de la mise à jour des paramètres : {str(e)}")
         raise HTTPException(status_code=500, detail=f"Erreur serveur: {str(e)}")
 
+
+# ==================== SMTP CONFIGURATION ROUTES ====================
+@api_router.get("/smtp/config")
+async def get_smtp_config(current_user: dict = Depends(get_current_admin_user)):
+    """Récupérer la configuration SMTP actuelle (Admin uniquement)"""
+    try:
+        # Lire depuis les variables d'environnement
+        config = SMTPConfig(
+            smtp_host=os.environ.get('SMTP_HOST', 'smtp.gmail.com'),
+            smtp_port=int(os.environ.get('SMTP_PORT', '587')),
+            smtp_user=os.environ.get('SMTP_USER', ''),
+            smtp_password='****' if os.environ.get('SMTP_PASSWORD') else '',  # Masquer le mot de passe
+            smtp_from_email=os.environ.get('SMTP_FROM_EMAIL', ''),
+            smtp_from_name=os.environ.get('SMTP_FROM_NAME', 'GMAO Iris'),
+            smtp_use_tls=os.environ.get('SMTP_USE_TLS', 'true').lower() == 'true'
+        )
+        return config
+    except Exception as e:
+        logger.error(f"Erreur lors de la récupération de la config SMTP: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.put("/smtp/config")
+async def update_smtp_config(
+    smtp_update: SMTPConfigUpdate,
+    current_user: dict = Depends(get_current_admin_user)
+):
+    """Mettre à jour la configuration SMTP (Admin uniquement)"""
+    try:
+        env_path = ROOT_DIR / '.env'
+        
+        # Lire le fichier .env actuel
+        env_vars = {}
+        if env_path.exists():
+            with open(env_path, 'r') as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith('#') and '=' in line:
+                        key, value = line.split('=', 1)
+                        env_vars[key] = value
+        
+        # Mettre à jour les variables
+        if smtp_update.smtp_host is not None:
+            env_vars['SMTP_HOST'] = smtp_update.smtp_host
+        if smtp_update.smtp_port is not None:
+            env_vars['SMTP_PORT'] = str(smtp_update.smtp_port)
+        if smtp_update.smtp_user is not None:
+            env_vars['SMTP_USER'] = smtp_update.smtp_user
+        if smtp_update.smtp_password is not None and smtp_update.smtp_password != '****':
+            env_vars['SMTP_PASSWORD'] = smtp_update.smtp_password
+        if smtp_update.smtp_from_email is not None:
+            env_vars['SMTP_FROM_EMAIL'] = smtp_update.smtp_from_email
+        if smtp_update.smtp_from_name is not None:
+            env_vars['SMTP_FROM_NAME'] = smtp_update.smtp_from_name
+        if smtp_update.smtp_use_tls is not None:
+            env_vars['SMTP_USE_TLS'] = 'true' if smtp_update.smtp_use_tls else 'false'
+        
+        # Écrire le fichier .env mis à jour
+        with open(env_path, 'w') as f:
+            for key, value in env_vars.items():
+                f.write(f"{key}={value}\n")
+        
+        # Mettre à jour les variables d'environnement en mémoire
+        for key, value in env_vars.items():
+            os.environ[key] = value
+        
+        # Réinitialiser le service email avec la nouvelle configuration
+        email_service.init_email_service()
+        
+        # Journaliser l'action
+        await audit_service.log_action(
+            user_id=current_user["id"],
+            user_name=f"{current_user['prenom']} {current_user['nom']}",
+            user_email=current_user["email"],
+            action=ActionType.UPDATE,
+            entity_type=EntityType.SETTINGS,
+            entity_id="smtp",
+            entity_name="Configuration SMTP",
+            details="Modification de la configuration SMTP"
+        )
+        
+        return {"success": True, "message": "Configuration SMTP mise à jour avec succès"}
+    except Exception as e:
+        logger.error(f"Erreur lors de la mise à jour de la config SMTP: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/smtp/test")
+async def test_smtp_config(
+    test_request: SMTPTestRequest,
+    current_user: dict = Depends(get_current_admin_user)
+):
+    """Tester la configuration SMTP en envoyant un email de test (Admin uniquement)"""
+    try:
+        # Envoyer un email de test
+        success = email_service.send_test_email(test_request.test_email)
+        
+        if success:
+            # Journaliser l'action
+            await audit_service.log_action(
+                user_id=current_user["id"],
+                user_name=f"{current_user['prenom']} {current_user['nom']}",
+                user_email=current_user["email"],
+                action=ActionType.OTHER,
+                entity_type=EntityType.SETTINGS,
+                entity_id="smtp",
+                entity_name="Test SMTP",
+                details=f"Test d'envoi d'email vers {test_request.test_email}"
+            )
+            
+            return {"success": True, "message": f"Email de test envoyé avec succès à {test_request.test_email}"}
+        else:
+            return {"success": False, "message": "Échec de l'envoi de l'email de test"}
+    except Exception as e:
+        logger.error(f"Erreur lors du test SMTP: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # ==================== VENDORS ROUTES ====================
 @api_router.get("/vendors", response_model=List[Vendor])
 async def get_vendors(current_user: dict = Depends(require_permission("vendors", "view"))):
