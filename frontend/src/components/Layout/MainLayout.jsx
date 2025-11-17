@@ -339,6 +339,7 @@ const MainLayout = () => {
     { icon: Package, label: 'Inventaire', path: '/inventory', module: 'inventory' },
     { icon: MapPin, label: 'Zones', path: '/locations', module: 'locations' },
     { icon: Gauge, label: 'Compteurs', path: '/meters', module: 'meters' },
+    { icon: Eye, label: 'Plan de Surveillance', path: '/surveillance-plan', module: 'surveillance' },
     { icon: BarChart3, label: 'Rapports', path: '/reports', module: 'reports' },
     { icon: Users, label: 'Équipes', path: '/people', module: 'people' },
     { icon: Calendar, label: 'Planning', path: '/planning', module: 'planning' },
