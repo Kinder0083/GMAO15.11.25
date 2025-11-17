@@ -443,14 +443,6 @@ class UpdateService:
                 "success": False,
                 "message": str(e)
             }
-
-            try:
-                from datetime import datetime
-                with open("/tmp/update_process.log", "a") as f:
-                    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                    f.write(f"[{timestamp}] [{level}] {message}\n")
-            except Exception as e:
-                logger.error(f"Erreur écriture log: {e}")
         
         try:
             log_detailed(f"🚀 Application de la mise à jour vers {version}...")
