@@ -132,6 +132,18 @@ user_problem_statement: |
   - Grille de permissions par module (17 modules)
   - Permissions par défaut selon le rôle
   - Possibilité de personnaliser les permissions
+  
+  PHASE 4: Nouvelle Fonctionnalité "Plan de Surveillance" [EN COURS]
+  
+  Implémentation d'un module complet de gestion du plan de surveillance avec :
+  1. Backend API - Endpoints CRUD pour les items de surveillance
+  2. Frontend - 3 vues différentes (Liste, Grille par catégorie, Calendrier)
+  3. Système de logs avec date, commentaire et upload de fichiers
+  4. Statuts visuels distincts (À planifier, Planifié, Réalisé)
+  5. Rappels automatiques par email
+  6. KPIs dans la page Rapport (Pourcentage global, par catégorie, par responsable)
+  7. Import/Export CSV/Excel
+  8. Badge de notification dans le header
 
 backend:
   - task: "Configuration SMTP/Postfix pour envoi d'emails"
