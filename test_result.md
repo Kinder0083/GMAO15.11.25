@@ -2247,6 +2247,29 @@ test_plan:
           ⚠️ STATUT: PROBLÈME NON RÉSOLU - NÉCESSITE INVESTIGATION APPROFONDIE
 
 agent_communication:
+  - agent: "main"
+    message: |
+      📋 PHASE 1 : BACKEND API PLAN DE SURVEILLANCE - IMPLÉMENTATION TERMINÉE
+      
+      ✅ Modèles de données créés dans models.py
+      ✅ Fichier surveillance_routes.py créé avec 10 endpoints
+      ✅ Routes intégrées dans server.py
+      ✅ Corrections de bugs bloquants effectuées:
+         - Fix erreur syntaxe update_service.py (restructuration apply_update)
+         - Fix imports audit_service
+      ✅ Backend redémarré avec succès
+      ✅ Endpoint test réussi: GET /api/surveillance/items retourne []
+      
+      🔍 À TESTER MAINTENANT:
+      - Tous les endpoints CRUD (GET, POST, PUT, DELETE)
+      - Filtres (category, responsable, batiment, status)
+      - Upload de pièces jointes
+      - Statistiques et alertes
+      - Import/Export CSV
+      - Permissions (DELETE admin uniquement)
+      
+      Je lance maintenant l'agent de test backend pour valider tous les endpoints.
+  
   - agent: "testing"
     message: |
       ✅ TEST CRITIQUE TERMINÉ - Page Maintenance Préventive après correction bug Pydantic
