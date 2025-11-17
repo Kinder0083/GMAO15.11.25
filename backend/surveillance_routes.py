@@ -103,12 +103,12 @@ async def create_surveillance_item(
     """Créer un nouvel item de surveillance"""
     try:
         item = SurveillanceItem(
-            **item_data.dict(),
+            **item_data.model_dump(),
             created_by=current_user.get("id"),
             updated_by=current_user.get("id")
         )
         
-        item_dict = item.dict()
+        item_dict = item.model_dump()
         await db.surveillance_items.insert_one(item_dict)
         
         # Audit
