@@ -461,3 +461,139 @@ Ceci est un email automatique, merci de ne pas y répondre.
     """
     
     return send_email(to_email, subject, html_content, text_content)
+
+
+def init_email_service():
+    """
+    Réinitialise le service email avec les nouvelles variables d'environnement
+    Utilisé après une mise à jour de la configuration SMTP
+    """
+    global SMTP_SERVER, SMTP_PORT, SMTP_USERNAME, SMTP_PASSWORD, SMTP_SENDER_EMAIL, SMTP_FROM_NAME, SMTP_USE_TLS
+    
+    # Recharger les variables d'environnement
+    SMTP_SERVER = os.environ.get('SMTP_HOST', os.environ.get('SMTP_SERVER', 'localhost'))
+    SMTP_PORT = int(os.environ.get('SMTP_PORT', '587'))
+    SMTP_USERNAME = os.environ.get('SMTP_USER', os.environ.get('SMTP_USERNAME', ''))
+    SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD', '')
+    SMTP_SENDER_EMAIL = os.environ.get('SMTP_FROM_EMAIL', os.environ.get('SMTP_SENDER_EMAIL', 'noreply@gmao-iris.com'))
+    SMTP_FROM_NAME = os.environ.get('SMTP_FROM_NAME', 'GMAO Iris')
+    SMTP_USE_TLS = os.environ.get('SMTP_USE_TLS', 'true').lower() == 'true'
+    
+    logger.info(f"📧 Service email réinitialisé : {SMTP_SERVER}:{SMTP_PORT}")
+    logger.info(f"👤 Username: {SMTP_USERNAME}")
+    logger.info(f"🔐 Password: {'*' * len(SMTP_PASSWORD) if SMTP_PASSWORD else 'NOT SET'}")
+
+
+def send_test_email(to_email: str) -> bool:
+    """
+    Envoie un email de test pour vérifier la configuration SMTP
+    
+    Args:
+        to_email: Email du destinataire pour le test
+    
+    Returns:
+        bool: True si envoi réussi, False sinon
+    """
+    subject = "🧪 Test de configuration SMTP - GMAO Iris"
+    
+    html_content = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {{
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }}
+        .header {{
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }}
+        .content {{
+            background: #f9f9f9;
+            padding: 30px;
+            border-radius: 0 0 10px 10px;
+        }}
+        .success-box {{
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }}
+        .info {{
+            background: #fff;
+            padding: 15px;
+            border-left: 4px solid #667eea;
+            margin: 20px 0;
+        }}
+        .footer {{
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            font-size: 12px;
+            color: #777;
+        }}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧪 Test SMTP Réussi !</h1>
+    </div>
+    <div class="content">
+        <div class="success-box">
+            <strong>✅ Félicitations !</strong><br>
+            Si vous recevez cet email, cela signifie que votre configuration SMTP fonctionne correctement.
+        </div>
+        
+        <div class="info">
+            <h3>📧 Informations de test</h3>
+            <p><strong>Destinataire :</strong> {to_email}</p>
+            <p><strong>Date d'envoi :</strong> {datetime.now().strftime("%d/%m/%Y à %H:%M")}</p>
+        </div>
+        
+        <p>Vous pouvez maintenant utiliser les fonctionnalités d'envoi d'email de GMAO Iris en toute confiance :</p>
+        <ul>
+            <li>Notifications de demandes d'intervention</li>
+            <li>Alertes de maintenance préventive</li>
+            <li>Rappels de tâches</li>
+            <li>Réinitialisation de mots de passe</li>
+        </ul>
+    </div>
+    <div class="footer">
+        Ceci est un email de test automatique envoyé depuis GMAO Iris.<br>
+        © 2025 GMAO Iris - Tous droits réservés
+    </div>
+</body>
+</html>
+    """
+    
+    text_content = f"""
+🧪 Test SMTP - GMAO Iris
+
+✅ Félicitations !
+Si vous recevez cet email, cela signifie que votre configuration SMTP fonctionne correctement.
+
+📧 Informations de test
+Destinataire : {to_email}
+Date d'envoi : {datetime.now().strftime("%d/%m/%Y à %H:%M")}
+
+Vous pouvez maintenant utiliser les fonctionnalités d'envoi d'email de GMAO Iris.
+
+---
+Ceci est un email de test automatique envoyé depuis GMAO Iris.
+© 2025 GMAO Iris - Tous droits réservés
+    """
+    
+    return send_email(to_email, subject, html_content, text_content)
+
