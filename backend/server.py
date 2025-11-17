@@ -5268,6 +5268,50 @@ async def check_updates(current_user: dict = Depends(get_current_admin_user)):
         raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.get("/updates/status")
+
+
+@api_router.get("/updates/check-conflicts")
+async def check_git_conflicts(current_user: dict = Depends(get_current_admin_user)):
+    """
+    Vérifie s'il y a des conflits Git avant une mise à jour (Admin uniquement)
+    Retourne la liste des fichiers modifiés localement
+    """
+    try:
+        result = update_service.check_git_conflicts()
+        return result
+    except Exception as e:
+        logger.error(f"Erreur lors de la vérification des conflits: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/updates/resolve-conflicts")
+async def resolve_git_conflicts(
+    strategy: str,
+    current_user: dict = Depends(get_current_admin_user)
+):
+    """
+    Résout les conflits Git selon la stratégie choisie (Admin uniquement)
+    strategy: "reset" (écraser), "stash" (sauvegarder), ou "abort" (annuler)
+    """
+    try:
+        result = update_service.resolve_git_conflicts(strategy)
+        
+        # Journaliser l'action
+        await audit_service.log_action(
+            user_id=current_user["id"],
+            user_name=f"{current_user['prenom']} {current_user['nom']}",
+            user_email=current_user["email"],
+            action=ActionType.UPDATE,
+            entity_type=EntityType.SETTINGS,
+            entity_id="git_conflicts",
+            entity_name=f"Résolution conflits Git ({strategy})",
+            details=result.get("message", "")
+        )
+        
+        return result
+    except Exception as e:
+        logger.error(f"Erreur lors de la résolution des conflits: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 async def get_update_status(current_user: dict = Depends(get_current_admin_user)):
     """
     Récupère le statut actuel des mises à jour (Admin uniquement)
