@@ -20,13 +20,13 @@ BACKEND_URL = "https://cmms-maintenance.preview.emergentagent.com/api"
 ADMIN_EMAIL = "admin@gmao-iris.local"
 ADMIN_PASSWORD = "Admin123!"
 
-class CategoryTimeTrackingTester:
+class SurveillanceTester:
     def __init__(self):
         self.admin_session = requests.Session()
         self.admin_token = None
         self.admin_data = None
-        self.created_work_orders = []  # Track created work orders for cleanup
-        self.test_work_orders = {}  # Dictionary to store work order IDs by category
+        self.created_items = []  # Track created surveillance items for cleanup
+        self.test_items = {}  # Dictionary to store surveillance item IDs
         
     def log(self, message, level="INFO"):
         """Log test messages with timestamp"""
