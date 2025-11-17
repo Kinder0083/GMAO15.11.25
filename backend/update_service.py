@@ -444,156 +444,156 @@ class UpdateService:
                 "message": str(e)
             }
         
-        try:
-            log_detailed(f"🚀 Application de la mise à jour vers {version}...")
-            log_detailed(f"Current version: {self.current_version}")
-            log_detailed(f"Branch: {self.github_branch}")
-            log_detailed(f"App root: {self.app_root}")
-            log_detailed(f"Backend dir: {self.backend_dir}")
-            log_detailed(f"Frontend dir: {self.frontend_dir}")
+            try:
+                log_detailed(f"🚀 Application de la mise à jour vers {version}...")
+                log_detailed(f"Current version: {self.current_version}")
+                log_detailed(f"Branch: {self.github_branch}")
+                log_detailed(f"App root: {self.app_root}")
+                log_detailed(f"Backend dir: {self.backend_dir}")
+                log_detailed(f"Frontend dir: {self.frontend_dir}")
             
-            # 1. Créer une sauvegarde
-            log_detailed("📋 Étape 1/7: Création du backup de la base de données...")
-            backup_result = await self.create_backup()
-            if not backup_result.get("success"):
-                log_detailed(f"❌ ÉCHEC BACKUP: {backup_result.get('error')}", "ERROR")
+                # 1. Créer une sauvegarde
+                log_detailed("📋 Étape 1/7: Création du backup de la base de données...")
+                backup_result = await self.create_backup()
+                if not backup_result.get("success"):
+                    log_detailed(f"❌ ÉCHEC BACKUP: {backup_result.get('error')}", "ERROR")
+                    return {
+                        "success": False,
+                        "step": "backup",
+                        "error": backup_result.get("error"),
+                        "message": "Échec de la sauvegarde"
+                    }
+                log_detailed(f"✅ Backup créé: {backup_result.get('backup_name')}")
+            
+                # 2. Git pull
+                # 🔥 CORRECTION: Utiliser self.app_root au lieu de /app
+                log_detailed("📥 Étape 2/7: Téléchargement de la mise à jour depuis GitHub...")
+                result = subprocess.run(
+                    ["git", "pull", "origin", self.github_branch],
+                    cwd=str(self.app_root),
+                    capture_output=True,
+                    text=True,
+                    timeout=60
+                )
+            
+                log_detailed(f"Git pull returncode: {result.returncode}")
+                log_detailed(f"Git pull stdout: {result.stdout}")
+                log_detailed(f"Git pull stderr: {result.stderr}")
+            
+                if result.returncode != 0:
+                    log_detailed(f"❌ ÉCHEC GIT PULL: {result.stderr}", "ERROR")
+                    raise Exception(f"Erreur git pull: {result.stderr}")
+            
+                log_detailed(f"✅ Mise à jour téléchargée")
+            
+                # 3. Installer les dépendances backend si requirements.txt a changé
+                # 🔥 CORRECTION: Détecter dynamiquement le chemin vers pip
+                log_detailed("📦 Étape 3/7: Installation des dépendances backend...")
+            
+                # Trouver le pip du venv
+                venv_pip = self.backend_dir / "venv" / "bin" / "pip"
+                if not venv_pip.exists():
+                    # Essayer d'autres emplacements possibles
+                    venv_pip = Path("/root/.venv/bin/pip")
+                    if not venv_pip.exists():
+                        # Utiliser pip système par défaut
+                        venv_pip = "pip"
+            
+                log_detailed(f"Utilisation de pip: {venv_pip}")
+            
+                result = subprocess.run(
+                    [str(venv_pip), "install", "-r", "requirements.txt"],
+                    cwd=str(self.backend_dir),
+                    capture_output=True,
+                    text=True,
+                    timeout=300
+                )
+            
+                log_detailed(f"Pip install returncode: {result.returncode}")
+                if result.returncode != 0:
+                    log_detailed(f"⚠️ Warning pip install: {result.stderr}", "WARNING")
+                else:
+                    log_detailed(f"✅ Dépendances backend installées")
+            
+                # 4. Installer les dépendances frontend si package.json a changé
+                # 🔥 CORRECTION: Utiliser self.frontend_dir au lieu de /app/frontend
+                log_detailed("📦 Étape 4/7: Installation des dépendances frontend...")
+                result = subprocess.run(
+                    ["yarn", "install"],
+                    cwd=str(self.frontend_dir),
+                    capture_output=True,
+                    text=True,
+                    timeout=300
+                )
+            
+                log_detailed(f"Yarn install returncode: {result.returncode}")
+                if result.returncode != 0:
+                    log_detailed(f"⚠️ Warning yarn install: {result.stderr}", "WARNING")
+                else:
+                    log_detailed(f"✅ Dépendances frontend installées")
+            
+                # 5. Enregistrer la mise à jour dans la DB
+                log_detailed("📝 Étape 5/7: Enregistrement dans la base de données...")
+                await self.db.update_history.insert_one({
+                    "from_version": self.current_version,
+                    "to_version": version,
+                    "applied_at": datetime.utcnow(),
+                    "backup_name": backup_result.get("backup_name"),
+                    "success": True
+                })
+                log_detailed(f"✅ Historique enregistré")
+            
+                # 6. Mettre à jour la version actuelle
+                log_detailed("📝 Étape 6/7: Mise à jour de la version actuelle...")
+                self.current_version = version
+                log_detailed(f"✅ Version mise à jour: {version}")
+            
+                # 7. Programmer le redémarrage des services avec délai
+                log_detailed("🔄 Étape 7/7: Programmation du redémarrage des services dans 3 secondes...")
+            
+                # Créer un script temporaire qui attendra 3 secondes puis redémarrera les services
+                restart_script = """#!/bin/bash
+    sleep 3
+    echo "Redémarrage des services..." >> /tmp/update_process.log
+    sudo supervisorctl restart all >> /tmp/update_process.log 2>&1
+    """
+                restart_script_path = "/tmp/restart_services.sh"
+                with open(restart_script_path, "w") as f:
+                    f.write(restart_script)
+            
+                # Rendre le script exécutable
+                os.chmod(restart_script_path, 0o755)
+                log_detailed(f"✅ Script de redémarrage créé: {restart_script_path}")
+            
+                # Lancer le script en arrière-plan
+                subprocess.Popen(
+                    [restart_script_path],
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                    start_new_session=True  # Détacher du processus parent
+                )
+            
+                log_detailed("✅ MISE À JOUR TERMINÉE AVEC SUCCÈS - Services redémarrent dans 3s...")
+            
+                return {
+                    "success": True,
+                    "from_version": backup_result.get("backup_name"),
+                    "to_version": version,
+                    "backup_name": backup_result.get("backup_name"),
+                    "message": "Mise à jour appliquée avec succès. Les services redémarrent dans 3 secondes..."
+                }
+            
+            except Exception as e:
+                log_detailed(f"❌ ERREUR CRITIQUE: {str(e)}", "ERROR")
+                log_detailed(f"Type: {type(e).__name__}", "ERROR")
+                import traceback
+                log_detailed(f"Traceback: {traceback.format_exc()}", "ERROR")
+                logger.error(f"❌ Erreur lors de l'application de la mise à jour: {str(e)}")
                 return {
                     "success": False,
-                    "step": "backup",
-                    "error": backup_result.get("error"),
-                    "message": "Échec de la sauvegarde"
+                    "error": str(e),
+                    "message": f"Erreur lors de l'application de la mise à jour: {str(e)}"
                 }
-            log_detailed(f"✅ Backup créé: {backup_result.get('backup_name')}")
-            
-            # 2. Git pull
-            # 🔥 CORRECTION: Utiliser self.app_root au lieu de /app
-            log_detailed("📥 Étape 2/7: Téléchargement de la mise à jour depuis GitHub...")
-            result = subprocess.run(
-                ["git", "pull", "origin", self.github_branch],
-                cwd=str(self.app_root),
-                capture_output=True,
-                text=True,
-                timeout=60
-            )
-            
-            log_detailed(f"Git pull returncode: {result.returncode}")
-            log_detailed(f"Git pull stdout: {result.stdout}")
-            log_detailed(f"Git pull stderr: {result.stderr}")
-            
-            if result.returncode != 0:
-                log_detailed(f"❌ ÉCHEC GIT PULL: {result.stderr}", "ERROR")
-                raise Exception(f"Erreur git pull: {result.stderr}")
-            
-            log_detailed(f"✅ Mise à jour téléchargée")
-            
-            # 3. Installer les dépendances backend si requirements.txt a changé
-            # 🔥 CORRECTION: Détecter dynamiquement le chemin vers pip
-            log_detailed("📦 Étape 3/7: Installation des dépendances backend...")
-            
-            # Trouver le pip du venv
-            venv_pip = self.backend_dir / "venv" / "bin" / "pip"
-            if not venv_pip.exists():
-                # Essayer d'autres emplacements possibles
-                venv_pip = Path("/root/.venv/bin/pip")
-                if not venv_pip.exists():
-                    # Utiliser pip système par défaut
-                    venv_pip = "pip"
-            
-            log_detailed(f"Utilisation de pip: {venv_pip}")
-            
-            result = subprocess.run(
-                [str(venv_pip), "install", "-r", "requirements.txt"],
-                cwd=str(self.backend_dir),
-                capture_output=True,
-                text=True,
-                timeout=300
-            )
-            
-            log_detailed(f"Pip install returncode: {result.returncode}")
-            if result.returncode != 0:
-                log_detailed(f"⚠️ Warning pip install: {result.stderr}", "WARNING")
-            else:
-                log_detailed(f"✅ Dépendances backend installées")
-            
-            # 4. Installer les dépendances frontend si package.json a changé
-            # 🔥 CORRECTION: Utiliser self.frontend_dir au lieu de /app/frontend
-            log_detailed("📦 Étape 4/7: Installation des dépendances frontend...")
-            result = subprocess.run(
-                ["yarn", "install"],
-                cwd=str(self.frontend_dir),
-                capture_output=True,
-                text=True,
-                timeout=300
-            )
-            
-            log_detailed(f"Yarn install returncode: {result.returncode}")
-            if result.returncode != 0:
-                log_detailed(f"⚠️ Warning yarn install: {result.stderr}", "WARNING")
-            else:
-                log_detailed(f"✅ Dépendances frontend installées")
-            
-            # 5. Enregistrer la mise à jour dans la DB
-            log_detailed("📝 Étape 5/7: Enregistrement dans la base de données...")
-            await self.db.update_history.insert_one({
-                "from_version": self.current_version,
-                "to_version": version,
-                "applied_at": datetime.utcnow(),
-                "backup_name": backup_result.get("backup_name"),
-                "success": True
-            })
-            log_detailed(f"✅ Historique enregistré")
-            
-            # 6. Mettre à jour la version actuelle
-            log_detailed("📝 Étape 6/7: Mise à jour de la version actuelle...")
-            self.current_version = version
-            log_detailed(f"✅ Version mise à jour: {version}")
-            
-            # 7. Programmer le redémarrage des services avec délai
-            log_detailed("🔄 Étape 7/7: Programmation du redémarrage des services dans 3 secondes...")
-            
-            # Créer un script temporaire qui attendra 3 secondes puis redémarrera les services
-            restart_script = """#!/bin/bash
-sleep 3
-echo "Redémarrage des services..." >> /tmp/update_process.log
-sudo supervisorctl restart all >> /tmp/update_process.log 2>&1
-"""
-            restart_script_path = "/tmp/restart_services.sh"
-            with open(restart_script_path, "w") as f:
-                f.write(restart_script)
-            
-            # Rendre le script exécutable
-            os.chmod(restart_script_path, 0o755)
-            log_detailed(f"✅ Script de redémarrage créé: {restart_script_path}")
-            
-            # Lancer le script en arrière-plan
-            subprocess.Popen(
-                [restart_script_path],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-                start_new_session=True  # Détacher du processus parent
-            )
-            
-            log_detailed("✅ MISE À JOUR TERMINÉE AVEC SUCCÈS - Services redémarrent dans 3s...")
-            
-            return {
-                "success": True,
-                "from_version": backup_result.get("backup_name"),
-                "to_version": version,
-                "backup_name": backup_result.get("backup_name"),
-                "message": "Mise à jour appliquée avec succès. Les services redémarrent dans 3 secondes..."
-            }
-            
-        except Exception as e:
-            log_detailed(f"❌ ERREUR CRITIQUE: {str(e)}", "ERROR")
-            log_detailed(f"Type: {type(e).__name__}", "ERROR")
-            import traceback
-            log_detailed(f"Traceback: {traceback.format_exc()}", "ERROR")
-            logger.error(f"❌ Erreur lors de l'application de la mise à jour: {str(e)}")
-            return {
-                "success": False,
-                "error": str(e),
-                "message": f"Erreur lors de l'application de la mise à jour: {str(e)}"
-            }
     
     async def get_recent_updates_info(self, days: int = 3) -> Optional[Dict]:
         """
