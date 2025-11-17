@@ -2511,9 +2511,9 @@ async def test_smtp_config(
                 user_id=current_user["id"],
                 user_name=f"{current_user['prenom']} {current_user['nom']}",
                 user_email=current_user["email"],
-                action=ActionType.OTHER,
+                action=ActionType.UPDATE,
                 entity_type=EntityType.SETTINGS,
-                entity_id="smtp",
+                entity_id="smtp_test",
                 entity_name="Test SMTP",
                 details=f"Test d'envoi d'email vers {test_request.test_email}"
             )
