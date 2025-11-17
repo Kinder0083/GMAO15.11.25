@@ -108,6 +108,7 @@
 **Backend :**
 - ✅ `backend/server.py` :
   - Correction `EntityType.SYSTEM` → `EntityType.SETTINGS`
+  - Correction `ActionType.OTHER` → `ActionType.UPDATE`
   - Suppression doublon route `/api/updates/apply` (ligne 3661-3675)
 - ✅ `backend/update_service.py` :
   - Détection automatique des chemins (fonctionne en `/app` et `/opt/gmao-iris`)
