@@ -24,6 +24,23 @@ const SpecialSettings = () => {
   const [inactivityTimeout, setInactivityTimeout] = useState(15);
   const [loadingSettings, setLoadingSettings] = useState(true);
   const [savingSettings, setSavingSettings] = useState(false);
+  
+  // États SMTP
+  const [smtpConfig, setSmtpConfig] = useState({
+    smtp_host: '',
+    smtp_port: 587,
+    smtp_user: '',
+    smtp_password: '',
+    smtp_from_email: '',
+    smtp_from_name: 'GMAO Iris',
+    smtp_use_tls: true
+  });
+  const [loadingSmtp, setLoadingSmtp] = useState(true);
+  const [savingSmtp, setSavingSmtp] = useState(false);
+  const [testingSmtp, setTestingSmtp] = useState(false);
+  const [testEmail, setTestEmail] = useState('');
+  const [showSmtpPassword, setShowSmtpPassword] = useState(false);
+  
   const { toast } = useToast();
 
   useEffect(() => {
