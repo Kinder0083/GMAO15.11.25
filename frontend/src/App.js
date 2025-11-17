@@ -101,6 +101,7 @@ function App() {
             <Route path="intervention-requests" element={<InterventionRequests />} />
             <Route path="improvement-requests" element={<ImprovementRequests />} />
             <Route path="improvements" element={<Improvements />} />
+            <Route path="surveillance-plan" element={<SurveillancePlan />} />
           </Route>
         </Routes>
       </BrowserRouter>
