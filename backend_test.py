@@ -624,13 +624,16 @@ class SurveillanceTester:
         return results
 
 if __name__ == "__main__":
-    tester = CategoryTimeTrackingTester()
-    results = tester.run_category_time_tracking_tests()
+    tester = SurveillanceTester()
+    results = tester.run_surveillance_tests()
     
     # Exit with appropriate code - allow cleanup to fail
-    critical_tests = ["admin_login", "create_curatif_order", "create_divers_order", 
-                     "create_formation_order", "create_changement_format_order", 
-                     "test_time_by_category_stats"]
+    critical_tests = [
+        "admin_login", "create_incendie_item", "create_electrique_item", "create_mmri_item", 
+        "create_securite_item", "test_surveillance_list_with_filters", "test_surveillance_item_details", 
+        "test_surveillance_item_update", "test_surveillance_stats", "test_surveillance_alerts",
+        "test_surveillance_upload", "test_surveillance_export_template", "test_surveillance_delete_item"
+    ]
     
     critical_passed = sum(results.get(test, False) for test in critical_tests)
     
