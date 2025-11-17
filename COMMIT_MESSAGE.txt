@@ -1,0 +1,63 @@
+feat: Configuration adaptative + Interface SMTP + Gestion conflits Git
+
+🌐 Configuration URL Backend Adaptative
+- Détection automatique de l'URL (fonctionne en local ET distant)
+- Nouveau fichier: frontend/src/utils/config.js
+- Modifié: 10 fichiers frontend pour utiliser config adaptative
+- Documentation: frontend/.env.example
+- Fini les problèmes d'accès distant avec IP publique
+
+📧 Interface de Configuration SMTP
+- Interface complète dans "Paramètres spéciaux"
+- 3 nouveaux endpoints: /api/smtp/config, /api/smtp/test
+- Modèles: SMTPConfig, SMTPConfigUpdate, SMTPTestRequest
+- Fonctions email_service: init_email_service(), send_test_email()
+- Configuration directe depuis l'UI, plus besoin de SSH
+- Test d'envoi avec email stylisé
+
+🔧 Gestion Intelligente des Conflits Git
+- Détection automatique des conflits avant mise à jour
+- Nouveau composant: GitConflictDialog.jsx
+- 3 options: Écraser, Sauvegarder (git stash), Annuler
+- Endpoints: /api/updates/check-conflicts, /api/updates/resolve-conflicts
+- Plus de blocage lors des mises à jour avec modifications locales
+
+🔄 Corrections Système de Mise à Jour
+- Fix: EntityType.SYSTEM → EntityType.SETTINGS
+- Fix: ActionType.OTHER → ActionType.UPDATE
+- Suppression doublon route /api/updates/apply
+- Ajout paramètre version dans appel frontend
+- Détection automatique des chemins (dev/prod)
+- Logging détaillé dans /tmp/update_process.log
+
+📊 Fichiers modifiés:
+Backend (4 fichiers):
+- backend/models.py (modèles SMTP)
+- backend/server.py (endpoints + corrections)
+- backend/update_service.py (détection chemins + conflits)
+- backend/email_service.py (init + test SMTP)
+
+Frontend (14 fichiers):
+- Nouveaux: utils/config.js, GitConflictDialog.jsx, .env.example
+- Modifiés: api.js, 5 pages, 5 composants, .env
+
+📝 Documentation:
+- CHANGELOG_LATEST.md (détails complets)
+- DEPLOY_GUIDE.md (guide déploiement)
+- COMMIT_MESSAGE.txt (ce fichier)
+
+✅ Tests validés:
+- Accès local (IP privée)
+- Accès distant (IP publique)
+- Configuration SMTP Gmail
+- Test envoi email
+- Gestion conflits Git (3 scénarios)
+- Build frontend + déploiement nginx
+- Journalisation audit
+
+Breaking changes: Aucun
+Migrations requises: Aucune
+Dépendances: Aucune nouvelle
+
+Version: 1.2.1
+Date: 17 novembre 2025
