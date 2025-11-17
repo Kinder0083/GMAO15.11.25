@@ -29,6 +29,11 @@ const Updates = () => {
   const [expandedChangelog, setExpandedChangelog] = useState(false);
   const [expandedHistory, setExpandedHistory] = useState(false);
   const [updateLogs, setUpdateLogs] = useState([]);
+  
+  // États pour la gestion des conflits Git
+  const [showConflictDialog, setShowConflictDialog] = useState(false);
+  const [conflictData, setConflictData] = useState(null);
+  const [checkingConflicts, setCheckingConflicts] = useState(false);
 
   useEffect(() => {
     loadUpdateInfo();
