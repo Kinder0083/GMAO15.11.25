@@ -183,12 +183,12 @@ function SurveillancePlan() {
           </SelectContent>
         </Select>
 
-        <Select value={filters.responsable} onValueChange={(val) => setFilters(prev => ({ ...prev, responsable: val }))}>
+        <Select value={filters.responsable || "all"} onValueChange={(val) => setFilters(prev => ({ ...prev, responsable: val === "all" ? "" : val }))}>
           <SelectTrigger className="w-[150px]">
             <SelectValue placeholder="Responsable" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Tous</SelectItem>
+            <SelectItem value="all">Tous</SelectItem>
             <SelectItem value="MAINT">MAINT</SelectItem>
             <SelectItem value="PROD">PROD</SelectItem>
             <SelectItem value="QHSE">QHSE</SelectItem>
