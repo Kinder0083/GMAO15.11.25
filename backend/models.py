@@ -1172,5 +1172,6 @@ class SurveillanceItemUpdate(BaseModel):
     commentaire: Optional[str] = None
     piece_jointe_url: Optional[str] = None
     piece_jointe_nom: Optional[str] = None
+    duree_rappel_echeance: Optional[int] = None  # Durée en jours avant échéance pour l'alerte
 
 
