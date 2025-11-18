@@ -944,7 +944,7 @@ class PresquAccidentTester:
         
         # Summary
         self.log("=" * 70)
-        self.log("PLAN DE SURVEILLANCE TEST RESULTS SUMMARY")
+        self.log("PRESQU'ACCIDENT (NEAR MISS) TEST RESULTS SUMMARY")
         self.log("=" * 70)
         
         passed = sum(results.values())
