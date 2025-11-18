@@ -229,16 +229,18 @@ const SpecialSettings = () => {
         description: `Un nouveau mot de passe temporaire a été généré pour ${userName}`,
       });
 
-      loadUsers(); // Recharger pour mettre à jour firstLogin
-    } catch (error) {
-      toast({
-        title: 'Erreur',
-        description: error.response?.data?.detail || 'Impossible de réinitialiser le mot de passe',
-        variant: 'destructive'
-      });
-    } finally {
-      setResetting(null);
-    }
+          loadUsers(); // Recharger pour mettre à jour firstLogin
+        } catch (error) {
+          toast({
+            title: 'Erreur',
+            description: error.response?.data?.detail || 'Impossible de réinitialiser le mot de passe',
+            variant: 'destructive'
+          });
+        } finally {
+          setResetting(null);
+        }
+      }
+    });
   };
 
   const copyToClipboard = (text) => {
