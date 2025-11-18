@@ -36,6 +36,7 @@ class UserPermissions(BaseModel):
     inventory: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
     locations: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
     meters: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
+    surveillance: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
     vendors: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
     reports: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
     people: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
