@@ -778,6 +778,9 @@ const SpecialSettings = () => {
           )}
         </div>
       </div>
+
+      {/* Confirm Dialog */}
+      <ConfirmDialog />
     </div>
   );
 };
