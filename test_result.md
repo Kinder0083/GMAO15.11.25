@@ -1588,6 +1588,52 @@ backend:
           - Système d'alertes
           - Permissions admin
 
+  - task: "API Plan de Surveillance - Badge de notification avec durée de rappel personnalisable"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/models.py, /app/backend/surveillance_routes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          NOUVELLE FONCTIONNALITÉ - Badge de notification dans le header (Backend)
+          
+          CONTEXTE:
+          L'utilisateur souhaite un badge de notification dans le header affichant:
+          1. Nombre de contrôles à échéance proche (selon durée de rappel personnalisée par item)
+          2. Pourcentage de réalisation global du plan de surveillance
+          
+          MODIFICATIONS BACKEND:
+          
+          1. /app/backend/models.py:
+             - Ajout du champ `duree_rappel_echeance: int = 30` dans SurveillanceItem (ligne ~1127)
+             - Ajout du champ dans SurveillanceItemCreate (défaut: 30 jours)
+             - Ajout du champ optionnel dans SurveillanceItemUpdate
+             - Permet à chaque contrôle de définir sa propre durée de rappel
+          
+          2. /app/backend/surveillance_routes.py:
+             - Nouvel endpoint GET /api/surveillance/badge-stats (lignes ~308-362)
+               * Retourne: { echeances_proches: int, pourcentage_realisation: float }
+               * Calcule le nombre de contrôles dont l'échéance approche selon leur duree_rappel_echeance individuelle
+               * Ignore les items déjà réalisés
+               * Calcule le % de réalisation global (realises / total * 100)
+             - Modification de GET /api/surveillance/alerts (ligne ~287)
+               * Utilise maintenant la duree_rappel_echeance de chaque item au lieu d'une valeur fixe de 30 jours
+          
+          LOGIQUE MÉTIER:
+          - Chaque item peut avoir sa propre durée de rappel (ex: 7j, 15j, 30j, 60j, etc.)
+          - Si un item a prochain_controle dans X jours et X <= duree_rappel_echeance, il est compté
+          - Le badge affichera dynamiquement ces informations pour alerter l'utilisateur
+          
+          À TESTER:
+          - GET /api/surveillance/badge-stats (authentification requise)
+          - Vérifier que le calcul respecte la duree_rappel_echeance de chaque item
+          - Vérifier que les items réalisés sont exclus du comptage
+          - Vérifier que le pourcentage de réalisation est correct
+
 frontend:
   - task: "Plan de Surveillance - Interface complète avec 3 vues"
     implemented: true
