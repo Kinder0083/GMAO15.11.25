@@ -894,53 +894,53 @@ class PresquAccidentTester:
             self.log("❌ Cannot proceed with other tests - Admin login failed", "ERROR")
             return results
         
-        # Test 2-5: Create surveillance items with different categories
-        results["create_incendie_item"] = self.test_create_incendie_item()
-        results["create_electrique_item"] = self.test_create_electrique_item()
-        results["create_mmri_item"] = self.test_create_mmri_item()
-        results["create_securite_item"] = self.test_create_securite_item()
+        # Test 2-5: Create presqu'accident items with different services
+        results["create_adv_item"] = self.test_create_adv_item()
+        results["create_logistique_item"] = self.test_create_logistique_item()
+        results["create_production_item"] = self.test_create_production_item()
+        results["create_qhse_item"] = self.test_create_qhse_item()
         
         # Test 6: List with filters
-        results["test_surveillance_list_with_filters"] = self.test_surveillance_list_with_filters()
+        results["test_presqu_accident_list_with_filters"] = self.test_presqu_accident_list_with_filters()
         
         # Test 7: Item details
-        results["test_surveillance_item_details"] = self.test_surveillance_item_details()
+        results["test_presqu_accident_item_details"] = self.test_presqu_accident_item_details()
         
         # Test 8: Update item
-        results["test_surveillance_item_update"] = self.test_surveillance_item_update()
+        results["test_presqu_accident_item_update"] = self.test_presqu_accident_item_update()
         
         # Test 9: Statistics
-        results["test_surveillance_stats"] = self.test_surveillance_stats()
+        results["test_presqu_accident_stats"] = self.test_presqu_accident_stats()
         
         # Test 10: Alerts
-        results["test_surveillance_alerts"] = self.test_surveillance_alerts()
+        results["test_presqu_accident_alerts"] = self.test_presqu_accident_alerts()
         
         # Test 11: Badge Stats (CRITIQUE)
-        results["test_surveillance_badge_stats"] = self.test_surveillance_badge_stats()
+        results["test_presqu_accident_badge_stats"] = self.test_presqu_accident_badge_stats()
         
         # Test 12: Badge Stats Security (sans auth)
-        results["test_surveillance_badge_stats_without_auth"] = self.test_surveillance_badge_stats_without_auth()
+        results["test_presqu_accident_badge_stats_without_auth"] = self.test_presqu_accident_badge_stats_without_auth()
         
-        # Test 13: Rapport Stats (NOUVEAU - CRITIQUE)
-        results["test_surveillance_rapport_stats"] = self.test_surveillance_rapport_stats()
+        # Test 13: Rapport Stats (CRITIQUE)
+        results["test_presqu_accident_rapport_stats"] = self.test_presqu_accident_rapport_stats()
         
         # Test 14: Rapport Stats Security (sans auth)
-        results["test_surveillance_rapport_stats_without_auth"] = self.test_surveillance_rapport_stats_without_auth()
+        results["test_presqu_accident_rapport_stats_without_auth"] = self.test_presqu_accident_rapport_stats_without_auth()
         
         # Test 15: Upload
-        results["test_surveillance_upload"] = self.test_surveillance_upload()
+        results["test_presqu_accident_upload"] = self.test_presqu_accident_upload()
         
         # Test 16: Export template
-        results["test_surveillance_export_template"] = self.test_surveillance_export_template()
+        results["test_presqu_accident_export_template"] = self.test_presqu_accident_export_template()
         
         # Test 17: Delete item
-        results["test_surveillance_delete_item"] = self.test_surveillance_delete_item()
+        results["test_presqu_accident_delete_item"] = self.test_presqu_accident_delete_item()
         
         # Test 18: Cleanup
-        results["test_cleanup_surveillance_items"] = self.test_cleanup_surveillance_items()
+        results["test_cleanup_presqu_accident_items"] = self.test_cleanup_presqu_accident_items()
         
         # Test 19: Final cleanup
-        results["cleanup_remaining"] = self.cleanup_remaining_surveillance_items()
+        results["cleanup_remaining"] = self.cleanup_remaining_presqu_accident_items()
         
         # Summary
         self.log("=" * 70)
