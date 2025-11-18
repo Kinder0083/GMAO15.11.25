@@ -131,14 +131,53 @@ function PresquAccidentList() {
   };
 
   const handleDelete = async (itemId) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer ce presqu\'accident ?')) {
-      try {
-        await presquAccidentAPI.deleteItem(itemId);
-        toast({ title: 'Succès', description: 'Presqu\'accident supprimé' });
-        loadData();
-      } catch (error) {
-        toast({ title: 'Erreur', description: 'Erreur lors de la suppression', variant: 'destructive' });
+    confirm({
+      title: 'Supprimer le presqu\'accident',
+      description: 'Êtes-vous sûr de vouloir supprimer ce presqu\'accident ? Cette action est irréversible.',
+      confirmText: 'Supprimer',
+      cancelText: 'Annuler',
+      variant: 'destructive',
+      onConfirm: async () => {
+        try {
+          await presquAccidentAPI.deleteItem(itemId);
+          toast({ title: 'Succès', description: 'Presqu\'accident supprimé' });
+          loadData();
+        } catch (error) {
+          toast({ title: 'Erreur', description: 'Erreur lors de la suppression', variant: 'destructive' });
+        }
       }
+    });
+  };
+
+  const handleExportTemplate = async () => {
+    try {
+      const blob = await presquAccidentAPI.exportTemplate();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'template_presqu_accidents.csv';
+      a.click();
+      toast({ title: 'Succès', description: 'Template téléchargé' });
+    } catch (error) {
+      toast({ title: 'Erreur', description: 'Erreur téléchargement', variant: 'destructive' });
+    }
+  };
+
+  const handleImport = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const result = await presquAccidentAPI.importData(formData);
+      toast({ 
+        title: 'Succès', 
+        description: `${result.imported_count} presqu'accident(s) importé(s)` 
+      });
+      loadData();
+      if (importInputRef.current) importInputRef.current.value = '';
+    } catch (error) {
+      toast({ title: 'Erreur', description: 'Erreur lors de l\'import', variant: 'destructive' });
     }
   };
 
