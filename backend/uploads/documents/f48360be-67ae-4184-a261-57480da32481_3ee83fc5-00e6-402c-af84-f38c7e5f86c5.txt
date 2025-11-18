@@ -1,0 +1,2 @@
+Ceci est un document de test pour le module Documentations
+Contenu de test avec des données techniques.
