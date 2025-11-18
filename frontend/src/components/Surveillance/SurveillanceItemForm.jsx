@@ -142,6 +142,19 @@ function SurveillanceItemForm({ open, item, onClose }) {
           </div>
 
           <div>
+            <Label>Durée de rappel d'échéance (jours)</Label>
+            <Input 
+              type="number" 
+              min="1" 
+              max="365" 
+              value={formData.duree_rappel_echeance} 
+              onChange={(e) => setFormData({...formData, duree_rappel_echeance: parseInt(e.target.value) || 30})} 
+              placeholder="30"
+            />
+            <p className="text-xs text-gray-500 mt-1">Nombre de jours avant l'échéance pour recevoir un rappel</p>
+          </div>
+
+          <div>
             <Label>Commentaire</Label>
             <Textarea value={formData.commentaire} onChange={(e) => setFormData({...formData, commentaire: e.target.value})} rows={2} />
           </div>
