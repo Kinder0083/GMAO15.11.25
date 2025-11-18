@@ -654,7 +654,7 @@ const SpecialSettings = () => {
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                      Exemple : https://monitorplus-1.preview.emergentagent.com
+                      Exemple : https://surveillance-plus.preview.emergentagent.com
                     </p>
                   </div>
 
@@ -671,7 +671,7 @@ const SpecialSettings = () => {
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                      Exemple : https://monitorplus-1.preview.emergentagent.com
+                      Exemple : https://surveillance-plus.preview.emergentagent.com
                     </p>
                   </div>
                 </div>
