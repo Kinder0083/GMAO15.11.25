@@ -4180,4 +4180,37 @@ agent_communication:
       
       Le backend et le frontend sont prêts pour les tests automatisés.
       Priorité: HIGH (il s'agit de la demande principale de l'utilisateur)
+  - agent: "testing"
+    message: |
+      ✅ ENDPOINT GET /api/surveillance/rapport-stats TESTÉ ET VALIDÉ - Novembre 2025
+      
+      🎯 RÉSULTATS DES TESTS BACKEND:
+      
+      📊 TESTS EFFECTUÉS (8/8 RÉUSSIS):
+      1. ✅ Authentification et accès (admin@gmao-iris.local / Admin123!)
+      2. ✅ Structure de réponse JSON complète (6 sections requises)
+      3. ✅ Statistiques globales avec calculs corrects
+      4. ✅ Validation des types de données (entiers/nombres)
+      5. ✅ Validation des calculs mathématiques (pourcentages)
+      6. ✅ Statistiques par sections (catégorie, bâtiment, périodicité, responsable)
+      7. ✅ Comptage des anomalies par mots-clés
+      8. ✅ Sécurité - Protection par authentification (403 sans token)
+      
+      🔧 PROBLÈME CRITIQUE RÉSOLU:
+      - Erreur initiale: "'NoneType' object has no attribute 'lower'" 
+      - Cause: Gestion des valeurs null dans le champ commentaire
+      - Correction appliquée dans surveillance_routes.py ligne 414-415
+      - Backend redémarré et test de validation réussi
+      
+      📋 DONNÉES DE TEST VALIDÉES:
+      - Total: 16 items, Réalisés: 1, Planifiés: 1, À planifier: 14
+      - Pourcentage réalisation: 6.2% (calcul correct: 1/16 * 100)
+      - En retard: 15, À temps: 0, Anomalies: 0
+      - 7 catégories, 3 bâtiments, 2 périodicités, 4 responsables
+      
+      🎉 CONCLUSION BACKEND:
+      L'endpoint GET /api/surveillance/rapport-stats est ENTIÈREMENT OPÉRATIONNEL et conforme aux spécifications. Tous les critères de test du cahier des charges sont validés. Prêt pour utilisation par le frontend.
+      
+      ➡️ RECOMMANDATION POUR MAIN AGENT:
+      Le backend étant validé, vous pouvez maintenant procéder aux tests frontend de la page Rapport ou marquer cette tâche backend comme terminée et passer à la suite.
 
