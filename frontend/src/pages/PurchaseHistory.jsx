@@ -5,11 +5,13 @@ import { Input } from '../components/ui/input';
 import { Plus, Search, ShoppingCart, TrendingUp, Calendar, Pencil, Trash2, Download, Upload, ChevronDown, ChevronRight } from 'lucide-react';
 import { purchaseHistoryAPI } from '../services/api';
 import { useToast } from '../hooks/use-toast';
+import { useConfirmDialog } from '../components/ui/confirm-dialog';
 import PurchaseFormDialog from '../components/PurchaseHistory/PurchaseFormDialog';
 import { ResponsiveBar } from '@nivo/bar';
 
 const PurchaseHistory = () => {
   const { toast } = useToast();
+  const { confirm, ConfirmDialog } = useConfirmDialog();
   const [purchases, setPurchases] = useState([]);
   const [groupedPurchases, setGroupedPurchases] = useState([]);
   const [stats, setStats] = useState(null);
