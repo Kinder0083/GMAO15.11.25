@@ -846,16 +846,16 @@ class SurveillanceTester:
         # Test 15: Upload
         results["test_surveillance_upload"] = self.test_surveillance_upload()
         
-        # Test 14: Export template
+        # Test 16: Export template
         results["test_surveillance_export_template"] = self.test_surveillance_export_template()
         
-        # Test 15: Delete item
+        # Test 17: Delete item
         results["test_surveillance_delete_item"] = self.test_surveillance_delete_item()
         
-        # Test 16: Cleanup
+        # Test 18: Cleanup
         results["test_cleanup_surveillance_items"] = self.test_cleanup_surveillance_items()
         
-        # Test 17: Final cleanup
+        # Test 19: Final cleanup
         results["cleanup_remaining"] = self.cleanup_remaining_surveillance_items()
         
         # Summary
