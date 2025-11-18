@@ -246,10 +246,27 @@ function PresquAccidentList() {
           <h1 className="text-3xl font-bold">Presqu'accidents</h1>
           <p className="text-gray-500">Gestion des presqu'accidents et incidents évités</p>
         </div>
-        <Button onClick={handleCreate}>
-          <Plus className="mr-2 h-4 w-4" />
-          Nouveau Presqu'accident
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleExportTemplate}>
+            <Download className="mr-2 h-4 w-4" />
+            Template CSV
+          </Button>
+          <Button variant="outline" onClick={() => importInputRef.current?.click()}>
+            <Upload className="mr-2 h-4 w-4" />
+            Importer
+          </Button>
+          <input
+            ref={importInputRef}
+            type="file"
+            accept=".csv,.xlsx,.xls"
+            onChange={handleImport}
+            style={{ display: 'none' }}
+          />
+          <Button onClick={handleCreate}>
+            <Plus className="mr-2 h-4 w-4" />
+            Nouveau
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}
