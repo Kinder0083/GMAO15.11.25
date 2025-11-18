@@ -100,7 +100,7 @@ const MeterDialog = ({ open, onOpenChange, meter, onSuccess }) => {
     } catch (error) {
       toast({
         title: 'Erreur',
-        description: formatErrorMessage(error, 'Impossible d\')ajouter le relevé',
+        description: formatErrorMessage(error, 'Impossible d\'ajouter le relevé'),
         variant: 'destructive'
       });
     }
