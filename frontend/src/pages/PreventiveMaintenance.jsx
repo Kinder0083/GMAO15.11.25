@@ -13,9 +13,11 @@ import { Plus, Calendar, Clock, CheckCircle, List, Grid, Trash2 } from 'lucide-r
 import PreventiveMaintenanceFormDialog from '../components/PreventiveMaintenance/PreventiveMaintenanceFormDialog';
 import { preventiveMaintenanceAPI, workOrdersAPI } from '../services/api';
 import { useToast } from '../hooks/use-toast';
+import { useConfirmDialog } from '../components/ui/confirm-dialog';
 
 const PreventiveMaintenance = () => {
   const { toast } = useToast();
+  const { confirm, ConfirmDialog } = useConfirmDialog();
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const [maintenance, setMaintenance] = useState([]);
   const [loading, setLoading] = useState(true);
