@@ -5466,6 +5466,15 @@ init_surveillance_routes(db, audit_service)
 # Include surveillance routes
 api_router.include_router(surveillance_router)
 
+# Import presqu'accident routes
+from presqu_accident_routes import router as presqu_accident_router, init_presqu_accident_routes
+
+# Initialize presqu'accident routes with database and audit service
+init_presqu_accident_routes(db, audit_service)
+
+# Include presqu'accident routes
+api_router.include_router(presqu_accident_router)
+
 # Include the router in the main app (MUST be after all endpoint definitions)
 app.include_router(api_router)
 
