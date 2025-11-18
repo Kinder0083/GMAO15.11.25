@@ -122,7 +122,7 @@ const Inscription = () => {
     } catch (error) {
       toast({
         title: 'Erreur',
-        description: formatErrorMessage(error, 'Une erreur est survenue lors de l\')inscription',
+        description: formatErrorMessage(error, 'Une erreur est survenue lors de l\'inscription'),
         variant: 'destructive'
       });
     } finally {
