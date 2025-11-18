@@ -214,30 +214,33 @@ class PresquAccidentTester:
             self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
             return False
     
-    def test_surveillance_item_details(self):
-        """TEST 7: Tester GET /api/surveillance/items/{item_id}"""
-        self.log("🧪 TEST 7: Récupérer les détails d'un item spécifique")
+    def test_presqu_accident_item_details(self):
+        """TEST 7: Tester GET /api/presqu-accident/items/{item_id}"""
+        self.log("🧪 TEST 7: Récupérer les détails d'un presqu'accident spécifique")
         
         if not self.created_items:
-            self.log("⚠️ Pas d'items créés pour tester les détails", "WARNING")
+            self.log("⚠️ Pas de presqu'accidents créés pour tester les détails", "WARNING")
             return False
         
         try:
             item_id = self.created_items[0]  # Prendre le premier item créé
             response = self.admin_session.get(
-                f"{BACKEND_URL}/surveillance/items/{item_id}",
+                f"{BACKEND_URL}/presqu-accident/items/{item_id}",
                 timeout=10
             )
             
             if response.status_code == 200:
                 data = response.json()
                 self.log(f"✅ Détails récupérés - ID: {data.get('id')}")
-                self.log(f"✅ Classe type: {data.get('classe_type')}")
-                self.log(f"✅ Catégorie: {data.get('category')}")
-                self.log(f"✅ Responsable: {data.get('responsable')}")
+                self.log(f"✅ Titre: {data.get('titre')}")
+                self.log(f"✅ Service: {data.get('service')}")
+                self.log(f"✅ Sévérité: {data.get('severite')}")
+                self.log(f"✅ Statut: {data.get('status')}")
+                self.log(f"✅ Lieu: {data.get('lieu')}")
                 return True
             else:
                 self.log(f"❌ Récupération détails échouée - Status: {response.status_code}", "ERROR")
+                self.log(f"Response: {response.text}", "ERROR")
                 return False
                 
         except requests.exceptions.RequestException as e:
