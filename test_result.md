@@ -4202,8 +4202,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Plan de Surveillance - Page Rapport avec 3 modes d'affichage"
-    - "Plan de Surveillance - Route et Navigation vers Rapport"
+    - "API Documentations - Module complet Pôles de Service et Bons de Travail"
+    - "Module Documentations - Pages frontend et intégration"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
