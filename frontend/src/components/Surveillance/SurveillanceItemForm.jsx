@@ -37,7 +37,8 @@ function SurveillanceItemForm({ open, item, onClose }) {
         description: item.description || '',
         derniere_visite: item.derniere_visite ? item.derniere_visite.split('T')[0] : '',
         prochain_controle: item.prochain_controle ? item.prochain_controle.split('T')[0] : '',
-        commentaire: item.commentaire || ''
+        commentaire: item.commentaire || '',
+        duree_rappel_echeance: item.duree_rappel_echeance || 30
       });
     }
   }, [item]);
