@@ -516,6 +516,36 @@ const MainLayout = () => {
           {/* Badge de mise à jour (Admin uniquement) */}
           {isAdmin() && <UpdateNotificationBadge />}
           
+          {/* Badge Plan de Surveillance */}
+          <button 
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative group"
+            onClick={() => navigate('/surveillance-plan')}
+            title="Plan de Surveillance"
+          >
+            <Eye size={20} className="text-gray-600" />
+            {surveillanceBadge.echeances_proches > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                {surveillanceBadge.echeances_proches > 9 ? '9+' : surveillanceBadge.echeances_proches}
+              </span>
+            )}
+            {/* Tooltip avec détails */}
+            <div className="absolute hidden group-hover:block right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 z-50 p-3">
+              <div className="text-sm font-semibold text-gray-800 mb-2">Plan de Surveillance</div>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Échéances proches:</span>
+                  <span className="font-bold text-orange-600">{surveillanceBadge.echeances_proches}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Taux de réalisation:</span>
+                  <span className={`font-bold ${surveillanceBadge.pourcentage_realisation >= 75 ? 'text-green-600' : surveillanceBadge.pourcentage_realisation >= 50 ? 'text-orange-600' : 'text-red-600'}`}>
+                    {surveillanceBadge.pourcentage_realisation}%
+                  </span>
+                </div>
+              </div>
+            </div>
+          </button>
+          
           {/* Cloche notifications */}
           <button 
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative"
