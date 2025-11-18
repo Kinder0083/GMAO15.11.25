@@ -6,9 +6,11 @@ import { Plus, Search, Building, Mail, Phone, MapPin, Pencil, Trash2, LayoutGrid
 import VendorFormDialog from '../components/Vendors/VendorFormDialog';
 import { vendorsAPI } from '../services/api';
 import { useToast } from '../hooks/use-toast';
+import { useConfirmDialog } from '../components/ui/confirm-dialog';
 
 const Vendors = () => {
   const { toast } = useToast();
+  const { confirm, ConfirmDialog } = useConfirmDialog();
   const [vendors, setVendors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
