@@ -34,6 +34,9 @@ import SurveillancePlan from "./pages/SurveillancePlan";
 import SurveillanceRapport from "./pages/SurveillanceRapport";
 import PresquAccidentList from "./pages/PresquAccidentList";
 import PresquAccidentRapport from "./pages/PresquAccidentRapport";
+import Documentations from "./pages/Documentations";
+import PoleDetails from "./pages/PoleDetails";
+import BonDeTravailForm from "./pages/BonDeTravailForm";
 
 // Protected Route Component with Token Validation
 const ProtectedRoute = ({ children }) => {
