@@ -67,25 +67,32 @@ class PresquAccidentTester:
             self.log(f"❌ Admin login request failed - Error: {str(e)}", "ERROR")
             return False
     
-    def test_create_surveillance_item(self, category, classe_type, batiment, responsable):
-        """Créer un item de surveillance avec des données spécifiques"""
-        self.log(f"🧪 Créer item surveillance - Catégorie: {category}, Type: {classe_type}")
+    def test_create_presqu_accident_item(self, service, severite, lieu, titre_suffix):
+        """Créer un item de presqu'accident avec des données spécifiques"""
+        self.log(f"🧪 Créer presqu'accident - Service: {service}, Sévérité: {severite}")
         
         try:
-            # Créer l'item de surveillance
+            # Créer l'item de presqu'accident
             item_data = {
-                "classe_type": classe_type,
-                "category": category,
-                "batiment": batiment,
-                "periodicite": "6 mois",
-                "responsable": responsable,
-                "executant": "DESAUTEL",
-                "description": f"Test surveillance {classe_type}",
-                "prochain_controle": "2025-06-15"
+                "titre": f"Test presqu'accident {titre_suffix}",
+                "description": f"Description détaillée du presqu'accident {titre_suffix}",
+                "date_incident": "2025-01-15",
+                "lieu": lieu,
+                "service": service,
+                "personnes_impliquees": "Jean DUPONT, Marie MARTIN",
+                "declarant": "Paul LEFEBVRE",
+                "contexte_cause": f"Contexte et cause du presqu'accident {titre_suffix}",
+                "severite": severite,
+                "actions_proposees": f"Actions proposées pour {titre_suffix}",
+                "actions_preventions": f"Actions de prévention pour {titre_suffix}",
+                "responsable_action": "Sophie BERNARD",
+                "date_echeance_action": "2025-02-15",
+                "status": "A_TRAITER",
+                "commentaire": f"Commentaire test {titre_suffix}"
             }
             
             response = self.admin_session.post(
-                f"{BACKEND_URL}/surveillance/items",
+                f"{BACKEND_URL}/presqu-accident/items",
                 json=item_data,
                 timeout=10
             )
@@ -94,15 +101,16 @@ class PresquAccidentTester:
                 data = response.json()
                 item_id = data.get("id")
                 self.created_items.append(item_id)
-                self.test_items[category] = item_id
+                self.test_items[service] = item_id
                 
-                self.log(f"✅ Item créé avec succès - ID: {item_id}")
-                self.log(f"✅ Catégorie: {data.get('category')}")
-                self.log(f"✅ Classe type: {data.get('classe_type')}")
+                self.log(f"✅ Presqu'accident créé avec succès - ID: {item_id}")
+                self.log(f"✅ Service: {data.get('service')}")
+                self.log(f"✅ Sévérité: {data.get('severite')}")
+                self.log(f"✅ Lieu: {data.get('lieu')}")
                 return True
                     
             else:
-                self.log(f"❌ Création d'item échouée - Status: {response.status_code}", "ERROR")
+                self.log(f"❌ Création presqu'accident échouée - Status: {response.status_code}", "ERROR")
                 self.log(f"Response: {response.text}", "ERROR")
                 return False
                 
