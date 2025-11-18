@@ -13,7 +13,7 @@ from pathlib import Path
 class UpdateManager:
     def __init__(self, db):
         self.db = db
-        self.current_version = "1.2.0"  # Mise à jour de la version
+        self.current_version = "1.5.0"  # Version 1.5.0 - Rapport de Surveillance Avancé
         self.github_user = "Kinder0083"
         self.github_repo = "GMAO"
         self.github_branch = "main"
