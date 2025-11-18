@@ -21,7 +21,8 @@ function SurveillanceItemForm({ open, item, onClose }) {
     description: '',
     derniere_visite: '',
     prochain_controle: '',
-    commentaire: ''
+    commentaire: '',
+    duree_rappel_echeance: 30
   });
 
   useEffect(() => {
