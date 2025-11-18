@@ -4,9 +4,11 @@ import { Button } from '../ui/button';
 import { X, Download, File, Image, Video, FileText } from 'lucide-react';
 import { workOrdersAPI } from '../../services/api';
 import { useToast } from '../../hooks/use-toast';
+import { useConfirmDialog } from '../ui/confirm-dialog';
 
 const AttachmentsList = ({ workOrderId, refreshTrigger }) => {
   const { toast } = useToast();
+  const { confirm, ConfirmDialog } = useConfirmDialog();
   const [attachments, setAttachments] = useState([]);
   const [loading, setLoading] = useState(true);
 
