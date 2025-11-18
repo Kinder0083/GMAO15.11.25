@@ -236,17 +236,19 @@ const Updates = () => {
           window.location.reload();
         }, 3000);
       }
-    } catch (error) {
-      setUpdateLogs(prev => [...prev, `❌ Erreur: ${error.response?.data?.detail || error.message}`]);
-      
-      toast({
-        title: 'Erreur',
-        description: error.response?.data?.detail || 'Échec de la mise à jour',
-        variant: 'destructive'
-      });
-    } finally {
-      setUpdating(false);
-    }
+        } catch (error) {
+          setUpdateLogs(prev => [...prev, `❌ Erreur: ${error.response?.data?.detail || error.message}`]);
+          
+          toast({
+            title: 'Erreur',
+            description: error.response?.data?.detail || 'Échec de la mise à jour',
+            variant: 'destructive'
+          });
+        } finally {
+          setUpdating(false);
+        }
+      }
+    });
   };
 
   const handleRollback = async (backupPath) => {
