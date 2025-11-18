@@ -412,6 +412,186 @@ class SurveillanceTester:
             self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
             return False
     
+    def test_surveillance_rapport_stats(self):
+        """TEST CRITIQUE: Tester GET /api/surveillance/rapport-stats - Statistiques complètes pour la page Rapport"""
+        self.log("🧪 TEST CRITIQUE: Statistiques Rapport - GET /api/surveillance/rapport-stats")
+        
+        try:
+            response = self.admin_session.get(
+                f"{BACKEND_URL}/surveillance/rapport-stats",
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Vérifier la structure de réponse JSON
+                required_keys = ["global", "by_category", "by_batiment", "by_periodicite", "by_responsable", "anomalies"]
+                for key in required_keys:
+                    if key not in data:
+                        self.log(f"❌ Champ '{key}' manquant dans la réponse", "ERROR")
+                        return False
+                
+                # Vérifier la structure des statistiques globales
+                global_stats = data.get("global", {})
+                global_required = ["total", "realises", "planifies", "a_planifier", "pourcentage_realisation", "en_retard", "a_temps"]
+                for key in global_required:
+                    if key not in global_stats:
+                        self.log(f"❌ Champ 'global.{key}' manquant dans la réponse", "ERROR")
+                        return False
+                
+                # Vérifier les types de données
+                if not isinstance(global_stats.get("total"), int):
+                    self.log(f"❌ 'global.total' doit être un entier, reçu: {type(global_stats.get('total'))}", "ERROR")
+                    return False
+                
+                if not isinstance(global_stats.get("realises"), int):
+                    self.log(f"❌ 'global.realises' doit être un entier, reçu: {type(global_stats.get('realises'))}", "ERROR")
+                    return False
+                
+                if not isinstance(global_stats.get("planifies"), int):
+                    self.log(f"❌ 'global.planifies' doit être un entier, reçu: {type(global_stats.get('planifies'))}", "ERROR")
+                    return False
+                
+                if not isinstance(global_stats.get("a_planifier"), int):
+                    self.log(f"❌ 'global.a_planifier' doit être un entier, reçu: {type(global_stats.get('a_planifier'))}", "ERROR")
+                    return False
+                
+                if not isinstance(global_stats.get("en_retard"), int):
+                    self.log(f"❌ 'global.en_retard' doit être un entier, reçu: {type(global_stats.get('en_retard'))}", "ERROR")
+                    return False
+                
+                if not isinstance(global_stats.get("a_temps"), int):
+                    self.log(f"❌ 'global.a_temps' doit être un entier, reçu: {type(global_stats.get('a_temps'))}", "ERROR")
+                    return False
+                
+                if not isinstance(global_stats.get("pourcentage_realisation"), (int, float)):
+                    self.log(f"❌ 'global.pourcentage_realisation' doit être un nombre, reçu: {type(global_stats.get('pourcentage_realisation'))}", "ERROR")
+                    return False
+                
+                if not isinstance(data.get("anomalies"), int):
+                    self.log(f"❌ 'anomalies' doit être un entier, reçu: {type(data.get('anomalies'))}", "ERROR")
+                    return False
+                
+                # Vérifier les valeurs logiques
+                total = global_stats.get("total", 0)
+                realises = global_stats.get("realises", 0)
+                planifies = global_stats.get("planifies", 0)
+                a_planifier = global_stats.get("a_planifier", 0)
+                pourcentage = global_stats.get("pourcentage_realisation", 0)
+                
+                # Validation mathématique
+                if total > 0:
+                    calculated_percentage = round((realises / total * 100), 1)
+                    if abs(calculated_percentage - pourcentage) > 0.1:
+                        self.log(f"❌ Calcul pourcentage incorrect: attendu {calculated_percentage}%, reçu {pourcentage}%", "ERROR")
+                        return False
+                
+                # Vérifier que le pourcentage est entre 0 et 100
+                if not (0 <= pourcentage <= 100):
+                    self.log(f"❌ 'pourcentage_realisation' doit être entre 0 et 100: {pourcentage}", "ERROR")
+                    return False
+                
+                # Vérifier les structures par catégorie, bâtiment, etc.
+                for section_name, section_data in [
+                    ("by_category", data.get("by_category", {})),
+                    ("by_batiment", data.get("by_batiment", {})),
+                    ("by_periodicite", data.get("by_periodicite", {})),
+                    ("by_responsable", data.get("by_responsable", {}))
+                ]:
+                    if not isinstance(section_data, dict):
+                        self.log(f"❌ '{section_name}' doit être un dictionnaire", "ERROR")
+                        return False
+                    
+                    # Vérifier la structure de chaque sous-section
+                    for key, value in section_data.items():
+                        if not isinstance(value, dict):
+                            self.log(f"❌ '{section_name}.{key}' doit être un dictionnaire", "ERROR")
+                            return False
+                        
+                        required_sub_keys = ["total", "realises", "pourcentage"]
+                        for sub_key in required_sub_keys:
+                            if sub_key not in value:
+                                self.log(f"❌ Champ '{section_name}.{key}.{sub_key}' manquant", "ERROR")
+                                return False
+                        
+                        # Vérifier les types
+                        if not isinstance(value.get("total"), int):
+                            self.log(f"❌ '{section_name}.{key}.total' doit être un entier", "ERROR")
+                            return False
+                        
+                        if not isinstance(value.get("realises"), int):
+                            self.log(f"❌ '{section_name}.{key}.realises' doit être un entier", "ERROR")
+                            return False
+                        
+                        if not isinstance(value.get("pourcentage"), (int, float)):
+                            self.log(f"❌ '{section_name}.{key}.pourcentage' doit être un nombre", "ERROR")
+                            return False
+                        
+                        # Vérifier que le pourcentage est entre 0 et 100
+                        sub_pourcentage = value.get("pourcentage", 0)
+                        if not (0 <= sub_pourcentage <= 100):
+                            self.log(f"❌ '{section_name}.{key}.pourcentage' doit être entre 0 et 100: {sub_pourcentage}", "ERROR")
+                            return False
+                
+                self.log(f"✅ Rapport stats récupérées avec succès:")
+                self.log(f"  - Total: {global_stats.get('total')}")
+                self.log(f"  - Réalisés: {global_stats.get('realises')}")
+                self.log(f"  - Planifiés: {global_stats.get('planifies')}")
+                self.log(f"  - À planifier: {global_stats.get('a_planifier')}")
+                self.log(f"  - % réalisation: {global_stats.get('pourcentage_realisation')}%")
+                self.log(f"  - En retard: {global_stats.get('en_retard')}")
+                self.log(f"  - À temps: {global_stats.get('a_temps')}")
+                self.log(f"  - Anomalies: {data.get('anomalies')}")
+                
+                # Afficher les statistiques par section
+                self.log(f"✅ Statistiques par catégorie: {len(data.get('by_category', {}))} catégories")
+                self.log(f"✅ Statistiques par bâtiment: {len(data.get('by_batiment', {}))} bâtiments")
+                self.log(f"✅ Statistiques par périodicité: {len(data.get('by_periodicite', {}))} périodicités")
+                self.log(f"✅ Statistiques par responsable: {len(data.get('by_responsable', {}))} responsables")
+                
+                # Validation logique métier
+                self.log("✅ Validation de la structure JSON: CONFORME")
+                self.log("✅ Validation des types de données: RÉUSSIE")
+                self.log("✅ Validation des calculs mathématiques: RÉUSSIE")
+                self.log("✅ Validation des valeurs logiques: RÉUSSIE")
+                
+                return True
+            else:
+                self.log(f"❌ Rapport stats échoué - Status: {response.status_code}", "ERROR")
+                self.log(f"Response: {response.text}", "ERROR")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
+            return False
+    
+    def test_surveillance_rapport_stats_without_auth(self):
+        """TEST SÉCURITÉ: Tester GET /api/surveillance/rapport-stats SANS authentification"""
+        self.log("🧪 TEST SÉCURITÉ: Rapport stats sans authentification")
+        
+        try:
+            # Créer une session sans token d'authentification
+            no_auth_session = requests.Session()
+            
+            response = no_auth_session.get(
+                f"{BACKEND_URL}/surveillance/rapport-stats",
+                timeout=10
+            )
+            
+            # Doit retourner 401 Unauthorized ou 403 Forbidden
+            if response.status_code in [401, 403]:
+                self.log(f"✅ Protection par authentification fonctionnelle - Status: {response.status_code}")
+                return True
+            else:
+                self.log(f"❌ SÉCURITÉ COMPROMISE - Endpoint accessible sans authentification - Status: {response.status_code}", "ERROR")
+                self.log(f"Response: {response.text}", "ERROR")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
+            return False
+    
     def test_surveillance_upload(self):
         """TEST 11: Tester POST /api/surveillance/items/{item_id}/upload"""
         self.log("🧪 TEST 11: Upload d'une pièce jointe")
