@@ -419,6 +419,9 @@ const Locations = () => {
         onSuccess={loadLocations}
         allLocations={locations}
       />
+      
+      {/* Confirm Dialog */}
+      <ConfirmDialog />
     </div>
   );
 };
