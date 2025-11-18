@@ -252,12 +252,15 @@ const Updates = () => {
   };
 
   const handleRollback = async (backupPath) => {
-    if (!window.confirm('⚠️ Confirmer le rollback ?\n\nCeci va restaurer la base de données à une version précédente.\n\nToutes les données créées depuis seront perdues.')) {
-      return;
-    }
-
-    try {
-      const token = localStorage.getItem('token');
+    confirm({
+      title: '⚠️ ATTENTION - Rollback base de données',
+      description: 'Ceci va restaurer la base de données à une version précédente.\n\nToutes les données créées depuis seront DÉFINITIVEMENT PERDUES.\n\nVoulez-vous vraiment continuer ?',
+      confirmText: 'Restaurer',
+      cancelText: 'Annuler',
+      variant: 'destructive',
+      onConfirm: async () => {
+        try {
+          const token = localStorage.getItem('token');
       
       await axios.post(
         `${BACKEND_URL}/api/updates/rollback`,
