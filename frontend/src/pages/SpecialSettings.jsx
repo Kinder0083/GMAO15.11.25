@@ -33,7 +33,9 @@ const SpecialSettings = () => {
     smtp_password: '',
     smtp_from_email: '',
     smtp_from_name: 'GMAO Iris',
-    smtp_use_tls: true
+    smtp_use_tls: true,
+    frontend_url: '',
+    backend_url: ''
   });
   const [loadingSmtp, setLoadingSmtp] = useState(true);
   const [savingSmtp, setSavingSmtp] = useState(false);
