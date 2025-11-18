@@ -40,18 +40,20 @@ const AttachmentsList = ({ workOrderId, refreshTrigger }) => {
       onConfirm: async () => {
         try {
           await improvementsAPI.deleteAttachment(workOrderId, attachmentId);
-      toast({
-        title: 'Succès',
-        description: 'Pièce jointe supprimée'
-      });
-      loadAttachments();
-    } catch (error) {
-      toast({
-        title: 'Erreur',
-        description: 'Impossible de supprimer la pièce jointe',
-        variant: 'destructive'
-      });
-    }
+          toast({
+            title: 'Succès',
+            description: 'Pièce jointe supprimée'
+          });
+          loadAttachments();
+        } catch (error) {
+          toast({
+            title: 'Erreur',
+            description: 'Impossible de supprimer la pièce jointe',
+            variant: 'destructive'
+          });
+        }
+      }
+    });
   };
 
   const handleDownload = async (attachmentId, filename) => {
