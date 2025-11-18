@@ -646,7 +646,13 @@ class SurveillanceTester:
         # Test 10: Alerts
         results["test_surveillance_alerts"] = self.test_surveillance_alerts()
         
-        # Test 11: Upload
+        # Test 11: Badge Stats (CRITIQUE)
+        results["test_surveillance_badge_stats"] = self.test_surveillance_badge_stats()
+        
+        # Test 12: Badge Stats Security (sans auth)
+        results["test_surveillance_badge_stats_without_auth"] = self.test_surveillance_badge_stats_without_auth()
+        
+        # Test 13: Upload
         results["test_surveillance_upload"] = self.test_surveillance_upload()
         
         # Test 12: Export template
