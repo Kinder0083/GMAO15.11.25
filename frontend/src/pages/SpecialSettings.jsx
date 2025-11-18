@@ -10,7 +10,9 @@ import {
   AlertTriangle,
   CheckCircle,
   Clock,
-  Save
+  Save,
+  AlertCircle,
+  Globe
 } from 'lucide-react';
 import api, { usersAPI } from '../services/api';
 import { useToast } from '../hooks/use-toast';
