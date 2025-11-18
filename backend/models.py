@@ -1190,3 +1190,103 @@ class SurveillanceItemUpdate(BaseModel):
     duree_rappel_echeance: Optional[int] = None  # Durée en jours avant échéance pour l'alerte
 
 
+# ==================== PRESQU'ACCIDENT (NEAR MISS) MODELS ====================
+
+class PresquAccidentStatus(str, Enum):
+    A_TRAITER = "A_TRAITER"  # À traiter
+    EN_COURS = "EN_COURS"  # En cours de traitement
+    TERMINE = "TERMINE"  # Terminé / Traité
+    ARCHIVE = "ARCHIVE"  # Archivé
+
+class PresquAccidentService(str, Enum):
+    ADV = "ADV"
+    LOGISTIQUE = "LOGISTIQUE"
+    PRODUCTION = "PRODUCTION"
+    QHSE = "QHSE"
+    MAINTENANCE = "MAINTENANCE"
+    LABO = "LABO"
+    INDUS = "INDUS"
+    AUTRE = "AUTRE"
+
+class PresquAccidentSeverity(str, Enum):
+    FAIBLE = "FAIBLE"  # Faible
+    MOYEN = "MOYEN"  # Moyen
+    ELEVE = "ELEVE"  # Élevé
+    CRITIQUE = "CRITIQUE"  # Critique
+
+class PresquAccidentItem(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    
+    # Informations principales
+    titre: str  # Titre court du presqu'accident
+    description: str  # Description détaillée / Circonstances
+    date_incident: str  # Date ISO de l'incident
+    lieu: str  # Lieu de l'incident
+    service: PresquAccidentService  # Service concerné
+    
+    # Personnes impliquées
+    personnes_impliquees: Optional[str] = None  # Noms des personnes (séparés par virgule)
+    declarant: Optional[str] = None  # Nom du déclarant
+    
+    # Analyse
+    contexte_cause: Optional[str] = None  # Contexte et cause probable
+    severite: PresquAccidentSeverity = PresquAccidentSeverity.MOYEN
+    
+    # Actions correctives
+    actions_proposees: Optional[str] = None  # Actions proposées par l'encadrement
+    actions_preventions: Optional[str] = None  # Actions de prévention
+    responsable_action: Optional[str] = None  # Responsable de l'action
+    date_echeance_action: Optional[str] = None  # Date ISO d'échéance de l'action
+    
+    # Statut et suivi
+    status: PresquAccidentStatus = PresquAccidentStatus.A_TRAITER
+    date_cloture: Optional[str] = None  # Date ISO de clôture
+    
+    # Documents et commentaires
+    commentaire: Optional[str] = None
+    piece_jointe_url: Optional[str] = None  # URL du fichier uploadé
+    piece_jointe_nom: Optional[str] = None  # Nom original du fichier
+    
+    # Métadonnées
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    updated_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    created_by: Optional[str] = None
+    updated_by: Optional[str] = None
+
+class PresquAccidentItemCreate(BaseModel):
+    titre: str
+    description: str
+    date_incident: str
+    lieu: str
+    service: PresquAccidentService
+    personnes_impliquees: Optional[str] = None
+    declarant: Optional[str] = None
+    contexte_cause: Optional[str] = None
+    severite: PresquAccidentSeverity = PresquAccidentSeverity.MOYEN
+    actions_proposees: Optional[str] = None
+    actions_preventions: Optional[str] = None
+    responsable_action: Optional[str] = None
+    date_echeance_action: Optional[str] = None
+    commentaire: Optional[str] = None
+
+class PresquAccidentItemUpdate(BaseModel):
+    titre: Optional[str] = None
+    description: Optional[str] = None
+    date_incident: Optional[str] = None
+    lieu: Optional[str] = None
+    service: Optional[PresquAccidentService] = None
+    personnes_impliquees: Optional[str] = None
+    declarant: Optional[str] = None
+    contexte_cause: Optional[str] = None
+    severite: Optional[PresquAccidentSeverity] = None
+    actions_proposees: Optional[str] = None
+    actions_preventions: Optional[str] = None
+    responsable_action: Optional[str] = None
+    date_echeance_action: Optional[str] = None
+    status: Optional[PresquAccidentStatus] = None
+    date_cloture: Optional[str] = None
+    commentaire: Optional[str] = None
+    piece_jointe_url: Optional[str] = None
+    piece_jointe_nom: Optional[str] = None
+
+
