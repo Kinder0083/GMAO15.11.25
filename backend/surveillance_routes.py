@@ -411,7 +411,8 @@ async def get_rapport_stats(current_user: dict = Depends(get_current_user)):
         # Compter les anomalies (items avec commentaires mentionnant des problèmes)
         anomalies = 0
         for item in items:
-            commentaire = item.get("commentaire", "").lower()
+            commentaire = item.get("commentaire", "") or ""
+            commentaire = commentaire.lower()
             if any(keyword in commentaire for keyword in ["anomalie", "problème", "défaut", "dysfonctionnement", "intervention", "réparation"]):
                 anomalies += 1
         
