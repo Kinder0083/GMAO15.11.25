@@ -31,6 +31,7 @@ import InterventionRequests from "./pages/InterventionRequests";
 import ImprovementRequests from "./pages/ImprovementRequests";
 import Improvements from "./pages/Improvements";
 import SurveillancePlan from "./pages/SurveillancePlan";
+import SurveillanceRapport from "./pages/SurveillanceRapport";
 
 // Protected Route Component with Token Validation
 const ProtectedRoute = ({ children }) => {
