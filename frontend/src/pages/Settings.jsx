@@ -88,7 +88,7 @@ const Settings = () => {
     } catch (error) {
       toast({
         title: 'Erreur',
-        description: formatErrorMessage(error, 'Impossible d\')enregistrer les modifications',
+        description: formatErrorMessage(error, 'Impossible d\'enregistrer les modifications'),
         variant: 'destructive'
       });
     } finally {
