@@ -4606,11 +4606,33 @@ async def convert_to_work_order(
         logger.error(f"Erreur conversion demande: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# Configuration CORS sécurisée
+# Récupérer l'URL frontend depuis les variables d'environnement
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
+ALLOWED_ORIGINS = [
+    FRONTEND_URL,
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
+# Si BACKEND_URL est défini, l'extraire pour obtenir le domaine principal
+BACKEND_URL = os.environ.get('BACKEND_URL', '')
+if BACKEND_URL:
+    # Extraire le domaine depuis l'URL backend (ex: https://app.example.com)
+    from urllib.parse import urlparse
+    parsed = urlparse(BACKEND_URL)
+    if parsed.scheme and parsed.netloc:
+        main_domain = f"{parsed.scheme}://{parsed.netloc}"
+        if main_domain not in ALLOWED_ORIGINS:
+            ALLOWED_ORIGINS.append(main_domain)
+
+logger.info(f"🔒 CORS configuré avec les origines autorisées: {ALLOWED_ORIGINS}")
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=["*"],
-    allow_methods=["*"],
+    allow_origins=ALLOWED_ORIGINS,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allow_headers=["*"],
 )
 
