@@ -485,6 +485,9 @@ const PreventiveMaintenance = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Confirm Dialog */}
+      <ConfirmDialog />
     </div>
   );
 };
