@@ -31,10 +31,15 @@ const AttachmentsList = ({ workOrderId, refreshTrigger }) => {
   };
 
   const handleDelete = async (attachmentId) => {
-    if (!window.confirm('Supprimer cette pièce jointe ?')) return;
-
-    try {
-      await improvementsAPI.deleteAttachment(workOrderId, attachmentId);
+    confirm({
+      title: 'Supprimer la pièce jointe',
+      description: 'Êtes-vous sûr de vouloir supprimer cette pièce jointe ? Cette action est irréversible.',
+      confirmText: 'Supprimer',
+      cancelText: 'Annuler',
+      variant: 'destructive',
+      onConfirm: async () => {
+        try {
+          await improvementsAPI.deleteAttachment(workOrderId, attachmentId);
       toast({
         title: 'Succès',
         description: 'Pièce jointe supprimée'
