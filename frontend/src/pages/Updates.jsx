@@ -275,16 +275,18 @@ const Updates = () => {
         description: 'Rollback effectué. Rechargement...'
       });
 
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000);
-    } catch (error) {
-      toast({
-        title: 'Erreur',
-        description: 'Échec du rollback',
-        variant: 'destructive'
-      });
-    }
+          setTimeout(() => {
+            window.location.reload();
+          }, 2000);
+        } catch (error) {
+          toast({
+            title: 'Erreur',
+            description: 'Échec du rollback',
+            variant: 'destructive'
+          });
+        }
+      }
+    });
   };
 
   if (loading) {
