@@ -387,13 +387,13 @@ class PresquAccidentTester:
             self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
             return False
     
-    def test_surveillance_badge_stats(self):
-        """TEST CRITIQUE: Tester GET /api/surveillance/badge-stats - Badge de notification du header"""
-        self.log("🧪 TEST CRITIQUE: Badge de notification - GET /api/surveillance/badge-stats")
+    def test_presqu_accident_badge_stats(self):
+        """TEST CRITIQUE: Tester GET /api/presqu-accident/badge-stats - Badge de notification du header"""
+        self.log("🧪 TEST CRITIQUE: Badge de notification - GET /api/presqu-accident/badge-stats")
         
         try:
             response = self.admin_session.get(
-                f"{BACKEND_URL}/surveillance/badge-stats",
+                f"{BACKEND_URL}/presqu-accident/badge-stats",
                 timeout=10
             )
             
@@ -401,38 +401,38 @@ class PresquAccidentTester:
                 data = response.json()
                 
                 # Vérifier que les champs requis sont présents
-                if "echeances_proches" not in data:
-                    self.log("❌ Champ 'echeances_proches' manquant dans la réponse", "ERROR")
+                if "a_traiter" not in data:
+                    self.log("❌ Champ 'a_traiter' manquant dans la réponse", "ERROR")
                     return False
                 
-                if "pourcentage_realisation" not in data:
-                    self.log("❌ Champ 'pourcentage_realisation' manquant dans la réponse", "ERROR")
+                if "en_retard" not in data:
+                    self.log("❌ Champ 'en_retard' manquant dans la réponse", "ERROR")
                     return False
                 
-                echeances_proches = data.get("echeances_proches")
-                pourcentage_realisation = data.get("pourcentage_realisation")
+                a_traiter = data.get("a_traiter")
+                en_retard = data.get("en_retard")
                 
                 # Vérifier les types de données
-                if not isinstance(echeances_proches, int):
-                    self.log(f"❌ 'echeances_proches' doit être un entier, reçu: {type(echeances_proches)}", "ERROR")
+                if not isinstance(a_traiter, int):
+                    self.log(f"❌ 'a_traiter' doit être un entier, reçu: {type(a_traiter)}", "ERROR")
                     return False
                 
-                if not isinstance(pourcentage_realisation, (int, float)):
-                    self.log(f"❌ 'pourcentage_realisation' doit être un nombre, reçu: {type(pourcentage_realisation)}", "ERROR")
+                if not isinstance(en_retard, int):
+                    self.log(f"❌ 'en_retard' doit être un entier, reçu: {type(en_retard)}", "ERROR")
                     return False
                 
                 # Vérifier les valeurs logiques
-                if echeances_proches < 0:
-                    self.log(f"❌ 'echeances_proches' ne peut pas être négatif: {echeances_proches}", "ERROR")
+                if a_traiter < 0:
+                    self.log(f"❌ 'a_traiter' ne peut pas être négatif: {a_traiter}", "ERROR")
                     return False
                 
-                if not (0 <= pourcentage_realisation <= 100):
-                    self.log(f"❌ 'pourcentage_realisation' doit être entre 0 et 100: {pourcentage_realisation}", "ERROR")
+                if en_retard < 0:
+                    self.log(f"❌ 'en_retard' ne peut pas être négatif: {en_retard}", "ERROR")
                     return False
                 
                 self.log(f"✅ Badge stats récupérées avec succès:")
-                self.log(f"  - Échéances proches: {echeances_proches}")
-                self.log(f"  - Pourcentage réalisation: {pourcentage_realisation}%")
+                self.log(f"  - À traiter: {a_traiter}")
+                self.log(f"  - En retard: {en_retard}")
                 
                 # Validation logique métier
                 self.log("✅ Validation des types de données: RÉUSSIE")
