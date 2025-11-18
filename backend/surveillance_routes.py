@@ -283,9 +283,10 @@ async def get_surveillance_alerts(current_user: dict = Depends(get_current_user)
                 try:
                     prochain_controle = datetime.fromisoformat(item["prochain_controle"]).date()
                     days_until = (prochain_controle - today).days
+                    duree_rappel = item.get("duree_rappel_echeance", 30)
                     
-                    # Alerte si moins de 30 jours
-                    if days_until <= 30:
+                    # Alerte si moins de la durée de rappel configurée
+                    if days_until <= duree_rappel:
                         if "_id" in item:
                             del item["_id"]
                         item["days_until"] = days_until
@@ -303,6 +304,58 @@ async def get_surveillance_alerts(current_user: dict = Depends(get_current_user)
         }
     except Exception as e:
         logger.error(f"Erreur récupération alertes: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/badge-stats")
+async def get_badge_stats(current_user: dict = Depends(get_current_user)):
+    """
+    Récupérer les statistiques pour le badge de notification du header
+    - Nombre de contrôles à échéance proche (selon duree_rappel_echeance de chaque item)
+    - Pourcentage de réalisation global
+    """
+    try:
+        items = await db.surveillance_items.find().to_list(length=None)
+        
+        total = len(items)
+        if total == 0:
+            return {
+                "echeances_proches": 0,
+                "pourcentage_realisation": 0
+            }
+        
+        # Compter les items réalisés
+        realises = len([i for i in items if i.get("status") == SurveillanceItemStatus.REALISE.value])
+        pourcentage_realisation = round((realises / total * 100), 1)
+        
+        # Compter les échéances proches (selon la durée de rappel de chaque item)
+        echeances_proches = 0
+        today = datetime.now(timezone.utc).date()
+        
+        for item in items:
+            # Ignorer les items déjà réalisés
+            if item.get("status") == SurveillanceItemStatus.REALISE.value:
+                continue
+                
+            if item.get("prochain_controle"):
+                try:
+                    prochain_controle = datetime.fromisoformat(item["prochain_controle"]).date()
+                    days_until = (prochain_controle - today).days
+                    duree_rappel = item.get("duree_rappel_echeance", 30)
+                    
+                    # Compter si l'échéance est proche selon la durée de rappel
+                    if days_until <= duree_rappel:
+                        echeances_proches += 1
+                except Exception as e:
+                    logger.warning(f"Erreur parsing date pour item {item.get('id')}: {str(e)}")
+                    pass
+        
+        return {
+            "echeances_proches": echeances_proches,
+            "pourcentage_realisation": pourcentage_realisation
+        }
+    except Exception as e:
+        logger.error(f"Erreur récupération badge stats: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
