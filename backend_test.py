@@ -794,6 +794,8 @@ class SurveillanceTester:
             "test_surveillance_alerts": False,
             "test_surveillance_badge_stats": False,
             "test_surveillance_badge_stats_without_auth": False,
+            "test_surveillance_rapport_stats": False,
+            "test_surveillance_rapport_stats_without_auth": False,
             "test_surveillance_upload": False,
             "test_surveillance_export_template": False,
             "test_surveillance_delete_item": False,
