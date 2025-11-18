@@ -103,15 +103,16 @@ const PurchaseHistory = () => {
             title: 'Succès',
             description: 'Achat supprimé'
           });
-        loadData();
-      } catch (error) {
-        toast({
-          title: 'Erreur',
-          description: 'Impossible de supprimer l\'achat',
-          variant: 'destructive'
-        });
+          loadData();
+        } catch (error) {
+          toast({
+            title: 'Erreur',
+            description: 'Impossible de supprimer l\'achat',
+            variant: 'destructive'
+          });
+        }
       }
-    }
+    });
   };
 
   const handleDownloadTemplate = async () => {
