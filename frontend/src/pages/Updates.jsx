@@ -183,12 +183,15 @@ const Updates = () => {
   };
 
   const proceedWithUpdate = async () => {
-    if (!window.confirm('⚠️ ATTENTION !\n\nUne sauvegarde automatique de la base de données sera créée avant la mise à jour.\n\nL\'application sera indisponible pendant quelques minutes.\n\nVoulez-vous continuer ?')) {
-      return;
-    }
-
-    try {
-      setUpdating(true);
+    confirm({
+      title: '⚠️ ATTENTION - Mise à jour système',
+      description: 'Une sauvegarde automatique de la base de données sera créée avant la mise à jour.\n\nL\'application sera indisponible pendant quelques minutes.\n\nVoulez-vous continuer ?',
+      confirmText: 'Mettre à jour',
+      cancelText: 'Annuler',
+      variant: 'default',
+      onConfirm: async () => {
+        try {
+          setUpdating(true);
       setUpdateLogs(['🚀 Démarrage de la mise à jour...']);
       
       const token = localStorage.getItem('token');
