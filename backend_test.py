@@ -247,24 +247,24 @@ class PresquAccidentTester:
             self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
             return False
     
-    def test_surveillance_item_update(self):
-        """TEST 8: Tester PUT /api/surveillance/items/{item_id}"""
-        self.log("🧪 TEST 8: Mettre à jour un item de surveillance")
+    def test_presqu_accident_item_update(self):
+        """TEST 8: Tester PUT /api/presqu-accident/items/{item_id}"""
+        self.log("🧪 TEST 8: Mettre à jour un presqu'accident")
         
         if not self.created_items:
-            self.log("⚠️ Pas d'items créés pour tester la mise à jour", "WARNING")
+            self.log("⚠️ Pas de presqu'accidents créés pour tester la mise à jour", "WARNING")
             return False
         
         try:
             item_id = self.created_items[0]  # Prendre le premier item créé
             update_data = {
-                "status": "PLANIFIE",
-                "commentaire": "Test de mise à jour - item planifié",
-                "date_realisation": "2025-12-01"
+                "status": "EN_COURS",
+                "commentaire": "Test de mise à jour - presqu'accident en cours de traitement",
+                "actions_preventions": "Actions de prévention mises à jour"
             }
             
             response = self.admin_session.put(
-                f"{BACKEND_URL}/surveillance/items/{item_id}",
+                f"{BACKEND_URL}/presqu-accident/items/{item_id}",
                 json=update_data,
                 timeout=10
             )
@@ -273,7 +273,30 @@ class PresquAccidentTester:
                 data = response.json()
                 self.log(f"✅ Mise à jour réussie - Status: {data.get('status')}")
                 self.log(f"✅ Commentaire: {data.get('commentaire')}")
-                return True
+                self.log(f"✅ Actions prévention: {data.get('actions_preventions')}")
+                
+                # Test 2: Mettre à jour vers TERMINE
+                update_data_termine = {
+                    "status": "TERMINE",
+                    "commentaire": "Presqu'accident traité et terminé"
+                }
+                
+                response_termine = self.admin_session.put(
+                    f"{BACKEND_URL}/presqu-accident/items/{item_id}",
+                    json=update_data_termine,
+                    timeout=10
+                )
+                
+                if response_termine.status_code == 200:
+                    data_termine = response_termine.json()
+                    self.log(f"✅ Mise à jour vers TERMINE réussie - Status: {data_termine.get('status')}")
+                    if data_termine.get('date_cloture'):
+                        self.log(f"✅ Date de clôture automatique ajoutée: {data_termine.get('date_cloture')}")
+                    return True
+                else:
+                    self.log(f"❌ Mise à jour vers TERMINE échouée - Status: {response_termine.status_code}", "ERROR")
+                    return False
+                
             else:
                 self.log(f"❌ Mise à jour échouée - Status: {response.status_code}", "ERROR")
                 self.log(f"Response: {response.text}", "ERROR")
