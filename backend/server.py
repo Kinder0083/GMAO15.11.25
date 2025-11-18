@@ -2476,6 +2476,10 @@ async def update_smtp_config(
             env_vars['SMTP_FROM_NAME'] = smtp_update.smtp_from_name
         if smtp_update.smtp_use_tls is not None:
             env_vars['SMTP_USE_TLS'] = 'true' if smtp_update.smtp_use_tls else 'false'
+        if smtp_update.frontend_url is not None:
+            env_vars['FRONTEND_URL'] = smtp_update.frontend_url
+        if smtp_update.backend_url is not None:
+            env_vars['BACKEND_URL'] = smtp_update.backend_url
         
         # Écrire le fichier .env mis à jour
         with open(env_path, 'w') as f:
