@@ -207,12 +207,15 @@ const SpecialSettings = () => {
   };
 
   const handleResetPassword = async (userId, userName) => {
-    if (!window.confirm(`Êtes-vous sûr de vouloir réinitialiser le mot de passe de ${userName} ?`)) {
-      return;
-    }
-
-    try {
-      setResetting(userId);
+    confirm({
+      title: 'Réinitialiser le mot de passe',
+      description: `Êtes-vous sûr de vouloir réinitialiser le mot de passe de ${userName} ?\n\nUn nouveau mot de passe temporaire sera généré.`,
+      confirmText: 'Réinitialiser',
+      cancelText: 'Annuler',
+      variant: 'default',
+      onConfirm: async () => {
+        try {
+          setResetting(userId);
       const response = await usersAPI.resetPasswordByAdmin(userId);
       
       setTempPassword({
