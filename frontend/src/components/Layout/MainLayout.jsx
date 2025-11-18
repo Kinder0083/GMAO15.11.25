@@ -112,6 +112,9 @@ const MainLayout = () => {
           window.removeEventListener('improvementCreated', handleWorkOrderChange);
           window.removeEventListener('improvementUpdated', handleWorkOrderChange);
           window.removeEventListener('improvementDeleted', handleWorkOrderChange);
+          window.removeEventListener('surveillanceItemCreated', handleSurveillanceChange);
+          window.removeEventListener('surveillanceItemUpdated', handleSurveillanceChange);
+          window.removeEventListener('surveillanceItemDeleted', handleSurveillanceChange);
         };
       } catch (error) {
         console.error('Erreur lors du parsing des infos utilisateur:', error);
