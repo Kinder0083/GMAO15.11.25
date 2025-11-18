@@ -89,12 +89,19 @@ const MainLayout = () => {
           loadOverdueCount(); // Aussi rafraîchir les échéances
         };
         
+        const handleSurveillanceChange = () => {
+          loadSurveillanceBadgeStats();
+        };
+        
         window.addEventListener('workOrderCreated', handleWorkOrderChange);
         window.addEventListener('workOrderUpdated', handleWorkOrderChange);
         window.addEventListener('workOrderDeleted', handleWorkOrderChange);
         window.addEventListener('improvementCreated', handleWorkOrderChange);
         window.addEventListener('improvementUpdated', handleWorkOrderChange);
         window.addEventListener('improvementDeleted', handleWorkOrderChange);
+        window.addEventListener('surveillanceItemCreated', handleSurveillanceChange);
+        window.addEventListener('surveillanceItemUpdated', handleSurveillanceChange);
+        window.addEventListener('surveillanceItemDeleted', handleSurveillanceChange);
         
         // Nettoyer les listeners et l'intervalle au démontage
         return () => {
