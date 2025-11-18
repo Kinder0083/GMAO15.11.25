@@ -805,33 +805,33 @@ class PresquAccidentTester:
         self.log(f"✅ Nettoyage terminé: {success_count} presqu'accidents supprimés")
         return success_count >= 0  # Toujours réussir le nettoyage
     
-    def cleanup_remaining_surveillance_items(self):
-        """Nettoyer tous les items de surveillance créés pendant les tests"""
-        self.log("🧹 Nettoyage des items de surveillance restants...")
+    def cleanup_remaining_presqu_accident_items(self):
+        """Nettoyer tous les presqu'accidents créés pendant les tests"""
+        self.log("🧹 Nettoyage des presqu'accidents restants...")
         
         if not self.created_items:
-            self.log("Aucun item de surveillance à nettoyer")
+            self.log("Aucun presqu'accident à nettoyer")
             return True
         
         success_count = 0
         for item_id in self.created_items[:]:  # Copy list to avoid modification during iteration
             try:
                 response = self.admin_session.delete(
-                    f"{BACKEND_URL}/surveillance/items/{item_id}",
+                    f"{BACKEND_URL}/presqu-accident/items/{item_id}",
                     timeout=10
                 )
                 
                 if response.status_code in [200, 404]:
-                    self.log(f"✅ Item {item_id} nettoyé")
+                    self.log(f"✅ Presqu'accident {item_id} nettoyé")
                     self.created_items.remove(item_id)
                     success_count += 1
                 else:
-                    self.log(f"⚠️ Impossible de nettoyer l'item {item_id} - Status: {response.status_code}")
+                    self.log(f"⚠️ Impossible de nettoyer le presqu'accident {item_id} - Status: {response.status_code}")
                     
             except Exception as e:
-                self.log(f"⚠️ Erreur lors du nettoyage de l'item {item_id}: {str(e)}")
+                self.log(f"⚠️ Erreur lors du nettoyage du presqu'accident {item_id}: {str(e)}")
         
-        self.log(f"Nettoyage terminé: {success_count} items supprimés")
+        self.log(f"Nettoyage terminé: {success_count} presqu'accidents supprimés")
         return True
     
     def run_surveillance_tests(self):
