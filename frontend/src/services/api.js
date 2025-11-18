@@ -389,4 +389,44 @@ export const presquAccidentAPI = {
   }).then(res => res.data)
 };
 
+// ==================== DOCUMENTATIONS ====================
+export const documentationsAPI = {
+  // Pôles de Service
+  getPoles: () => api.get('/documentations/poles').then(res => res.data),
+  getPole: (id) => api.get(`/documentations/poles/${id}`).then(res => res.data),
+  createPole: (data) => api.post('/documentations/poles', data).then(res => res.data),
+  updatePole: (id, data) => api.put(`/documentations/poles/${id}`, data).then(res => res.data),
+  deletePole: (id) => api.delete(`/documentations/poles/${id}`).then(res => res.data),
+  
+  // Documents
+  getDocuments: (params) => api.get('/documentations/documents', { params }).then(res => res.data),
+  getDocument: (id) => api.get(`/documentations/documents/${id}`).then(res => res.data),
+  createDocument: (data) => api.post('/documentations/documents', data).then(res => res.data),
+  updateDocument: (id, data) => api.put(`/documentations/documents/${id}`, data).then(res => res.data),
+  deleteDocument: (id) => api.delete(`/documentations/documents/${id}`).then(res => res.data),
+  
+  // Upload/Download
+  uploadFile: (id, file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post(`/documentations/documents/${id}/upload`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    }).then(res => res.data);
+  },
+  downloadFile: (id) => api.get(`/documentations/documents/${id}/download`, {
+    responseType: 'blob'
+  }).then(res => res.data),
+  
+  // Bons de Travail
+  getBonsTravail: (params) => api.get('/documentations/bons-travail', { params }).then(res => res.data),
+  getBonTravail: (id) => api.get(`/documentations/bons-travail/${id}`).then(res => res.data),
+  createBonTravail: (data) => api.post('/documentations/bons-travail', data).then(res => res.data),
+  updateBonTravail: (id, data) => api.put(`/documentations/bons-travail/${id}`, data).then(res => res.data),
+  deleteBonTravail: (id) => api.delete(`/documentations/bons-travail/${id}`).then(res => res.data),
+  
+  // Actions
+  generatePDF: (id) => api.post(`/documentations/bons-travail/${id}/pdf`).then(res => res.data),
+  sendEmail: (id, email) => api.post(`/documentations/bons-travail/${id}/email`, { email_to: email }).then(res => res.data)
+};
+
 export default api;
