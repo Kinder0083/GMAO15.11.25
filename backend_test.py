@@ -701,6 +701,8 @@ class SurveillanceTester:
             self.log("✅ POST /api/surveillance/items/{id}/upload works correctly")
             self.log("✅ GET /api/surveillance/stats works correctly")
             self.log("✅ GET /api/surveillance/alerts works correctly")
+            self.log("✅ GET /api/surveillance/badge-stats works correctly")
+            self.log("✅ GET /api/surveillance/badge-stats security works correctly")
             self.log("✅ GET /api/surveillance/export/template works correctly")
         else:
             self.log("🚨 CRITICAL FAILURE: Some main surveillance endpoint tests failed!")
