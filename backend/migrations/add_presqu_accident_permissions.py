@@ -21,7 +21,9 @@ MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017/cmms")
 async def migrate_permissions():
     """Ajoute les permissions presquaccident à tous les utilisateurs existants"""
     client = AsyncIOMotorClient(MONGO_URL)
-    db = client.get_database()
+    # Extraire le nom de la base de données de l'URL
+    db_name = MONGO_URL.split('/')[-1].split('?')[0]
+    db = client[db_name]
     
     print("🚀 Début de la migration des permissions presquaccident...")
     
