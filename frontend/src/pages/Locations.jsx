@@ -56,13 +56,14 @@ const Locations = () => {
           });
           loadLocations();
         } catch (error) {
-        toast({
-          title: 'Erreur',
-          description: error.response?.data?.detail || 'Impossible de supprimer la zone',
-          variant: 'destructive'
-        });
+          toast({
+            title: 'Erreur',
+            description: error.response?.data?.detail || 'Impossible de supprimer la zone',
+            variant: 'destructive'
+          });
+        }
       }
-    }
+    });
   };
 
   const handleAddSubZone = (parentLocation) => {
