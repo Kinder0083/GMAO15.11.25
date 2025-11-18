@@ -494,6 +494,9 @@ const Updates = () => {
         conflictData={conflictData}
         onResolve={handleResolveConflict}
       />
+
+      {/* Confirm Dialog */}
+      <ConfirmDialog />
     </div>
   );
 };
