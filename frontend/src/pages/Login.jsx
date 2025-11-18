@@ -20,17 +20,20 @@ const Login = () => {
   });
   const [loading, setLoading] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
-  const [version, setVersion] = useState('1.2.0');
+  const [version, setVersion] = useState('1.5.0');
 
   useEffect(() => {
     // Récupérer la version depuis l'API (sans authentification pour la page de login)
     const fetchVersion = async () => {
       try {
-        // On utilise une version par défaut car l'endpoint nécessite l'authentification
-        // La version sera récupérée depuis le package ou un fichier de config
-        setVersion('1.1.0');
+        // Récupérer la version depuis le backend
+        const response = await axios.get(`${BACKEND_URL}/api/version`, { timeout: 3000 });
+        if (response.data && response.data.version) {
+          setVersion(response.data.version);
+        }
       } catch (error) {
-        setVersion('1.1.0');
+        // En cas d'erreur, garder la version par défaut
+        setVersion('1.5.0');
       }
     };
     fetchVersion();
