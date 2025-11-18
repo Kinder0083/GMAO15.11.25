@@ -66,7 +66,7 @@ const EditUserDialog = ({ open, onOpenChange, user, onSuccess }) => {
     } catch (error) {
       toast({
         title: 'Erreur',
-        description: formatErrorMessage(error, 'Impossible de modifier l\')utilisateur',
+        description: formatErrorMessage(error, 'Impossible de modifier l\'utilisateur'),
         variant: 'destructive'
       });
     } finally {
