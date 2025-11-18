@@ -169,3 +169,161 @@ class UpdateService:
             logger.info(f"✅ Notification marquée comme lue: {version}")
         except Exception as e:
             logger.error(f"❌ Erreur lors du marquage de la notification: {str(e)}")
+
+    
+    def check_git_conflicts(self) -> Dict:
+        """
+        Vérifie s'il y a des modifications locales non commitées qui pourraient créer des conflits
+        Retourne un dictionnaire avec le statut et la liste des fichiers modifiés
+        """
+        try:
+            # Vérifier que nous sommes dans un dépôt git
+            if not (self.app_root / ".git").exists():
+                return {
+                    "success": True,
+                    "has_conflicts": False,
+                    "modified_files": [],
+                    "message": "Pas de dépôt Git détecté (normal en environnement de production)"
+                }
+            
+            # Exécuter git status --porcelain pour obtenir les fichiers modifiés
+            result = subprocess.run(
+                ['git', 'status', '--porcelain'],
+                cwd=str(self.app_root),
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+            
+            if result.returncode != 0:
+                logger.error(f"Erreur git status: {result.stderr}")
+                return {
+                    "success": False,
+                    "error": "Impossible d'exécuter git status",
+                    "details": result.stderr
+                }
+            
+            # Parser la sortie
+            modified_files = []
+            for line in result.stdout.strip().split('\n'):
+                if line.strip():
+                    # Format: XY filename
+                    status = line[:2]
+                    filename = line[3:].strip()
+                    modified_files.append({
+                        "file": filename,
+                        "status": status.strip()
+                    })
+            
+            has_conflicts = len(modified_files) > 0
+            
+            return {
+                "success": True,
+                "has_conflicts": has_conflicts,
+                "modified_files": modified_files,
+                "message": f"{len(modified_files)} fichier(s) modifié(s) localement" if has_conflicts else "Aucune modification locale"
+            }
+            
+        except subprocess.TimeoutExpired:
+            logger.error("Timeout lors de l'exécution de git status")
+            return {
+                "success": False,
+                "error": "Timeout lors de la vérification Git"
+            }
+        except FileNotFoundError:
+            logger.error("Git n'est pas installé sur le système")
+            return {
+                "success": True,
+                "has_conflicts": False,
+                "modified_files": [],
+                "message": "Git non disponible (normal en production)"
+            }
+        except Exception as e:
+            logger.error(f"Erreur inattendue lors de la vérification Git: {str(e)}")
+            return {
+                "success": False,
+                "error": str(e)
+            }
+    
+    def resolve_git_conflicts(self, strategy: str) -> Dict:
+        """
+        Résout les conflits Git selon la stratégie choisie
+        strategy: "reset" (écraser les modifications locales), "stash" (sauvegarder), ou "abort" (annuler)
+        """
+        try:
+            if not (self.app_root / ".git").exists():
+                return {
+                    "success": True,
+                    "message": "Pas de dépôt Git (environnement de production)"
+                }
+            
+            if strategy == "reset":
+                # Écraser les modifications locales
+                result = subprocess.run(
+                    ['git', 'reset', '--hard', 'HEAD'],
+                    cwd=str(self.app_root),
+                    capture_output=True,
+                    text=True,
+                    timeout=30
+                )
+                
+                if result.returncode == 0:
+                    return {
+                        "success": True,
+                        "message": "Modifications locales écrasées (git reset --hard)"
+                    }
+                else:
+                    return {
+                        "success": False,
+                        "error": result.stderr
+                    }
+            
+            elif strategy == "stash":
+                # Sauvegarder les modifications dans le stash
+                result = subprocess.run(
+                    ['git', 'stash', 'save', f'Auto-stash avant mise à jour {datetime.now().isoformat()}'],
+                    cwd=str(self.app_root),
+                    capture_output=True,
+                    text=True,
+                    timeout=30
+                )
+                
+                if result.returncode == 0:
+                    return {
+                        "success": True,
+                        "message": "Modifications sauvegardées dans le stash Git"
+                    }
+                else:
+                    return {
+                        "success": False,
+                        "error": result.stderr
+                    }
+            
+            elif strategy == "abort":
+                return {
+                    "success": True,
+                    "message": "Mise à jour annulée (aucune action effectuée)"
+                }
+            
+            else:
+                return {
+                    "success": False,
+                    "error": f"Stratégie invalide: {strategy}"
+                }
+                
+        except subprocess.TimeoutExpired:
+            return {
+                "success": False,
+                "error": "Timeout lors de la résolution des conflits"
+            }
+        except FileNotFoundError:
+            return {
+                "success": True,
+                "message": "Git non disponible (normal en production)"
+            }
+        except Exception as e:
+            return {
+                "success": False,
+                "error": str(e)
+            }
+
