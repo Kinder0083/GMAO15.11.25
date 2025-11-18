@@ -103,6 +103,7 @@ function App() {
             <Route path="improvement-requests" element={<ImprovementRequests />} />
             <Route path="improvements" element={<Improvements />} />
             <Route path="surveillance-plan" element={<SurveillancePlan />} />
+            <Route path="surveillance-rapport" element={<SurveillanceRapport />} />
           </Route>
         </Routes>
       </BrowserRouter>
