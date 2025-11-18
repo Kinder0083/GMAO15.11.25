@@ -343,6 +343,7 @@ export const surveillanceAPI = {
   getStats: () => api.get('/surveillance/stats').then(res => res.data),
   getAlerts: () => api.get('/surveillance/alerts').then(res => res.data),
   getBadgeStats: () => api.get('/surveillance/badge-stats').then(res => res.data),
+  getRapportStats: () => api.get('/surveillance/rapport-stats').then(res => res.data),
   
   // Import/Export
   importData: (formData) => api.post('/surveillance/import', formData, {
