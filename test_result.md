@@ -4010,6 +4010,74 @@ agent_communication:
           Localisation: /app/frontend/src/services/api.js, ligne ~346
 
 frontend:
+  - task: "Module Documentations - Pages frontend et intégration"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/Documentations.jsx, /app/frontend/src/pages/PoleDetails.jsx, /app/frontend/src/pages/BonDeTravailForm.jsx, /app/frontend/src/App.js, /app/frontend/src/components/Layout/MainLayout.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          FRONTEND MODULE DOCUMENTATIONS IMPLÉMENTÉ - Intégration complète
+          
+          FICHIERS CRÉÉS:
+          1. /app/frontend/src/pages/Documentations.jsx
+             - Liste de tous les Pôles de Service
+             - Bouton "Créer un nouveau pôle"
+             - Dialog de création/modification de pôle
+             - Boutons d'action: Voir détails, Modifier, Supprimer
+          
+          2. /app/frontend/src/pages/PoleDetails.jsx
+             - Affichage détaillé d'un Pôle de Service spécifique
+             - Section "Documents attachés" avec liste des fichiers
+             - Upload de nouveaux documents (DOCX, PDF, XLSX, JPG, PNG, etc.)
+             - Téléchargement et suppression de documents
+             - Bouton "Créer un Bon de Travail"
+          
+          3. /app/frontend/src/pages/BonDeTravailForm.jsx
+             - Formulaire dynamique pour générer un Bon de Travail
+             - Champs: Titre, Description, Date souhaitée, Demandeur, etc.
+             - Bouton "Générer PDF" qui crée le document
+             - Boutons "Envoyer par email" (mailto:) et "Télécharger PDF"
+          
+          INTÉGRATIONS:
+          - Routes ajoutées dans /app/frontend/src/App.js:
+            * /documentations - Liste des pôles
+            * /documentations/:poleId - Détails d'un pôle
+            * /documentations/:poleId/bon-de-travail - Formulaire de bon de travail
+          
+          - Navigation ajoutée dans /app/frontend/src/components/Layout/MainLayout.jsx:
+            * Icône FolderOpen pour "Documentations"
+            * Module 'documentations' avec permissions
+          
+          - Permissions ajoutées dans /app/frontend/src/components/Common/PermissionsGrid.jsx:
+            * Module 'documentations' avec permissions view, edit, delete
+          
+          FONCTIONNALITÉS UI:
+          - API Client mis à jour dans /app/frontend/src/services/api.js
+          - Gestion des états de chargement
+          - Messages toast pour succès/erreurs
+          - Upload de fichiers avec indicateur de progression
+          - Téléchargement de documents
+          - Génération de PDF avec prévisualisation
+          - Envoi par email via application par défaut
+          
+          À TESTER:
+          1. Navigation vers /documentations depuis la sidebar
+          2. Création d'un nouveau pôle de service
+          3. Affichage de la liste des pôles
+          4. Navigation vers les détails d'un pôle
+          5. Upload de documents (DOCX, PDF, XLSX, photos)
+          6. Téléchargement de documents
+          7. Suppression de documents
+          8. Création d'un Bon de Travail
+          9. Génération de PDF
+          10. Envoi par email
+          11. Permissions (view, edit, delete) selon le rôle
+
   - task: "Plan de Surveillance - Page Rapport avec 3 modes d'affichage"
     implemented: true
     working: "NA"
