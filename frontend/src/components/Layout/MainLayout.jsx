@@ -24,7 +24,8 @@ import {
   Lightbulb,
   Sparkles,
   Shield,
-  Eye
+  Eye,
+  AlertTriangle
 } from 'lucide-react';
 import FirstLoginPasswordDialog from '../Common/FirstLoginPasswordDialog';
 import UpdateNotificationBadge from '../Common/UpdateNotificationBadge';
