@@ -38,6 +38,7 @@ class UserPermissions(BaseModel):
     meters: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
     surveillance: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
     presquaccident: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
+    documentations: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
     vendors: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
     reports: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
     people: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
