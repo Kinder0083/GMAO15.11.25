@@ -2433,7 +2433,9 @@ async def get_smtp_config(current_user: dict = Depends(get_current_admin_user)):
             smtp_password='****' if os.environ.get('SMTP_PASSWORD') else '',  # Masquer le mot de passe
             smtp_from_email=os.environ.get('SMTP_FROM_EMAIL', ''),
             smtp_from_name=os.environ.get('SMTP_FROM_NAME', 'GMAO Iris'),
-            smtp_use_tls=os.environ.get('SMTP_USE_TLS', 'true').lower() == 'true'
+            smtp_use_tls=os.environ.get('SMTP_USE_TLS', 'true').lower() == 'true',
+            frontend_url=os.environ.get('FRONTEND_URL', ''),
+            backend_url=os.environ.get('BACKEND_URL', '')
         )
         return config
     except Exception as e:
