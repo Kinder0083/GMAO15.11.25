@@ -4257,6 +4257,14 @@ agent_communication:
       
       🚀 Le backend Presqu'accident est entièrement opérationnel et conforme aux spécifications!
 
+  - task: "API Documentations - Module complet Pôles de Service et Bons de Travail"
+    implemented: true
+    working: true
+    file: "/app/backend/documentations_routes.py, /app/backend/models.py, /app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+  
   - task: "API Presqu'accident - Module complet CRUD et statistiques"
     implemented: true
     working: true
