@@ -926,6 +926,7 @@ if __name__ == "__main__":
         "create_securite_item", "test_surveillance_list_with_filters", "test_surveillance_item_details", 
         "test_surveillance_item_update", "test_surveillance_stats", "test_surveillance_alerts",
         "test_surveillance_badge_stats", "test_surveillance_badge_stats_without_auth",
+        "test_surveillance_rapport_stats", "test_surveillance_rapport_stats_without_auth",
         "test_surveillance_upload", "test_surveillance_export_template", "test_surveillance_delete_item"
     ]
     
