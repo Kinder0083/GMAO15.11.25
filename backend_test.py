@@ -134,62 +134,76 @@ class PresquAccidentTester:
         """TEST 5: Créer presqu'accident avec service QHSE"""
         return self.test_create_presqu_accident_item("QHSE", "CRITIQUE", "Zone de sécurité", "QHSE")
     
-    def test_surveillance_list_with_filters(self):
-        """TEST 6: Tester GET /api/surveillance/items avec filtres"""
-        self.log("🧪 TEST 6: Récupérer la liste des items avec filtres")
+    def test_presqu_accident_list_with_filters(self):
+        """TEST 6: Tester GET /api/presqu-accident/items avec filtres"""
+        self.log("🧪 TEST 6: Récupérer la liste des presqu'accidents avec filtres")
         
         try:
             # Test 1: Liste complète
             response = self.admin_session.get(
-                f"{BACKEND_URL}/surveillance/items",
+                f"{BACKEND_URL}/presqu-accident/items",
                 timeout=10
             )
             
             if response.status_code == 200:
                 data = response.json()
-                self.log(f"✅ Liste complète récupérée - {len(data)} items")
+                self.log(f"✅ Liste complète récupérée - {len(data)} presqu'accidents")
                 
-                # Test 2: Filtre par catégorie INCENDIE
+                # Test 2: Filtre par service PRODUCTION
                 response_filtered = self.admin_session.get(
-                    f"{BACKEND_URL}/surveillance/items?category=INCENDIE",
+                    f"{BACKEND_URL}/presqu-accident/items?service=PRODUCTION",
                     timeout=10
                 )
                 
                 if response_filtered.status_code == 200:
                     filtered_data = response_filtered.json()
-                    incendie_count = len([item for item in filtered_data if item.get("category") == "INCENDIE"])
-                    self.log(f"✅ Filtre catégorie INCENDIE: {incendie_count} items")
+                    production_count = len([item for item in filtered_data if item.get("service") == "PRODUCTION"])
+                    self.log(f"✅ Filtre service PRODUCTION: {production_count} items")
                     
-                    # Test 3: Filtre par responsable MAINT
-                    response_resp = self.admin_session.get(
-                        f"{BACKEND_URL}/surveillance/items?responsable=MAINT",
+                    # Test 3: Filtre par statut A_TRAITER
+                    response_status = self.admin_session.get(
+                        f"{BACKEND_URL}/presqu-accident/items?status=A_TRAITER",
                         timeout=10
                     )
                     
-                    if response_resp.status_code == 200:
-                        resp_data = response_resp.json()
-                        maint_count = len([item for item in resp_data if item.get("responsable") == "MAINT"])
-                        self.log(f"✅ Filtre responsable MAINT: {maint_count} items")
+                    if response_status.status_code == 200:
+                        status_data = response_status.json()
+                        a_traiter_count = len([item for item in status_data if item.get("status") == "A_TRAITER"])
+                        self.log(f"✅ Filtre statut A_TRAITER: {a_traiter_count} items")
                         
-                        # Test 4: Filtre par bâtiment
-                        response_bat = self.admin_session.get(
-                            f"{BACKEND_URL}/surveillance/items?batiment=BATIMENT 1",
+                        # Test 4: Filtre par sévérité ELEVE
+                        response_sev = self.admin_session.get(
+                            f"{BACKEND_URL}/presqu-accident/items?severite=ELEVE",
                             timeout=10
                         )
                         
-                        if response_bat.status_code == 200:
-                            bat_data = response_bat.json()
-                            bat_count = len([item for item in bat_data if "BATIMENT 1" in item.get("batiment", "")])
-                            self.log(f"✅ Filtre bâtiment BATIMENT 1: {bat_count} items")
-                            return True
+                        if response_sev.status_code == 200:
+                            sev_data = response_sev.json()
+                            eleve_count = len([item for item in sev_data if item.get("severite") == "ELEVE"])
+                            self.log(f"✅ Filtre sévérité ELEVE: {eleve_count} items")
+                            
+                            # Test 5: Filtre par lieu
+                            response_lieu = self.admin_session.get(
+                                f"{BACKEND_URL}/presqu-accident/items?lieu=Atelier",
+                                timeout=10
+                            )
+                            
+                            if response_lieu.status_code == 200:
+                                lieu_data = response_lieu.json()
+                                lieu_count = len([item for item in lieu_data if "Atelier" in item.get("lieu", "")])
+                                self.log(f"✅ Filtre lieu 'Atelier': {lieu_count} items")
+                                return True
+                            else:
+                                self.log(f"❌ Filtre lieu échoué - Status: {response_lieu.status_code}", "ERROR")
+                                return False
                         else:
-                            self.log(f"❌ Filtre bâtiment échoué - Status: {response_bat.status_code}", "ERROR")
+                            self.log(f"❌ Filtre sévérité échoué - Status: {response_sev.status_code}", "ERROR")
                             return False
                     else:
-                        self.log(f"❌ Filtre responsable échoué - Status: {response_resp.status_code}", "ERROR")
+                        self.log(f"❌ Filtre statut échoué - Status: {response_status.status_code}", "ERROR")
                         return False
                 else:
-                    self.log(f"❌ Filtre catégorie échoué - Status: {response_filtered.status_code}", "ERROR")
+                    self.log(f"❌ Filtre service échoué - Status: {response_filtered.status_code}", "ERROR")
                     return False
             else:
                 self.log(f"❌ Liste complète échouée - Status: {response.status_code}", "ERROR")
