@@ -245,9 +245,10 @@ const WorkOrderFormDialog = ({ open, onOpenChange, workOrder, onSuccess }) => {
       // Ne pas fermer directement, afficher le dialog de changement de statut
       setShowStatusDialog(true);
     } catch (error) {
+      console.error('Erreur création/modification ordre de travail:', error);
       toast({
         title: 'Erreur',
-        description: error.response?.data?.detail || 'Une erreur est survenue',
+        description: formatErrorMessage(error, 'Une erreur est survenue lors de l\'enregistrement'),
         variant: 'destructive'
       });
     } finally {
