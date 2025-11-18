@@ -454,7 +454,9 @@ async def download_document_file(
         if not doc.get("fichier_url"):
             raise HTTPException(status_code=404, detail="Aucun fichier associé")
         
-        file_path = Path(f"/app{doc['fichier_url']}")
+        # Le fichier_url commence par /uploads/documents/
+        # Le fichier réel est dans /app/backend/uploads/documents/
+        file_path = Path(f"/app/backend{doc['fichier_url']}")
         if not file_path.exists():
             raise HTTPException(status_code=404, detail="Fichier non trouvé sur le serveur")
         
