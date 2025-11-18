@@ -106,21 +106,22 @@ const PreventiveMaintenance = () => {
             equipement_id: pm.equipement?.id,
             assigne_a_id: pm.assigneA?.id,
             tempsEstime: pm.duree,
-          dateLimite: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // +7 jours
-        });
-        
-        toast({
-          title: 'Succès',
-          description: 'Ordre de travail créé avec succès'
-        });
-      } catch (error) {
-        toast({
-          title: 'Erreur',
-          description: 'Impossible de créer l\'ordre de travail',
-          variant: 'destructive'
-        });
+            dateLimite: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // +7 jours
+          });
+          
+          toast({
+            title: 'Succès',
+            description: 'Ordre de travail créé avec succès'
+          });
+        } catch (error) {
+          toast({
+            title: 'Erreur',
+            description: 'Impossible de créer l\'ordre de travail',
+            variant: 'destructive'
+          });
+        }
       }
-    }
+    });
   };
 
   const getFrequencyBadge = (frequency) => {
