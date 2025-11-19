@@ -4012,11 +4012,11 @@ agent_communication:
 frontend:
   - task: "Module Documentations - Pages frontend et intégration + Vues multiples + Prévisualisation"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/pages/Documentations.jsx, /app/frontend/src/pages/PoleDetails.jsx, /app/frontend/src/pages/BonDeTravailForm.jsx, /app/frontend/src/App.js, /app/frontend/src/components/Layout/MainLayout.jsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
