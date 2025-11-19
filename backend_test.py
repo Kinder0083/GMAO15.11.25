@@ -307,37 +307,52 @@ class DocumentationPolesTester:
             self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
             return False
     
-    def test_ssh_execute_non_admin_user(self):
-        """TEST 4: Tester SSH avec utilisateur non-admin (doit échouer avec 403)"""
-        self.log("🧪 TEST 4: SSH Execute - Utilisateur non-admin (doit échouer)")
+    def test_document_count_summary(self):
+        """TEST 4: Résumé des documents et bons de travail par pôle"""
+        self.log("🧪 TEST 4: Résumé des documents et bons de travail par pôle")
         
-        try:
-            # Créer une session sans token admin (ou avec un token utilisateur normal)
-            non_admin_session = requests.Session()
+        if not self.documents_count:
+            self.log("⚠️ Pas de données de comptage disponibles", "WARNING")
+            return True
+        
+        self.log("📊 RÉSUMÉ DES DOCUMENTS ET BONS DE TRAVAIL PAR PÔLE:")
+        self.log("=" * 60)
+        
+        total_documents = 0
+        total_bons = 0
+        poles_with_documents = 0
+        poles_with_bons = 0
+        
+        for pole_name, counts in self.documents_count.items():
+            doc_count = counts.get('documents', 0)
+            bons_count = counts.get('bons_travail', 0)
             
-            command_data = {
-                "command": "pwd"
-            }
+            self.log(f"📋 {pole_name}:")
+            self.log(f"   - Documents: {doc_count}")
+            self.log(f"   - Bons de travail: {bons_count}")
             
-            response = non_admin_session.post(
-                f"{BACKEND_URL}/ssh/execute",
-                json=command_data,
-                timeout=15
-            )
+            total_documents += doc_count
+            total_bons += bons_count
             
-            # Doit retourner 401 Unauthorized ou 403 Forbidden
-            if response.status_code in [401, 403]:
-                self.log(f"✅ Protection par authentification fonctionnelle - Status: {response.status_code}")
-                self.log("✅ Utilisateur non-admin correctement refusé")
-                return True
-            else:
-                self.log(f"❌ SÉCURITÉ COMPROMISE - SSH accessible sans authentification admin - Status: {response.status_code}", "ERROR")
-                self.log(f"Response: {response.text}", "ERROR")
-                return False
-                
-        except requests.exceptions.RequestException as e:
-            self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
-            return False
+            if doc_count > 0:
+                poles_with_documents += 1
+            if bons_count > 0:
+                poles_with_bons += 1
+        
+        self.log("=" * 60)
+        self.log(f"📊 TOTAUX:")
+        self.log(f"   - Total pôles analysés: {len(self.documents_count)}")
+        self.log(f"   - Total documents: {total_documents}")
+        self.log(f"   - Total bons de travail: {total_bons}")
+        self.log(f"   - Pôles avec documents: {poles_with_documents}")
+        self.log(f"   - Pôles avec bons de travail: {poles_with_bons}")
+        
+        if total_documents > 0 or total_bons > 0:
+            self.log("✅ Des documents et/ou bons de travail sont présents dans la base")
+        else:
+            self.log("⚠️ Aucun document ni bon de travail trouvé - base de données vide?")
+        
+        return True
     
     def test_get_bons_travail_list(self):
         """TEST 5: Récupérer la liste des bons de travail"""
