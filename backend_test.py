@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Backend API Testing Script for GMAO Application
-Tests SSH Terminal and Documentations (Bons de Travail) endpoints
+Tests Documentation Poles endpoints - CRITICAL FIX VERIFICATION
 """
 
 import requests
