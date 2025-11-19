@@ -56,12 +56,14 @@ function PoleDetails() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [poleData, documentsData] = await Promise.all([
+      const [poleData, documentsData, bonsTravailData] = await Promise.all([
         documentationsAPI.getPole(poleId),
-        documentationsAPI.getDocuments({ pole_id: poleId })
+        documentationsAPI.getDocuments({ pole_id: poleId }),
+        documentationsAPI.getBonsTravail({ pole_id: poleId })
       ]);
       setPole(poleData);
       setDocuments(documentsData);
+      setBonsTravail(bonsTravailData);
     } catch (error) {
       console.error('Erreur chargement:', error);
       toast({
