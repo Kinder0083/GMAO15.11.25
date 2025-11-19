@@ -5175,6 +5175,86 @@ frontend:
           6. Comparaison visuelle avec le template Word original
 
 frontend:
+  - task: "Terminal SSH - Test correction erreur Response body already used"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/SSHTerminal.jsx"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          CORRECTION CRITIQUE EFFECTUÉE - Terminal SSH
+          
+          PROBLÈME REPORTÉ:
+          - Erreur "Failed to execute 'clone' on 'Response': Response body is already used"
+          - Se produit lors de l'exécution de commandes dans le terminal SSH
+          
+          CORRECTION APPLIQUÉE:
+          - Remplacement de fetch() par api.post() dans SSHTerminal.jsx
+          - Utilisation d'axios pour éviter les problèmes de Response body
+          - Endpoint backend POST /api/ssh/execute déjà fonctionnel
+          
+          À TESTER:
+          1. Connexion au terminal SSH
+          2. Exécution de commandes: pwd, ls, echo 'Test SSH'
+          3. Vérifier absence d'erreur "Response body is already used"
+          4. Vérifier affichage correct des résultats
+
+  - task: "Module Documentations - Visualisation Bon de Travail"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/BonDeTravailView.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          FONCTIONNALITÉ À TESTER - Visualisation Bon de Travail
+          
+          CONTEXTE:
+          - Page BonDeTravailView.jsx pour afficher les détails d'un bon de travail
+          - 4 sections: Travaux, Risques, Précautions, Engagement
+          - Boutons Imprimer et Télécharger PDF
+          
+          À TESTER (si des bons existent):
+          1. Navigation vers /documentations
+          2. Clic sur un pôle de service
+          3. Si des bons de travail existent, cliquer sur "Voir"
+          4. Vérifier affichage des 4 sections
+          5. Tester bouton "Imprimer" (nouvelle fenêtre PDF)
+          6. Tester bouton "Télécharger PDF"
+          7. Vérifier absence d'erreurs JavaScript
+
+  - task: "Module Documentations - Navigation de base"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/Documentations.jsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          FONCTIONNALITÉ À TESTER - Navigation de base Documentations
+          
+          CONTEXTE:
+          - Page principale du module Documentations
+          - Gestion des pôles de service
+          - Vues multiples (grille/liste)
+          
+          À TESTER:
+          1. Navigation vers /documentations
+          2. Vérifier chargement sans erreur
+          3. Vérifier présence bouton "Nouveau Pôle"
+          4. Vérifier boutons de vue (grille/liste)
+          5. Cliquer sur un pôle pour voir les détails
+          6. Vérifier absence d'erreurs console
 
 metadata:
   created_by: "main_agent"
