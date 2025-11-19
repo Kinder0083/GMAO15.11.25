@@ -883,27 +883,21 @@ async def generate_bon_pdf(
             </table>
 
             <!-- SECTION 2: RISQUES IDENTIFIÉS -->
-            <div class="section">
-                <div class="section-title">RISQUES IDENTIFIÉS</div>
-                
-                <div class="subsection-title">Intervention sur du matériel ou des infrastructures :</div>
-                {''.join([f'<div class="checkbox-item"><span class="checkbox checked"></span>{r}</div>' for r in bon.get('risques_materiel', [])])}
-                {f'<div class="checkbox-item"><span class="checkbox checked"></span>Autre : {bon.get("risques_materiel_autre")}</div>' if bon.get('risques_materiel_autre') else ''}
-                {('<div style="color: #999; padding: 3px 0;">Aucun risque matériel identifié</div>' if not bon.get('risques_materiel') and not bon.get('risques_materiel_autre') else '')}
-                
-                <div class="subsection-title">Travaux nécessitant une autorisation particulière :</div>
-                {''.join([f'<div class="checkbox-item"><span class="checkbox checked"></span>{r}</div>' for r in bon.get('risques_autorisation', [])])}
-                {('<div style="color: #999; padding: 3px 0;">Aucune autorisation particulière</div>' if not bon.get('risques_autorisation') else '')}
-                
-                <div class="subsection-title">Produits dangereux :</div>
-                {''.join([f'<div class="checkbox-item"><span class="checkbox checked"></span>{r}</div>' for r in bon.get('risques_produits', [])])}
-                {('<div style="color: #999; padding: 3px 0;">Aucun produit dangereux</div>' if not bon.get('risques_produits') else '')}
-                
-                <div class="subsection-title">Environnement des travaux nécessitant une attention particulière :</div>
-                {''.join([f'<div class="checkbox-item"><span class="checkbox checked"></span>{r}</div>' for r in bon.get('risques_environnement', [])])}
-                {f'<div class="checkbox-item"><span class="checkbox checked"></span>Autre : {bon.get("risques_environnement_autre")}</div>' if bon.get('risques_environnement_autre') else ''}
-                {('<div style="color: #999; padding: 3px 0;">Aucun risque environnemental particulier</div>' if not bon.get('risques_environnement') and not bon.get('risques_environnement_autre') else '')}
-            </div>
+            <div class="section-title">Risques Identifiés</div>
+            
+            <div class="subsection-title">Intervention sur du matériel ou des infrastructures :</div>
+            {''.join([f'<div class="checkbox-line"><span class="checkbox checked"></span>{r}</div>' for r in bon.get('risques_materiel', [])])}
+            {f'<div class="checkbox-line"><span class="checkbox checked"></span>Autre (préciser) : {bon.get("risques_materiel_autre")}</div>' if bon.get('risques_materiel_autre') else ''}
+            
+            <div class="subsection-title">Travaux nécessitant une autorisation particulière :</div>
+            {''.join([f'<div class="checkbox-line"><span class="checkbox checked"></span>{r}</div>' for r in bon.get('risques_autorisation', [])])}
+            
+            <div class="subsection-title">Produits dangereux :</div>
+            {''.join([f'<div class="checkbox-line"><span class="checkbox checked"></span>{r}</div>' for r in bon.get('risques_produits', [])])}
+            
+            <div class="subsection-title">Environnement des travaux nécessitant une attention particulière :</div>
+            {''.join([f'<div class="checkbox-line"><span class="checkbox checked"></span>{r}</div>' for r in bon.get('risques_environnement', [])])}
+            {f'<div class="checkbox-line"><span class="checkbox checked"></span>Autre (préciser) : {bon.get("risques_environnement_autre")}</div>' if bon.get('risques_environnement_autre') else ''}
 
             <!-- SECTION 3: PRÉCAUTIONS À PRENDRE -->
             <div class="section">
