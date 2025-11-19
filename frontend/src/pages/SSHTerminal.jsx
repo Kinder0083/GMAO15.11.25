@@ -4,6 +4,7 @@ import { Button } from '../components/ui/button';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import { Terminal, AlertTriangle } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
+import api from '../services/api';
 
 function SSHTerminal() {
   const { toast } = useToast();
