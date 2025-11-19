@@ -148,39 +148,84 @@ class DocumentationPolesTester:
             self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
             return False
     
-    def test_ssh_execute_list_command(self):
-        """TEST 2: Exécuter une commande SSH liste - ls -la /app"""
-        self.log("🧪 TEST 2: SSH Execute - Commande liste (ls -la /app)")
+    def test_get_pole_by_id(self):
+        """TEST 2: CRITIQUE - GET /api/documentations/poles/{pole_id} - Vérifier structure d'un pôle spécifique"""
+        self.log("🧪 TEST 2: CRITIQUE - GET /api/documentations/poles/{pole_id} - Pôle spécifique")
+        
+        if not self.poles_data:
+            self.log("⚠️ Pas de données de pôles disponibles du test précédent", "WARNING")
+            return False
+        
+        # Prendre le premier pôle pour le test
+        first_pole = self.poles_data[0]
+        pole_id = first_pole.get('id')
+        pole_name = first_pole.get('nom', 'Pôle inconnu')
+        
+        if not pole_id:
+            self.log("❌ Pas d'ID de pôle disponible pour le test", "ERROR")
+            return False
         
         try:
-            command_data = {
-                "command": "ls -la /app"
-            }
-            
-            response = self.admin_session.post(
-                f"{BACKEND_URL}/ssh/execute",
-                json=command_data,
+            response = self.admin_session.get(
+                f"{BACKEND_URL}/documentations/poles/{pole_id}",
                 timeout=15
             )
             
             if response.status_code == 200:
                 data = response.json()
-                self.log(f"✅ Commande SSH exécutée avec succès")
-                stdout = data.get('stdout', '').strip()
-                self.log(f"✅ stdout (first 200 chars): {stdout[:200]}...")
-                self.log(f"✅ stderr: {data.get('stderr', '').strip()}")
-                self.log(f"✅ exit_code: {data.get('exit_code')}")
+                self.log(f"✅ Pôle spécifique récupéré - ID: {pole_id}")
+                self.log(f"✅ Nom du pôle: {data.get('nom', 'N/A')}")
                 
-                # Vérifier que la réponse contient des informations de fichiers
-                if 'backend' in stdout or 'frontend' in stdout or 'total' in stdout:
-                    self.log("✅ Commande ls retourne des informations de fichiers attendues")
+                # Vérifications critiques
+                success = True
+                
+                # Vérification 1: Champ "documents" existe et est un array
+                if 'documents' not in data:
+                    self.log(f"❌ CRITIQUE: Champ 'documents' MANQUANT", "ERROR")
+                    success = False
+                elif not isinstance(data['documents'], list):
+                    self.log(f"❌ CRITIQUE: Champ 'documents' n'est pas un array", "ERROR")
+                    success = False
+                else:
+                    doc_count = len(data['documents'])
+                    self.log(f"✅ Champ 'documents': array avec {doc_count} éléments")
+                
+                # Vérification 2: Champ "bons_travail" existe et est un array
+                if 'bons_travail' not in data:
+                    self.log(f"❌ CRITIQUE: Champ 'bons_travail' MANQUANT", "ERROR")
+                    success = False
+                elif not isinstance(data['bons_travail'], list):
+                    self.log(f"❌ CRITIQUE: Champ 'bons_travail' n'est pas un array", "ERROR")
+                    success = False
+                else:
+                    bons_count = len(data['bons_travail'])
+                    self.log(f"✅ Champ 'bons_travail': array avec {bons_count} éléments")
+                
+                # Vérification 3: Si des documents existent, vérifier leurs champs
+                if data.get('documents') and len(data['documents']) > 0:
+                    first_doc = data['documents'][0]
+                    self.log(f"📄 Analyse du premier document:")
+                    self.log(f"   - ID: {first_doc.get('id', 'N/A')}")
+                    self.log(f"   - pole_id: {first_doc.get('pole_id', 'N/A')}")
+                    self.log(f"   - nom_fichier: {first_doc.get('nom_fichier', 'N/A')}")
+                    self.log(f"   - type_fichier: {first_doc.get('type_fichier', 'N/A')}")
+                    self.log(f"   - taille: {first_doc.get('taille', 'N/A')}")
+                    
+                    # Vérifier que pole_id correspond
+                    if first_doc.get('pole_id') == pole_id:
+                        self.log("✅ pole_id du document correspond au pôle demandé")
+                    else:
+                        self.log(f"⚠️ pole_id du document ({first_doc.get('pole_id')}) ne correspond pas au pôle ({pole_id})")
+                
+                if success:
+                    self.log("✅ SUCCÈS CRITIQUE: Structure du pôle spécifique valide")
                     return True
                 else:
-                    self.log("⚠️ Commande ls ne retourne pas les informations attendues")
-                    return True  # Still consider it working
+                    self.log("❌ ÉCHEC CRITIQUE: Structure du pôle spécifique invalide", "ERROR")
+                    return False
                     
             else:
-                self.log(f"❌ Commande SSH échouée - Status: {response.status_code}", "ERROR")
+                self.log(f"❌ Récupération pôle spécifique échouée - Status: {response.status_code}", "ERROR")
                 self.log(f"Response: {response.text}", "ERROR")
                 return False
                 
