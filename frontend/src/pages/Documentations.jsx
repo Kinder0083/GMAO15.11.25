@@ -554,6 +554,63 @@ function Documentations() {
 
       {/* Confirm Dialog */}
       <ConfirmDialog />
+
+      {/* Document Preview Dialog */}
+      <Dialog open={openPreview} onOpenChange={setOpenPreview}>
+        <DialogContent className="max-w-4xl h-[80vh]">
+          <DialogHeader>
+            <DialogTitle>Prévisualisation : {previewDocument?.nom_fichier}</DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-auto">
+            {previewDocument && (
+              <>
+                {previewDocument.type_fichier?.includes('pdf') ? (
+                  <iframe
+                    src={`${getBackendURL()}${previewDocument.fichier_url}`}
+                    className="w-full h-full border-0"
+                    title="PDF Preview"
+                  />
+                ) : previewDocument.type_fichier?.includes('image') ? (
+                  <img
+                    src={`${getBackendURL()}${previewDocument.fichier_url}`}
+                    alt={previewDocument.nom_fichier}
+                    className="max-w-full h-auto mx-auto"
+                  />
+                ) : (
+                  <div className="text-center py-12">
+                    <FileText className="h-16 w-16 mx-auto text-gray-300 mb-4" />
+                    <p className="text-gray-600 mb-4">
+                      Prévisualisation non disponible pour ce type de fichier
+                    </p>
+                    <Button
+                      onClick={() => {
+                        window.open(`${getBackendURL()}${previewDocument.fichier_url}`, '_blank');
+                      }}
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      Télécharger le document
+                    </Button>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                window.open(`${getBackendURL()}${previewDocument?.fichier_url}`, '_blank');
+              }}
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Télécharger
+            </Button>
+            <Button onClick={() => setOpenPreview(false)}>
+              Fermer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
