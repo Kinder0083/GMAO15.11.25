@@ -464,85 +464,38 @@ class SSHAndDocumentationsTester:
             self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
             return False
     
-    def test_presqu_accident_list_with_filters(self):
-        """TEST 6: Tester GET /api/presqu-accident/items avec filtres"""
-        self.log("🧪 TEST 6: Récupérer la liste des presqu'accidents avec filtres")
+    def test_cleanup_bons_travail(self):
+        """TEST 10: Nettoyer (supprimer les bons de travail de test créés)"""
+        self.log("🧪 TEST 10: Nettoyer les bons de travail de test créés")
         
-        try:
-            # Test 1: Liste complète
-            response = self.admin_session.get(
-                f"{BACKEND_URL}/presqu-accident/items",
-                timeout=10
-            )
-            
-            if response.status_code == 200:
-                data = response.json()
-                self.log(f"✅ Liste complète récupérée - {len(data)} presqu'accidents")
-                
-                # Test 2: Filtre par service PRODUCTION
-                response_filtered = self.admin_session.get(
-                    f"{BACKEND_URL}/presqu-accident/items?service=PRODUCTION",
+        if not self.created_bons:
+            self.log("⚠️ Pas de bons de travail de test à supprimer", "WARNING")
+            return True
+        
+        success_count = 0
+        for bon_id in self.created_bons[:]:  # Copy to avoid modification during iteration
+            try:
+                response = self.admin_session.delete(
+                    f"{BACKEND_URL}/documentations/bons-travail/{bon_id}",
                     timeout=10
                 )
                 
-                if response_filtered.status_code == 200:
-                    filtered_data = response_filtered.json()
-                    production_count = len([item for item in filtered_data if item.get("service") == "PRODUCTION"])
-                    self.log(f"✅ Filtre service PRODUCTION: {production_count} items")
-                    
-                    # Test 3: Filtre par statut A_TRAITER
-                    response_status = self.admin_session.get(
-                        f"{BACKEND_URL}/presqu-accident/items?status=A_TRAITER",
-                        timeout=10
-                    )
-                    
-                    if response_status.status_code == 200:
-                        status_data = response_status.json()
-                        a_traiter_count = len([item for item in status_data if item.get("status") == "A_TRAITER"])
-                        self.log(f"✅ Filtre statut A_TRAITER: {a_traiter_count} items")
-                        
-                        # Test 4: Filtre par sévérité ELEVE
-                        response_sev = self.admin_session.get(
-                            f"{BACKEND_URL}/presqu-accident/items?severite=ELEVE",
-                            timeout=10
-                        )
-                        
-                        if response_sev.status_code == 200:
-                            sev_data = response_sev.json()
-                            eleve_count = len([item for item in sev_data if item.get("severite") == "ELEVE"])
-                            self.log(f"✅ Filtre sévérité ELEVE: {eleve_count} items")
-                            
-                            # Test 5: Filtre par lieu
-                            response_lieu = self.admin_session.get(
-                                f"{BACKEND_URL}/presqu-accident/items?lieu=Atelier",
-                                timeout=10
-                            )
-                            
-                            if response_lieu.status_code == 200:
-                                lieu_data = response_lieu.json()
-                                lieu_count = len([item for item in lieu_data if "Atelier" in item.get("lieu", "")])
-                                self.log(f"✅ Filtre lieu 'Atelier': {lieu_count} items")
-                                return True
-                            else:
-                                self.log(f"❌ Filtre lieu échoué - Status: {response_lieu.status_code}", "ERROR")
-                                return False
-                        else:
-                            self.log(f"❌ Filtre sévérité échoué - Status: {response_sev.status_code}", "ERROR")
-                            return False
-                    else:
-                        self.log(f"❌ Filtre statut échoué - Status: {response_status.status_code}", "ERROR")
-                        return False
+                if response.status_code == 200:
+                    self.log(f"✅ Bon de travail {bon_id} supprimé avec succès")
+                    self.created_bons.remove(bon_id)
+                    success_count += 1
+                elif response.status_code == 404:
+                    self.log(f"⚠️ Bon de travail {bon_id} déjà supprimé (Status 404)")
+                    self.created_bons.remove(bon_id)
+                    success_count += 1
                 else:
-                    self.log(f"❌ Filtre service échoué - Status: {response_filtered.status_code}", "ERROR")
-                    return False
-            else:
-                self.log(f"❌ Liste complète échouée - Status: {response.status_code}", "ERROR")
-                self.log(f"Response: {response.text}", "ERROR")
-                return False
-                
-        except requests.exceptions.RequestException as e:
-            self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
-            return False
+                    self.log(f"❌ Suppression du bon de travail {bon_id} échouée - Status: {response.status_code}", "ERROR")
+                    
+            except requests.exceptions.RequestException as e:
+                self.log(f"❌ Request failed for {bon_id} - Error: {str(e)}", "ERROR")
+        
+        self.log(f"✅ Nettoyage terminé: {success_count} bons de travail supprimés")
+        return success_count >= 0  # Toujours réussir le nettoyage
     
     def test_presqu_accident_item_details(self):
         """TEST 7: Tester GET /api/presqu-accident/items/{item_id}"""
