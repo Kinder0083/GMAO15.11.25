@@ -27,14 +27,10 @@ from models import (
 )
 from dependencies import get_current_user, get_current_admin_user, get_current_user_optional
 from audit_service import AuditService
-from jose import jwt, JWTError
+from auth import decode_access_token
 import os
 
 logger = logging.getLogger(__name__)
-
-# JWT Configuration
-SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-keep-it-safe")
-ALGORITHM = "HS256"
 
 router = APIRouter(prefix="/documentations", tags=["documentations"])
 
