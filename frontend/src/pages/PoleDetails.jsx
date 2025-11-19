@@ -268,7 +268,21 @@ function PoleDetails() {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => navigate(`/documentations/${poleId}/bon-de-travail?id=${bon.id}`)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/documentations/${poleId}/bon-de-travail/${bon.id}/view`);
+                      }}
+                    >
+                      <Eye className="h-4 w-4 mr-1" />
+                      Voir
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/documentations/${poleId}/bon-de-travail/${bon.id}/edit`);
+                      }}
                     >
                       <Edit className="h-4 w-4 mr-1" />
                       Modifier
@@ -276,13 +290,16 @@ function PoleDetails() {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation();
                         const token = localStorage.getItem('token');
-                        window.open(`${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/documentations/bons-travail/${bon.id}/pdf?token=${token}`, '_blank');
+                        const printUrl = `${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/documentations/bons-travail/${bon.id}/pdf?token=${token}`;
+                        const printWindow = window.open(printUrl, '_blank');
+                        printWindow.onload = () => printWindow.print();
                       }}
                     >
-                      <Download className="h-4 w-4 mr-1" />
-                      PDF
+                      <Printer className="h-4 w-4 mr-1" />
+                      Imprimer
                     </Button>
                   </div>
                 </CardContent>
