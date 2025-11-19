@@ -72,8 +72,13 @@ function BonDeTravailForm() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [pole, setPole] = useState(null);
+  const [showEntrepriseDialog, setShowEntrepriseDialog] = useState(false);
+  const [entreprises, setEntreprises] = useState([]);
+  const [newEntreprise, setNewEntreprise] = useState('');
+  const [selectedEntreprise, setSelectedEntreprise] = useState('');
 
   const [formData, setFormData] = useState({
+    titre: '',
     localisation_ligne: '',
     description_travaux: '',
     nom_intervenants: '',
@@ -94,7 +99,8 @@ function BonDeTravailForm() {
     
     date_engagement: new Date().toISOString().split('T')[0],
     nom_agent_maitrise: '',
-    nom_representant: ''
+    nom_representant: '',
+    entreprise: 'Non assignée'
   });
 
   useEffect(() => {
