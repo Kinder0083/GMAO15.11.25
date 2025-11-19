@@ -456,7 +456,8 @@ function Documentations() {
                                         variant="ghost"
                                         size="sm"
                                         onClick={() => {
-                                          window.open(`${getBackendURL()}/api/documentations/documents/${doc.id}/view`, '_blank');
+                                          const token = localStorage.getItem('token');
+                                          window.open(`${getBackendURL()}/api/documentations/documents/${doc.id}/view?token=${token}`, '_blank');
                                         }}
                                         title="Ouvrir dans un nouvel onglet"
                                       >
