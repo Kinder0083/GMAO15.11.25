@@ -83,9 +83,23 @@ function Documentations() {
   const loadPoles = async () => {
     try {
       setLoading(true);
-      const data = await documentationsAPI.getPoles();
-      setPoles(data);
-      setFilteredPoles(data);
+      const polesData = await documentationsAPI.getPoles();
+      
+      // Charger les détails de chaque pôle pour récupérer les documents
+      const polesWithDocuments = await Promise.all(
+        polesData.map(async (pole) => {
+          try {
+            const details = await documentationsAPI.getPoleById(pole.id);
+            return details;
+          } catch (error) {
+            console.error(`Erreur chargement détails pôle ${pole.id}:`, error);
+            return pole; // Retourner le pôle sans documents en cas d'erreur
+          }
+        })
+      );
+      
+      setPoles(polesWithDocuments);
+      setFilteredPoles(polesWithDocuments);
     } catch (error) {
       console.error('Erreur chargement pôles:', error);
       toast({
