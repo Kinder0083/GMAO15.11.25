@@ -391,6 +391,19 @@ function PoleDetails() {
         </div>
       )}
 
+      {/* Séparateur Documents Utilisateur */}
+      {documents.length > 0 && (
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <div className="flex-1 h-px bg-gray-300"></div>
+            <h3 className="text-lg font-semibold text-gray-700 px-4 bg-gray-50 rounded-full">
+              📄 Documents Utilisateur ({documents.length})
+            </h3>
+            <div className="flex-1 h-px bg-gray-300"></div>
+          </div>
+        </div>
+      )}
+
       {/* Documents List */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {documents.length === 0 ? (
