@@ -360,12 +360,27 @@ function PoleDetails() {
                         const token = localStorage.getItem('token');
                         const printUrl = `${process.env.REACT_APP_BACKEND_URL || window.location.origin}/api/documentations/bons-travail/${bon.id}/pdf?token=${token}`;
                         const printWindow = window.open(printUrl, '_blank');
-                        printWindow.onload = () => printWindow.print();
+                        if (printWindow) {
+                          printWindow.onload = () => printWindow.print();
+                        }
                       }}
                     >
                       <Printer className="h-4 w-4 mr-1" />
                       Imprimer
                     </Button>
+                    {isAdmin() && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteBonTravail(bon.id);
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
                 </CardContent>
               </Card>
