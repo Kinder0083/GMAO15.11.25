@@ -64,13 +64,30 @@ async def get_poles(current_user: dict = Depends(get_current_user)):
 
 @router.get("/poles/{pole_id}")
 async def get_pole(pole_id: str, current_user: dict = Depends(get_current_user)):
-    """Récupérer un pôle spécifique"""
+    """Récupérer un pôle spécifique avec ses documents et bons de travail"""
     try:
         pole = await db.poles_service.find_one({"id": pole_id})
         if not pole:
             raise HTTPException(status_code=404, detail="Pôle non trouvé")
         if "_id" in pole:
             del pole["_id"]
+        
+        # Récupérer les documents associés au pôle
+        documents = await db.documents.find({"pole_id": pole_id}).to_list(length=None)
+        for doc in documents:
+            if "_id" in doc:
+                del doc["_id"]
+        
+        # Récupérer les bons de travail associés au pôle
+        bons_travail = await db.bons_travail.find({"pole_id": pole_id}).to_list(length=None)
+        for bon in bons_travail:
+            if "_id" in bon:
+                del bon["_id"]
+        
+        # Ajouter les documents et bons au pôle
+        pole["documents"] = documents
+        pole["bons_travail"] = bons_travail
+        
         return pole
     except HTTPException:
         raise
