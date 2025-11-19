@@ -1113,56 +1113,49 @@ class SSHAndDocumentationsTester:
         self.log(f"Nettoyage terminé: {success_count} presqu'accidents supprimés")
         return True
     
-    def run_presqu_accident_tests(self):
-        """Run comprehensive tests for Presqu'accident (Near Miss) endpoints"""
+    def run_ssh_and_documentations_tests(self):
+        """Run comprehensive tests for SSH Terminal and Documentations endpoints"""
         self.log("=" * 80)
-        self.log("TESTING PRESQU'ACCIDENT (NEAR MISS) - ENDPOINTS CRUD COMPLETS")
+        self.log("TESTING SSH TERMINAL & DOCUMENTATIONS (BONS DE TRAVAIL) - ENDPOINTS CRITIQUES")
         self.log("=" * 80)
-        self.log("CONTEXTE: Test complet du nouveau module Presqu'accident avec tous les endpoints:")
-        self.log("- CRUD de base (GET, POST, PUT, DELETE)")
-        self.log("- Upload de pièces jointes")
-        self.log("- Statistiques et alertes")
-        self.log("- Badge de notification")
-        self.log("- Statistiques complètes pour page Rapport (GET /api/presqu-accident/rapport-stats)")
-        self.log("- Import/Export")
+        self.log("CONTEXTE: Test complet des modules SSH et Documentations selon la demande:")
+        self.log("- Terminal SSH (CRITIQUE - Correction juste effectuée)")
+        self.log("- Génération PDF Bon de Travail (HAUTE PRIORITÉ)")
+        self.log("- CRUD Bons de Travail (MOYENNE PRIORITÉ)")
         self.log("")
-        self.log("TESTS À EFFECTUER:")
-        self.log("1. Se connecter en tant qu'admin")
-        self.log("2. Créer presqu'accidents avec différents services (ADV, LOGISTIQUE, PRODUCTION, QHSE)")
-        self.log("3. Tester les filtres (service, statut, sévérité, lieu)")
-        self.log("4. Récupérer les détails d'un presqu'accident")
-        self.log("5. Mettre à jour un presqu'accident (statut A_TRAITER → EN_COURS → TERMINE)")
-        self.log("6. Tester les statistiques globales")
-        self.log("7. Tester les alertes (items à traiter, en retard)")
-        self.log("8. Tester le badge de notification (GET /api/presqu-accident/badge-stats)")
-        self.log("9. SÉCURITÉ: Tester badge sans authentification (doit échouer)")
-        self.log("10. CRITIQUE: Tester statistiques rapport (GET /api/presqu-accident/rapport-stats)")
-        self.log("11. SÉCURITÉ: Tester rapport stats sans authentification (doit échouer)")
-        self.log("12. Upload d'une pièce jointe")
-        self.log("13. Export du template CSV")
-        self.log("14. Supprimer un presqu'accident (admin uniquement)")
-        self.log("15. Nettoyer les presqu'accidents de test créés")
+        self.log("TESTS À EFFECTUER PAR ORDRE DE PRIORITÉ:")
+        self.log("1. 🔧 TERMINAL SSH (CRITIQUE)")
+        self.log("   a) Connexion en tant qu'admin")
+        self.log("   b) Test commande simple: pwd")
+        self.log("   c) Test commande liste: ls -la /app")
+        self.log("   d) Test commande echo: echo 'Test SSH'")
+        self.log("   e) Test avec utilisateur non-admin (doit échouer avec 403)")
+        self.log("2. 📄 GÉNÉRATION PDF BON DE TRAVAIL (HAUTE)")
+        self.log("   a) Lister les bons de travail existants")
+        self.log("   b) Récupérer détails d'un bon")
+        self.log("   c) Créer un bon si nécessaire")
+        self.log("   d) Générer le PDF (HTML)")
+        self.log("   e) Vérifier Content-Type: text/html")
+        self.log("   f) Vérifier présence: COSMEVA, Bon de travail, MTN/008/F")
+        self.log("   g) Vérifier 4 sections: Travaux, Risques, Précautions, Engagement")
+        self.log("3. 📋 CRUD BONS DE TRAVAIL (MOYENNE)")
+        self.log("   a) GET /api/documentations/bons-travail - Liste")
+        self.log("   b) GET /api/documentations/bons-travail/{id} - Détails")
+        self.log("   c) POST /api/documentations/bons-travail - Créer")
         self.log("=" * 80)
         
         results = {
             "admin_login": False,
-            "create_adv_item": False,
-            "create_logistique_item": False,
-            "create_production_item": False,
-            "create_qhse_item": False,
-            "test_presqu_accident_list_with_filters": False,
-            "test_presqu_accident_item_details": False,
-            "test_presqu_accident_item_update": False,
-            "test_presqu_accident_stats": False,
-            "test_presqu_accident_alerts": False,
-            "test_presqu_accident_badge_stats": False,
-            "test_presqu_accident_badge_stats_without_auth": False,
-            "test_presqu_accident_rapport_stats": False,
-            "test_presqu_accident_rapport_stats_without_auth": False,
-            "test_presqu_accident_upload": False,
-            "test_presqu_accident_export_template": False,
-            "test_presqu_accident_delete_item": False,
-            "test_cleanup_presqu_accident_items": False,
+            "ssh_execute_simple": False,
+            "ssh_execute_list": False,
+            "ssh_execute_echo": False,
+            "ssh_execute_non_admin": False,
+            "get_bons_travail_list": False,
+            "get_bon_travail_details": False,
+            "create_bon_travail": False,
+            "generate_bon_pdf": False,
+            "generate_bon_pdf_with_token": False,
+            "cleanup_bons_travail": False,
             "cleanup_remaining": False
         }
         
@@ -1173,58 +1166,40 @@ class SSHAndDocumentationsTester:
             self.log("❌ Cannot proceed with other tests - Admin login failed", "ERROR")
             return results
         
-        # Test 2-5: Create presqu'accident items with different services
-        results["create_adv_item"] = self.test_create_adv_item()
-        results["create_logistique_item"] = self.test_create_logistique_item()
-        results["create_production_item"] = self.test_create_production_item()
-        results["create_qhse_item"] = self.test_create_qhse_item()
+        # PRIORITÉ 1: TERMINAL SSH (CRITIQUE)
+        self.log("\n" + "=" * 60)
+        self.log("🔧 PRIORITÉ 1: TERMINAL SSH (CRITIQUE)")
+        self.log("=" * 60)
         
-        # Test 6: List with filters
-        results["test_presqu_accident_list_with_filters"] = self.test_presqu_accident_list_with_filters()
+        results["ssh_execute_simple"] = self.test_ssh_execute_simple_command()
+        results["ssh_execute_list"] = self.test_ssh_execute_list_command()
+        results["ssh_execute_echo"] = self.test_ssh_execute_echo_command()
+        results["ssh_execute_non_admin"] = self.test_ssh_execute_non_admin_user()
         
-        # Test 7: Item details
-        results["test_presqu_accident_item_details"] = self.test_presqu_accident_item_details()
+        # PRIORITÉ 2: GÉNÉRATION PDF BON DE TRAVAIL (HAUTE)
+        self.log("\n" + "=" * 60)
+        self.log("📄 PRIORITÉ 2: GÉNÉRATION PDF BON DE TRAVAIL (HAUTE)")
+        self.log("=" * 60)
         
-        # Test 8: Update item
-        results["test_presqu_accident_item_update"] = self.test_presqu_accident_item_update()
+        results["get_bons_travail_list"] = self.test_get_bons_travail_list()
+        results["get_bon_travail_details"] = self.test_get_bon_travail_details()
+        results["create_bon_travail"] = self.test_create_bon_travail()
+        results["generate_bon_pdf"] = self.test_generate_bon_pdf()
+        results["generate_bon_pdf_with_token"] = self.test_generate_bon_pdf_with_token()
         
-        # Test 9: Statistics
-        results["test_presqu_accident_stats"] = self.test_presqu_accident_stats()
+        # PRIORITÉ 3: CRUD BONS DE TRAVAIL (MOYENNE) - Déjà testé ci-dessus
+        self.log("\n" + "=" * 60)
+        self.log("📋 PRIORITÉ 3: CRUD BONS DE TRAVAIL (MOYENNE) - DÉJÀ TESTÉ")
+        self.log("=" * 60)
         
-        # Test 10: Alerts
-        results["test_presqu_accident_alerts"] = self.test_presqu_accident_alerts()
-        
-        # Test 11: Badge Stats (CRITIQUE)
-        results["test_presqu_accident_badge_stats"] = self.test_presqu_accident_badge_stats()
-        
-        # Test 12: Badge Stats Security (sans auth)
-        results["test_presqu_accident_badge_stats_without_auth"] = self.test_presqu_accident_badge_stats_without_auth()
-        
-        # Test 13: Rapport Stats (CRITIQUE)
-        results["test_presqu_accident_rapport_stats"] = self.test_presqu_accident_rapport_stats()
-        
-        # Test 14: Rapport Stats Security (sans auth)
-        results["test_presqu_accident_rapport_stats_without_auth"] = self.test_presqu_accident_rapport_stats_without_auth()
-        
-        # Test 15: Upload
-        results["test_presqu_accident_upload"] = self.test_presqu_accident_upload()
-        
-        # Test 16: Export template
-        results["test_presqu_accident_export_template"] = self.test_presqu_accident_export_template()
-        
-        # Test 17: Delete item
-        results["test_presqu_accident_delete_item"] = self.test_presqu_accident_delete_item()
-        
-        # Test 18: Cleanup
-        results["test_cleanup_presqu_accident_items"] = self.test_cleanup_presqu_accident_items()
-        
-        # Test 19: Final cleanup
-        results["cleanup_remaining"] = self.cleanup_remaining_presqu_accident_items()
+        # Cleanup
+        results["cleanup_bons_travail"] = self.test_cleanup_bons_travail()
+        results["cleanup_remaining"] = self.cleanup_remaining_bons_travail()
         
         # Summary
-        self.log("=" * 70)
-        self.log("PRESQU'ACCIDENT (NEAR MISS) TEST RESULTS SUMMARY")
-        self.log("=" * 70)
+        self.log("=" * 80)
+        self.log("SSH TERMINAL & DOCUMENTATIONS TEST RESULTS SUMMARY")
+        self.log("=" * 80)
         
         passed = sum(results.values())
         total = len(results)
@@ -1235,47 +1210,81 @@ class SSHAndDocumentationsTester:
         
         self.log(f"\n📊 Overall: {passed}/{total} tests passed")
         
-        # Detailed analysis for critical tests
-        critical_tests = [
-            "create_adv_item", "create_logistique_item", "create_production_item", "create_qhse_item",
-            "test_presqu_accident_list_with_filters", "test_presqu_accident_item_details", 
-            "test_presqu_accident_item_update", "test_presqu_accident_stats", "test_presqu_accident_alerts",
-            "test_presqu_accident_badge_stats", "test_presqu_accident_badge_stats_without_auth",
-            "test_presqu_accident_rapport_stats", "test_presqu_accident_rapport_stats_without_auth",
-            "test_presqu_accident_upload", "test_presqu_accident_export_template", "test_presqu_accident_delete_item"
-        ]
-        critical_passed = sum(results.get(test, False) for test in critical_tests)
+        # Analyse détaillée par priorité
+        ssh_tests = ["ssh_execute_simple", "ssh_execute_list", "ssh_execute_echo", "ssh_execute_non_admin"]
+        ssh_passed = sum(results.get(test, False) for test in ssh_tests)
         
-        if critical_passed == len(critical_tests):
-            self.log("🎉 CRITICAL SUCCESS: All main presqu'accident endpoints tests passed!")
-            self.log("✅ POST /api/presqu-accident/items works correctly")
-            self.log("✅ GET /api/presqu-accident/items with filters works correctly")
-            self.log("✅ GET /api/presqu-accident/items/{id} works correctly")
-            self.log("✅ PUT /api/presqu-accident/items/{id} works correctly")
-            self.log("✅ DELETE /api/presqu-accident/items/{id} works correctly (admin only)")
-            self.log("✅ POST /api/presqu-accident/items/{id}/upload works correctly")
-            self.log("✅ GET /api/presqu-accident/stats works correctly")
-            self.log("✅ GET /api/presqu-accident/alerts works correctly")
-            self.log("✅ GET /api/presqu-accident/badge-stats works correctly")
-            self.log("✅ GET /api/presqu-accident/badge-stats security works correctly")
-            self.log("✅ GET /api/presqu-accident/rapport-stats works correctly")
-            self.log("✅ GET /api/presqu-accident/rapport-stats security works correctly")
-            self.log("✅ GET /api/presqu-accident/export/template works correctly")
-        else:
-            self.log("🚨 CRITICAL FAILURE: Some main presqu'accident endpoint tests failed!")
-            failed_critical = [test for test in critical_tests if not results.get(test, False)]
-            self.log(f"❌ Failed critical tests: {', '.join(failed_critical)}")
+        pdf_tests = ["get_bons_travail_list", "get_bon_travail_details", "create_bon_travail", "generate_bon_pdf", "generate_bon_pdf_with_token"]
+        pdf_passed = sum(results.get(test, False) for test in pdf_tests)
         
-        if critical_passed == len(critical_tests):
-            self.log("🎉 PRESQU'ACCIDENT (NEAR MISS) ENDPOINTS ARE WORKING CORRECTLY!")
-            self.log("✅ All CRUD operations functional")
-            self.log("✅ Filters and statistics working")
-            self.log("✅ Upload and export features working")
-            self.log("✅ Admin permissions respected")
-            self.log("✅ The Presqu'accident backend is READY FOR PRODUCTION")
+        crud_tests = ["get_bons_travail_list", "get_bon_travail_details", "create_bon_travail"]
+        crud_passed = sum(results.get(test, False) for test in crud_tests)
+        
+        self.log("\n" + "=" * 60)
+        self.log("ANALYSE PAR PRIORITÉ")
+        self.log("=" * 60)
+        
+        # PRIORITÉ 1: SSH Terminal (CRITIQUE)
+        if ssh_passed == len(ssh_tests):
+            self.log("🎉 PRIORITÉ 1 - SSH TERMINAL: ✅ SUCCÈS CRITIQUE")
+            self.log("✅ POST /api/ssh/execute fonctionne correctement")
+            self.log("✅ Commandes simples (pwd) exécutées")
+            self.log("✅ Commandes complexes (ls -la) exécutées")
+            self.log("✅ Commandes echo fonctionnelles")
+            self.log("✅ Sécurité: Accès refusé aux non-admin (403 Forbidden)")
+            self.log("✅ Pas d'erreur 'Response body is already used'")
+            self.log("✅ stdout, stderr, exit_code correctement retournés")
         else:
-            self.log("⚠️ PRESQU'ACCIDENT ISSUES DETECTED")
-            self.log("❌ Some endpoints are not working correctly")
+            self.log("🚨 PRIORITÉ 1 - SSH TERMINAL: ❌ ÉCHEC CRITIQUE")
+            failed_ssh = [test for test in ssh_tests if not results.get(test, False)]
+            self.log(f"❌ Tests SSH échoués: {', '.join(failed_ssh)}")
+        
+        # PRIORITÉ 2: Génération PDF (HAUTE)
+        if pdf_passed == len(pdf_tests):
+            self.log("🎉 PRIORITÉ 2 - GÉNÉRATION PDF: ✅ SUCCÈS HAUTE PRIORITÉ")
+            self.log("✅ GET /api/documentations/bons-travail/{id}/pdf fonctionne")
+            self.log("✅ Response 200 OK")
+            self.log("✅ Content-Type: text/html")
+            self.log("✅ HTML contient 'COSMEVA', 'Bon de travail', 'MTN/008/F'")
+            self.log("✅ Structure complète: Travaux, Risques, Précautions, Engagement")
+            self.log("✅ Authentification Bearer token ET query param ?token=xxx")
+        else:
+            self.log("🚨 PRIORITÉ 2 - GÉNÉRATION PDF: ❌ ÉCHEC HAUTE PRIORITÉ")
+            failed_pdf = [test for test in pdf_tests if not results.get(test, False)]
+            self.log(f"❌ Tests PDF échoués: {', '.join(failed_pdf)}")
+        
+        # PRIORITÉ 3: CRUD Bons de Travail (MOYENNE)
+        if crud_passed == len(crud_tests):
+            self.log("🎉 PRIORITÉ 3 - CRUD BONS DE TRAVAIL: ✅ SUCCÈS MOYENNE PRIORITÉ")
+            self.log("✅ GET /api/documentations/bons-travail - Liste OK")
+            self.log("✅ GET /api/documentations/bons-travail/{id} - Détails OK")
+            self.log("✅ POST /api/documentations/bons-travail - Création OK")
+            self.log("✅ Champs requis: id, titre, entreprise, created_by, created_at")
+            self.log("✅ Format JSON valide")
+        else:
+            self.log("🚨 PRIORITÉ 3 - CRUD BONS DE TRAVAIL: ❌ ÉCHEC MOYENNE PRIORITÉ")
+            failed_crud = [test for test in crud_tests if not results.get(test, False)]
+            self.log(f"❌ Tests CRUD échoués: {', '.join(failed_crud)}")
+        
+        # Conclusion finale
+        self.log("\n" + "=" * 80)
+        self.log("CONCLUSION FINALE")
+        self.log("=" * 80)
+        
+        if ssh_passed == len(ssh_tests) and pdf_passed == len(pdf_tests) and crud_passed == len(crud_tests):
+            self.log("🎉 TOUS LES TESTS CRITIQUES RÉUSSIS!")
+            self.log("✅ Terminal SSH: OPÉRATIONNEL (correction validée)")
+            self.log("✅ Génération PDF: OPÉRATIONNELLE (utilisateur peut générer)")
+            self.log("✅ CRUD Bons de Travail: OPÉRATIONNEL (support des tests)")
+            self.log("✅ Les modules SSH et Documentations sont PRÊTS POUR PRODUCTION")
+        else:
+            self.log("⚠️ PROBLÈMES DÉTECTÉS DANS LES MODULES CRITIQUES")
+            if ssh_passed < len(ssh_tests):
+                self.log("❌ Terminal SSH: PROBLÈMES CRITIQUES")
+            if pdf_passed < len(pdf_tests):
+                self.log("❌ Génération PDF: PROBLÈMES HAUTE PRIORITÉ")
+            if crud_passed < len(crud_tests):
+                self.log("❌ CRUD Bons de Travail: PROBLÈMES MOYENNE PRIORITÉ")
         
         return results
 
