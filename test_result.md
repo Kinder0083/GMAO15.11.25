@@ -4065,18 +4065,48 @@ frontend:
           - Génération de PDF avec prévisualisation
           - Envoi par email via application par défaut
           
+          NOUVELLES FONCTIONNALITÉS AJOUTÉES:
+          1. **Double mode d'affichage**:
+             - Vue en Cartes (mode par défaut)
+             - Vue en Liste avec arborescence dépliable
+             - Boutons de toggle entre les 2 vues (icônes Grid3x3 et List)
+          
+          2. **Arborescence dans la vue Liste**:
+             - Chaque pôle peut être déplié/replié avec chevron
+             - Affichage des documents directement sous le pôle
+             - Icônes de fichiers selon le type (PDF, Excel, Image, Video)
+             - Compteur de documents pour chaque pôle
+          
+          3. **Prévisualisation de documents**:
+             - Bouton "Œil" (Eye) pour prévisualiser sans télécharger
+             - Modal de prévisualisation pour:
+               * PDF (iframe intégré)
+               * Images (affichage direct)
+               * Autres fichiers (option de téléchargement)
+             - Bouton de téléchargement dans le modal
+          
+          4. **Amélioration UX**:
+             - Ouverture des documents en cliquant sur l'icône Eye
+             - Téléchargement avec icône Download
+             - Affichage de la taille des fichiers
+             - Transitions fluides entre les vues
+          
           À TESTER:
-          1. Navigation vers /documentations depuis la sidebar
-          2. Création d'un nouveau pôle de service
-          3. Affichage de la liste des pôles
-          4. Navigation vers les détails d'un pôle
-          5. Upload de documents (DOCX, PDF, XLSX, photos)
-          6. Téléchargement de documents
-          7. Suppression de documents
-          8. Création d'un Bon de Travail
-          9. Génération de PDF
-          10. Envoi par email
-          11. Permissions (view, edit, delete) selon le rôle
+          1. ✅ Navigation vers /documentations depuis la sidebar
+          2. ✅ Création d'un nouveau pôle de service
+          3. ✅ Affichage de la liste des pôles
+          4. **🆕 Toggle entre vue Cartes et vue Liste**
+          5. **🆕 Dépliage/repliage des pôles dans la vue Liste**
+          6. **🆕 Visualisation des documents dans l'arborescence**
+          7. ✅ Navigation vers les détails d'un pôle
+          8. ✅ Upload de documents (DOCX, PDF, XLSX, photos)
+          9. **🆕 Prévisualisation de documents (PDF et images)**
+          10. ✅ Téléchargement de documents
+          11. ✅ Suppression de documents
+          12. ✅ Création d'un Bon de Travail
+          13. ✅ Génération de PDF
+          14. ✅ Envoi par email
+          15. ✅ Permissions (view, edit, delete) selon le rôle
 
   - task: "Plan de Surveillance - Page Rapport avec 3 modes d'affichage"
     implemented: true
