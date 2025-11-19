@@ -35,6 +35,7 @@ import SurveillanceRapport from "./pages/SurveillanceRapport";
 import PresquAccidentList from "./pages/PresquAccidentList";
 import PresquAccidentRapport from "./pages/PresquAccidentRapport";
 import Documentations from "./pages/Documentations";
+import SSHTerminal from "./pages/SSHTerminal";
 import PoleDetails from "./pages/PoleDetails";
 import BonDeTravailForm from "./pages/BonDeTravailForm";
 
