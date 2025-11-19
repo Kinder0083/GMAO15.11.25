@@ -556,6 +556,62 @@ function BonDeTravailForm() {
           </Button>
         </div>
       </form>
+
+      {/* Dialog de sélection d'entreprise */}
+      <Dialog open={showEntrepriseDialog} onOpenChange={setShowEntrepriseDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Sélectionner une entreprise</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Entreprise existante</Label>
+              <Select 
+                value={selectedEntreprise} 
+                onValueChange={setSelectedEntreprise}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Choisir une entreprise..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Non assignée">Non assignée</SelectItem>
+                  {entreprises.map((ent, idx) => (
+                    <SelectItem key={idx} value={ent}>{ent}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <div className="h-px flex-1 bg-gray-300"></div>
+              <span className="text-sm text-gray-500">OU</span>
+              <div className="h-px flex-1 bg-gray-300"></div>
+            </div>
+            
+            <div>
+              <Label>Nouvelle entreprise</Label>
+              <Input
+                value={newEntreprise}
+                onChange={(e) => setNewEntreprise(e.target.value)}
+                placeholder="Nom de la nouvelle entreprise"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowEntrepriseDialog(false)}>
+              Annuler
+            </Button>
+            <Button 
+              onClick={() => {
+                const entrepriseToSave = newEntreprise || selectedEntreprise || 'Non assignée';
+                saveBonTravail(entrepriseToSave);
+              }}
+            >
+              Enregistrer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
