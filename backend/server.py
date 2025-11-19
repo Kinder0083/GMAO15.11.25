@@ -5490,6 +5490,7 @@ api_router.include_router(presqu_accident_router)
 
 # Import documentations routes
 from documentations_routes import router as documentations_router, init_documentations_routes
+from ssh_routes import router as ssh_router
 
 # Initialize documentations routes with database and audit service
 init_documentations_routes(db, audit_service)
