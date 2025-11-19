@@ -440,12 +440,50 @@ async def upload_document_file(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.get("/documents/{document_id}/view")
+async def view_document_file(
+    document_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Visualiser le fichier d'un document dans le navigateur (inline)"""
+    try:
+        doc = await db.documents.find_one({"id": document_id})
+        if not doc:
+            raise HTTPException(status_code=404, detail="Document non trouvé")
+        
+        if not doc.get("fichier_url"):
+            raise HTTPException(status_code=404, detail="Aucun fichier associé")
+        
+        # Le fichier_url commence par /uploads/documents/
+        # Le fichier réel est dans /app/backend/uploads/documents/
+        file_path = Path(f"/app/backend{doc['fichier_url']}")
+        if not file_path.exists():
+            raise HTTPException(status_code=404, detail="Fichier non trouvé sur le serveur")
+        
+        # Lire le fichier
+        with open(file_path, "rb") as f:
+            content = f.read()
+        
+        # Utiliser inline pour permettre la visualisation dans le navigateur
+        return StreamingResponse(
+            BytesIO(content),
+            media_type=doc.get("fichier_type", "application/octet-stream"),
+            headers={
+                "Content-Disposition": f"inline; filename={doc.get('fichier_nom', 'document')}"
+            }
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erreur visualisation fichier: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router.get("/documents/{document_id}/download")
 async def download_document_file(
     document_id: str,
     current_user: dict = Depends(get_current_user)
 ):
-    """Télécharger le fichier d'un document"""
+    """Télécharger le fichier d'un document (force le téléchargement)"""
     try:
         doc = await db.documents.find_one({"id": document_id})
         if not doc:
