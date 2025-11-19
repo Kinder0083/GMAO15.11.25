@@ -641,6 +641,13 @@ const MainLayout = () => {
                   <FileText size={20} />
                   <span className="text-sm font-medium">Journal</span>
                 </button>
+                <button
+                  onClick={() => navigate('/ssh')}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 text-gray-300 transition-all"
+                >
+                  <Terminal size={20} />
+                  <span className="text-sm font-medium">SSH</span>
+                </button>
               </>
             )}
             <button
