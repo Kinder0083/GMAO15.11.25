@@ -20,13 +20,13 @@ BACKEND_URL = "https://mainttracker-1.preview.emergentagent.com/api"
 ADMIN_EMAIL = "admin@gmao-iris.local"
 ADMIN_PASSWORD = "Admin123!"
 
-class SSHAndDocumentationsTester:
+class DocumentationPolesTester:
     def __init__(self):
         self.admin_session = requests.Session()
         self.admin_token = None
         self.admin_data = None
-        self.created_bons = []  # Track created bons de travail for cleanup
-        self.test_bons = {}  # Dictionary to store bon de travail IDs
+        self.poles_data = []  # Store poles data for analysis
+        self.documents_count = {}  # Track document counts per pole
         
     def log(self, message, level="INFO"):
         """Log test messages with timestamp"""
