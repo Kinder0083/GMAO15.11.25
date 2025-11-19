@@ -358,6 +358,112 @@ class SSHAndDocumentationsTester:
             self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
             return False
     
+    def test_generate_bon_pdf(self):
+        """TEST 8: CRITIQUE - Générer le PDF d'un bon de travail"""
+        self.log("🧪 TEST 8: CRITIQUE - GET /api/documentations/bons-travail/{id}/pdf - Génération PDF")
+        
+        # Utiliser le bon créé ou existant
+        bon_id = self.test_bons.get('created') or self.test_bons.get('existing')
+        if not bon_id:
+            self.log("⚠️ Pas de bon de travail disponible pour tester la génération PDF", "WARNING")
+            return False
+        
+        try:
+            response = self.admin_session.get(
+                f"{BACKEND_URL}/documentations/bons-travail/{bon_id}/pdf",
+                timeout=20
+            )
+            
+            if response.status_code == 200:
+                content_type = response.headers.get('content-type', '')
+                content_length = len(response.content)
+                
+                self.log(f"✅ PDF généré avec succès - Type: {content_type}")
+                self.log(f"✅ Taille: {content_length} bytes")
+                
+                # Vérifier que c'est bien du HTML (comme spécifié dans le code)
+                if 'text/html' in content_type:
+                    self.log("✅ Content-Type correct: text/html")
+                    
+                    # Vérifier le contenu HTML
+                    html_content = response.text
+                    
+                    # Vérifications critiques selon les spécifications
+                    checks = {
+                        "COSMEVA": "COSMEVA" in html_content,
+                        "Bon de travail": "Bon de travail" in html_content,
+                        "MTN/008/F": "MTN/008/F" in html_content,
+                        "Travaux à réaliser": "Travaux à réaliser" in html_content,
+                        "Risques Identifiés": "Risques Identifiés" in html_content,
+                        "Précautions à prendre": "Précautions à prendre" in html_content,
+                        "Engagement": "Engagement" in html_content
+                    }
+                    
+                    all_checks_passed = True
+                    for check_name, check_result in checks.items():
+                        if check_result:
+                            self.log(f"✅ Vérification '{check_name}': PRÉSENT")
+                        else:
+                            self.log(f"❌ Vérification '{check_name}': MANQUANT", "ERROR")
+                            all_checks_passed = False
+                    
+                    if all_checks_passed:
+                        self.log("✅ Toutes les sections requises sont présentes dans le PDF")
+                        self.log("✅ Structure complète du document validée")
+                        return True
+                    else:
+                        self.log("❌ Certaines sections requises sont manquantes dans le PDF", "ERROR")
+                        return False
+                        
+                else:
+                    self.log(f"❌ Content-Type incorrect - Attendu: text/html, Reçu: {content_type}", "ERROR")
+                    return False
+                    
+            else:
+                self.log(f"❌ Génération PDF échouée - Status: {response.status_code}", "ERROR")
+                self.log(f"Response: {response.text}", "ERROR")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
+            return False
+    
+    def test_generate_bon_pdf_with_token(self):
+        """TEST 9: Générer le PDF avec token en query param"""
+        self.log("🧪 TEST 9: GET /api/documentations/bons-travail/{id}/pdf?token=xxx - PDF avec token")
+        
+        bon_id = self.test_bons.get('created') or self.test_bons.get('existing')
+        if not bon_id:
+            self.log("⚠️ Pas de bon de travail disponible pour tester la génération PDF avec token", "WARNING")
+            return False
+        
+        try:
+            # Utiliser le token admin en query param
+            response = self.admin_session.get(
+                f"{BACKEND_URL}/documentations/bons-travail/{bon_id}/pdf?token={self.admin_token}",
+                timeout=20
+            )
+            
+            if response.status_code == 200:
+                content_type = response.headers.get('content-type', '')
+                self.log(f"✅ PDF avec token généré avec succès - Type: {content_type}")
+                
+                if 'text/html' in content_type:
+                    self.log("✅ Authentification par token en query param fonctionnelle")
+                    return True
+                else:
+                    self.log(f"❌ Content-Type incorrect avec token", "ERROR")
+                    return False
+                    
+            else:
+                self.log(f"❌ Génération PDF avec token échouée - Status: {response.status_code}", "ERROR")
+                self.log(f"Response: {response.text}", "ERROR")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
+            return False
+    
     def test_presqu_accident_list_with_filters(self):
         """TEST 6: Tester GET /api/presqu-accident/items avec filtres"""
         self.log("🧪 TEST 6: Récupérer la liste des presqu'accidents avec filtres")
