@@ -25,8 +25,8 @@ class SSHAndDocumentationsTester:
         self.admin_session = requests.Session()
         self.admin_token = None
         self.admin_data = None
-        self.created_items = []  # Track created presqu'accident items for cleanup
-        self.test_items = {}  # Dictionary to store presqu'accident item IDs
+        self.created_bons = []  # Track created bons de travail for cleanup
+        self.test_bons = {}  # Dictionary to store bon de travail IDs
         
     def log(self, message, level="INFO"):
         """Log test messages with timestamp"""
