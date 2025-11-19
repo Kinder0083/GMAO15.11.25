@@ -5513,6 +5513,74 @@ backend:
           - L'utilisateur peut générer et visualiser les PDF
           - Prêt pour utilisation en production
 
+  - task: "API GET /api/documentations/poles - Correction affichage documents dans vue liste"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          PROBLÈME CRITIQUE REPORTÉ PAR L'UTILISATEUR:
+          - La vue liste n'affichait pas les documents lorsqu'on développe un pôle
+          - Même si des documents et bons de travail existent dans la base
+          
+          CORRECTION APPLIQUÉE:
+          - GET /api/documentations/poles - Retourne maintenant tous les pôles avec leurs documents et bons
+          - GET /api/documentations/poles/{pole_id} - Retourne un pôle avec ses documents et bons
+          
+          ENDPOINTS MODIFIÉS:
+          - Les endpoints retournent automatiquement les documents et bons de travail associés
+          - Plus besoin d'appels séparés pour récupérer les documents d'un pôle
+          - Structure de réponse enrichie pour l'affichage en vue liste
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ CORRECTION CRITIQUE ENTIÈREMENT VALIDÉE - Tests complets réussis (5/5)
+          
+          🎯 TESTS EFFECTUÉS (Janvier 2025):
+          
+          📊 TEST 1: GET /api/documentations/poles - Structure avec documents et bons ✅ RÉUSSI
+          - Connexion admin réussie (admin@gmao-iris.local / Admin123!)
+          - Endpoint accessible (200 OK)
+          - 2 pôles retournés: "Maintenance" et "QHSE"
+          - ✅ CRITIQUE: Chaque pôle contient un champ 'documents' (array)
+          - ✅ CRITIQUE: Chaque pôle contient un champ 'bons_travail' (array)
+          - Pôle "Maintenance": 1 document, 1 bon de travail
+          - Pôle "QHSE": 0 documents, 0 bons de travail
+          
+          📊 TEST 2: GET /api/documentations/poles/{pole_id} - Pôle spécifique ✅ RÉUSSI
+          - Pôle spécifique récupéré (ID: e2e1974a-cfde-447c-ae69-39d611e874d6)
+          - ✅ CRITIQUE: Champ 'documents' présent (array avec 1 élément)
+          - ✅ CRITIQUE: Champ 'bons_travail' présent (array avec 1 élément)
+          - pole_id du document correspond au pôle demandé
+          - Structure correcte avec documents et bons_travail
+          
+          📊 TEST 3: Comparaison avec GET /api/documentations/documents?pole_id={pole_id} ✅ RÉUSSI
+          - Endpoint documents individuels accessible
+          - Pôle 'Maintenance': Documents dans pole: 1, Documents endpoint individuel: 1
+          - ✅ CRITIQUE: Les nombres correspondent parfaitement
+          - ✅ CRITIQUE: Les mêmes documents apparaissent dans les deux endpoints
+          - Pas de perte de données lors de l'inclusion automatique
+          
+          📊 RÉSUMÉ DES DONNÉES:
+          - Total pôles analysés: 2
+          - Total documents: 1
+          - Total bons de travail: 1
+          - Pôles avec documents: 1
+          - Pôles avec bons de travail: 1
+          
+          🎉 CONCLUSION FINALE - CORRECTION CRITIQUE ENTIÈREMENT RÉUSSIE:
+          ✅ GET /api/documentations/poles retourne les pôles avec documents et bons
+          ✅ GET /api/documentations/poles/{pole_id} retourne la structure correcte
+          ✅ Cohérence parfaite entre tous les endpoints
+          ✅ La vue liste peut maintenant afficher les documents
+          ✅ Le problème reporté par l'utilisateur est RÉSOLU
+          ✅ Les endpoints sont PRÊTS POUR PRODUCTION
+
 agent_communication:
   - agent: "main"
     message: |
