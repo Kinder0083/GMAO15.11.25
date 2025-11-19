@@ -525,7 +525,24 @@ class SSHAndDocumentationsTester:
         
         self.log(f"Nettoyage terminé: {success_count} bons de travail supprimés")
         return True
-        """TEST 8: Tester PUT /api/presqu-accident/items/{item_id}"""
+
+if __name__ == "__main__":
+    tester = SSHAndDocumentationsTester()
+    results = tester.run_ssh_and_documentations_tests()
+    
+    # Exit with appropriate code
+    critical_tests = [
+        "admin_login", "ssh_execute_simple", "ssh_execute_list", "ssh_execute_echo", 
+        "ssh_execute_non_admin", "get_bons_travail_list", "get_bon_travail_details", 
+        "create_bon_travail", "generate_bon_pdf", "generate_bon_pdf_with_token"
+    ]
+    
+    critical_passed = sum(results.get(test, False) for test in critical_tests)
+    
+    if critical_passed == len(critical_tests):
+        exit(0)  # Success
+    else:
+        exit(1)  # Failure
         self.log("🧪 TEST 8: Mettre à jour un presqu'accident")
         
         if not self.created_items:
