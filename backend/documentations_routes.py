@@ -692,7 +692,10 @@ async def generate_bon_pdf(
         if not bon:
             raise HTTPException(status_code=404, detail="Bon de travail non trouvé")
         
-        # Générer HTML pour impression avec le format du template officiel
+        # Date formatée
+        date_created = bon.get('created_at', '')[:10] if bon.get('created_at') else ''
+        
+        # Générer HTML EXACTEMENT comme le template Word
         html_content = f"""
         <!DOCTYPE html>
         <html>
@@ -702,180 +705,165 @@ async def generate_bon_pdf(
             <style>
                 @page {{
                     size: A4;
-                    margin: 15mm;
+                    margin: 20mm 15mm;
                 }}
                 body {{
                     font-family: 'Calibri', 'Arial', sans-serif;
                     margin: 0;
                     padding: 0;
                     font-size: 11pt;
-                    line-height: 1.4;
+                    line-height: 1.3;
                     color: #000;
                 }}
-                /* EN-TÊTE OFFICIEL */
-                .document-header {{
-                    border-bottom: 3px solid #003366;
-                    padding-bottom: 10px;
-                    margin-bottom: 20px;
+                /* EN-TÊTE EXACT DU TEMPLATE WORD */
+                .header-table {{
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-bottom: 5px;
                 }}
-                .header-top {{
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    margin-bottom: 10px;
+                .header-table td {{
+                    border: 2px solid #000;
+                    padding: 5px 8px;
+                    vertical-align: middle;
                 }}
-                .logo-section {{
-                    flex: 1;
-                }}
-                .title-section {{
-                    flex: 2;
-                    text-align: center;
-                }}
-                .doc-title {{
-                    font-size: 20pt;
+                .header-cell-logo {{
+                    width: 25%;
                     font-weight: bold;
-                    color: #003366;
-                    text-transform: uppercase;
-                    margin: 0;
+                    font-size: 14pt;
                 }}
-                .doc-ref {{
+                .header-cell-title {{
+                    width: 50%;
+                    text-align: center;
+                    font-weight: bold;
+                    font-size: 12pt;
+                }}
+                .header-cell-ref {{
+                    width: 25%;
                     font-size: 9pt;
-                    color: #666;
-                    margin-top: 5px;
                 }}
-                .intro-box {{
-                    background-color: #f0f4f8;
-                    border: 1px solid #003366;
-                    padding: 10px;
-                    margin: 15px 0;
+                /* CONTENU */
+                p {{
+                    margin: 8px 0;
+                    text-align: justify;
+                }}
+                .intro {{
                     font-size: 10pt;
-                }}
-                .intro-text {{
-                    margin: 5px 0;
-                    line-height: 1.5;
-                }}
-                .validity-note {{
-                    font-style: italic;
-                    margin-top: 8px;
-                    color: #003366;
-                }}
-                /* SECTIONS */
-                .section {{
-                    margin-bottom: 25px;
-                    page-break-inside: avoid;
+                    margin-bottom: 15px;
                 }}
                 .section-title {{
-                    background-color: #003366;
-                    color: white;
-                    padding: 8px 12px;
-                    font-size: 12pt;
                     font-weight: bold;
-                    margin-bottom: 12px;
+                    font-size: 11pt;
+                    margin-top: 15px;
+                    margin-bottom: 8px;
+                    text-decoration: underline;
                 }}
                 .subsection-title {{
                     font-weight: bold;
-                    font-size: 10.5pt;
-                    margin: 12px 0 6px 0;
-                    color: #003366;
+                    font-size: 10pt;
+                    margin-top: 10px;
+                    margin-bottom: 5px;
                 }}
-                /* TABLEAUX */
-                table {{
+                /* TABLEAUX DE CONTENU */
+                .content-table {{
                     width: 100%;
                     border-collapse: collapse;
-                    margin-bottom: 10px;
+                    margin: 10px 0;
                 }}
-                td, th {{
-                    border: 1px solid #003366;
+                .content-table td {{
+                    border: 1px solid #000;
                     padding: 8px;
                     vertical-align: top;
                 }}
-                th {{
-                    background-color: #e6f0ff;
+                .content-table .label-cell {{
                     font-weight: bold;
-                    text-align: left;
+                    width: 35%;
+                    background-color: #f0f0f0;
                 }}
-                /* CHECKBOXES ET LISTES */
-                .checkbox-item {{
-                    display: block;
-                    padding: 3px 0;
+                /* CHECKBOXES */
+                .checkbox-line {{
+                    margin: 3px 0;
+                    padding-left: 5px;
                 }}
                 .checkbox {{
                     display: inline-block;
-                    width: 14px;
-                    height: 14px;
-                    border: 2px solid #003366;
-                    margin-right: 8px;
+                    width: 12px;
+                    height: 12px;
+                    border: 1px solid #000;
+                    margin-right: 6px;
                     vertical-align: middle;
+                    position: relative;
                 }}
                 .checkbox.checked {{
-                    background-color: #003366;
-                    position: relative;
+                    background-color: #000;
                 }}
                 .checkbox.checked::after {{
                     content: '✓';
                     color: white;
                     position: absolute;
-                    top: -3px;
-                    left: 2px;
-                    font-size: 12px;
+                    top: -4px;
+                    left: 1px;
+                    font-size: 11px;
                     font-weight: bold;
                 }}
-                /* FOOTER */
-                .footer {{
-                    margin-top: 30px;
-                    padding-top: 10px;
-                    border-top: 2px solid #003366;
-                    font-size: 9pt;
+                /* TABLEAU SIGNATURES */
+                .signature-table {{
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 20px;
                 }}
-                .signature-box {{
-                    display: inline-block;
-                    width: 45%;
-                    border: 1px solid #003366;
+                .signature-table td {{
+                    border: 1px solid #000;
                     padding: 10px;
-                    margin: 10px 2% 10px 0;
-                    min-height: 80px;
+                    height: 80px;
                     vertical-align: top;
+                }}
+                .signature-table .sig-header {{
+                    font-weight: bold;
+                    background-color: #e0e0e0;
+                }}
+                .footer-note {{
+                    font-size: 9pt;
+                    margin-top: 15px;
+                    font-weight: bold;
                 }}
                 @media print {{
                     body {{ margin: 0; }}
-                    .no-print {{ display: none; }}
                 }}
             </style>
         </head>
         <body>
-            <!-- EN-TÊTE OFFICIEL DU DOCUMENT -->
-            <div class="document-header">
-                <div class="header-top">
-                    <div class="logo-section">
-                        <!-- Espace pour logo si nécessaire -->
-                    </div>
-                    <div class="title-section">
-                        <h1 class="doc-title">Bon de Travail</h1>
-                        <div class="doc-ref">MAINT_FE_004_V02</div>
-                    </div>
-                    <div class="logo-section" style="text-align: right;">
-                        <div style="font-size: 9pt;">
-                            Entreprise: <strong>{bon.get('entreprise', 'Non assignée')}</strong><br>
-                            Date: <strong>{bon.get('created_at', '')[:10] if bon.get('created_at') else 'N/A'}</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <!-- EN-TÊTE EXACT COMME LE TEMPLATE WORD -->
+            <table class="header-table">
+                <tr>
+                    <td class="header-cell-logo" rowspan="2">
+                        <div style="font-size: 16pt; font-weight: bold;">COSMEVA</div>
+                    </td>
+                    <td class="header-cell-title" rowspan="2">
+                        <div style="font-size: 11pt;">FORMULAIRE</div>
+                        <div style="font-size: 13pt; font-weight: bold; margin-top: 3px;">Bon de travail</div>
+                    </td>
+                    <td class="header-cell-ref">
+                        <strong>Date :</strong> {date_created}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="header-cell-ref">
+                        <strong>MTN/008/F</strong><br>
+                        Version 2
+                    </td>
+                </tr>
+            </table>
 
             <!-- INTRODUCTION -->
-            <div class="intro-box">
-                <div class="intro-text">
-                    <strong>Le bon de travail</strong> permet d'identifier les risques liés aux travaux spécifiés ci-dessous 
-                    ainsi que les précautions à prendre pour éviter tout accident, dégât matériel ou atteinte à l'environnement.
-                </div>
-                <div class="intro-text">
-                    Ce bon de travail tient lieu de <strong>plan de prévention</strong>.
-                </div>
-                <div class="validity-note">
-                    Sauf contre-indication particulière (ou modification des conditions d'intervention), le bon de travail 
-                    est valable pour toute la durée du chantier (dans la limite de 24 heures).
-                </div>
-            </div>
+            <p class="intro">
+                Le bon de travail, permet d'identifier les risques liés aux travaux spécifiés ci-dessous ainsi que 
+                les précautions à prendre pour éviter tout accident, dégât matériel ou atteinte à l'environnement. 
+                <strong>Ce bon de travail tient lieu de plan de prévention</strong>.
+            </p>
+            <p class="intro" style="font-style: italic;">
+                Sauf contre-indication particulière (ou modification des conditions d'intervention), le bon de travail 
+                est valable pour toute la durée du chantier (dans la limite de 24 heures).
+            </p>
 
             <!-- SECTION 1: TRAVAUX À RÉALISER -->
             <div class="section">
