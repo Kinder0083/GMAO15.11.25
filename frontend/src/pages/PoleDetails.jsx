@@ -36,6 +36,7 @@ function PoleDetails() {
 
   const [pole, setPole] = useState(null);
   const [documents, setDocuments] = useState([]);
+  const [bonsTravail, setBonsTravail] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openDocForm, setOpenDocForm] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState(null);
