@@ -1304,17 +1304,14 @@ if __name__ == "__main__":
         return results
 
 if __name__ == "__main__":
-    tester = PresquAccidentTester()
-    results = tester.run_presqu_accident_tests()
+    tester = SSHAndDocumentationsTester()
+    results = tester.run_ssh_and_documentations_tests()
     
-    # Exit with appropriate code - allow cleanup to fail
+    # Exit with appropriate code
     critical_tests = [
-        "admin_login", "create_adv_item", "create_logistique_item", "create_production_item", 
-        "create_qhse_item", "test_presqu_accident_list_with_filters", "test_presqu_accident_item_details", 
-        "test_presqu_accident_item_update", "test_presqu_accident_stats", "test_presqu_accident_alerts",
-        "test_presqu_accident_badge_stats", "test_presqu_accident_badge_stats_without_auth",
-        "test_presqu_accident_rapport_stats", "test_presqu_accident_rapport_stats_without_auth",
-        "test_presqu_accident_upload", "test_presqu_accident_export_template", "test_presqu_accident_delete_item"
+        "admin_login", "ssh_execute_simple", "ssh_execute_list", "ssh_execute_echo", 
+        "ssh_execute_non_admin", "get_bons_travail_list", "get_bon_travail_details", 
+        "create_bon_travail", "generate_bon_pdf", "generate_bon_pdf_with_token"
     ]
     
     critical_passed = sum(results.get(test, False) for test in critical_tests)
