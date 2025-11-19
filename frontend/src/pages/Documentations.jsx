@@ -568,13 +568,13 @@ function Documentations() {
               <>
                 {previewDocument.type_fichier?.includes('pdf') ? (
                   <iframe
-                    src={`${getBackendURL()}${previewDocument.fichier_url}`}
+                    src={`${getBackendURL()}/api/documentations/documents/${previewDocument.id}/view`}
                     className="w-full h-full border-0"
                     title="PDF Preview"
                   />
                 ) : previewDocument.type_fichier?.includes('image') ? (
                   <img
-                    src={`${getBackendURL()}${previewDocument.fichier_url}`}
+                    src={`${getBackendURL()}/api/documentations/documents/${previewDocument.id}/view`}
                     alt={previewDocument.nom_fichier}
                     className="max-w-full h-auto mx-auto"
                   />
@@ -586,11 +586,11 @@ function Documentations() {
                     </p>
                     <Button
                       onClick={() => {
-                        window.open(`${getBackendURL()}${previewDocument.fichier_url}`, '_blank');
+                        window.open(`${getBackendURL()}/api/documentations/documents/${previewDocument.id}/view`, '_blank');
                       }}
                     >
-                      <Download className="mr-2 h-4 w-4" />
-                      Télécharger le document
+                      <Eye className="mr-2 h-4 w-4" />
+                      Ouvrir dans un nouvel onglet
                     </Button>
                   </div>
                 )}
@@ -601,7 +601,7 @@ function Documentations() {
             <Button
               variant="outline"
               onClick={() => {
-                window.open(`${getBackendURL()}${previewDocument?.fichier_url}`, '_blank');
+                window.open(`${getBackendURL()}/api/documentations/documents/${previewDocument?.id}/download`, '_blank');
               }}
             >
               <Download className="mr-2 h-4 w-4" />
