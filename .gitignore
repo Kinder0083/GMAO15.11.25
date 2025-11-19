@@ -345,3 +345,7 @@ backend/.env.backup.*
 # Commiter uniquement les .env.example
 .env.production
 .env.local
+-e 
+# Environment files
+*.env
+*.env.*
