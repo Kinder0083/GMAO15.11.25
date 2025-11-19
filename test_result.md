@@ -5177,11 +5177,11 @@ frontend:
 frontend:
   - task: "Terminal SSH - Test correction erreur Response body already used"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/pages/SSHTerminal.jsx"
     stuck_count: 0
     priority: "critical"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -5202,6 +5202,28 @@ frontend:
           2. Exécution de commandes: pwd, ls, echo 'Test SSH'
           3. Vérifier absence d'erreur "Response body is already used"
           4. Vérifier affichage correct des résultats
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ TERMINAL SSH CORRECTION ENTIÈREMENT VALIDÉE - Tests critiques réussis (Décembre 2025)
+          
+          🎯 TESTS EFFECTUÉS:
+          1. ✅ Connexion admin réussie (admin@gmao-iris.local / Admin123!)
+          2. ✅ Navigation vers /ssh: SUCCESS
+          3. ✅ Bouton 'Connecter' trouvé et fonctionnel
+          4. ✅ Terminal connecté - Messages de connexion affichés
+          5. ✅ Commande 'pwd' exécutée SANS erreur - Résultat: /app
+          6. ✅ Commande 'echo "Test SSH GMAO Iris"' exécutée avec succès
+          
+          🔧 CORRECTION CRITIQUE VALIDÉE:
+          - ✅ AUCUNE erreur "Failed to execute 'clone' on 'Response': Response body is already used"
+          - ✅ Toutes les commandes s'exécutent correctement
+          - ✅ Résultats affichés dans le terminal sans problème
+          - ✅ Interface terminal responsive et fonctionnelle
+          
+          🎉 CONCLUSION: La correction SSH est ENTIÈREMENT RÉUSSIE
+          Le remplacement de fetch() par api.post() a résolu le problème critique.
+          Le terminal SSH fonctionne parfaitement sans erreurs.
 
   - task: "Module Documentations - Visualisation Bon de Travail"
     implemented: true
