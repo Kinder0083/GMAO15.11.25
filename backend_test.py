@@ -63,17 +63,17 @@ class SurveillanceCustomCategoryTester:
             return False
     
     def test_create_custom_category_item(self):
-        """TEST 1: Créer un contrôle avec une nouvelle catégorie personnalisée"""
-        self.log("🧪 TEST 1: Créer un contrôle avec une nouvelle catégorie personnalisée")
+        """TEST 1: Créer un contrôle avec TOUS les champs requis et nouvelle catégorie"""
+        self.log("🧪 TEST 1: Créer un contrôle avec TOUS les champs requis et nouvelle catégorie")
         
         test_item_data = {
-            "classe_type": "Test Catégorie Personnalisée",
-            "category": "MA_NOUVELLE_CATEGORIE",
-            "batiment": "TEST BATIMENT",
+            "classe_type": "Test Frontend Categorie",
+            "category": "TEST_CATEGORIE_NOUVELLE",
+            "batiment": "BATIMENT TEST",
             "periodicite": "1 mois",
             "responsable": "MAINT",
-            "executant": "Test Executant",
-            "description": "Test création avec catégorie dynamique"
+            "executant": "Executant Test",
+            "description": "Test depuis frontend"
         }
         
         try:
