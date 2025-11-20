@@ -288,7 +288,7 @@ class SurveillanceTester:
         
         test_item_data = {
             "classe_type": "Test Statut PLANIFIER",
-            "category": "TEST",
+            "category": "AUTRE",
             "batiment": "TEST",
             "periodicite": "6 mois",
             "responsable": "MAINT",
