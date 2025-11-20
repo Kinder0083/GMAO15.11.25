@@ -359,23 +359,41 @@ function Documentations() {
             ) : (
               <div className="divide-y">
                 {filteredPoles.map((pole) => {
-                  const isExpanded = expandedPoles.has(pole.id);
+                  const isBonsExpanded = expandedBonsPoles.has(pole.id);
+                  const isDocsExpanded = expandedDocsPoles.has(pole.id);
                   const Icon = getFileIcon();
                   
                   return (
                     <div key={pole.id}>
                       {/* Pôle Header */}
                       <div className="flex items-center gap-3 p-4 hover:bg-gray-50 transition-colors">
-                        <button
-                          onClick={() => togglePoleExpansion(pole.id)}
-                          className="p-1 hover:bg-gray-200 rounded"
-                        >
-                          {isExpanded ? (
-                            <ChevronDown className="h-5 w-5" />
-                          ) : (
-                            <ChevronRight className="h-5 w-5" />
-                          )}
-                        </button>
+                        {/* Chevrons d'expansion */}
+                        <div className="flex flex-col gap-1">
+                          {/* Chevron pour Bons de travail */}
+                          <button
+                            onClick={() => toggleBonsExpansion(pole.id)}
+                            className="p-1 hover:bg-blue-100 rounded"
+                            title="Bons de travail"
+                          >
+                            {isBonsExpanded ? (
+                              <ChevronDown className="h-4 w-4 text-blue-600" />
+                            ) : (
+                              <ChevronRight className="h-4 w-4 text-blue-600" />
+                            )}
+                          </button>
+                          {/* Chevron pour Documents */}
+                          <button
+                            onClick={() => toggleDocsExpansion(pole.id)}
+                            className="p-1 hover:bg-green-100 rounded"
+                            title="Documents"
+                          >
+                            {isDocsExpanded ? (
+                              <ChevronDown className="h-4 w-4 text-green-600" />
+                            ) : (
+                              <ChevronRight className="h-4 w-4 text-green-600" />
+                            )}
+                          </button>
+                        </div>
                         
                         <div
                           className="w-10 h-10 rounded-lg flex items-center justify-center text-xl flex-shrink-0"
@@ -404,10 +422,17 @@ function Documentations() {
                           )}
                         </div>
 
-                        <div className="flex gap-2">
-                          <span className="text-sm text-gray-500">
-                            {pole.documents?.length || 0} doc(s)
-                          </span>
+                        <div className="flex gap-3 items-center">
+                          <div className="flex flex-col gap-1 text-xs text-gray-500">
+                            <span className="flex items-center gap-1">
+                              <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                              {pole.bons_travail?.length || 0} bon(s)
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                              {pole.documents?.length || 0} doc(s)
+                            </span>
+                          </div>
                           <Button
                             variant="ghost"
                             size="sm"
@@ -431,22 +456,69 @@ function Documentations() {
                         </div>
                       </div>
 
+                      {/* Bons de travail List (expanded) */}
+                      {isBonsExpanded && (
+                        <div className="bg-blue-50 border-t border-blue-200">
+                          <div className="px-4 py-2 bg-blue-100">
+                            <p className="text-xs font-semibold text-blue-800">📋 BONS DE TRAVAIL</p>
+                          </div>
+                          {pole.bons_travail && pole.bons_travail.length > 0 ? (
+                            <div className="divide-y divide-blue-200">
+                              {pole.bons_travail.map((bon) => (
+                                <div
+                                  key={bon.id}
+                                  className="flex items-center gap-3 p-3 pl-16 hover:bg-blue-100 transition-colors"
+                                >
+                                  <FileText className="h-5 w-5 text-blue-600 flex-shrink-0" />
+                                  <div className="flex-1 min-w-0">
+                                    <p className="font-medium text-sm truncate">
+                                      {bon.titre || 'Bon de travail'}
+                                    </p>
+                                    <p className="text-xs text-gray-600">
+                                      {bon.entreprise && `${bon.entreprise} • `}
+                                      {new Date(bon.created_at).toLocaleDateString()}
+                                    </p>
+                                  </div>
+                                  <div className="flex gap-2">
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => navigate(`/documentations/bons-travail/${bon.id}`)}
+                                      title="Voir le bon"
+                                    >
+                                      <Eye className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="p-4 pl-16 text-sm text-gray-500">
+                              Aucun bon de travail dans ce pôle
+                            </div>
+                          )}
+                        </div>
+                      )}
+
                       {/* Documents List (expanded) */}
-                      {isExpanded && (
-                        <div className="bg-gray-50 border-t">
+                      {isDocsExpanded && (
+                        <div className="bg-green-50 border-t border-green-200">
+                          <div className="px-4 py-2 bg-green-100">
+                            <p className="text-xs font-semibold text-green-800">📄 DOCUMENTS</p>
+                          </div>
                           {pole.documents && pole.documents.length > 0 ? (
-                            <div className="divide-y divide-gray-200">
+                            <div className="divide-y divide-green-200">
                               {pole.documents.map((doc) => {
                                 const DocIcon = getFileIcon(doc.type_fichier);
                                 return (
                                   <div
                                     key={doc.id}
-                                    className="flex items-center gap-3 p-3 pl-16 hover:bg-gray-100 transition-colors"
+                                    className="flex items-center gap-3 p-3 pl-16 hover:bg-green-100 transition-colors"
                                   >
-                                    <DocIcon className="h-5 w-5 text-blue-500 flex-shrink-0" />
+                                    <DocIcon className="h-5 w-5 text-green-600 flex-shrink-0" />
                                     <div className="flex-1 min-w-0">
                                       <p className="font-medium text-sm truncate">{doc.nom_fichier}</p>
-                                      <p className="text-xs text-gray-500">
+                                      <p className="text-xs text-gray-600">
                                         {(doc.taille / 1024).toFixed(2)} KB
                                       </p>
                                     </div>
