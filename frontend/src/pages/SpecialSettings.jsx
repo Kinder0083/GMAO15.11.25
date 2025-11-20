@@ -48,6 +48,12 @@ const SpecialSettings = () => {
   const [testEmail, setTestEmail] = useState('');
   const [showSmtpPassword, setShowSmtpPassword] = useState(false);
   
+  // États Tailscale
+  const [tailscaleIP, setTailscaleIP] = useState('');
+  const [loadingTailscale, setLoadingTailscale] = useState(true);
+  const [savingTailscale, setSavingTailscale] = useState(false);
+  const [tailscaleStatus, setTailscaleStatus] = useState(null);
+  
   const { toast } = useToast();
 
   useEffect(() => {
