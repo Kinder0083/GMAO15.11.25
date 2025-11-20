@@ -176,7 +176,13 @@ function ListViewGrouped({ items, loading, onEdit, onDelete, onRefresh }) {
                     <TableCell>{item.periodicite}</TableCell>
                     <TableCell>{item.responsable}</TableCell>
                     <TableCell>
-                      {item.prochain_controle ? new Date(item.prochain_controle).toLocaleDateString('fr-FR') : '-'}
+                      <button
+                        onClick={() => setHistoryDialog({ open: true, control: item })}
+                        className="text-blue-600 hover:underline cursor-pointer"
+                        title="Voir l'historique"
+                      >
+                        {item.prochain_controle ? new Date(item.prochain_controle).toLocaleDateString('fr-FR') : '-'}
+                      </button>
                     </TableCell>
                     <TableCell>
                       <Badge className={getStatusColor(item.status)}>{getStatusLabel(item.status)}</Badge>
