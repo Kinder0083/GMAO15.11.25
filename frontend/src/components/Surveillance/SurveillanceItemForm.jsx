@@ -42,7 +42,35 @@ function SurveillanceItemForm({ open, item, onClose }) {
         derniere_visite: item.derniere_visite ? item.derniere_visite.split('T')[0] : '',
         prochain_controle: item.prochain_controle ? item.prochain_controle.split('T')[0] : '',
         commentaire: item.commentaire || '',
-        duree_rappel_echeance: item.duree_rappel_echeance || 30
+        duree_rappel_echeance: item.duree_rappel_echeance || 30,
+        // Champs booléens pour les mois
+        janvier: item.janvier || false,
+        fevrier: item.fevrier || false,
+        mars: item.mars || false,
+        avril: item.avril || false,
+        mai: item.mai || false,
+        juin: item.juin || false,
+        juillet: item.juillet || false,
+        aout: item.aout || false,
+        septembre: item.septembre || false,
+        octobre: item.octobre || false,
+        novembre: item.novembre || false,
+        decembre: item.decembre || false
+      });
+    } else {
+      // Reset pour création
+      setFormData({
+        classe_type: '',
+        category: '',
+        batiment: '',
+        periodicite: '',
+        responsable: '',
+        executant: '',
+        description: '',
+        derniere_visite: '',
+        prochain_controle: '',
+        commentaire: '',
+        duree_rappel_echeance: 30
       });
     }
   }, [item, open]);
