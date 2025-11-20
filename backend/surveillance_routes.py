@@ -182,7 +182,10 @@ async def update_surveillance_item(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Erreur mise à jour item {item_id}: {str(e)}")
+        logger.error(f"❌ Erreur mise à jour item {item_id}: {str(e)}")
+        logger.error(f"❌ Type erreur: {type(e).__name__}")
+        import traceback
+        logger.error(f"❌ Traceback: {traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
