@@ -534,13 +534,13 @@ class SurveillanceTester:
         return results
 
 if __name__ == "__main__":
-    tester = DocumentationPolesTester()
-    results = tester.run_documentation_poles_tests()
+    tester = SurveillanceTester()
+    results = tester.run_surveillance_tests()
     
     # Exit with appropriate code
     critical_tests = [
-        "admin_login", "get_poles_with_documents", "get_pole_by_id", 
-        "compare_with_documents_endpoint"
+        "admin_login", "check_due_dates_with_overdue_item", "verify_status_change", 
+        "authentication_required"
     ]
     
     critical_passed = sum(results.get(test, False) for test in critical_tests)
