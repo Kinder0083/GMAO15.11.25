@@ -296,6 +296,47 @@ const SpecialSettings = () => {
     });
   };
 
+  const handleRestoreTailscaleConfig = () => {
+    confirm({
+      title: 'Restaurer la configuration précédente',
+      description: 'Êtes-vous sûr de vouloir restaurer la configuration IP précédente ?\n\n⚠️ Cette action va :\n\n- Restaurer l\'ancien fichier .env\n- Recompiler l\'application (1-2 minutes)\n- Redémarrer les services\n\nUtilisez cette fonction si vous rencontrez des problèmes après un changement d\'IP.',
+      confirmText: 'Restaurer',
+      cancelText: 'Annuler',
+      variant: 'default',
+      onConfirm: async () => {
+        try {
+          setRestoringTailscale(true);
+          const response = await api.post('/tailscale/restore');
+          
+          if (response.data.success) {
+            toast({
+              title: 'Configuration restaurée',
+              description: 'La configuration précédente a été restaurée. Rechargement de la page dans 3 secondes...',
+            });
+            
+            setTimeout(() => {
+              window.location.reload();
+            }, 3000);
+          } else {
+            toast({
+              title: 'Erreur',
+              description: response.data.message || 'La restauration a échoué',
+              variant: 'destructive'
+            });
+          }
+        } catch (error) {
+          toast({
+            title: 'Erreur',
+            description: formatErrorMessage(error, 'Impossible de restaurer la configuration'),
+            variant: 'destructive'
+          });
+        } finally {
+          setRestoringTailscale(false);
+        }
+      }
+    });
+  };
+
   const handleResetPassword = async (userId, userName) => {
     confirm({
       title: 'Réinitialiser le mot de passe',
