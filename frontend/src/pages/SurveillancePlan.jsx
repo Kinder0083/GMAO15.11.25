@@ -73,6 +73,16 @@ function SurveillancePlan() {
     setFilteredItems(filtered);
   };
 
+  const extractCategories = () => {
+    // Extraire toutes les catégories uniques des items
+    const uniqueCategories = [...new Set(items.map(item => item.category))].filter(Boolean).sort();
+    setCategories(uniqueCategories);
+  };
+
+  const handleCategoryOrderChanged = (newOrder) => {
+    setCategoryOrderChanged(!categoryOrderChanged);
+  };
+
   const handleCreate = () => {
     setSelectedItem(null);
     setOpenForm(true);
