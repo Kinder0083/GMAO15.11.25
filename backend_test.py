@@ -279,38 +279,134 @@ class SurveillanceTester:
             self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
             return False
     
-    def run_documentation_poles_tests(self):
-        """Run comprehensive tests for Documentation Poles endpoints - CRITICAL FIX VERIFICATION"""
+    def test_different_status_items(self):
+        """TEST 5: Vérifier que seuls les items REALISE sont traités"""
+        self.log("🧪 TEST 5: Items avec différents statuts - seuls REALISE doivent être traités")
+        
+        # Créer un item avec statut PLANIFIER (ne doit pas être modifié)
+        past_date = (datetime.now() - timedelta(days=5)).strftime("%Y-%m-%d")
+        
+        test_item_data = {
+            "classe_type": "Test Statut PLANIFIER",
+            "category": "TEST",
+            "batiment": "TEST",
+            "periodicite": "6 mois",
+            "responsable": "MAINT",
+            "executant": "TEST",
+            "status": "PLANIFIER",  # Déjà PLANIFIER
+            "prochain_controle": past_date,
+            "duree_rappel_echeance": 30
+        }
+        
+        try:
+            response = self.admin_session.post(
+                f"{BACKEND_URL}/surveillance/items",
+                json=test_item_data,
+                timeout=15
+            )
+            
+            if response.status_code in [200, 201]:
+                data = response.json()
+                item_id = data.get('id')
+                self.test_items.append(item_id)
+                self.log(f"✅ Item PLANIFIER créé - ID: {item_id}")
+                
+                # Appeler check-due-dates
+                check_response = self.admin_session.post(
+                    f"{BACKEND_URL}/surveillance/check-due-dates",
+                    timeout=15
+                )
+                
+                if check_response.status_code == 200:
+                    # Vérifier que l'item reste PLANIFIER
+                    get_response = self.admin_session.get(
+                        f"{BACKEND_URL}/surveillance/items/{item_id}",
+                        timeout=15
+                    )
+                    
+                    if get_response.status_code == 200:
+                        updated_item = get_response.json()
+                        
+                        if updated_item.get('status') == 'PLANIFIER':
+                            self.log("✅ SUCCÈS: Item PLANIFIER reste inchangé")
+                            return True
+                        else:
+                            self.log(f"❌ ÉCHEC: Item PLANIFIER modifié - Statut: {updated_item.get('status')}", "ERROR")
+                            return False
+                    else:
+                        self.log("❌ Impossible de récupérer l'item", "ERROR")
+                        return False
+                else:
+                    self.log("❌ Échec de l'appel check-due-dates", "ERROR")
+                    return False
+            else:
+                self.log(f"❌ Création échouée - Status: {response.status_code}", "ERROR")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
+            return False
+
+    def test_authentication_required(self):
+        """TEST 6: Vérifier que l'authentification est requise"""
+        self.log("🧪 TEST 6: Test authentification requise")
+        
+        try:
+            # Créer une session sans token
+            no_auth_session = requests.Session()
+            
+            response = no_auth_session.post(
+                f"{BACKEND_URL}/surveillance/check-due-dates",
+                timeout=15
+            )
+            
+            if response.status_code == 403:
+                self.log("✅ SUCCÈS: Authentification requise (403 Forbidden)")
+                return True
+            else:
+                self.log(f"❌ ÉCHEC: Endpoint accessible sans authentification - Status: {response.status_code}", "ERROR")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
+            return False
+
+    def cleanup_test_items(self):
+        """Nettoyer les items de test créés"""
+        self.log("🧹 Nettoyage des items de test...")
+        
+        for item_id in self.test_items:
+            try:
+                response = self.admin_session.delete(
+                    f"{BACKEND_URL}/surveillance/items/{item_id}",
+                    timeout=10
+                )
+                if response.status_code == 200:
+                    self.log(f"✅ Item {item_id} supprimé")
+                else:
+                    self.log(f"⚠️ Échec suppression item {item_id} - Status: {response.status_code}")
+            except:
+                self.log(f"⚠️ Erreur suppression item {item_id}")
+
+    def run_surveillance_tests(self):
+        """Run comprehensive tests for Plan de Surveillance - Vérification automatique échéances"""
         self.log("=" * 80)
-        self.log("TESTING DOCUMENTATION POLES - CORRECTION CRITIQUE VÉRIFICATION")
+        self.log("TESTING PLAN DE SURVEILLANCE - VÉRIFICATION AUTOMATIQUE ÉCHÉANCES")
         self.log("=" * 80)
-        self.log("CONTEXTE DU PROBLÈME:")
-        self.log("L'utilisateur a signalé que la vue liste n'affichait pas les documents")
-        self.log("lorsqu'on développe un pôle, même si des documents et bons de travail existent.")
+        self.log("CONTEXTE:")
+        self.log("Nouvelle fonctionnalité pour le module Plan de Surveillance : un endpoint qui")
+        self.log("vérifie automatiquement les dates d'échéance et met à jour les statuts des")
+        self.log("contrôles de 'REALISE' à 'PLANIFIER' lorsque la durée de rappel est atteinte.")
         self.log("")
-        self.log("CORRECTION APPLIQUÉE:")
-        self.log("- GET /api/documentations/poles - Retourne maintenant tous les pôles avec leurs documents et bons")
-        self.log("- GET /api/documentations/poles/{pole_id} - Retourne un pôle avec ses documents et bons")
+        self.log("ENDPOINT À TESTER: POST /api/surveillance/check-due-dates")
         self.log("")
-        self.log("TÂCHE DE TEST CRITIQUE:")
-        self.log("1. 📋 VÉRIFIER L'ENDPOINT GET /api/documentations/poles")
-        self.log("   a) Se connecter en tant qu'admin")
-        self.log("   b) Appeler GET /api/documentations/poles")
-        self.log("   c) Vérifier que CHAQUE pôle contient:")
-        self.log("      - Un champ 'documents' (liste)")
-        self.log("      - Un champ 'bons_travail' (liste)")
-        self.log("   d) Vérifier que ces listes contiennent les données s'il y en a")
-        self.log("   e) Compter le nombre de documents et bons pour chaque pôle")
-        self.log("")
-        self.log("2. 🔍 VÉRIFIER L'ENDPOINT GET /api/documentations/poles/{pole_id}")
-        self.log("   a) Prendre l'ID d'un pôle depuis le test précédent")
-        self.log("   b) Appeler GET /api/documentations/poles/{pole_id}")
-        self.log("   c) Vérifier la structure de la réponse")
-        self.log("")
-        self.log("3. 📊 COMPARER AVEC GET /api/documentations/documents?pole_id={pole_id}")
-        self.log("   a) Prendre un pole_id")
-        self.log("   b) Appeler GET /api/documentations/documents?pole_id={pole_id}")
-        self.log("   c) Comparer avec le nombre dans pole['documents']")
+        self.log("SCÉNARIOS DE TEST:")
+        self.log("1. 📋 Créer un item de surveillance avec échéance dépassée")
+        self.log("2. 🔄 Appeler l'endpoint de vérification automatique")
+        self.log("3. ✅ Vérifier que le statut change de REALISE à PLANIFIER")
+        self.log("4. 🚫 Vérifier qu'un item NON en échéance n'est pas modifié")
+        self.log("5. 📊 Vérifier que seuls les items REALISE sont traités")
+        self.log("6. 🔐 Vérifier que l'authentification est requise")
         self.log("=" * 80)
         
         results = {
