@@ -5711,3 +5711,59 @@ agent_communication:
       ✅ Les endpoints sont PRÊTS POUR PRODUCTION
       
       RECOMMANDATION MAIN AGENT: Informer l'utilisateur que la correction est validée
+  - agent: "main"
+    message: |
+      📋 PHASE ACTUELLE : FINALISATION PLAN DE SURVEILLANCE - Janvier 2025
+      
+      🎯 CONTEXTE:
+      Le client a demandé plusieurs améliorations du module "Plan de Surveillance":
+      1. ✅ Groupement par catégorie avec sections collapsibles (FAIT)
+      2. ✅ Réorganisation drag-and-drop des catégories (FAIT)
+      3. ✅ Combobox catégorie dynamique dans le formulaire (FAIT)
+      4. ✅ Historique des 18 dernières complétions (FAIT)
+      5. ✅ Calcul automatique prochain contrôle (FAIT)
+      6. 🔧 Mise à jour automatique statut "REALISE" → "PLANIFIER" (EN COURS)
+      
+      🔧 IMPLÉMENTATION ACTUELLE:
+      
+      BACKEND (/app/backend/surveillance_routes.py):
+      - Nouvel endpoint POST /api/surveillance/check-due-dates (ligne 641-700)
+      - Vérifie tous les items avec statut "REALISE"
+      - Compare date actuelle avec prochain_controle - duree_rappel_echeance
+      - Change statut automatiquement de "REALISE" à "PLANIFIER" si échéance proche
+      
+      FRONTEND (/app/frontend/src/pages/SurveillancePlan.jsx):
+      - Fonction loadData() modifiée (ligne 49-66)
+      - Appelle surveillanceAPI.checkDueDates() au chargement de la page
+      - Ensuite charge les items, stats et alertes
+      
+      FRONTEND (/app/frontend/src/services/api.js):
+      - Ajout checkDueDates: () => api.post('/surveillance/check-due-dates') (ligne 347)
+      
+      FICHIERS COMPOSANTS DÉJÀ CRÉÉS:
+      - ✅ ListViewGrouped.jsx - Vue groupée par catégorie avec pourcentages
+      - ✅ CategoryOrderDialog.jsx - Réorganisation drag-and-drop
+      - ✅ CompleteSurveillanceDialogNew.jsx - Complétion avec fichiers et historique
+      - ✅ HistoryDialog.jsx - Affichage des 18 derniers contrôles
+      - ✅ SurveillanceItemForm.jsx - Formulaire avec combobox catégorie dynamique
+      
+      🧪 À TESTER MAINTENANT:
+      1. Backend: POST /api/surveillance/check-due-dates
+         - Créer item test avec statut REALISE et date passée
+         - Vérifier changement automatique vers PLANIFIER
+      2. Frontend: Workflow complet
+         - Création item
+         - Complétion (marquer comme réalisé)
+         - Vérification calcul prochain contrôle
+         - Vérification changement statut après échéance
+         - Affichage historique
+      3. Intégration E2E
+         - Navigation page surveillance
+         - Appel automatique check-due-dates
+         - Groupement catégories
+         - Réorganisation catégories
+      
+      🎯 PROCHAINES ÉTAPES:
+      1. Lancer tests backend avec deep_testing_backend_v2
+      2. Si backend OK, lancer tests frontend automatiques
+      3. Valider avec l'utilisateur
