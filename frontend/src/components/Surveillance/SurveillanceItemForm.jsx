@@ -28,6 +28,9 @@ function SurveillanceItemForm({ open, item, onClose }) {
   });
 
   useEffect(() => {
+    if (open) {
+      loadExistingCategories();
+    }
     if (item) {
       setFormData({
         classe_type: item.classe_type || '',
@@ -43,7 +46,20 @@ function SurveillanceItemForm({ open, item, onClose }) {
         duree_rappel_echeance: item.duree_rappel_echeance || 30
       });
     }
-  }, [item]);
+  }, [item, open]);
+
+  const loadExistingCategories = async () => {
+    try {
+      const items = await surveillanceAPI.getItems();
+      // Extraire toutes les catégories uniques
+      const categories = [...new Set(items.map(i => i.category))].filter(Boolean).sort();
+      setExistingCategories(categories);
+    } catch (error) {
+      console.error('Erreur chargement catégories:', error);
+      // Catégories par défaut en cas d'erreur
+      setExistingCategories(['INCENDIE', 'ELECTRIQUE', 'MMRI', 'SECURITE_ENVIRONNEMENT']);
+    }
+  };
 
   const handleSubmit = async () => {
     if (!formData.classe_type || !formData.category || !formData.batiment || !formData.periodicite || !formData.responsable || !formData.executant) {
