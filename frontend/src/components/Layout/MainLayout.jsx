@@ -526,8 +526,8 @@ const MainLayout = () => {
           {/* Badge Plan de Surveillance */}
           <button 
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative group"
-            onClick={() => navigate('/surveillance-plan')}
-            title="Plan de Surveillance"
+            onClick={() => navigate('/surveillance-plan', { state: { showOverdueOnly: true } })}
+            title="Plan de Surveillance - Voir les contrôles en retard"
           >
             <Eye size={20} className="text-gray-600" />
             {surveillanceBadge.echeances_proches > 0 && (
@@ -549,6 +549,9 @@ const MainLayout = () => {
                     {surveillanceBadge.pourcentage_realisation}%
                   </span>
                 </div>
+              </div>
+              <div className="mt-3 pt-3 border-t border-gray-200 text-xs text-gray-500">
+                💡 Cliquez pour voir uniquement les contrôles en retard
               </div>
             </div>
           </button>
