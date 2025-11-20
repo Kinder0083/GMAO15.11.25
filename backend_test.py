@@ -213,6 +213,52 @@ class SurveillanceCustomCategoryTester:
             self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
             return False
     
+    def test_create_existing_category_item(self):
+        """TEST 2: Tester avec une catégorie existante pour comparaison"""
+        self.log("🧪 TEST 2: Tester avec une catégorie existante pour comparaison")
+        
+        test_item_data = {
+            "classe_type": "Test Catégorie Existante",
+            "category": "INCENDIE",
+            "batiment": "BATIMENT EXISTANT",
+            "periodicite": "6 mois",
+            "responsable": "MAINT",
+            "executant": "Executant Existant",
+            "description": "Test avec catégorie existante"
+        }
+        
+        try:
+            response = self.admin_session.post(
+                f"{BACKEND_URL}/surveillance/items",
+                json=test_item_data,
+                timeout=15
+            )
+            
+            if response.status_code in [200, 201]:
+                data = response.json()
+                self.log(f"✅ Item avec catégorie existante créé - Status: {response.status_code}")
+                self.log(f"✅ ID: {data.get('id')}")
+                self.log(f"✅ Classe: {data.get('classe_type')}")
+                self.log(f"✅ Catégorie: {data.get('category')}")
+                
+                # Vérifier que la catégorie existante fonctionne
+                if data.get('category') == "INCENDIE":
+                    self.log("✅ SUCCÈS: Catégorie existante 'INCENDIE' acceptée")
+                    # Stocker pour nettoyage
+                    self.test_items.append(data.get('id'))
+                    return True, data
+                else:
+                    self.log(f"❌ ÉCHEC: Catégorie incorrecte - Attendu: INCENDIE, Reçu: {data.get('category')}", "ERROR")
+                    return False, None
+            else:
+                self.log(f"❌ Création échouée - Status: {response.status_code}", "ERROR")
+                self.log(f"Response: {response.text}", "ERROR")
+                return False, None
+                
+        except requests.exceptions.RequestException as e:
+            self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
+            return False, None
+
     def test_create_second_custom_category_item(self):
         """TEST 4: Créer un 2ème item avec une autre catégorie personnalisée"""
         self.log("🧪 TEST 4: Créer un 2ème item avec une autre catégorie personnalisée")
