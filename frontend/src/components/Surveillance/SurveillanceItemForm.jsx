@@ -100,15 +100,19 @@ function SurveillanceItemForm({ open, item, onClose }) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label>Catégorie *</Label>
-              <Combobox
-                value={formData.category}
-                onValueChange={(val) => setFormData({...formData, category: val})}
-                options={existingCategories}
-                placeholder="Sélectionner ou créer..."
-                emptyText="Aucune catégorie trouvée"
+              <Input 
+                value={formData.category} 
+                onChange={(e) => setFormData({...formData, category: e.target.value.toUpperCase()})} 
+                placeholder="Ex: INCENDIE, ELECTRIQUE, NOUVELLE_CATEGORIE..."
+                list="categories-list"
               />
+              <datalist id="categories-list">
+                {existingCategories.map(cat => (
+                  <option key={cat} value={cat} />
+                ))}
+              </datalist>
               <p className="text-xs text-gray-500 mt-1">
-                💡 Vous pouvez créer une nouvelle catégorie en tapant son nom
+                💡 Tapez le nom de la catégorie (ex: INCENDIE) ou créez-en une nouvelle
               </p>
             </div>
             <div>
