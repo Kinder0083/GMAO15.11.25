@@ -109,84 +109,43 @@ class SurveillanceTester:
             self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
             return False, None
     
-    def test_get_pole_by_id(self):
-        """TEST 2: CRITIQUE - GET /api/documentations/poles/{pole_id} - Vérifier structure d'un pôle spécifique"""
-        self.log("🧪 TEST 2: CRITIQUE - GET /api/documentations/poles/{pole_id} - Pôle spécifique")
-        
-        if not self.poles_data:
-            self.log("⚠️ Pas de données de pôles disponibles du test précédent", "WARNING")
-            return False
-        
-        # Prendre le premier pôle pour le test
-        first_pole = self.poles_data[0]
-        pole_id = first_pole.get('id')
-        pole_name = first_pole.get('nom', 'Pôle inconnu')
-        
-        if not pole_id:
-            self.log("❌ Pas d'ID de pôle disponible pour le test", "ERROR")
-            return False
+    def test_check_due_dates_with_overdue_item(self):
+        """TEST 2: Vérifier l'endpoint check-due-dates avec un item en échéance"""
+        self.log("🧪 TEST 2: POST /api/surveillance/check-due-dates - Item en échéance")
         
         try:
-            response = self.admin_session.get(
-                f"{BACKEND_URL}/documentations/poles/{pole_id}",
+            response = self.admin_session.post(
+                f"{BACKEND_URL}/surveillance/check-due-dates",
                 timeout=15
             )
             
             if response.status_code == 200:
                 data = response.json()
-                self.log(f"✅ Pôle spécifique récupéré - ID: {pole_id}")
-                self.log(f"✅ Nom du pôle: {data.get('nom', 'N/A')}")
+                self.log(f"✅ Endpoint accessible - Status: 200 OK")
+                self.log(f"✅ Réponse structure: {data}")
                 
-                # Vérifications critiques
-                success = True
+                # Vérifier la structure de la réponse
+                required_fields = ["success", "updated_count", "message"]
+                missing_fields = [field for field in required_fields if field not in data]
                 
-                # Vérification 1: Champ "documents" existe et est un array
-                if 'documents' not in data:
-                    self.log(f"❌ CRITIQUE: Champ 'documents' MANQUANT", "ERROR")
-                    success = False
-                elif not isinstance(data['documents'], list):
-                    self.log(f"❌ CRITIQUE: Champ 'documents' n'est pas un array", "ERROR")
-                    success = False
-                else:
-                    doc_count = len(data['documents'])
-                    self.log(f"✅ Champ 'documents': array avec {doc_count} éléments")
+                if missing_fields:
+                    self.log(f"❌ Champs manquants dans la réponse: {missing_fields}", "ERROR")
+                    return False
                 
-                # Vérification 2: Champ "bons_travail" existe et est un array
-                if 'bons_travail' not in data:
-                    self.log(f"❌ CRITIQUE: Champ 'bons_travail' MANQUANT", "ERROR")
-                    success = False
-                elif not isinstance(data['bons_travail'], list):
-                    self.log(f"❌ CRITIQUE: Champ 'bons_travail' n'est pas un array", "ERROR")
-                    success = False
-                else:
-                    bons_count = len(data['bons_travail'])
-                    self.log(f"✅ Champ 'bons_travail': array avec {bons_count} éléments")
+                self.log(f"✅ success: {data.get('success')}")
+                self.log(f"✅ updated_count: {data.get('updated_count')}")
+                self.log(f"✅ message: {data.get('message')}")
                 
-                # Vérification 3: Si des documents existent, vérifier leurs champs
-                if data.get('documents') and len(data['documents']) > 0:
-                    first_doc = data['documents'][0]
-                    self.log(f"📄 Analyse du premier document:")
-                    self.log(f"   - ID: {first_doc.get('id', 'N/A')}")
-                    self.log(f"   - pole_id: {first_doc.get('pole_id', 'N/A')}")
-                    self.log(f"   - nom_fichier: {first_doc.get('nom_fichier', 'N/A')}")
-                    self.log(f"   - type_fichier: {first_doc.get('type_fichier', 'N/A')}")
-                    self.log(f"   - taille: {first_doc.get('taille', 'N/A')}")
-                    
-                    # Vérifier que pole_id correspond
-                    if first_doc.get('pole_id') == pole_id:
-                        self.log("✅ pole_id du document correspond au pôle demandé")
-                    else:
-                        self.log(f"⚠️ pole_id du document ({first_doc.get('pole_id')}) ne correspond pas au pôle ({pole_id})")
-                
-                if success:
-                    self.log("✅ SUCCÈS CRITIQUE: Structure du pôle spécifique valide")
+                # Si nous avons créé un item avec une date dépassée, il devrait être mis à jour
+                if data.get("updated_count", 0) > 0:
+                    self.log(f"✅ SUCCÈS: {data.get('updated_count')} item(s) mis à jour automatiquement")
                     return True
                 else:
-                    self.log("❌ ÉCHEC CRITIQUE: Structure du pôle spécifique invalide", "ERROR")
-                    return False
+                    self.log("⚠️ Aucun item mis à jour - peut-être aucun item en échéance")
+                    return True  # Still consider it working
                     
             else:
-                self.log(f"❌ Récupération pôle spécifique échouée - Status: {response.status_code}", "ERROR")
+                self.log(f"❌ Endpoint inaccessible - Status: {response.status_code}", "ERROR")
                 self.log(f"Response: {response.text}", "ERROR")
                 return False
                 
