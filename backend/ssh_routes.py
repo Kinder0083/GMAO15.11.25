@@ -26,8 +26,14 @@ async def execute_ssh_command(
     Réservé aux super administrateurs uniquement
     """
     try:
-        # Vérifier que l'utilisateur est admin de secours
-        if current_user.get("role") != "admin" and current_user.get("email") != "admin@gmao-iris.local":
+        # Vérifier que l'utilisateur est admin
+        # Autoriser: rôle "admin", "ADMIN", ou emails spécifiques
+        user_role = current_user.get("role", "").upper()
+        user_email = current_user.get("email", "")
+        
+        allowed_emails = ["admin@gmao-iris.local", "buenogy@gmail.com"]
+        
+        if user_role != "ADMIN" and user_email not in allowed_emails:
             raise HTTPException(
                 status_code=403, 
                 detail="Accès refusé. Réservé aux super administrateurs uniquement."
