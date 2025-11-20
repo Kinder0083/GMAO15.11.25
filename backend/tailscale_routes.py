@@ -237,13 +237,44 @@ REACT_APP_BACKEND_URL=http://{tailscale_ip}
         if result_backend.returncode != 0:
             logger.warning(f"⚠️ Avertissement backend: {result_backend.stderr}")
         
-        # Attendre que le backend soit prêt
+        # Attendre que le backend soit vraiment prêt avec health check
         import time
-        logger.info("Attente 5 secondes pour que le backend démarre...")
-        time.sleep(5)
+        import requests
+        logger.info("Vérification que le backend est prêt (max 30 secondes)...")
+        
+        backend_ready = False
+        for attempt in range(30):  # 30 essais de 1 seconde
+            try:
+                time.sleep(1)
+                # Tester si le backend répond sur localhost
+                response = requests.get('http://localhost:8001/api/version', timeout=2)
+                if response.status_code in [200, 404]:  # 404 acceptable si /version n'existe pas
+                    backend_ready = True
+                    logger.info(f"✅ Backend prêt après {attempt + 1} secondes")
+                    break
+            except:
+                continue
+        
+        if not backend_ready:
+            logger.error("❌ Le backend ne répond pas après 30 secondes")
+            # Restaurer le backup
+            subprocess.run(['cp', str(backup_path), str(env_file_path)], check=True)
+            raise Exception("Le backend ne démarre pas correctement - Configuration restaurée")
+        
+        # Attendre 2 secondes supplémentaires pour être sûr
+        time.sleep(2)
         
         logger.info("[6/6] Redémarrage de nginx...")
         subprocess.run(['systemctl', 'restart', 'nginx'], check=True)
+        
+        # Vérifier que nginx a bien démarré
+        time.sleep(2)
+        result_nginx = subprocess.run(['systemctl', 'is-active', 'nginx'], 
+                                     capture_output=True, text=True)
+        if result_nginx.returncode != 0:
+            logger.error("❌ Nginx n'a pas démarré correctement")
+            subprocess.run(['cp', str(backup_path), str(env_file_path)], check=True)
+            raise Exception("Nginx n'a pas démarré - Configuration restaurée")
         
         logger.info(f"✅ Configuration Tailscale appliquée avec succès : {tailscale_ip}")
         
