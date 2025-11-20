@@ -372,35 +372,32 @@ class SurveillanceCustomCategoryTester:
             except:
                 self.log(f"⚠️ Erreur suppression item {item_id}")
 
-    def run_surveillance_tests(self):
-        """Run comprehensive tests for Plan de Surveillance - Vérification automatique échéances"""
+    def run_surveillance_custom_category_tests(self):
+        """Run comprehensive tests for Plan de Surveillance - Création contrôle avec catégorie personnalisée"""
         self.log("=" * 80)
-        self.log("TESTING PLAN DE SURVEILLANCE - VÉRIFICATION AUTOMATIQUE ÉCHÉANCES")
+        self.log("TESTING PLAN DE SURVEILLANCE - CRÉATION CONTRÔLE AVEC CATÉGORIE PERSONNALISÉE")
         self.log("=" * 80)
         self.log("CONTEXTE:")
-        self.log("Nouvelle fonctionnalité pour le module Plan de Surveillance : un endpoint qui")
-        self.log("vérifie automatiquement les dates d'échéance et met à jour les statuts des")
-        self.log("contrôles de 'REALISE' à 'PLANIFIER' lorsque la durée de rappel est atteinte.")
-        self.log("")
-        self.log("ENDPOINT À TESTER: POST /api/surveillance/check-due-dates")
+        self.log("Correction du bug empêchant la création de contrôles avec des catégories personnalisées.")
+        self.log("Le champ `category` a été changé de `Enum` à `str` pour accepter n'importe quelle catégorie.")
         self.log("")
         self.log("SCÉNARIOS DE TEST:")
-        self.log("1. 📋 Créer un item de surveillance avec échéance dépassée")
-        self.log("2. 🔄 Appeler l'endpoint de vérification automatique")
-        self.log("3. ✅ Vérifier que le statut change de REALISE à PLANIFIER")
-        self.log("4. 🚫 Vérifier qu'un item NON en échéance n'est pas modifié")
-        self.log("5. 📊 Vérifier que seuls les items REALISE sont traités")
-        self.log("6. 🔐 Vérifier que l'authentification est requise")
+        self.log("1. 📋 Créer un contrôle avec une nouvelle catégorie personnalisée")
+        self.log("2. 🔍 Récupérer l'item créé et vérifier tous les champs")
+        self.log("3. 📊 Vérifier statistiques avec nouvelle catégorie")
+        self.log("4. 📋 Créer un 2ème item avec une autre catégorie personnalisée")
+        self.log("5. 📊 Vérifier que les deux catégories apparaissent dans les statistiques")
+        self.log("6. 🧹 Nettoyer - Supprimer les items de test")
         self.log("=" * 80)
         
         results = {
             "admin_login": False,
-            "create_surveillance_item": False,
-            "check_due_dates_with_overdue_item": False,
-            "verify_status_change": False,
-            "item_not_in_due_range": False,
-            "different_status_items": False,
-            "authentication_required": False
+            "create_custom_category_item": False,
+            "retrieve_created_item": False,
+            "verify_stats_with_new_category": False,
+            "create_second_custom_category_item": False,
+            "verify_both_categories_in_stats": False,
+            "delete_created_items": False
         }
         
         # Test 1: Admin Login
@@ -412,34 +409,32 @@ class SurveillanceCustomCategoryTester:
         
         # TESTS CRITIQUES DU PLAN DE SURVEILLANCE
         self.log("\n" + "=" * 60)
-        self.log("📋 TESTS CRITIQUES - PLAN DE SURVEILLANCE")
+        self.log("📋 TESTS CRITIQUES - CATÉGORIES PERSONNALISÉES")
         self.log("=" * 60)
         
-        # Test 2: Créer un item de surveillance
-        success, test_item = self.test_create_surveillance_item()
-        results["create_surveillance_item"] = success
+        # Test 2: Créer un item avec catégorie personnalisée
+        success, test_item = self.test_create_custom_category_item()
+        results["create_custom_category_item"] = success
         
-        # Test 3: Vérifier l'endpoint check-due-dates
-        results["check_due_dates_with_overdue_item"] = self.test_check_due_dates_with_overdue_item()
+        # Test 3: Récupérer l'item créé
+        results["retrieve_created_item"] = self.test_retrieve_created_item()
         
-        # Test 4: Vérifier le changement de statut
-        results["verify_status_change"] = self.test_verify_status_change()
+        # Test 4: Vérifier les statistiques
+        results["verify_stats_with_new_category"] = self.test_verify_stats_with_new_category()
         
-        # Test 5: Item NON en échéance
-        results["item_not_in_due_range"] = self.test_item_not_in_due_range()
+        # Test 5: Créer un deuxième item avec une autre catégorie
+        success2, test_item2 = self.test_create_second_custom_category_item()
+        results["create_second_custom_category_item"] = success2
         
-        # Test 6: Items avec différents statuts
-        results["different_status_items"] = self.test_different_status_items()
+        # Test 6: Vérifier que les deux catégories apparaissent dans les statistiques
+        results["verify_both_categories_in_stats"] = self.test_verify_both_categories_in_stats()
         
-        # Test 7: Authentification requise
-        results["authentication_required"] = self.test_authentication_required()
-        
-        # Nettoyage
-        self.cleanup_test_items()
+        # Test 7: Nettoyage
+        results["delete_created_items"] = self.test_delete_created_items()
         
         # Summary
         self.log("=" * 80)
-        self.log("PLAN DE SURVEILLANCE TEST RESULTS SUMMARY")
+        self.log("PLAN DE SURVEILLANCE - CATÉGORIES PERSONNALISÉES - RÉSULTATS")
         self.log("=" * 80)
         
         passed = sum(results.values())
@@ -452,67 +447,72 @@ class SurveillanceCustomCategoryTester:
         self.log(f"\n📊 Overall: {passed}/{total} tests passed")
         
         # Analyse détaillée des tests critiques
-        critical_tests = ["check_due_dates_with_overdue_item", "verify_status_change", "authentication_required"]
+        critical_tests = ["create_custom_category_item", "retrieve_created_item", "verify_stats_with_new_category"]
         critical_passed = sum(results.get(test, False) for test in critical_tests)
         
         self.log("\n" + "=" * 60)
         self.log("ANALYSE CRITIQUE DE LA FONCTIONNALITÉ")
         self.log("=" * 60)
         
-        # TEST CRITIQUE 1: Endpoint check-due-dates
-        if results.get("check_due_dates_with_overdue_item", False):
-            self.log("🎉 TEST CRITIQUE 1 - POST /api/surveillance/check-due-dates: ✅ SUCCÈS")
-            self.log("✅ Endpoint accessible (200 OK)")
-            self.log("✅ Structure de réponse correcte (success, updated_count, message)")
-            self.log("✅ Logique de vérification des échéances fonctionnelle")
+        # TEST CRITIQUE 1: Création avec catégorie personnalisée
+        if results.get("create_custom_category_item", False):
+            self.log("🎉 TEST CRITIQUE 1 - CRÉATION AVEC CATÉGORIE PERSONNALISÉE: ✅ SUCCÈS")
+            self.log("✅ POST /api/surveillance/items accepte les catégories personnalisées")
+            self.log("✅ Réponse 200/201 OK")
+            self.log("✅ Catégorie 'MA_NOUVELLE_CATEGORIE' acceptée et enregistrée")
         else:
-            self.log("🚨 TEST CRITIQUE 1 - POST /api/surveillance/check-due-dates: ❌ ÉCHEC")
-            self.log("❌ Endpoint inaccessible ou réponse incorrecte")
+            self.log("🚨 TEST CRITIQUE 1 - CRÉATION AVEC CATÉGORIE PERSONNALISÉE: ❌ ÉCHEC")
+            self.log("❌ Erreur lors de la création ou catégorie rejetée")
         
-        # TEST CRITIQUE 2: Changement de statut
-        if results.get("verify_status_change", False):
-            self.log("🎉 TEST CRITIQUE 2 - CHANGEMENT DE STATUT: ✅ SUCCÈS")
-            self.log("✅ Items REALISE en échéance changent vers PLANIFIER")
-            self.log("✅ updated_by = 'system_auto_check' (traçabilité)")
-            self.log("✅ Logique métier correctement implémentée")
+        # TEST CRITIQUE 2: Récupération des données
+        if results.get("retrieve_created_item", False):
+            self.log("🎉 TEST CRITIQUE 2 - RÉCUPÉRATION DES DONNÉES: ✅ SUCCÈS")
+            self.log("✅ GET /api/surveillance/items retourne l'item créé")
+            self.log("✅ Catégorie personnalisée correctement stockée")
+            self.log("✅ Tous les champs sont corrects")
         else:
-            self.log("🚨 TEST CRITIQUE 2 - CHANGEMENT DE STATUT: ❌ ÉCHEC")
-            self.log("❌ Statuts non mis à jour ou logique incorrecte")
+            self.log("🚨 TEST CRITIQUE 2 - RÉCUPÉRATION DES DONNÉES: ❌ ÉCHEC")
+            self.log("❌ Item non trouvé ou données incorrectes")
         
-        # TEST CRITIQUE 3: Sécurité
-        if results.get("authentication_required", False):
-            self.log("🎉 TEST CRITIQUE 3 - SÉCURITÉ: ✅ SUCCÈS")
-            self.log("✅ Authentification JWT requise")
-            self.log("✅ Endpoint protégé contre accès non autorisé")
+        # TEST CRITIQUE 3: Statistiques
+        if results.get("verify_stats_with_new_category", False):
+            self.log("🎉 TEST CRITIQUE 3 - STATISTIQUES AVEC NOUVELLE CATÉGORIE: ✅ SUCCÈS")
+            self.log("✅ GET /api/surveillance/stats inclut la nouvelle catégorie")
+            self.log("✅ by_category contient 'MA_NOUVELLE_CATEGORIE'")
+            self.log("✅ Comptage correct")
         else:
-            self.log("🚨 TEST CRITIQUE 3 - SÉCURITÉ: ❌ ÉCHEC")
-            self.log("❌ Endpoint accessible sans authentification")
+            self.log("🚨 TEST CRITIQUE 3 - STATISTIQUES AVEC NOUVELLE CATÉGORIE: ❌ ÉCHEC")
+            self.log("❌ Nouvelle catégorie non présente dans les statistiques")
         
         # Tests complémentaires
-        if results.get("item_not_in_due_range", False):
-            self.log("✅ VALIDATION: Items NON en échéance restent inchangés")
+        if results.get("create_second_custom_category_item", False):
+            self.log("✅ VALIDATION: Création de multiples catégories personnalisées")
         
-        if results.get("different_status_items", False):
-            self.log("✅ VALIDATION: Seuls les items REALISE sont traités")
+        if results.get("verify_both_categories_in_stats", False):
+            self.log("✅ VALIDATION: Multiples catégories personnalisées dans les statistiques")
+        
+        if results.get("delete_created_items", False):
+            self.log("✅ NETTOYAGE: Items de test supprimés avec succès")
         
         # Conclusion finale
         self.log("\n" + "=" * 80)
-        self.log("CONCLUSION FINALE - FONCTIONNALITÉ VÉRIFICATION ÉCHÉANCES")
+        self.log("CONCLUSION FINALE - CATÉGORIES PERSONNALISÉES")
         self.log("=" * 80)
         
         if critical_passed == len(critical_tests):
             self.log("🎉 FONCTIONNALITÉ ENTIÈREMENT OPÉRATIONNELLE!")
-            self.log("✅ POST /api/surveillance/check-due-dates fonctionne correctement")
-            self.log("✅ Logique de vérification des échéances implémentée")
-            self.log("✅ Changement automatique de statut REALISE → PLANIFIER")
-            self.log("✅ Sécurité et authentification en place")
-            self.log("✅ Traçabilité des modifications automatiques")
+            self.log("✅ Création d'items avec catégories personnalisées fonctionne (200/201 OK)")
+            self.log("✅ Les catégories dynamiques sont acceptées (pas d'erreur de validation Pydantic)")
+            self.log("✅ Les statistiques incluent les nouvelles catégories")
+            self.log("✅ Pas d'erreur 'Erreur d'enregistrement'")
+            self.log("✅ Le bug de catégorie personnalisée est RÉSOLU")
             self.log("✅ La fonctionnalité est PRÊTE POUR PRODUCTION")
         else:
             self.log("⚠️ FONCTIONNALITÉ INCOMPLÈTE - PROBLÈMES DÉTECTÉS")
             failed_critical = [test for test in critical_tests if not results.get(test, False)]
             self.log(f"❌ Tests critiques échoués: {', '.join(failed_critical)}")
-            self.log("❌ La vérification automatique des échéances ne fonctionne pas correctement")
+            self.log("❌ Les catégories personnalisées ne fonctionnent pas correctement")
+            self.log("❌ Le bug n'est pas entièrement résolu")
             self.log("❌ Intervention requise avant mise en production")
         
         return results
