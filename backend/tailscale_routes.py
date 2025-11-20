@@ -66,6 +66,82 @@ async def get_tailscale_config(current_user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.post("/restore")
+async def restore_tailscale_backup(current_user: dict = Depends(get_current_user)):
+    """
+    RESTAURATION D'URGENCE - Restaurer la configuration Tailscale précédente
+    Accessible uniquement aux admins
+    
+    Utilise le fichier .env.backup créé automatiquement
+    """
+    try:
+        # Vérifier si l'utilisateur est admin
+        if current_user.get("role") != "ADMIN":
+            raise HTTPException(status_code=403, detail="Accès réservé aux administrateurs")
+        
+        logger.info("🔄 RESTAURATION D'URGENCE - Configuration Tailscale")
+        
+        # Vérifier l'environnement
+        proxmox_frontend_path = Path("/opt/gmao-iris/frontend")
+        is_proxmox = proxmox_frontend_path.exists()
+        
+        if not is_proxmox:
+            return {
+                "success": False,
+                "message": "Environnement de développement - Restauration non applicable"
+            }
+        
+        env_file_path = proxmox_frontend_path / ".env"
+        backup_path = proxmox_frontend_path / ".env.backup"
+        
+        if not backup_path.exists():
+            raise HTTPException(status_code=404, detail="Aucun fichier de sauvegarde trouvé")
+        
+        logger.info("[1/4] Restauration du fichier .env depuis la sauvegarde...")
+        subprocess.run(['cp', str(backup_path), str(env_file_path)], check=True)
+        
+        logger.info("[2/4] Recompilation du frontend...")
+        result = subprocess.run(
+            ['yarn', 'build'],
+            cwd=str(proxmox_frontend_path),
+            capture_output=True,
+            text=True,
+            timeout=300
+        )
+        
+        if result.returncode != 0:
+            logger.error(f"❌ Erreur compilation: {result.stderr}")
+            raise Exception("Erreur lors de la compilation du frontend")
+        
+        logger.info("[3/4] Redémarrage du backend...")
+        subprocess.run(['supervisorctl', 'restart', 'gmao-iris-backend'], check=True)
+        
+        import time
+        time.sleep(5)
+        
+        logger.info("[4/4] Redémarrage de nginx...")
+        subprocess.run(['systemctl', 'restart', 'nginx'], check=True)
+        
+        logger.info("✅ Configuration restaurée avec succès")
+        
+        return {
+            "success": True,
+            "message": "Configuration précédente restaurée avec succès",
+            "steps_completed": [
+                "Fichier .env restauré depuis .env.backup",
+                "Frontend recompilé",
+                "Backend redémarré",
+                "Nginx redémarré"
+            ]
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"❌ Erreur restauration: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.post("/configure")
 async def configure_tailscale(
     config: TailscaleConfigRequest,
