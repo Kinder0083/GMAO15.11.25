@@ -214,6 +214,87 @@ const SpecialSettings = () => {
     }
   };
 
+  // Fonctions Tailscale
+  const loadTailscaleConfig = async () => {
+    try {
+      setLoadingTailscale(true);
+      const response = await api.get('/tailscale/config');
+      setTailscaleIP(response.data.tailscale_ip || '');
+      setTailscaleStatus(response.data.status);
+    } catch (error) {
+      console.error('Erreur chargement config Tailscale:', error);
+      // Pas de toast d'erreur car cette fonctionnalité n'est peut-être pas disponible sur tous les environnements
+    } finally {
+      setLoadingTailscale(false);
+    }
+  };
+
+  const handleSaveTailscaleConfig = async () => {
+    // Validation de l'IP
+    const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
+    if (!ipRegex.test(tailscaleIP)) {
+      toast({
+        title: 'IP invalide',
+        description: 'Veuillez entrer une adresse IP valide (ex: 100.105.2.113)',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    const parts = tailscaleIP.split('.');
+    if (parts.some(part => parseInt(part) > 255)) {
+      toast({
+        title: 'IP invalide',
+        description: 'Chaque partie de l\'IP doit être entre 0 et 255',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    const confirmed = await confirm({
+      title: 'Modifier l\'adresse IP Tailscale',
+      description: `Êtes-vous sûr de vouloir changer l'IP en ${tailscaleIP} ?\n\n⚠️ Cette action va :\n- Modifier le fichier .env du frontend\n- Recompiler l'application (1-2 minutes)\n- Redémarrer les services\n\nVous devrez peut-être rafraîchir votre navigateur après.`,
+      confirmText: 'Confirmer',
+      cancelText: 'Annuler',
+      variant: 'default'
+    });
+
+    if (!confirmed) return;
+
+    try {
+      setSavingTailscale(true);
+      const response = await api.post('/tailscale/configure', {
+        tailscale_ip: tailscaleIP
+      });
+      
+      if (response.data.success) {
+        toast({
+          title: 'Configuration mise à jour',
+          description: `L'IP Tailscale a été changée en ${tailscaleIP}. Rechargement de la page dans 3 secondes...`,
+        });
+        
+        // Recharger la page après 3 secondes
+        setTimeout(() => {
+          window.location.reload();
+        }, 3000);
+      } else {
+        toast({
+          title: 'Erreur',
+          description: response.data.message || 'La configuration a échoué',
+          variant: 'destructive'
+        });
+      }
+    } catch (error) {
+      toast({
+        title: 'Erreur',
+        description: formatErrorMessage(error, 'Impossible de modifier la configuration Tailscale'),
+        variant: 'destructive'
+      });
+    } finally {
+      setSavingTailscale(false);
+    }
+  };
+
   const handleResetPassword = async (userId, userName) => {
     confirm({
       title: 'Réinitialiser le mot de passe',
