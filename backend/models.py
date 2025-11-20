@@ -1184,7 +1184,7 @@ class SurveillanceItemCreate(BaseModel):
 
 class SurveillanceItemUpdate(BaseModel):
     classe_type: Optional[str] = None
-    category: Optional[SurveillanceCategory] = None
+    category: Optional[str] = None  # Catégorie dynamique (ex: "INCENDIE", "ELECTRIQUE", etc.)
     batiment: Optional[str] = None
     periodicite: Optional[str] = None
     responsable: Optional[SurveillanceResponsible] = None
