@@ -84,6 +84,32 @@ function ListViewGrouped({ items, loading, onEdit, onDelete, onRefresh }) {
     setGroupedItems(grouped);
   };
 
+  const toggleCategory = (category) => {
+    const newExpanded = new Set(expandedCategories);
+    if (newExpanded.has(category)) {
+      newExpanded.delete(category);
+    } else {
+      newExpanded.add(category);
+    }
+    setExpandedCategories(newExpanded);
+  };
+
+  const calculateCategoryPercentage = (categoryItems) => {
+    if (categoryItems.length === 0) return 0;
+    
+    // Un contrôle est "à jour" si son statut est REALISE ET sa date de prochain contrôle n'est pas dépassée
+    const today = new Date();
+    const upToDate = categoryItems.filter(item => {
+      if (item.status !== 'REALISE') return false;
+      if (!item.prochain_controle) return false;
+      
+      const nextDate = new Date(item.prochain_controle);
+      return nextDate >= today;
+    });
+
+    return Math.round((upToDate.length / categoryItems.length) * 100);
+  };
+
   if (loading) return <div className="text-center p-4">Chargement...</div>;
 
   if (items.length === 0) {
