@@ -10,7 +10,7 @@ import os
 from datetime import datetime
 
 # Use the correct backend URL from frontend .env
-BACKEND_URL = "https://mainttracker-1.preview.emergentagent.com/api"
+BACKEND_URL = "https://surveil-plan.preview.emergentagent.com/api"
 
 # Test credentials - admin account as specified in the request
 ADMIN_EMAIL = "admin@gmao-iris.local"

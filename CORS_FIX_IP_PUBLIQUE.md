@@ -50,7 +50,7 @@ app.add_middleware(
 
 ```bash
 # Test depuis n'importe quelle IP
-curl https://mainttracker-1.preview.emergentagent.com/api/version
+curl https://surveil-plan.preview.emergentagent.com/api/version
 
 # Résultat attendu :
 {"version":"1.5.0","versionName":"...","releaseDate":"..."}
