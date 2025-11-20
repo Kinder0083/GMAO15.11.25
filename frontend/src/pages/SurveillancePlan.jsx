@@ -222,12 +222,26 @@ function SurveillancePlan() {
       )}
 
       {stats && (
-        <div className="flex gap-2 mb-4">
+        <div className="flex gap-2 mb-4 flex-wrap items-center">
           <Badge variant="default">Total: {stats.global.total}</Badge>
           <Badge variant="default" className="bg-green-500">Réalisés: {stats.global.realises}</Badge>
           <Badge variant="default" className="bg-blue-500">Planifiés: {stats.global.planifies}</Badge>
           <Badge variant="default" className="bg-orange-500">À planifier: {stats.global.a_planifier}</Badge>
           <Badge variant="secondary">Taux: {stats.global.pourcentage_realisation}%</Badge>
+          
+          {/* Badge filtre en retard actif */}
+          {showOverdueFilter && (
+            <Badge variant="destructive" className="bg-red-600 flex items-center gap-2">
+              🚨 Affichage : Contrôles en retard uniquement ({filteredItems.length})
+              <button 
+                onClick={() => setShowOverdueFilter(false)}
+                className="ml-1 hover:bg-red-700 rounded-full p-0.5"
+                title="Désactiver le filtre"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </Badge>
+          )}
         </div>
       )}
 
