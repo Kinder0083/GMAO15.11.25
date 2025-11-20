@@ -77,7 +77,14 @@ function SurveillanceItemForm({ open, item, onClose }) {
 
     setLoading(true);
     try {
-      const apiData = { ...formData };
+      // Nettoyer les données : transformer les chaînes vides en null
+      const apiData = Object.fromEntries(
+        Object.entries(formData).map(([key, value]) => [
+          key,
+          value === '' ? null : value
+        ])
+      );
+      
       console.log('📤 Envoi données au backend:', apiData);
       
       if (item) {
