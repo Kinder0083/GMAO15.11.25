@@ -209,52 +209,75 @@ class SurveillanceTester:
             self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
             return False
     
-    def test_document_count_summary(self):
-        """TEST 4: Résumé des documents et bons de travail par pôle"""
-        self.log("🧪 TEST 4: Résumé des documents et bons de travail par pôle")
+    def test_item_not_in_due_range(self):
+        """TEST 4: Créer un item NON en échéance et vérifier qu'il n'est pas modifié"""
+        self.log("🧪 TEST 4: Item NON en échéance - ne doit pas être modifié")
         
-        if not self.documents_count:
-            self.log("⚠️ Pas de données de comptage disponibles", "WARNING")
-            return True
+        # Créer un item avec une date dans 60 jours et durée rappel de 30 jours
+        future_date = (datetime.now() + timedelta(days=60)).strftime("%Y-%m-%d")
         
-        self.log("📊 RÉSUMÉ DES DOCUMENTS ET BONS DE TRAVAIL PAR PÔLE:")
-        self.log("=" * 60)
+        test_item_data = {
+            "classe_type": "Test Non Échéance",
+            "category": "TEST",
+            "batiment": "TEST",
+            "periodicite": "1 an",
+            "responsable": "MAINT",
+            "executant": "TEST",
+            "status": "REALISE",
+            "prochain_controle": future_date,
+            "duree_rappel_echeance": 30
+        }
         
-        total_documents = 0
-        total_bons = 0
-        poles_with_documents = 0
-        poles_with_bons = 0
-        
-        for pole_name, counts in self.documents_count.items():
-            doc_count = counts.get('documents', 0)
-            bons_count = counts.get('bons_travail', 0)
+        try:
+            # Créer l'item
+            response = self.admin_session.post(
+                f"{BACKEND_URL}/surveillance/items",
+                json=test_item_data,
+                timeout=15
+            )
             
-            self.log(f"📋 {pole_name}:")
-            self.log(f"   - Documents: {doc_count}")
-            self.log(f"   - Bons de travail: {bons_count}")
-            
-            total_documents += doc_count
-            total_bons += bons_count
-            
-            if doc_count > 0:
-                poles_with_documents += 1
-            if bons_count > 0:
-                poles_with_bons += 1
-        
-        self.log("=" * 60)
-        self.log(f"📊 TOTAUX:")
-        self.log(f"   - Total pôles analysés: {len(self.documents_count)}")
-        self.log(f"   - Total documents: {total_documents}")
-        self.log(f"   - Total bons de travail: {total_bons}")
-        self.log(f"   - Pôles avec documents: {poles_with_documents}")
-        self.log(f"   - Pôles avec bons de travail: {poles_with_bons}")
-        
-        if total_documents > 0 or total_bons > 0:
-            self.log("✅ Des documents et/ou bons de travail sont présents dans la base")
-        else:
-            self.log("⚠️ Aucun document ni bon de travail trouvé - base de données vide?")
-        
-        return True
+            if response.status_code in [200, 201]:
+                data = response.json()
+                item_id = data.get('id')
+                self.test_items.append(item_id)
+                self.log(f"✅ Item NON en échéance créé - ID: {item_id}")
+                self.log(f"✅ Prochain contrôle: {future_date} (dans 60 jours)")
+                
+                # Appeler check-due-dates
+                check_response = self.admin_session.post(
+                    f"{BACKEND_URL}/surveillance/check-due-dates",
+                    timeout=15
+                )
+                
+                if check_response.status_code == 200:
+                    # Vérifier que l'item n'a pas été modifié
+                    get_response = self.admin_session.get(
+                        f"{BACKEND_URL}/surveillance/items/{item_id}",
+                        timeout=15
+                    )
+                    
+                    if get_response.status_code == 200:
+                        updated_item = get_response.json()
+                        
+                        if updated_item.get('status') == 'REALISE':
+                            self.log("✅ SUCCÈS: Item NON en échéance reste REALISE")
+                            return True
+                        else:
+                            self.log(f"❌ ÉCHEC: Item modifié à tort - Statut: {updated_item.get('status')}", "ERROR")
+                            return False
+                    else:
+                        self.log("❌ Impossible de récupérer l'item après vérification", "ERROR")
+                        return False
+                else:
+                    self.log("❌ Échec de l'appel check-due-dates", "ERROR")
+                    return False
+            else:
+                self.log(f"❌ Création de l'item échouée - Status: {response.status_code}", "ERROR")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
+            return False
     
     def run_documentation_poles_tests(self):
         """Run comprehensive tests for Documentation Poles endpoints - CRITICAL FIX VERIFICATION"""
