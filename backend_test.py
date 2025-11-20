@@ -518,13 +518,13 @@ class SurveillanceCustomCategoryTester:
         return results
 
 if __name__ == "__main__":
-    tester = SurveillanceTester()
-    results = tester.run_surveillance_tests()
+    tester = SurveillanceCustomCategoryTester()
+    results = tester.run_surveillance_custom_category_tests()
     
     # Exit with appropriate code
     critical_tests = [
-        "admin_login", "check_due_dates_with_overdue_item", "verify_status_change", 
-        "authentication_required"
+        "admin_login", "create_custom_category_item", "retrieve_created_item", 
+        "verify_stats_with_new_category"
     ]
     
     critical_passed = sum(results.get(test, False) for test in critical_tests)
