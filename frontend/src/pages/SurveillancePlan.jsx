@@ -27,6 +27,9 @@ function SurveillancePlan() {
   const [loading, setLoading] = useState(true);
   const [openForm, setOpenForm] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [openCategoryDialog, setOpenCategoryDialog] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [categoryOrderChanged, setCategoryOrderChanged] = useState(false);
   
   const [filters, setFilters] = useState({
     category: '',
