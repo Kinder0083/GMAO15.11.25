@@ -89,9 +89,27 @@ function SurveillancePlan() {
 
   const applyFilters = () => {
     let filtered = [...items];
+    
+    // Filtre spécial : contrôles en retard
+    if (showOverdueFilter) {
+      const today = new Date();
+      filtered = filtered.filter(item => {
+        if (!item.prochain_controle) return false;
+        const nextControlDate = new Date(item.prochain_controle);
+        // Calculer la date de début de période d'alerte
+        const alertDays = item.duree_rappel_echeance || 30;
+        const alertDate = new Date(nextControlDate);
+        alertDate.setDate(alertDate.getDate() - alertDays);
+        // En retard = date actuelle >= date d'alerte
+        return today >= alertDate;
+      });
+    }
+    
+    // Filtres classiques
     if (filters.category) filtered = filtered.filter(item => item.category === filters.category);
     if (filters.responsable) filtered = filtered.filter(item => item.responsable === filters.responsable);
     if (filters.status) filtered = filtered.filter(item => item.status === filters.status);
+    
     setFilteredItems(filtered);
   };
 
