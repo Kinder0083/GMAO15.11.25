@@ -368,9 +368,9 @@ class SurveillanceCustomCategoryTester:
                     
                     # Vérifier que les deux catégories personnalisées sont présentes
                     categories_found = []
-                    if "MA_NOUVELLE_CATEGORIE" in by_category:
-                        categories_found.append("MA_NOUVELLE_CATEGORIE")
-                        self.log(f"✅ Catégorie 'MA_NOUVELLE_CATEGORIE' trouvée")
+                    if "TEST_CATEGORIE_NOUVELLE" in by_category:
+                        categories_found.append("TEST_CATEGORIE_NOUVELLE")
+                        self.log(f"✅ Catégorie 'TEST_CATEGORIE_NOUVELLE' trouvée")
                     
                     if "CATEGORIE_TEST_2" in by_category:
                         categories_found.append("CATEGORIE_TEST_2")
