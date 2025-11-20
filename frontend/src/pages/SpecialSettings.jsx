@@ -268,14 +268,15 @@ const SpecialSettings = () => {
           
           if (response.data.success) {
             toast({
-              title: 'Configuration mise à jour',
-              description: `L'IP Tailscale a été changée en ${tailscaleIP}. Rechargement de la page dans 3 secondes...`,
+              title: '⏳ Configuration en cours...',
+              description: `L'IP Tailscale est en cours de configuration (${tailscaleIP}). Le système va se recharger dans 30 secondes. ATTENDEZ au moins 2 minutes avant de tester !`,
+              duration: 30000, // 30 secondes
             });
             
-            // Recharger la page après 3 secondes
+            // Recharger la page après 30 secondes pour laisser le temps au backend
             setTimeout(() => {
-              window.location.reload();
-            }, 3000);
+              window.location.href = `http://${tailscaleIP}`;
+            }, 30000);
           } else {
             toast({
               title: 'Erreur',
