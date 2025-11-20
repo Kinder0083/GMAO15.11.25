@@ -93,13 +93,13 @@ class SurveillanceCustomCategoryTester:
                 self.log(f"✅ Exécutant: {data.get('executant')}")
                 
                 # Vérifier que la catégorie personnalisée est bien enregistrée
-                if data.get('category') == "MA_NOUVELLE_CATEGORIE":
-                    self.log("✅ SUCCÈS: Catégorie personnalisée 'MA_NOUVELLE_CATEGORIE' acceptée")
+                if data.get('category') == "TEST_CATEGORIE_NOUVELLE":
+                    self.log("✅ SUCCÈS: Catégorie personnalisée 'TEST_CATEGORIE_NOUVELLE' acceptée")
                     # Stocker pour nettoyage
                     self.test_items.append(data.get('id'))
                     return True, data
                 else:
-                    self.log(f"❌ ÉCHEC: Catégorie incorrecte - Attendu: MA_NOUVELLE_CATEGORIE, Reçu: {data.get('category')}", "ERROR")
+                    self.log(f"❌ ÉCHEC: Catégorie incorrecte - Attendu: TEST_CATEGORIE_NOUVELLE, Reçu: {data.get('category')}", "ERROR")
                     return False, None
             else:
                 self.log(f"❌ Création échouée - Status: {response.status_code}", "ERROR")
