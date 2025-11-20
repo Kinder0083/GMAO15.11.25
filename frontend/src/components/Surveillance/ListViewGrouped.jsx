@@ -154,7 +154,8 @@ function ListViewGrouped({ items, loading, onEdit, onDelete, onRefresh }) {
               </div>
             </button>
 
-            {/* Tableau des items de la catégorie */}
+            {/* Tableau des items de la catégorie - Affiché seulement si catégorie dépliée */}
+            {expandedCategories.has(category) && (
             <Table>
               <TableHeader>
                 <TableRow>
