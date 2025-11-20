@@ -635,3 +635,68 @@ async def export_template(current_user: dict = Depends(get_current_user)):
     except Exception as e:
         logger.error(f"Erreur export template: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# ==================== Vérification automatique des échéances ====================
+
+@router.post("/check-due-dates")
+async def check_due_dates(current_user: dict = Depends(get_current_user)):
+    """
+    Vérifier les dates d'échéance et mettre à jour automatiquement les statuts.
+    
+    Logique:
+    - Pour chaque item avec statut "REALISE"
+    - Si la date actuelle est dans la période de rappel (duree_rappel_echeance jours avant prochain_controle)
+    - Alors changer le statut de "REALISE" à "PLANIFIER"
+    
+    Cet endpoint est appelé automatiquement au chargement de la page de surveillance.
+    """
+    try:
+        today = datetime.now(timezone.utc).date()
+        updated_count = 0
+        
+        # Récupérer tous les items avec statut REALISE
+        items = await db.surveillance_items.find({
+            "status": SurveillanceItemStatus.REALISE.value
+        }).to_list(length=None)
+        
+        for item in items:
+            # Vérifier si l'item a une date de prochain contrôle
+            if not item.get("prochain_controle"):
+                continue
+            
+            try:
+                prochain_controle = datetime.fromisoformat(item["prochain_controle"]).date()
+                duree_rappel = item.get("duree_rappel_echeance", 30)
+                
+                # Calculer la date de début de la période de rappel
+                date_rappel = prochain_controle - timedelta(days=duree_rappel)
+                
+                # Si nous sommes dans la période de rappel ou après
+                if today >= date_rappel:
+                    # Mettre à jour le statut vers PLANIFIER
+                    await db.surveillance_items.update_one(
+                        {"id": item["id"]},
+                        {
+                            "$set": {
+                                "status": SurveillanceItemStatus.PLANIFIER.value,
+                                "updated_at": datetime.now(timezone.utc).isoformat(),
+                                "updated_by": "system_auto_check"
+                            }
+                        }
+                    )
+                    updated_count += 1
+                    
+                    logger.info(f"Item {item['id']} ({item.get('classe_type')}) statut changé de REALISE à PLANIFIER (échéance: {prochain_controle})")
+            except Exception as e:
+                logger.warning(f"Erreur traitement item {item.get('id')}: {str(e)}")
+                continue
+        
+        return {
+            "success": True,
+            "updated_count": updated_count,
+            "message": f"{updated_count} contrôle(s) mis à jour automatiquement"
+        }
+    except Exception as e:
+        logger.error(f"Erreur vérification échéances: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
