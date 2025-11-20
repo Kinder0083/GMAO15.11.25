@@ -536,7 +536,7 @@ function Documentations() {
                           {pole.documents && pole.documents.length > 0 ? (
                             <div className="divide-y divide-green-200">
                               {pole.documents.map((doc) => {
-                                const DocIcon = getFileIcon(doc.type_fichier);
+                                const DocIcon = getFileIcon(doc.fichier_type);
                                 return (
                                   <div
                                     key={doc.id}
@@ -544,10 +544,10 @@ function Documentations() {
                                   >
                                     <DocIcon className="h-5 w-5 text-green-600 flex-shrink-0" />
                                     <div className="flex-1 min-w-0">
-                                      <p className="font-medium text-sm truncate">{doc.nom_fichier || 'Document sans nom'}</p>
+                                      <p className="font-medium text-sm truncate">{doc.fichier_nom || doc.titre || 'Document sans nom'}</p>
                                       <p className="text-xs text-gray-600">
-                                        {doc.taille ? `${(doc.taille / 1024).toFixed(2)} KB` : 'Taille inconnue'}
-                                        {doc.type_fichier && ` • ${doc.type_fichier}`}
+                                        {doc.fichier_taille ? `${(doc.fichier_taille / 1024).toFixed(2)} KB` : 'Taille inconnue'}
+                                        {doc.fichier_type && ` • ${doc.fichier_type}`}
                                       </p>
                                     </div>
                                     <div className="flex gap-2">
