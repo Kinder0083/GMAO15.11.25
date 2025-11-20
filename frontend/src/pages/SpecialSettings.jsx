@@ -52,6 +52,7 @@ const SpecialSettings = () => {
   const [tailscaleIP, setTailscaleIP] = useState('');
   const [loadingTailscale, setLoadingTailscale] = useState(true);
   const [savingTailscale, setSavingTailscale] = useState(false);
+  const [restoringTailscale, setRestoringTailscale] = useState(false);
   const [tailscaleStatus, setTailscaleStatus] = useState(null);
   
   const { toast } = useToast();
