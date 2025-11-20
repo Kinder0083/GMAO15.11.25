@@ -5523,6 +5523,7 @@ api_router.include_router(documentations_router)
 api_router.include_router(ssh_router)
 api_router.include_router(user_preferences_router)
 api_router.include_router(surveillance_history_router)
+api_router.include_router(tailscale_router)
 
 # Include the router in the main app (MUST be after all endpoint definitions)
 app.include_router(api_router)
