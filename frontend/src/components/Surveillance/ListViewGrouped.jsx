@@ -98,19 +98,32 @@ function ListViewGrouped({ items, loading, onEdit, onDelete, onRefresh }) {
       <div className="space-y-6">
         {Object.entries(groupedItems).map(([category, categoryItems]) => (
           <div key={category} className="rounded-lg border bg-white overflow-hidden">
-            {/* En-tête de catégorie */}
-            <div className="bg-gradient-to-r from-blue-50 to-blue-100 border-b px-4 py-3 flex items-center gap-3">
+            {/* En-tête de catégorie cliquable */}
+            <button
+              onClick={() => toggleCategory(category)}
+              className="w-full bg-gradient-to-r from-blue-50 to-blue-100 border-b px-4 py-3 flex items-center gap-3 hover:from-blue-100 hover:to-blue-150 transition-colors cursor-pointer"
+            >
+              {/* Chevron */}
+              <ChevronRight 
+                className={`h-5 w-5 text-gray-600 transition-transform ${expandedCategories.has(category) ? 'rotate-90' : ''}`}
+              />
+              
               <span className="text-3xl">{getCategoryIcon(category)}</span>
-              <div className="flex-1">
+              <div className="flex-1 text-left">
                 <h3 className="font-semibold text-lg text-gray-800">{category}</h3>
                 <p className="text-sm text-gray-600">
                   {categoryItems.length} contrôle{categoryItems.length > 1 ? 's' : ''}
                 </p>
               </div>
-              <Badge variant="outline" className="bg-white">
-                {category}
-              </Badge>
-            </div>
+              
+              {/* Pourcentage de réalisation */}
+              <div className="text-right">
+                <div className="text-2xl font-bold text-blue-600">
+                  {calculateCategoryPercentage(categoryItems)}%
+                </div>
+                <div className="text-xs text-gray-500">à jour</div>
+              </div>
+            </button>
 
             {/* Tableau des items de la catégorie */}
             <Table>
