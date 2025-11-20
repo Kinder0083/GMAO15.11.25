@@ -131,7 +131,7 @@ class SurveillanceCustomCategoryTester:
                 # Chercher notre item de test avec la catégorie personnalisée
                 test_item = None
                 for item in items:
-                    if item.get('id') in self.test_items and item.get('category') == 'MA_NOUVELLE_CATEGORIE':
+                    if item.get('id') in self.test_items and item.get('category') == 'TEST_CATEGORIE_NOUVELLE':
                         test_item = item
                         break
                 
