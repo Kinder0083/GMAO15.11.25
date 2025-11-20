@@ -6,14 +6,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Badge } from '../components/ui/badge';
 import { Alert, AlertDescription } from '../components/ui/alert';
-import { Plus, Download, Upload, Bell } from 'lucide-react';
+import { Plus, Download, Upload, Bell, Settings } from 'lucide-react';
 import { surveillanceAPI } from '../services/api';
 import { useToast } from '../hooks/use-toast';
 import { useConfirmDialog } from '../components/ui/confirm-dialog';
 import ListView from '../components/Surveillance/ListView';
+import ListViewGrouped from '../components/Surveillance/ListViewGrouped';
 import GridView from '../components/Surveillance/GridView';
 import CalendarView from '../components/Surveillance/CalendarView';
 import SurveillanceItemForm from '../components/Surveillance/SurveillanceItemForm';
+import CategoryOrderDialog from '../components/Surveillance/CategoryOrderDialog';
 
 function SurveillancePlan() {
   const { toast } = useToast();
