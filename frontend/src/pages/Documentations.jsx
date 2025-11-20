@@ -476,17 +476,44 @@ function Documentations() {
                                     </p>
                                     <p className="text-xs text-gray-600">
                                       {bon.entreprise && `${bon.entreprise} • `}
-                                      {new Date(bon.created_at).toLocaleDateString()}
+                                      {bon.created_at ? new Date(bon.created_at).toLocaleDateString() : ''}
                                     </p>
                                   </div>
                                   <div className="flex gap-2">
                                     <Button
                                       variant="ghost"
                                       size="sm"
-                                      onClick={() => navigate(`/documentations/bons-travail/${bon.id}`)}
+                                      onClick={() => navigate(`/pole/${pole.id}/bon-travail/${bon.id}`)}
                                       title="Voir le bon"
                                     >
                                       <Eye className="h-4 w-4" />
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => {
+                                        const token = localStorage.getItem('token');
+                                        const printWindow = window.open(`${getBackendURL()}/api/documentations/bons-travail/${bon.id}/pdf?token=${token}`, '_blank');
+                                        if (printWindow) {
+                                          printWindow.onload = () => {
+                                            printWindow.print();
+                                          };
+                                        }
+                                      }}
+                                      title="Imprimer le bon"
+                                    >
+                                      <FileText className="h-4 w-4" />
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => {
+                                        const token = localStorage.getItem('token');
+                                        window.open(`${getBackendURL()}/api/documentations/bons-travail/${bon.id}/pdf?token=${token}`, '_blank');
+                                      }}
+                                      title="Télécharger PDF"
+                                    >
+                                      <Download className="h-4 w-4" />
                                     </Button>
                                   </div>
                                 </div>
