@@ -140,7 +140,7 @@ REACT_APP_BACKEND_URL=http://{tailscale_ip}
         with open(env_file_path, 'w') as f:
             f.write(new_env_content)
         
-        logger.info("[3/5] Recompilation du frontend (cela peut prendre 1-2 minutes)...")
+        logger.info("[4/6] Recompilation du frontend (cela peut prendre 1-2 minutes)...")
         result = subprocess.run(
             ['yarn', 'build'],
             cwd=str(proxmox_frontend_path),
@@ -151,13 +151,23 @@ REACT_APP_BACKEND_URL=http://{tailscale_ip}
         
         if result.returncode != 0:
             logger.error(f"❌ Erreur compilation: {result.stderr}")
-            raise Exception("Erreur lors de la compilation du frontend")
+            # Restaurer le backup en cas d'erreur
+            subprocess.run(['cp', str(backup_path), str(env_file_path)], check=True)
+            raise Exception("Erreur lors de la compilation du frontend - Configuration restaurée")
         
-        logger.info("[4/5] Redémarrage de nginx...")
+        logger.info("[5/6] Redémarrage du backend (d'abord)...")
+        result_backend = subprocess.run(['supervisorctl', 'restart', 'gmao-iris-backend'], 
+                                       capture_output=True, text=True)
+        if result_backend.returncode != 0:
+            logger.warning(f"⚠️ Avertissement backend: {result_backend.stderr}")
+        
+        # Attendre que le backend soit prêt
+        import time
+        logger.info("Attente 5 secondes pour que le backend démarre...")
+        time.sleep(5)
+        
+        logger.info("[6/6] Redémarrage de nginx...")
         subprocess.run(['systemctl', 'restart', 'nginx'], check=True)
-        
-        logger.info("[5/5] Redémarrage du backend...")
-        subprocess.run(['supervisorctl', 'restart', 'gmao-iris-backend'], check=True)
         
         logger.info(f"✅ Configuration Tailscale appliquée avec succès : {tailscale_ip}")
         
