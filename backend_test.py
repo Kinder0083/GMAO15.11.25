@@ -165,7 +165,7 @@ class SurveillanceCustomCategoryTester:
     
     def test_verify_stats_with_new_category(self):
         """TEST 3: Vérifier statistiques avec nouvelle catégorie"""
-        self.log("🧪 TEST 3: Vérifier que by_category contient maintenant 'MA_NOUVELLE_CATEGORIE'")
+        self.log("🧪 TEST 3: Vérifier que by_category contient maintenant 'TEST_CATEGORIE_NOUVELLE'")
         
         try:
             response = self.admin_session.get(
@@ -183,9 +183,9 @@ class SurveillanceCustomCategoryTester:
                     self.log(f"✅ by_category trouvé avec {len(by_category)} catégories")
                     
                     # Vérifier que notre nouvelle catégorie est présente
-                    if "MA_NOUVELLE_CATEGORIE" in by_category:
-                        category_stats = by_category["MA_NOUVELLE_CATEGORIE"]
-                        self.log(f"✅ SUCCÈS: Catégorie 'MA_NOUVELLE_CATEGORIE' trouvée dans les statistiques")
+                    if "TEST_CATEGORIE_NOUVELLE" in by_category:
+                        category_stats = by_category["TEST_CATEGORIE_NOUVELLE"]
+                        self.log(f"✅ SUCCÈS: Catégorie 'TEST_CATEGORIE_NOUVELLE' trouvée dans les statistiques")
                         self.log(f"✅ Total items: {category_stats.get('total')}")
                         self.log(f"✅ Réalisés: {category_stats.get('realises')}")
                         self.log(f"✅ Pourcentage: {category_stats.get('pourcentage')}%")
@@ -198,7 +198,7 @@ class SurveillanceCustomCategoryTester:
                             self.log("❌ ÉCHEC: Comptage incorrect", "ERROR")
                             return False
                     else:
-                        self.log("❌ ÉCHEC: Catégorie 'MA_NOUVELLE_CATEGORIE' non trouvée dans les statistiques", "ERROR")
+                        self.log("❌ ÉCHEC: Catégorie 'TEST_CATEGORIE_NOUVELLE' non trouvée dans les statistiques", "ERROR")
                         self.log(f"Catégories disponibles: {list(by_category.keys())}")
                         return False
                 else:
