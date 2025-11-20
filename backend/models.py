@@ -1126,7 +1126,7 @@ class SurveillanceResponsible(str, Enum):
 class SurveillanceItem(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     classe_type: str  # Ex: "Protection incendie", "Installations électriques"
-    category: SurveillanceCategory
+    category: str  # Catégorie dynamique (ex: "INCENDIE", "ELECTRIQUE", etc.)
     batiment: str  # Ex: "BATIMENT 1", "BATIMENT 1 ET 2"
     periodicite: str  # Ex: "6 mois", "1 an", "3 ans"
     responsable: SurveillanceResponsible
