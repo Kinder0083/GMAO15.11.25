@@ -1171,7 +1171,7 @@ class SurveillanceItem(BaseModel):
 
 class SurveillanceItemCreate(BaseModel):
     classe_type: str
-    category: SurveillanceCategory
+    category: str  # Catégorie dynamique (ex: "INCENDIE", "ELECTRIQUE", etc.)
     batiment: str
     periodicite: str
     responsable: SurveillanceResponsible
