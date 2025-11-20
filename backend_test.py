@@ -450,9 +450,12 @@ class SurveillanceTester:
         # Test 7: Authentification requise
         results["authentication_required"] = self.test_authentication_required()
         
+        # Nettoyage
+        self.cleanup_test_items()
+        
         # Summary
         self.log("=" * 80)
-        self.log("DOCUMENTATION POLES TEST RESULTS SUMMARY")
+        self.log("PLAN DE SURVEILLANCE TEST RESULTS SUMMARY")
         self.log("=" * 80)
         
         passed = sum(results.values())
@@ -465,66 +468,68 @@ class SurveillanceTester:
         self.log(f"\n📊 Overall: {passed}/{total} tests passed")
         
         # Analyse détaillée des tests critiques
-        critical_tests = ["get_poles_with_documents", "get_pole_by_id", "compare_with_documents_endpoint"]
+        critical_tests = ["check_due_dates_with_overdue_item", "verify_status_change", "authentication_required"]
         critical_passed = sum(results.get(test, False) for test in critical_tests)
         
         self.log("\n" + "=" * 60)
-        self.log("ANALYSE CRITIQUE DES CORRECTIONS")
+        self.log("ANALYSE CRITIQUE DE LA FONCTIONNALITÉ")
         self.log("=" * 60)
         
-        # CORRECTION 1: GET /api/documentations/poles
-        if results.get("get_poles_with_documents", False):
-            self.log("🎉 CORRECTION 1 - GET /api/documentations/poles: ✅ SUCCÈS CRITIQUE")
+        # TEST CRITIQUE 1: Endpoint check-due-dates
+        if results.get("check_due_dates_with_overdue_item", False):
+            self.log("🎉 TEST CRITIQUE 1 - POST /api/surveillance/check-due-dates: ✅ SUCCÈS")
             self.log("✅ Endpoint accessible (200 OK)")
-            self.log("✅ Chaque pôle contient un champ 'documents' (array)")
-            self.log("✅ Chaque pôle contient un champ 'bons_travail' (array)")
-            self.log("✅ Structure de données correcte pour l'affichage en vue liste")
-            self.log("✅ Les documents et bons sont maintenant automatiquement inclus")
+            self.log("✅ Structure de réponse correcte (success, updated_count, message)")
+            self.log("✅ Logique de vérification des échéances fonctionnelle")
         else:
-            self.log("🚨 CORRECTION 1 - GET /api/documentations/poles: ❌ ÉCHEC CRITIQUE")
-            self.log("❌ Les pôles ne contiennent pas les champs requis")
-            self.log("❌ La vue liste ne pourra pas afficher les documents")
+            self.log("🚨 TEST CRITIQUE 1 - POST /api/surveillance/check-due-dates: ❌ ÉCHEC")
+            self.log("❌ Endpoint inaccessible ou réponse incorrecte")
         
-        # CORRECTION 2: GET /api/documentations/poles/{pole_id}
-        if results.get("get_pole_by_id", False):
-            self.log("🎉 CORRECTION 2 - GET /api/documentations/poles/{pole_id}: ✅ SUCCÈS CRITIQUE")
-            self.log("✅ Endpoint spécifique accessible (200 OK)")
-            self.log("✅ Structure correcte avec documents et bons_travail")
-            self.log("✅ Données cohérentes avec l'endpoint de liste")
+        # TEST CRITIQUE 2: Changement de statut
+        if results.get("verify_status_change", False):
+            self.log("🎉 TEST CRITIQUE 2 - CHANGEMENT DE STATUT: ✅ SUCCÈS")
+            self.log("✅ Items REALISE en échéance changent vers PLANIFIER")
+            self.log("✅ updated_by = 'system_auto_check' (traçabilité)")
+            self.log("✅ Logique métier correctement implémentée")
         else:
-            self.log("🚨 CORRECTION 2 - GET /api/documentations/poles/{pole_id}: ❌ ÉCHEC CRITIQUE")
-            self.log("❌ Structure incorrecte pour pôle spécifique")
+            self.log("🚨 TEST CRITIQUE 2 - CHANGEMENT DE STATUT: ❌ ÉCHEC")
+            self.log("❌ Statuts non mis à jour ou logique incorrecte")
         
-        # VÉRIFICATION 3: Cohérence avec endpoint documents
-        if results.get("compare_with_documents_endpoint", False):
-            self.log("🎉 VÉRIFICATION 3 - COHÉRENCE ENDPOINTS: ✅ SUCCÈS CRITIQUE")
-            self.log("✅ Les nombres de documents correspondent")
-            self.log("✅ Les mêmes documents apparaissent dans les deux endpoints")
-            self.log("✅ Pas de perte de données lors de l'inclusion automatique")
+        # TEST CRITIQUE 3: Sécurité
+        if results.get("authentication_required", False):
+            self.log("🎉 TEST CRITIQUE 3 - SÉCURITÉ: ✅ SUCCÈS")
+            self.log("✅ Authentification JWT requise")
+            self.log("✅ Endpoint protégé contre accès non autorisé")
         else:
-            self.log("🚨 VÉRIFICATION 3 - COHÉRENCE ENDPOINTS: ❌ PROBLÈME DÉTECTÉ")
-            self.log("❌ Incohérence entre les endpoints")
-            self.log("❌ Possible perte de données ou doublons")
+            self.log("🚨 TEST CRITIQUE 3 - SÉCURITÉ: ❌ ÉCHEC")
+            self.log("❌ Endpoint accessible sans authentification")
+        
+        # Tests complémentaires
+        if results.get("item_not_in_due_range", False):
+            self.log("✅ VALIDATION: Items NON en échéance restent inchangés")
+        
+        if results.get("different_status_items", False):
+            self.log("✅ VALIDATION: Seuls les items REALISE sont traités")
         
         # Conclusion finale
         self.log("\n" + "=" * 80)
-        self.log("CONCLUSION FINALE - CORRECTION CRITIQUE")
+        self.log("CONCLUSION FINALE - FONCTIONNALITÉ VÉRIFICATION ÉCHÉANCES")
         self.log("=" * 80)
         
         if critical_passed == len(critical_tests):
-            self.log("🎉 CORRECTION ENTIÈREMENT RÉUSSIE!")
-            self.log("✅ GET /api/documentations/poles retourne les pôles avec documents et bons")
-            self.log("✅ GET /api/documentations/poles/{pole_id} retourne la structure correcte")
-            self.log("✅ Cohérence parfaite entre tous les endpoints")
-            self.log("✅ La vue liste peut maintenant afficher les documents")
-            self.log("✅ Le problème reporté par l'utilisateur est RÉSOLU")
-            self.log("✅ Les endpoints sont PRÊTS POUR PRODUCTION")
+            self.log("🎉 FONCTIONNALITÉ ENTIÈREMENT OPÉRATIONNELLE!")
+            self.log("✅ POST /api/surveillance/check-due-dates fonctionne correctement")
+            self.log("✅ Logique de vérification des échéances implémentée")
+            self.log("✅ Changement automatique de statut REALISE → PLANIFIER")
+            self.log("✅ Sécurité et authentification en place")
+            self.log("✅ Traçabilité des modifications automatiques")
+            self.log("✅ La fonctionnalité est PRÊTE POUR PRODUCTION")
         else:
-            self.log("⚠️ CORRECTION INCOMPLÈTE - PROBLÈMES PERSISTANTS")
+            self.log("⚠️ FONCTIONNALITÉ INCOMPLÈTE - PROBLÈMES DÉTECTÉS")
             failed_critical = [test for test in critical_tests if not results.get(test, False)]
             self.log(f"❌ Tests critiques échoués: {', '.join(failed_critical)}")
-            self.log("❌ La vue liste pourrait encore ne pas afficher les documents")
-            self.log("❌ Intervention supplémentaire requise")
+            self.log("❌ La vérification automatique des échéances ne fonctionne pas correctement")
+            self.log("❌ Intervention requise avant mise en production")
         
         return results
 
