@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
 Backend API Testing Script for GMAO Application
-Tests Documentation Poles endpoints - CRITICAL FIX VERIFICATION
+Tests Plan de Surveillance - Vérification automatique échéances
 """
 
 import requests
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Use the correct backend URL from frontend .env
 BACKEND_URL = "https://surveil-plan.preview.emergentagent.com/api"
