@@ -68,7 +68,8 @@ async def get_user_preference(
         logger.error(f"Error getting user preference: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.post("/")
+@router.post("/", status_code=200)
+@router.post("", status_code=200)
 async def update_user_preference(
     preference: PreferenceUpdate,
     current_user: dict = Depends(get_current_user)
