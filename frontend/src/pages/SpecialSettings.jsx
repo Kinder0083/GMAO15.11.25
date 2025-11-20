@@ -60,6 +60,7 @@ const SpecialSettings = () => {
     loadUsers();
     loadSettings();
     loadSmtpConfig();
+    loadTailscaleConfig();
   }, []);
 
   const loadUsers = async () => {
