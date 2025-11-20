@@ -21,6 +21,7 @@ import CategoryOrderDialog from '../components/Surveillance/CategoryOrderDialog'
 function SurveillancePlan() {
   const { toast } = useToast();
   const { confirm, ConfirmDialog } = useConfirmDialog();
+  const location = useLocation();
   const [items, setItems] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
   const [stats, setStats] = useState(null);
@@ -31,6 +32,7 @@ function SurveillancePlan() {
   const [openCategoryDialog, setOpenCategoryDialog] = useState(false);
   const [categories, setCategories] = useState([]);
   const [categoryOrderChanged, setCategoryOrderChanged] = useState(false);
+  const [showOverdueFilter, setShowOverdueFilter] = useState(false);
   
   const [filters, setFilters] = useState({
     category: '',
