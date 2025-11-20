@@ -213,27 +213,21 @@ class SurveillanceCustomCategoryTester:
             self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
             return False
     
-    def test_item_not_in_due_range(self):
-        """TEST 4: Créer un item NON en échéance et vérifier qu'il n'est pas modifié"""
-        self.log("🧪 TEST 4: Item NON en échéance - ne doit pas être modifié")
-        
-        # Créer un item avec une date dans 60 jours et durée rappel de 30 jours
-        future_date = (datetime.now() + timedelta(days=60)).strftime("%Y-%m-%d")
+    def test_create_second_custom_category_item(self):
+        """TEST 4: Créer un 2ème item avec une autre catégorie personnalisée"""
+        self.log("🧪 TEST 4: Créer un 2ème item avec une autre catégorie personnalisée")
         
         test_item_data = {
-            "classe_type": "Test Non Échéance",
-            "category": "AUTRE",
-            "batiment": "TEST",
-            "periodicite": "1 an",
-            "responsable": "MAINT",
-            "executant": "TEST",
-            "status": "REALISE",
-            "prochain_controle": future_date,
-            "duree_rappel_echeance": 30
+            "classe_type": "Test Deuxième Catégorie",
+            "category": "CATEGORIE_TEST_2",
+            "batiment": "AUTRE BATIMENT",
+            "periodicite": "3 mois",
+            "responsable": "PROD",
+            "executant": "Autre Executant",
+            "description": "Test création avec deuxième catégorie dynamique"
         }
         
         try:
-            # Créer l'item
             response = self.admin_session.post(
                 f"{BACKEND_URL}/surveillance/items",
                 json=test_item_data,
@@ -242,46 +236,29 @@ class SurveillanceCustomCategoryTester:
             
             if response.status_code in [200, 201]:
                 data = response.json()
-                item_id = data.get('id')
-                self.test_items.append(item_id)
-                self.log(f"✅ Item NON en échéance créé - ID: {item_id}")
-                self.log(f"✅ Prochain contrôle: {future_date} (dans 60 jours)")
+                self.log(f"✅ Deuxième item créé - Status: {response.status_code}")
+                self.log(f"✅ ID: {data.get('id')}")
+                self.log(f"✅ Classe: {data.get('classe_type')}")
+                self.log(f"✅ Catégorie: {data.get('category')}")
+                self.log(f"✅ Responsable: {data.get('responsable')}")
                 
-                # Appeler check-due-dates
-                check_response = self.admin_session.post(
-                    f"{BACKEND_URL}/surveillance/check-due-dates",
-                    timeout=15
-                )
-                
-                if check_response.status_code == 200:
-                    # Vérifier que l'item n'a pas été modifié
-                    get_response = self.admin_session.get(
-                        f"{BACKEND_URL}/surveillance/items/{item_id}",
-                        timeout=15
-                    )
-                    
-                    if get_response.status_code == 200:
-                        updated_item = get_response.json()
-                        
-                        if updated_item.get('status') == 'REALISE':
-                            self.log("✅ SUCCÈS: Item NON en échéance reste REALISE")
-                            return True
-                        else:
-                            self.log(f"❌ ÉCHEC: Item modifié à tort - Statut: {updated_item.get('status')}", "ERROR")
-                            return False
-                    else:
-                        self.log("❌ Impossible de récupérer l'item après vérification", "ERROR")
-                        return False
+                # Vérifier que la deuxième catégorie personnalisée est bien enregistrée
+                if data.get('category') == "CATEGORIE_TEST_2":
+                    self.log("✅ SUCCÈS: Deuxième catégorie personnalisée 'CATEGORIE_TEST_2' acceptée")
+                    # Stocker pour nettoyage
+                    self.test_items.append(data.get('id'))
+                    return True, data
                 else:
-                    self.log("❌ Échec de l'appel check-due-dates", "ERROR")
-                    return False
+                    self.log(f"❌ ÉCHEC: Catégorie incorrecte - Attendu: CATEGORIE_TEST_2, Reçu: {data.get('category')}", "ERROR")
+                    return False, None
             else:
-                self.log(f"❌ Création de l'item échouée - Status: {response.status_code}", "ERROR")
-                return False
+                self.log(f"❌ Création échouée - Status: {response.status_code}", "ERROR")
+                self.log(f"Response: {response.text}", "ERROR")
+                return False, None
                 
         except requests.exceptions.RequestException as e:
             self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
-            return False
+            return False, None
     
     def test_different_status_items(self):
         """TEST 5: Vérifier que seuls les items REALISE sont traités"""
