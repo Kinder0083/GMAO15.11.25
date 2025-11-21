@@ -729,17 +729,8 @@ async def generate_bon_pdf(
         if not bon:
             raise HTTPException(status_code=404, detail="Bon de travail non trouvé")
         
-        # Date formatée
-        date_engagement = bon.get('date_engagement', bon.get('created_at', ''))[:10] if bon.get('date_engagement') or bon.get('created_at') else ''
-        
-        # Fonction helper pour générer les checkboxes
-        def generate_checkbox(label, checked_list, value):
-            checked = value in (checked_list or [])
-            check_mark = '✓' if checked else ''
-            return f'<div class="checkbox-line"><span class="checkbox {"checked" if checked else ""}">{check_mark}</span> {label}</div>'
-        
-        # Générer HTML EXACTEMENT comme le template Word
-        html_content = f"""
+        # Générer le HTML avec le template MAINT_FE_004_V02
+        html_content = generate_bon_travail_html(bon)
         <!DOCTYPE html>
         <html>
         <head>
