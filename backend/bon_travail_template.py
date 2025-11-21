@@ -1,6 +1,6 @@
 """
 Template HTML pour la génération du PDF Bon de Travail
-Format: MAINT_FE_004_V02
+Format: MAINT_FE_004_V02 - Basé sur le document Word officiel
 """
 
 def generate_bon_travail_html(bon):
