@@ -29,7 +29,7 @@ from models import (
 from dependencies import get_current_user, get_current_admin_user, get_current_user_optional
 from audit_service import AuditService
 from auth import decode_access_token
-from bon_travail_template_v2 import generate_bon_travail_html
+from bon_travail_template_final import generate_bon_travail_html
 import os
 
 logger = logging.getLogger(__name__)
