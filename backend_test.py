@@ -21,7 +21,7 @@ class AutorisationsParticulieresTester:
         self.admin_session = requests.Session()
         self.admin_token = None
         self.admin_data = None
-        self.test_items = []  # Store created test items for cleanup
+        self.test_autorisations = []  # Store created test autorisations for cleanup
         
     def log(self, message, level="INFO"):
         """Log test messages with timestamp"""
