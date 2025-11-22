@@ -699,64 +699,64 @@ class DemandeArretJournalisationTester:
         critical_passed = sum(results.get(test, False) for test in critical_tests)
         
         self.log("\n" + "=" * 60)
-        self.log("ANALYSE CRITIQUE DE LA FONCTIONNALITÉ")
+        self.log("ANALYSE CRITIQUE DE LA JOURNALISATION")
         self.log("=" * 60)
         
-        # TEST CRITIQUE 1: Récupération équipement
-        if results.get("get_equipment", False):
-            self.log("🎉 TEST CRITIQUE 1 - RÉCUPÉRATION ÉQUIPEMENT: ✅ SUCCÈS")
-            self.log("✅ GET /api/equipment fonctionne correctement")
-            self.log("✅ Équipement valide trouvé pour les tests")
-        else:
-            self.log("🚨 TEST CRITIQUE 1 - RÉCUPÉRATION ÉQUIPEMENT: ❌ ÉCHEC")
-            self.log("❌ Erreur lors de la récupération des équipements")
-        
-        # TEST CRITIQUE 2: Récupération utilisateur RSP_PROD
-        if results.get("get_rsp_prod_user", False):
-            self.log("🎉 TEST CRITIQUE 2 - RÉCUPÉRATION UTILISATEUR RSP_PROD: ✅ SUCCÈS")
-            self.log("✅ GET /api/users fonctionne correctement")
-            self.log("✅ Utilisateur avec rôle RSP_PROD trouvé")
-        else:
-            self.log("🚨 TEST CRITIQUE 2 - RÉCUPÉRATION UTILISATEUR RSP_PROD: ❌ ÉCHEC")
-            self.log("❌ Erreur lors de la récupération des utilisateurs RSP_PROD")
-        
-        # TEST CRITIQUE 3: Création demande d'arrêt
+        # TEST CRITIQUE 1: Création demande d'arrêt
         if results.get("create_demande_arret", False):
-            self.log("🎉 TEST CRITIQUE 3 - CRÉATION DEMANDE D'ARRÊT: ✅ SUCCÈS")
+            self.log("🎉 TEST CRITIQUE 1 - CRÉATION DEMANDE D'ARRÊT: ✅ SUCCÈS")
             self.log("✅ POST /api/demandes-arret/ fonctionne correctement")
-            self.log("✅ Statut par défaut 'EN_ATTENTE'")
-            self.log("✅ Noms d'équipements correctement récupérés (correction nom vs name)")
-            self.log("✅ Noms demandeur/destinataire formatés (correction prenom/nom)")
-            self.log("✅ Dates de création et expiration présentes")
+            self.log("✅ Demande créée avec token de validation")
         else:
-            self.log("🚨 TEST CRITIQUE 3 - CRÉATION DEMANDE D'ARRÊT: ❌ ÉCHEC")
+            self.log("🚨 TEST CRITIQUE 1 - CRÉATION DEMANDE D'ARRÊT: ❌ ÉCHEC")
             self.log("❌ Erreur lors de la création de demande d'arrêt")
         
-        # TEST CRITIQUE 4: Liste des demandes
-        if results.get("get_all_demandes_arret", False):
-            self.log("🎉 TEST CRITIQUE 4 - LISTE DES DEMANDES: ✅ SUCCÈS")
-            self.log("✅ GET /api/demandes-arret/ retourne la liste")
-            self.log("✅ Demande créée incluse dans la liste")
+        # TEST CRITIQUE 2: Vérification journal création
+        if results.get("verify_journal_creation", False):
+            self.log("🎉 TEST CRITIQUE 2 - JOURNAL CRÉATION: ✅ SUCCÈS")
+            self.log("✅ Entrée CREATE trouvée dans le journal d'audit")
+            self.log("✅ Action: CREATE, Entity Type: DEMANDE_ARRET")
+            self.log("✅ Détails contiennent noms équipements et destinataire")
         else:
-            self.log("🚨 TEST CRITIQUE 4 - LISTE DES DEMANDES: ❌ ÉCHEC")
-            self.log("❌ Erreur lors de la récupération de la liste")
+            self.log("🚨 TEST CRITIQUE 2 - JOURNAL CRÉATION: ❌ ÉCHEC")
+            self.log("❌ Entrée CREATE non trouvée ou incomplète")
         
-        # TEST CRITIQUE 5: Récupération par ID
-        if results.get("get_demande_by_id", False):
-            self.log("🎉 TEST CRITIQUE 5 - RÉCUPÉRATION PAR ID: ✅ SUCCÈS")
-            self.log("✅ GET /api/demandes-arret/{id} fonctionne")
-            self.log("✅ Tous les champs présents et corrects")
-            self.log("✅ equipement_ids et equipement_noms sont des arrays")
+        # TEST CRITIQUE 3: Approbation demande
+        if results.get("approve_demande", False):
+            self.log("🎉 TEST CRITIQUE 3 - APPROBATION DEMANDE: ✅ SUCCÈS")
+            self.log("✅ POST /api/demandes-arret/validate/{token} fonctionne")
+            self.log("✅ Demande approuvée avec commentaire")
         else:
-            self.log("🚨 TEST CRITIQUE 5 - RÉCUPÉRATION PAR ID: ❌ ÉCHEC")
-            self.log("❌ Erreur lors de la récupération par ID")
+            self.log("🚨 TEST CRITIQUE 3 - APPROBATION DEMANDE: ❌ ÉCHEC")
+            self.log("❌ Erreur lors de l'approbation")
         
-        # Tests complémentaires
-        if results.get("check_backend_logs", False):
-            self.log("✅ VALIDATION: Pas d'erreur critique dans les logs backend")
+        # TEST CRITIQUE 4: Vérification journal approbation
+        if results.get("verify_journal_approval", False):
+            self.log("🎉 TEST CRITIQUE 4 - JOURNAL APPROBATION: ✅ SUCCÈS")
+            self.log("✅ Entrée UPDATE trouvée avec détails 'APPROUVÉE'")
+            self.log("✅ Changes: 'EN_ATTENTE → APPROUVEE'")
+        else:
+            self.log("🚨 TEST CRITIQUE 4 - JOURNAL APPROBATION: ❌ ÉCHEC")
+            self.log("❌ Entrée UPDATE approbation non trouvée")
         
-        if results.get("cleanup_remaining_demandes", False):
-            self.log("✅ NETTOYAGE: Demandes de test marquées pour nettoyage")
+        # TEST CRITIQUE 5: Création et refus demande
+        if results.get("create_and_refuse_demande", False):
+            self.log("🎉 TEST CRITIQUE 5 - REFUS DEMANDE: ✅ SUCCÈS")
+            self.log("✅ Nouvelle demande créée et refusée")
+            self.log("✅ Entrée UPDATE trouvée avec détails 'REFUSÉE'")
+            self.log("✅ Changes: 'EN_ATTENTE → REFUSEE'")
+        else:
+            self.log("🚨 TEST CRITIQUE 5 - REFUS DEMANDE: ❌ ÉCHEC")
+            self.log("❌ Erreur lors du refus ou journalisation")
+        
+        # TEST CRITIQUE 6: Vérification finale
+        if results.get("final_journal_verification", False):
+            self.log("🎉 TEST CRITIQUE 6 - VÉRIFICATION FINALE: ✅ SUCCÈS")
+            self.log("✅ Toutes les actions DEMANDE_ARRET enregistrées")
+            self.log("✅ Actions CREATE et UPDATE présentes")
+        else:
+            self.log("🚨 TEST CRITIQUE 6 - VÉRIFICATION FINALE: ❌ ÉCHEC")
+            self.log("❌ Journalisation incomplète")
         
         # Conclusion finale
         self.log("\n" + "=" * 80)
