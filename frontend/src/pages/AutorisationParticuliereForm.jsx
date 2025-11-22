@@ -19,6 +19,7 @@ const AutorisationParticuliereForm = () => {
 
   const [loading, setLoading] = useState(false);
   const [bonsTravail, setBonsTravail] = useState([]);
+  const [selectedBonId, setSelectedBonId] = useState('');
   const [formData, setFormData] = useState({
     service_demandeur: '',
     responsable: '',
