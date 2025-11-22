@@ -476,68 +476,54 @@ class DemandeArretTester:
         self.log("ANALYSE CRITIQUE DE LA FONCTIONNALITÉ")
         self.log("=" * 60)
         
-        # TEST CRITIQUE 1: Création d'autorisation
-        if results.get("create_autorisation", False):
-            self.log("🎉 TEST CRITIQUE 1 - CRÉATION D'AUTORISATION: ✅ SUCCÈS")
-            self.log("✅ POST /api/autorisations fonctionne correctement")
-            self.log("✅ Numérotation automatique >= 8000")
-            self.log("✅ Date d'établissement auto-générée")
-            self.log("✅ Statut par défaut 'BROUILLON'")
-            self.log("✅ Champs created_at, updated_at présents")
+        # TEST CRITIQUE 1: Récupération équipement
+        if results.get("get_equipment", False):
+            self.log("🎉 TEST CRITIQUE 1 - RÉCUPÉRATION ÉQUIPEMENT: ✅ SUCCÈS")
+            self.log("✅ GET /api/equipment fonctionne correctement")
+            self.log("✅ Équipement valide trouvé pour les tests")
         else:
-            self.log("🚨 TEST CRITIQUE 1 - CRÉATION D'AUTORISATION: ❌ ÉCHEC")
-            self.log("❌ Erreur lors de la création d'autorisation")
+            self.log("🚨 TEST CRITIQUE 1 - RÉCUPÉRATION ÉQUIPEMENT: ❌ ÉCHEC")
+            self.log("❌ Erreur lors de la récupération des équipements")
         
-        # TEST CRITIQUE 2: Liste des autorisations
-        if results.get("get_all_autorisations", False):
-            self.log("🎉 TEST CRITIQUE 2 - LISTE DES AUTORISATIONS: ✅ SUCCÈS")
-            self.log("✅ GET /api/autorisations retourne la liste")
-            self.log("✅ Autorisation créée incluse dans la liste")
+        # TEST CRITIQUE 2: Récupération utilisateur RSP_PROD
+        if results.get("get_rsp_prod_user", False):
+            self.log("🎉 TEST CRITIQUE 2 - RÉCUPÉRATION UTILISATEUR RSP_PROD: ✅ SUCCÈS")
+            self.log("✅ GET /api/users fonctionne correctement")
+            self.log("✅ Utilisateur avec rôle RSP_PROD trouvé")
         else:
-            self.log("🚨 TEST CRITIQUE 2 - LISTE DES AUTORISATIONS: ❌ ÉCHEC")
+            self.log("🚨 TEST CRITIQUE 2 - RÉCUPÉRATION UTILISATEUR RSP_PROD: ❌ ÉCHEC")
+            self.log("❌ Erreur lors de la récupération des utilisateurs RSP_PROD")
+        
+        # TEST CRITIQUE 3: Création demande d'arrêt
+        if results.get("create_demande_arret", False):
+            self.log("🎉 TEST CRITIQUE 3 - CRÉATION DEMANDE D'ARRÊT: ✅ SUCCÈS")
+            self.log("✅ POST /api/demandes-arret/ fonctionne correctement")
+            self.log("✅ Statut par défaut 'EN_ATTENTE'")
+            self.log("✅ Noms d'équipements correctement récupérés (correction nom vs name)")
+            self.log("✅ Noms demandeur/destinataire formatés (correction prenom/nom)")
+            self.log("✅ Dates de création et expiration présentes")
+        else:
+            self.log("🚨 TEST CRITIQUE 3 - CRÉATION DEMANDE D'ARRÊT: ❌ ÉCHEC")
+            self.log("❌ Erreur lors de la création de demande d'arrêt")
+        
+        # TEST CRITIQUE 4: Liste des demandes
+        if results.get("get_all_demandes_arret", False):
+            self.log("🎉 TEST CRITIQUE 4 - LISTE DES DEMANDES: ✅ SUCCÈS")
+            self.log("✅ GET /api/demandes-arret/ retourne la liste")
+            self.log("✅ Demande créée incluse dans la liste")
+        else:
+            self.log("🚨 TEST CRITIQUE 4 - LISTE DES DEMANDES: ❌ ÉCHEC")
             self.log("❌ Erreur lors de la récupération de la liste")
         
-        # TEST CRITIQUE 3: Récupération par ID
-        if results.get("get_autorisation_by_id", False):
-            self.log("🎉 TEST CRITIQUE 3 - RÉCUPÉRATION PAR ID: ✅ SUCCÈS")
-            self.log("✅ GET /api/autorisations/{id} fonctionne")
+        # TEST CRITIQUE 5: Récupération par ID
+        if results.get("get_demande_by_id", False):
+            self.log("🎉 TEST CRITIQUE 5 - RÉCUPÉRATION PAR ID: ✅ SUCCÈS")
+            self.log("✅ GET /api/demandes-arret/{id} fonctionne")
             self.log("✅ Tous les champs présents et corrects")
-            self.log("✅ personnel_autorise est un array")
+            self.log("✅ equipement_ids et equipement_noms sont des arrays")
         else:
-            self.log("🚨 TEST CRITIQUE 3 - RÉCUPÉRATION PAR ID: ❌ ÉCHEC")
+            self.log("🚨 TEST CRITIQUE 5 - RÉCUPÉRATION PAR ID: ❌ ÉCHEC")
             self.log("❌ Erreur lors de la récupération par ID")
-        
-        # TEST CRITIQUE 4: Mise à jour
-        if results.get("update_autorisation", False):
-            self.log("🎉 TEST CRITIQUE 4 - MISE À JOUR: ✅ SUCCÈS")
-            self.log("✅ PUT /api/autorisations/{id} fonctionne")
-            self.log("✅ Modifications appliquées correctement")
-            self.log("✅ updated_at mis à jour")
-        else:
-            self.log("🚨 TEST CRITIQUE 4 - MISE À JOUR: ❌ ÉCHEC")
-            self.log("❌ Erreur lors de la mise à jour")
-        
-        # TEST CRITIQUE 5: Génération PDF
-        if results.get("generate_pdf", False):
-            self.log("🎉 TEST CRITIQUE 5 - GÉNÉRATION PDF: ✅ SUCCÈS")
-            self.log("✅ GET /api/autorisations/{id}/pdf fonctionne")
-            self.log("✅ Content-Type: text/html")
-            self.log("✅ HTML contient 'AUTORISATION PARTICULIÈRE DE TRAVAUX'")
-            self.log("✅ HTML contient le numéro d'autorisation")
-            self.log("✅ HTML contient les données de l'autorisation")
-        else:
-            self.log("🚨 TEST CRITIQUE 5 - GÉNÉRATION PDF: ❌ ÉCHEC")
-            self.log("❌ Erreur lors de la génération PDF")
-        
-        # TEST CRITIQUE 6: Suppression
-        if results.get("delete_autorisation", False):
-            self.log("🎉 TEST CRITIQUE 6 - SUPPRESSION: ✅ SUCCÈS")
-            self.log("✅ DELETE /api/autorisations/{id} fonctionne")
-            self.log("✅ Message de succès retourné")
-            self.log("✅ GET suivant retourne 404")
-        else:
-            self.log("🚨 TEST CRITIQUE 6 - SUPPRESSION: ❌ ÉCHEC")
-            self.log("❌ Erreur lors de la suppression")
         
         # Tests complémentaires
         if results.get("check_backend_logs", False):
