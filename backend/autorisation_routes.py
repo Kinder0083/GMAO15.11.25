@@ -62,6 +62,10 @@ async def get_autorisation(
         autorisation = await db.autorisations_particulieres.find_one({"id": autorisation_id})
         if not autorisation:
             raise HTTPException(status_code=404, detail="Autorisation non trouvée")
+        # Serialize document to handle ObjectId and other MongoDB types
+        if "_id" in autorisation:
+            autorisation["id"] = str(autorisation["_id"])
+            del autorisation["_id"]
         return autorisation
     except HTTPException:
         raise
