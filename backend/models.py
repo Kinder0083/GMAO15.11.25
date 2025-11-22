@@ -1506,6 +1506,7 @@ class AutorisationParticuliereUpdate(BaseModel):
     date_signature_demandeur: Optional[str] = None
     signature_responsable_securite: Optional[str] = None
     date_signature_responsable: Optional[str] = None
+    bons_travail_ids: Optional[List[str]] = None
     statut: Optional[str] = None
 
 # Models CRUD
