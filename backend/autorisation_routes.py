@@ -98,6 +98,10 @@ async def create_autorisation(
         
         await db.autorisations_particulieres.insert_one(data)
         logger.info(f"Autorisation créée: {data['id']} (numéro: {next_numero})")
+        
+        # Remove _id from response to avoid serialization issues
+        if "_id" in data:
+            del data["_id"]
         return data
     except Exception as e:
         logger.error(f"Erreur création autorisation: {str(e)}")
