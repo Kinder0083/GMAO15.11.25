@@ -14,7 +14,6 @@ const PlanningMPrev = () => {
   const [planningEntries, setPlanningEntries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedMonth, setSelectedMonth] = useState(null); // Pour vue mensuelle détaillée
 
   const loadEquipments = async () => {
     try {
@@ -34,8 +33,8 @@ const PlanningMPrev = () => {
     try {
       setLoading(true);
       const year = currentDate.getFullYear();
-      const startDate = new Date(year, 0, 1).toISOString().split('T')[0];
-      const endDate = new Date(year, 11, 31).toISOString().split('T')[0];
+      const startDate = new Date(year, 0, 1).toISOString().split('T')[0]; // 1er janvier
+      const endDate = new Date(year, 11, 31).toISOString().split('T')[0]; // 31 décembre
       
       const entries = await demandesArretAPI.getPlanningEquipements({
         date_debut: startDate,
@@ -61,20 +60,27 @@ const PlanningMPrev = () => {
     loadPlanningEntries();
   }, [currentDate]);
 
-  // Obtenir tous les jours d'un mois spécifique
-  const getDaysInMonth = (year, month) => {
-    const days = [];
-    const lastDay = new Date(year, month + 1, 0).getDate();
-    for (let d = 1; d <= lastDay; d++) {
-      days.push(new Date(year, month, d));
+  const getMonthsInYear = () => {
+    const year = currentDate.getFullYear();
+    const months = [];
+    
+    for (let m = 0; m < 12; m++) {
+      months.push({
+        month: m,
+        year: year,
+        name: monthNames[m],
+        daysInMonth: new Date(year, m + 1, 0).getDate()
+      });
     }
-    return days;
+    
+    return months;
   };
 
   // Obtenir le statut de l'équipement pour une demi-journée spécifique
   const getEquipmentStatusForHalfDay = (equipmentId, date, isAM) => {
     const dateStr = date.toISOString().split('T')[0];
     
+    // Chercher une entrée de planning pour cette date et cet équipement
     const entry = planningEntries.find(e => {
       if (e.equipement_id !== equipmentId) return false;
       
@@ -82,15 +88,17 @@ const PlanningMPrev = () => {
       const entryEnd = new Date(e.date_fin);
       const currentDate = new Date(dateStr);
       
+      // Vérifier si la date est dans la plage
       if (currentDate < entryStart || currentDate > entryEnd) return false;
       
-      // Vérifier la demi-journée pour le premier jour
+      // Vérifier la demi-journée
       if (currentDate.toISOString().split('T')[0] === e.date_debut) {
+        // Premier jour
         if (e.periode_debut === 'APRES_MIDI' && isAM) return false;
       }
       
-      // Vérifier la demi-journée pour le dernier jour
       if (currentDate.toISOString().split('T')[0] === e.date_fin) {
+        // Dernier jour
         if (e.periode_fin === 'MATIN' && !isAM) return false;
       }
       
@@ -101,13 +109,13 @@ const PlanningMPrev = () => {
       return entry.statut || 'EN_MAINTENANCE';
     }
 
+    // Utiliser le statut de l'équipement
     const equipment = equipments.find(e => e.id === equipmentId);
-    return equipment?.status || equipment?.statut || 'OPERATIONNEL';
+    return equipment?.status || 'OPERATIONAL';
   };
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'OPERATIONNEL':
       case 'OPERATIONAL':
         return '#10b981'; // Vert
       case 'EN_MAINTENANCE':
@@ -136,8 +144,8 @@ const PlanningMPrev = () => {
     'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
   ];
 
+  const months = getMonthsInYear();
   const today = new Date().toISOString().split('T')[0];
-  const year = currentDate.getFullYear();
 
   if (loading && equipments.length === 0) {
     return (
@@ -170,7 +178,7 @@ const PlanningMPrev = () => {
             </Button>
             <div className="flex items-center gap-4">
               <h2 className="text-2xl font-bold">
-                Année {year}
+                Année {currentDate.getFullYear()}
               </h2>
               <Button variant="ghost" size="sm" onClick={goToCurrentYear}>
                 Année actuelle
@@ -199,119 +207,114 @@ const PlanningMPrev = () => {
             <span className="text-xs text-gray-500 ml-4">• Triangle gauche = Matin (8h-12h) • Triangle droit = Après-midi (13h-17h)</span>
           </div>
 
-          {/* Vue annuelle - Affichage par mois */}
-          <div className="space-y-8">
-            {monthNames.map((monthName, monthIndex) => {
-              const days = getDaysInMonth(year, monthIndex);
-              const currentMonth = new Date().getMonth();
-              const currentYear = new Date().getFullYear();
-              const isCurrentMonth = monthIndex === currentMonth && year === currentYear;
-
-              return (
-                <div key={monthIndex} className="border rounded-lg p-4">
-                  <h3 className={`text-lg font-semibold mb-3 ${isCurrentMonth ? 'text-blue-600' : ''}`}>
-                    {monthName} {year}
-                  </h3>
-                  
-                  <div className="overflow-x-auto">
-                    <table className="w-full border-collapse">
-                      <thead>
-                        <tr>
-                          <th className="border p-2 bg-gray-100 sticky left-0 z-10 min-w-[150px]">
-                            <div className="flex items-center gap-2">
-                              <Wrench className="h-4 w-4" />
-                              Équipement
-                            </div>
-                          </th>
-                          {days.map((day, dayIndex) => {
-                            const isToday = day.toISOString().split('T')[0] === today;
-                            const isWeekend = day.getDay() === 0 || day.getDay() === 6;
-                            return (
-                              <th
-                                key={dayIndex}
-                                className={`border p-1 text-xs ${
-                                  isToday
-                                    ? 'bg-blue-100 font-bold'
-                                    : isWeekend
-                                    ? 'bg-gray-200'
-                                    : 'bg-gray-100'
-                                }`}
-                              >
-                                <div className="text-center">
-                                  <div>{day.getDate()}</div>
-                                  <div className="text-[10px] text-gray-600">
-                                    {['D', 'L', 'M', 'M', 'J', 'V', 'S'][day.getDay()]}
-                                  </div>
+          {/* Table planning - Vue annuelle par mois */}
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr>
+                  <th className="border p-2 bg-gray-100 sticky left-0 z-10 min-w-[200px]">
+                    <div className="flex items-center gap-2">
+                      <Wrench className="h-4 w-4" />
+                      Équipement
+                    </div>
+                  </th>
+                  {months.map((monthData, index) => {
+                    const isCurrentMonth = monthData.month === new Date().getMonth() && monthData.year === new Date().getFullYear();
+                    return (
+                      <th
+                        key={index}
+                        className={`border p-2 text-xs ${
+                          isCurrentMonth ? 'bg-blue-100 font-bold' : 'bg-gray-100'
+                        }`}
+                      >
+                        <div className="text-center">
+                          <div className="font-semibold">{monthData.name}</div>
+                          <div className="text-[10px] text-gray-600">{monthData.year}</div>
+                        </div>
+                      </th>
+                    );
+                  })}
+                </tr>
+              </thead>
+              <tbody>
+                {equipments.length === 0 ? (
+                  <tr>
+                    <td colSpan={months.length + 1} className="text-center p-8 text-gray-500">
+                      Aucun équipement enregistré
+                    </td>
+                  </tr>
+                ) : (
+                  equipments.map(equipment => (
+                    <tr key={equipment.id}>
+                      <td className="border p-2 font-medium sticky left-0 bg-white z-10">
+                        <div>
+                          <div className="font-semibold text-sm">{equipment.name || equipment.nom}</div>
+                          {(equipment.category || equipment.categorie) && (
+                            <div className="text-xs text-gray-500">{equipment.category || equipment.categorie}</div>
+                          )}
+                        </div>
+                      </td>
+                      {months.map((monthData, monthIndex) => {
+                        // Pour chaque mois, on affiche un résumé visuel
+                        // On va afficher une moyenne des statuts du mois
+                        const daysInMonth = monthData.daysInMonth;
+                        let operationalDays = 0;
+                        let maintenanceDays = 0;
+                        let outOfServiceDays = 0;
+                        
+                        // Compter les jours selon leur statut
+                        for (let d = 1; d <= daysInMonth; d++) {
+                          const date = new Date(monthData.year, monthData.month, d);
+                          const statusAM = getEquipmentStatusForHalfDay(equipment.id, date, true);
+                          const statusPM = getEquipmentStatusForHalfDay(equipment.id, date, false);
+                          
+                          if (statusAM === 'OPERATIONAL' && statusPM === 'OPERATIONAL') {
+                            operationalDays++;
+                          } else if (statusAM === 'EN_MAINTENANCE' || statusPM === 'EN_MAINTENANCE') {
+                            maintenanceDays++;
+                          } else if (statusAM === 'HORS_SERVICE' || statusPM === 'HORS_SERVICE') {
+                            outOfServiceDays++;
+                          } else {
+                            operationalDays++;
+                          }
+                        }
+                        
+                        // Déterminer la couleur dominante
+                        let dominantColor = getStatusColor('OPERATIONAL');
+                        if (maintenanceDays > operationalDays && maintenanceDays > outOfServiceDays) {
+                          dominantColor = getStatusColor('EN_MAINTENANCE');
+                        } else if (outOfServiceDays > operationalDays && outOfServiceDays > maintenanceDays) {
+                          dominantColor = getStatusColor('HORS_SERVICE');
+                        }
+                        
+                        const isCurrentMonth = monthData.month === new Date().getMonth() && monthData.year === new Date().getFullYear();
+                        
+                        return (
+                          <td
+                            key={monthIndex}
+                            className={`border p-1 relative ${
+                              isCurrentMonth ? 'bg-blue-50' : ''
+                            }`}
+                            style={{ height: '60px', minWidth: '80px' }}
+                          >
+                            <div 
+                              className="w-full h-full rounded flex flex-col items-center justify-center"
+                              style={{ backgroundColor: dominantColor, opacity: 0.8 }}
+                            >
+                              {maintenanceDays > 0 && (
+                                <div className="text-xs text-white font-semibold">
+                                  {maintenanceDays}j
                                 </div>
-                              </th>
-                            );
-                          })}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {equipments.length === 0 ? (
-                          <tr>
-                            <td colSpan={days.length + 1} className="text-center p-4 text-gray-500 text-sm">
-                              Aucun équipement
-                            </td>
-                          </tr>
-                        ) : (
-                          equipments.map(equipment => (
-                            <tr key={equipment.id}>
-                              <td className="border p-2 text-sm font-medium sticky left-0 bg-white z-10">
-                                <div className="font-semibold">{equipment.name || equipment.nom}</div>
-                              </td>
-                              {days.map((day, dayIndex) => {
-                                const statusAM = getEquipmentStatusForHalfDay(equipment.id, day, true);
-                                const statusPM = getEquipmentStatusForHalfDay(equipment.id, day, false);
-                                const isToday = day.toISOString().split('T')[0] === today;
-                                
-                                return (
-                                  <td
-                                    key={dayIndex}
-                                    className={`border p-0 relative ${
-                                      isToday ? 'bg-blue-50' : ''
-                                    }`}
-                                    style={{ height: '40px', width: '35px' }}
-                                  >
-                                    <div className="relative w-full h-full">
-                                      {/* Triangle gauche (Matin) */}
-                                      <svg
-                                        className="absolute inset-0 w-full h-full"
-                                        viewBox="0 0 100 100"
-                                        preserveAspectRatio="none"
-                                      >
-                                        <polygon
-                                          points="0,0 0,100 100,100"
-                                          fill={getStatusColor(statusAM)}
-                                          opacity="0.9"
-                                        />
-                                      </svg>
-                                      {/* Triangle droit (Après-midi) */}
-                                      <svg
-                                        className="absolute inset-0 w-full h-full"
-                                        viewBox="0 0 100 100"
-                                        preserveAspectRatio="none"
-                                      >
-                                        <polygon
-                                          points="0,0 100,0 100,100"
-                                          fill={getStatusColor(statusPM)}
-                                          opacity="0.9"
-                                        />
-                                      </svg>
-                                    </div>
-                                  </td>
-                                );
-                              })}
-                            </tr>
-                          ))
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              );
-            })}
+                              )}
+                            </div>
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
 
           {/* Statistiques */}
@@ -319,7 +322,7 @@ const PlanningMPrev = () => {
             <Card>
               <CardContent className="pt-6">
                 <div className="text-2xl font-bold">
-                  {equipments.filter(e => (e.status || e.statut) === 'OPERATIONNEL' || (e.status || e.statut) === 'OPERATIONAL').length}
+                  {equipments.filter(e => e.status === 'OPERATIONAL').length}
                 </div>
                 <div className="text-sm text-gray-600">Équipements opérationnels</div>
               </CardContent>
@@ -327,7 +330,7 @@ const PlanningMPrev = () => {
             <Card>
               <CardContent className="pt-6">
                 <div className="text-2xl font-bold">
-                  {equipments.filter(e => (e.status || e.statut) === 'EN_MAINTENANCE').length}
+                  {equipments.filter(e => e.status === 'EN_MAINTENANCE').length}
                 </div>
                 <div className="text-sm text-gray-600">En maintenance</div>
               </CardContent>
@@ -335,7 +338,7 @@ const PlanningMPrev = () => {
             <Card>
               <CardContent className="pt-6">
                 <div className="text-2xl font-bold">
-                  {equipments.filter(e => (e.status || e.statut) === 'HORS_SERVICE').length}
+                  {equipments.filter(e => e.status === 'HORS_SERVICE').length}
                 </div>
                 <div className="text-sm text-gray-600">Hors service</div>
               </CardContent>
