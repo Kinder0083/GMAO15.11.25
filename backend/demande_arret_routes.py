@@ -311,10 +311,10 @@ async def send_demande_email(demande: dict):
     """Envoyer l'email de demande d'arrêt au destinataire"""
     try:
         import os
-        APP_URL = os.environ.get('APP_URL', 'http://localhost')
+        FRONTEND_URL = os.environ.get('FRONTEND_URL', os.environ.get('APP_URL', 'http://localhost:3000'))
         
-        approve_link = f"{APP_URL}/api/demandes-arret/validate/{demande['validation_token']}"
-        refuse_link = f"{APP_URL}/api/demandes-arret/refuse/{demande['validation_token']}"
+        approve_link = f"{FRONTEND_URL}/validate-demande-arret?token={demande['validation_token']}&action=approve"
+        refuse_link = f"{FRONTEND_URL}/validate-demande-arret?token={demande['validation_token']}&action=refuse"
         
         equipements_str = ", ".join(demande["equipement_noms"])
         
