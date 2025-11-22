@@ -320,9 +320,9 @@ const DemandeArretDialog = ({ open, onOpenChange, onSuccess }) => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="none">Aucune</SelectItem>
-                      {preventiveMaintenances.map(pm => (
+                      {preventiveMaintenances.filter(pm => pm.id && pm.id !== '').map(pm => (
                         <SelectItem key={pm.id} value={pm.id}>
-                          {pm.title || pm.name}
+                          {pm.title || pm.titre || pm.name || pm.nom}
                         </SelectItem>
                       ))}
                     </SelectContent>
