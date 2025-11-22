@@ -355,9 +355,9 @@ const DemandeArretDialog = ({ open, onOpenChange, onSuccess }) => {
                     <SelectValue placeholder="Sélectionner le destinataire" />
                   </SelectTrigger>
                   <SelectContent>
-                    {users.map(user => (
+                    {users.filter(user => user.id && user.id !== '').map(user => (
                       <SelectItem key={user.id} value={user.id}>
-                        {user.first_name} {user.last_name} 
+                        {user.first_name || user.prenom} {user.last_name || user.nom} 
                         {user.role === 'RSP_PROD' && ' (Resp. Production - Par défaut)'}
                         {user.email && ` - ${user.email}`}
                       </SelectItem>
