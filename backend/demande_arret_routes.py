@@ -235,6 +235,19 @@ async def validate_demande_by_token(
         # Envoyer email de confirmation au demandeur
         await send_confirmation_email(demande, approved=True, commentaire=commentaire)
         
+        # Enregistrer dans le journal d'audit
+        await audit_service.log_action(
+            user_id=demande["destinataire_id"],
+            user_name=demande["destinataire_nom"],
+            user_email=demande["destinataire_email"],
+            action=ActionType.UPDATE,
+            entity_type=EntityType.DEMANDE_ARRET,
+            entity_id=demande["id"],
+            entity_name=f"Demande d'arrêt du {demande['date_debut']} au {demande['date_fin']}",
+            details=f"Demande d'arrêt APPROUVÉE pour {len(demande['equipement_ids'])} équipement(s). Commentaire: {commentaire or 'Aucun'}",
+            changes={"statut": "EN_ATTENTE → APPROUVEE"}
+        )
+        
         return {"message": "Demande approuvée avec succès", "demande_id": demande["id"]}
     except HTTPException:
         raise
