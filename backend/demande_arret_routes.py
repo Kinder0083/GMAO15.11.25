@@ -26,6 +26,32 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/demandes-arret", tags=["demandes-arret"])
 
+def serialize_doc(doc):
+    """Convert MongoDB document to JSON serializable format"""
+    if doc is None:
+        return None
+    
+    # Convertir le _id principal
+    if "_id" in doc:
+        doc["id"] = str(doc["_id"])
+        del doc["_id"]
+    
+    # Convertir récursivement tous les ObjectId
+    for key, value in list(doc.items()):
+        if isinstance(value, ObjectId):
+            doc[key] = str(value)
+        elif isinstance(value, list):
+            doc[key] = [
+                str(item) if isinstance(item, ObjectId) 
+                else serialize_doc(item) if isinstance(item, dict) 
+                else item 
+                for item in value
+            ]
+        elif isinstance(value, dict):
+            doc[key] = serialize_doc(value)
+    
+    return doc
+
 # ==================== CRUD DEMANDES ====================
 
 @router.post("/")
