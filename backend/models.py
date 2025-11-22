@@ -346,6 +346,7 @@ class EntityType(str, Enum):
     PRESQU_ACCIDENT = "PRESQU_ACCIDENT"
     DOCUMENTATION = "DOCUMENTATION"
     SETTINGS = "SETTINGS"
+    DEMANDE_ARRET = "DEMANDE_ARRET"
 
 # Audit Log Models
 class AuditLog(BaseModel):
