@@ -44,7 +44,7 @@ async def create_demande_arret(
         for eq_id in demande.equipement_ids:
             equipement = await db.equipment.find_one({"id": eq_id})
             if equipement:
-                equipement_noms.append(equipement.get("name", ""))
+                equipement_noms.append(equipement.get("nom", ""))
         
         # Calculer la date d'expiration (7 jours)
         date_creation = datetime.now(timezone.utc)
