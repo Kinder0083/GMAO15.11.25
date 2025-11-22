@@ -186,50 +186,57 @@ class AutorisationsParticulieresTester:
             self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
             return False
     
-    def test_verify_stats_with_new_category(self):
-        """TEST 3: Vérifier statistiques avec nouvelle catégorie"""
-        self.log("🧪 TEST 3: Vérifier que by_category contient maintenant 'TEST_CATEGORIE_NOUVELLE'")
+    def test_get_autorisation_by_id(self):
+        """TEST 3: Récupérer une autorisation spécifique par ID"""
+        self.log("🧪 TEST 3: Récupérer une autorisation spécifique par ID")
+        
+        if not self.test_autorisations:
+            self.log("⚠️ Aucune autorisation de test disponible", "WARNING")
+            return False
+        
+        autorisation_id = self.test_autorisations[0]
         
         try:
             response = self.admin_session.get(
-                f"{BACKEND_URL}/surveillance/stats",
+                f"{BACKEND_URL}/autorisations/{autorisation_id}",
                 timeout=15
             )
             
             if response.status_code == 200:
-                stats = response.json()
-                self.log(f"✅ Statistiques récupérées - Status: 200 OK")
+                autorisation = response.json()
+                self.log(f"✅ Autorisation récupérée - Status: 200 OK")
+                self.log(f"✅ ID: {autorisation.get('id')}")
+                self.log(f"✅ Numéro: {autorisation.get('numero')}")
+                self.log(f"✅ Service: {autorisation.get('service_demandeur')}")
+                self.log(f"✅ Responsable: {autorisation.get('responsable')}")
                 
-                # Vérifier la structure de la réponse
-                if "by_category" in stats:
-                    by_category = stats["by_category"]
-                    self.log(f"✅ by_category trouvé avec {len(by_category)} catégories")
+                # Vérifier tous les champs présents et corrects
+                required_fields = ['id', 'numero', 'service_demandeur', 'responsable', 
+                                 'description_travaux', 'horaire_debut', 'horaire_fin', 
+                                 'lieu_travaux', 'personnel_autorise']
+                
+                missing_fields = []
+                for field in required_fields:
+                    if field not in autorisation or autorisation[field] is None:
+                        missing_fields.append(field)
+                
+                if not missing_fields:
+                    self.log("✅ SUCCÈS: Tous les champs requis sont présents")
                     
-                    # Vérifier que notre nouvelle catégorie est présente
-                    if "TEST_CATEGORIE_NOUVELLE" in by_category:
-                        category_stats = by_category["TEST_CATEGORIE_NOUVELLE"]
-                        self.log(f"✅ SUCCÈS: Catégorie 'TEST_CATEGORIE_NOUVELLE' trouvée dans les statistiques")
-                        self.log(f"✅ Total items: {category_stats.get('total')}")
-                        self.log(f"✅ Réalisés: {category_stats.get('realises')}")
-                        self.log(f"✅ Pourcentage: {category_stats.get('pourcentage')}%")
-                        
-                        # Vérifier le comptage
-                        if category_stats.get('total', 0) >= 1:
-                            self.log("✅ SUCCÈS: Le comptage est correct (au moins 1 item)")
-                            return True
-                        else:
-                            self.log("❌ ÉCHEC: Comptage incorrect", "ERROR")
-                            return False
+                    # Vérifier que personnel_autorise est un array
+                    personnel = autorisation.get('personnel_autorise', [])
+                    if isinstance(personnel, list):
+                        self.log(f"✅ SUCCÈS: personnel_autorise est un array avec {len(personnel)} entrées")
+                        return True
                     else:
-                        self.log("❌ ÉCHEC: Catégorie 'TEST_CATEGORIE_NOUVELLE' non trouvée dans les statistiques", "ERROR")
-                        self.log(f"Catégories disponibles: {list(by_category.keys())}")
+                        self.log("❌ ÉCHEC: personnel_autorise n'est pas un array", "ERROR")
                         return False
                 else:
-                    self.log("❌ ÉCHEC: 'by_category' non trouvé dans la réponse", "ERROR")
+                    self.log(f"❌ ÉCHEC: Champs manquants: {missing_fields}", "ERROR")
                     return False
                     
             else:
-                self.log(f"❌ Récupération des statistiques échouée - Status: {response.status_code}", "ERROR")
+                self.log(f"❌ Récupération de l'autorisation échouée - Status: {response.status_code}", "ERROR")
                 return False
                 
         except requests.exceptions.RequestException as e:
