@@ -254,9 +254,9 @@ const PlanningMPrev = () => {
                     <tr key={equipment.id}>
                       <td className="border p-2 font-medium sticky left-0 bg-white z-10">
                         <div>
-                          <div className="font-semibold text-sm">{equipment.name}</div>
-                          {equipment.category && (
-                            <div className="text-xs text-gray-500">{equipment.category}</div>
+                          <div className="font-semibold text-sm">{equipment.name || equipment.nom}</div>
+                          {(equipment.category || equipment.categorie) && (
+                            <div className="text-xs text-gray-500">{equipment.category || equipment.categorie}</div>
                           )}
                         </div>
                       </td>
