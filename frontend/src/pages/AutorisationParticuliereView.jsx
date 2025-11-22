@@ -66,10 +66,17 @@ const AutorisationParticuliereView = () => {
 
     try {
       await autorisationsAPI.delete(id);
-      toast.success('Autorisation supprimée');
+      toast({
+        title: 'Succès',
+        description: 'Autorisation supprimée'
+      });
       loadAutorisations();
     } catch (error) {
-      toast.error('Erreur lors de la suppression');
+      toast({
+        title: 'Erreur',
+        description: 'Erreur lors de la suppression',
+        variant: 'destructive'
+      });
       console.error(error);
     }
   };
