@@ -120,6 +120,9 @@ function App() {
             <Route path="documentations/:poleId/bon-de-travail" element={<BonDeTravailForm />} />
             <Route path="documentations/:poleId/bon-de-travail/:bonId/view" element={<BonDeTravailView />} />
             <Route path="documentations/:poleId/bon-de-travail/:bonId/edit" element={<BonDeTravailForm />} />
+            <Route path="autorisations-particulieres" element={<AutorisationParticuliereView />} />
+            <Route path="autorisations-particulieres/new" element={<AutorisationParticuliereForm />} />
+            <Route path="autorisations-particulieres/edit/:id" element={<AutorisationParticuliereForm />} />
             <Route path="ssh" element={<SSHTerminal />} />
           </Route>
         </Routes>
