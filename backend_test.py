@@ -246,57 +246,58 @@ class DemandeArretTester:
             self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
             return False
     
-    def test_get_autorisation_by_id(self):
-        """TEST 3: Récupérer une autorisation spécifique par ID"""
-        self.log("🧪 TEST 3: Récupérer une autorisation spécifique par ID")
+    def test_get_demande_by_id(self):
+        """TEST 5: Récupérer une demande spécifique par ID"""
+        self.log("🧪 TEST 5: Récupérer une demande spécifique par ID")
         
-        if not self.test_autorisations:
-            self.log("⚠️ Aucune autorisation de test disponible", "WARNING")
+        if not self.test_demandes:
+            self.log("⚠️ Aucune demande de test disponible", "WARNING")
             return False
         
-        autorisation_id = self.test_autorisations[0]
+        demande_id = self.test_demandes[0]
         
         try:
             response = self.admin_session.get(
-                f"{BACKEND_URL}/autorisations/{autorisation_id}",
+                f"{BACKEND_URL}/demandes-arret/{demande_id}",
                 timeout=15
             )
             
             if response.status_code == 200:
-                autorisation = response.json()
-                self.log(f"✅ Autorisation récupérée - Status: 200 OK")
-                self.log(f"✅ ID: {autorisation.get('id')}")
-                self.log(f"✅ Numéro: {autorisation.get('numero')}")
-                self.log(f"✅ Service: {autorisation.get('service_demandeur')}")
-                self.log(f"✅ Responsable: {autorisation.get('responsable')}")
+                demande = response.json()
+                self.log(f"✅ Demande récupérée - Status: 200 OK")
+                self.log(f"✅ ID: {demande.get('id')}")
+                self.log(f"✅ Statut: {demande.get('statut')}")
+                self.log(f"✅ Demandeur: {demande.get('demandeur_nom')}")
+                self.log(f"✅ Destinataire: {demande.get('destinataire_nom')}")
                 
                 # Vérifier tous les champs présents et corrects
-                required_fields = ['id', 'numero', 'service_demandeur', 'responsable', 
-                                 'description_travaux', 'horaire_debut', 'horaire_fin', 
-                                 'lieu_travaux', 'personnel_autorise']
+                required_fields = ['id', 'statut', 'demandeur_id', 'demandeur_nom', 
+                                 'destinataire_id', 'destinataire_nom', 'equipement_ids', 
+                                 'equipement_noms', 'date_debut', 'date_fin']
                 
                 missing_fields = []
                 for field in required_fields:
-                    if field not in autorisation or autorisation[field] is None:
+                    if field not in demande or demande[field] is None:
                         missing_fields.append(field)
                 
                 if not missing_fields:
                     self.log("✅ SUCCÈS: Tous les champs requis sont présents")
                     
-                    # Vérifier que personnel_autorise est un array
-                    personnel = autorisation.get('personnel_autorise', [])
-                    if isinstance(personnel, list):
-                        self.log(f"✅ SUCCÈS: personnel_autorise est un array avec {len(personnel)} entrées")
+                    # Vérifier que equipement_ids et equipement_noms sont des arrays
+                    equipement_ids = demande.get('equipement_ids', [])
+                    equipement_noms = demande.get('equipement_noms', [])
+                    if isinstance(equipement_ids, list) and isinstance(equipement_noms, list):
+                        self.log(f"✅ SUCCÈS: equipement_ids et equipement_noms sont des arrays")
                         return True
                     else:
-                        self.log("❌ ÉCHEC: personnel_autorise n'est pas un array", "ERROR")
+                        self.log("❌ ÉCHEC: equipement_ids ou equipement_noms ne sont pas des arrays", "ERROR")
                         return False
                 else:
                     self.log(f"❌ ÉCHEC: Champs manquants: {missing_fields}", "ERROR")
                     return False
                     
             else:
-                self.log(f"❌ Récupération de l'autorisation échouée - Status: {response.status_code}", "ERROR")
+                self.log(f"❌ Récupération de la demande échouée - Status: {response.status_code}", "ERROR")
                 return False
                 
         except requests.exceptions.RequestException as e:
