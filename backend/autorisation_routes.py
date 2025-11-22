@@ -39,7 +39,14 @@ async def get_autorisations(
             query["pole_id"] = pole_id
         
         autorisations = await db.autorisations_particulieres.find(query).to_list(length=None)
-        return autorisations
+        # Serialize documents to handle ObjectId and other MongoDB types
+        serialized_autorisations = []
+        for autorisation in autorisations:
+            if "_id" in autorisation:
+                autorisation["id"] = str(autorisation["_id"])
+                del autorisation["_id"]
+            serialized_autorisations.append(autorisation)
+        return serialized_autorisations
     except Exception as e:
         logger.error(f"Erreur récupération autorisations: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
