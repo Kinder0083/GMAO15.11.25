@@ -297,52 +297,64 @@ class AutorisationsParticulieresTester:
             self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
             return False
 
-    def test_create_second_custom_category_item(self):
-        """TEST 4: Créer un 2ème item avec une autre catégorie personnalisée"""
-        self.log("🧪 TEST 4: Créer un 2ème item avec une autre catégorie personnalisée")
+    def test_generate_pdf(self):
+        """TEST 5: Générer le PDF de l'autorisation"""
+        self.log("🧪 TEST 5: Générer le PDF de l'autorisation")
         
-        test_item_data = {
-            "classe_type": "Test Deuxième Catégorie",
-            "category": "CATEGORIE_TEST_2",
-            "batiment": "AUTRE BATIMENT",
-            "periodicite": "3 mois",
-            "responsable": "PROD",
-            "executant": "Autre Executant",
-            "description": "Test création avec deuxième catégorie dynamique"
-        }
+        if not self.test_autorisations:
+            self.log("⚠️ Aucune autorisation de test disponible", "WARNING")
+            return False
+        
+        autorisation_id = self.test_autorisations[0]
         
         try:
-            response = self.admin_session.post(
-                f"{BACKEND_URL}/surveillance/items",
-                json=test_item_data,
+            response = self.admin_session.get(
+                f"{BACKEND_URL}/autorisations/{autorisation_id}/pdf",
                 timeout=15
             )
             
-            if response.status_code in [200, 201]:
-                data = response.json()
-                self.log(f"✅ Deuxième item créé - Status: {response.status_code}")
-                self.log(f"✅ ID: {data.get('id')}")
-                self.log(f"✅ Classe: {data.get('classe_type')}")
-                self.log(f"✅ Catégorie: {data.get('category')}")
-                self.log(f"✅ Responsable: {data.get('responsable')}")
+            if response.status_code == 200:
+                self.log(f"✅ PDF généré - Status: 200 OK")
+                self.log(f"✅ Content-Type: {response.headers.get('content-type')}")
                 
-                # Vérifier que la deuxième catégorie personnalisée est bien enregistrée
-                if data.get('category') == "CATEGORIE_TEST_2":
-                    self.log("✅ SUCCÈS: Deuxième catégorie personnalisée 'CATEGORIE_TEST_2' acceptée")
-                    # Stocker pour nettoyage
-                    self.test_items.append(data.get('id'))
-                    return True, data
+                # Vérifier que c'est du HTML
+                if response.headers.get('content-type') == 'text/html; charset=utf-8':
+                    self.log("✅ SUCCÈS: Content-Type correct (text/html)")
+                    
+                    # Vérifier le contenu HTML
+                    html_content = response.text
+                    if "AUTORISATION PARTICULIÈRE DE TRAVAUX" in html_content:
+                        self.log("✅ SUCCÈS: HTML contient le titre principal")
+                        
+                        # Vérifier que le numéro d'autorisation est présent
+                        if str(autorisation_id) in html_content or "8000" in html_content:
+                            self.log("✅ SUCCÈS: HTML contient le numéro d'autorisation")
+                            
+                            # Vérifier que les données de l'autorisation sont présentes
+                            if "Service Test" in html_content and "Jean Dupont" in html_content:
+                                self.log("✅ SUCCÈS: HTML contient les données de l'autorisation")
+                                return True
+                            else:
+                                self.log("❌ ÉCHEC: Données de l'autorisation manquantes dans le HTML", "ERROR")
+                                return False
+                        else:
+                            self.log("❌ ÉCHEC: Numéro d'autorisation manquant dans le HTML", "ERROR")
+                            return False
+                    else:
+                        self.log("❌ ÉCHEC: Titre principal manquant dans le HTML", "ERROR")
+                        return False
                 else:
-                    self.log(f"❌ ÉCHEC: Catégorie incorrecte - Attendu: CATEGORIE_TEST_2, Reçu: {data.get('category')}", "ERROR")
-                    return False, None
+                    self.log(f"❌ ÉCHEC: Content-Type incorrect: {response.headers.get('content-type')}", "ERROR")
+                    return False
+                    
             else:
-                self.log(f"❌ Création échouée - Status: {response.status_code}", "ERROR")
+                self.log(f"❌ Génération PDF échouée - Status: {response.status_code}", "ERROR")
                 self.log(f"Response: {response.text}", "ERROR")
-                return False, None
+                return False
                 
         except requests.exceptions.RequestException as e:
             self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
-            return False, None
+            return False
     
     def test_check_backend_logs(self):
         """TEST 3: Vérifier les logs backend pour erreurs"""
