@@ -5,7 +5,7 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Plus, Search, FileText, Edit, Trash2, Eye, Printer } from 'lucide-react';
-import { toast } from 'react-hot-toast';
+import { useToast } from '../hooks/use-toast';
 
 const AutorisationParticuliereView = () => {
   const navigate = useNavigate();
