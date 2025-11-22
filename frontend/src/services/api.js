@@ -449,6 +449,17 @@ export const autorisationsAPI = {
   }
 };
 
+// ==================== DEMANDES D'ARRÊT MAINTENANCE ====================
+export const demandesArretAPI = {
+  getAll: (statut = null) => {
+    const params = statut ? { statut } : {};
+    return api.get('/demandes-arret/', { params }).then(res => res.data);
+  },
+  getById: (id) => api.get(`/demandes-arret/${id}`).then(res => res.data),
+  create: (data) => api.post('/demandes-arret/', data).then(res => res.data),
+  getPlanningEquipements: (params = {}) => api.get('/demandes-arret/planning/equipements', { params }).then(res => res.data)
+};
+
 // User Preferences API
 export const userPreferencesAPI = {
   getAll: () => api.get('/user-preferences').then(res => res.data),
