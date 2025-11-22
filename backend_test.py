@@ -386,37 +386,37 @@ class DemandeArretTester:
             self.log(f"✅ Demande {demande_id} marquée pour nettoyage")
             self.test_demandes.remove(demande_id)
 
-    def run_autorisations_particulieres_tests(self):
-        """Run comprehensive tests for Autorisations Particulières de Travaux - Module MAINT_FE_003_V03"""
+    def run_demande_arret_tests(self):
+        """Run comprehensive tests for Demande d'Arrêt pour Maintenance"""
         self.log("=" * 80)
-        self.log("TESTING AUTORISATIONS PARTICULIÈRES DE TRAVAUX - MODULE MAINT_FE_003_V03")
+        self.log("TESTING DEMANDE D'ARRÊT POUR MAINTENANCE")
         self.log("=" * 80)
         self.log("CONTEXTE:")
-        self.log("Test complet du nouveau module 'Autorisations Particulières de Travaux'")
-        self.log("Collection MongoDB: autorisations_particulieres")
-        self.log("Format conforme au document MAINT_FE_003_V03")
+        self.log("Test complet du module 'Demande d'Arrêt pour Maintenance'")
+        self.log("Collection MongoDB: demandes_arret")
+        self.log("Corrections testées:")
+        self.log("- equipement.get('nom', '') au lieu de equipement.get('name', '')")
+        self.log("- prenom/nom au lieu de first_name/last_name pour les utilisateurs")
         self.log("")
         self.log("SCÉNARIOS DE TEST:")
-        self.log("1. 📋 POST /api/autorisations - Créer une nouvelle autorisation")
-        self.log("2. 📋 GET /api/autorisations - Liste toutes les autorisations")
-        self.log("3. 📋 GET /api/autorisations/{id} - Récupérer une autorisation spécifique")
-        self.log("4. 📋 PUT /api/autorisations/{id} - Mettre à jour une autorisation")
-        self.log("5. 📋 GET /api/autorisations/{id}/pdf - Générer le PDF")
-        self.log("6. 📋 DELETE /api/autorisations/{id} - Supprimer une autorisation")
-        self.log("7. 🔍 Vérifier les logs backend pour erreurs")
-        self.log("8. 🧹 Nettoyer - Supprimer les autorisations de test restantes")
+        self.log("1. 🔧 GET /api/equipment - Récupérer un équipement valide")
+        self.log("2. 👤 GET /api/users - Récupérer un utilisateur RSP_PROD")
+        self.log("3. 📋 POST /api/demandes-arret/ - Créer une demande d'arrêt")
+        self.log("4. 📋 GET /api/demandes-arret/ - Liste toutes les demandes")
+        self.log("5. 📋 GET /api/demandes-arret/{id} - Récupérer une demande spécifique")
+        self.log("6. 🔍 Vérifier les logs backend pour erreurs")
+        self.log("7. 🧹 Nettoyer - Marquer les demandes de test pour nettoyage")
         self.log("=" * 80)
         
         results = {
             "admin_login": False,
-            "create_autorisation": False,
-            "get_all_autorisations": False,
-            "get_autorisation_by_id": False,
-            "update_autorisation": False,
-            "generate_pdf": False,
-            "delete_autorisation": False,
+            "get_equipment": False,
+            "get_rsp_prod_user": False,
+            "create_demande_arret": False,
+            "get_all_demandes_arret": False,
+            "get_demande_by_id": False,
             "check_backend_logs": False,
-            "cleanup_remaining_autorisations": False
+            "cleanup_remaining_demandes": False
         }
         
         # Test 1: Admin Login
