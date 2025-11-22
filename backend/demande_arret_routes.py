@@ -26,6 +26,9 @@ db = client[os.environ.get('DB_NAME', 'gmao_iris')]
 
 logger = logging.getLogger(__name__)
 
+# Service d'audit pour journalisation
+audit_service = audit_module.AuditService(db)
+
 router = APIRouter(prefix="/demandes-arret", tags=["demandes-arret"])
 
 def serialize_doc(doc):
