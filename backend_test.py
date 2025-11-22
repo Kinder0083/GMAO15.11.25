@@ -64,72 +64,131 @@ class DemandeArretTester:
             self.log(f"❌ Admin login request failed - Error: {str(e)}", "ERROR")
             return False
     
-    def test_create_autorisation(self):
-        """TEST 1: Créer une nouvelle autorisation particulière"""
-        self.log("🧪 TEST 1: Créer une nouvelle autorisation particulière")
+    def test_get_equipment(self):
+        """TEST 1: Récupérer un équipement valide pour les tests"""
+        self.log("🧪 TEST 1: Récupérer un équipement valide")
         
-        test_autorisation_data = {
-            "service_demandeur": "Service Test",
-            "responsable": "Jean Dupont",
-            "personnel_autorise": [
-                {"nom": "Pierre Martin", "fonction": "Technicien"},
-                {"nom": "Marie Durand", "fonction": "Ingénieur"}
-            ],
-            "description_travaux": "Travaux de maintenance électrique",
-            "horaire_debut": "08:00",
-            "horaire_fin": "17:00",
-            "lieu_travaux": "Bâtiment A - Salle électrique",
-            "risques_potentiels": "Électrocution\nChute",
-            "mesures_securite": "Consignation électrique\nHarnais obligatoire",
-            "equipements_protection": "Gants isolants\nCasque\nChaussures de sécurité",
-            "signature_demandeur": "Jean Dupont",
-            "date_signature_demandeur": "2025-01-15"
+        try:
+            response = self.admin_session.get(
+                f"{BACKEND_URL}/equipment",
+                timeout=15
+            )
+            
+            if response.status_code == 200:
+                equipments = response.json()
+                if equipments:
+                    self.equipment_id = equipments[0].get('id')
+                    self.log(f"✅ Équipement trouvé - ID: {self.equipment_id}")
+                    self.log(f"✅ Nom: {equipments[0].get('nom', 'N/A')}")
+                    return True
+                else:
+                    self.log("❌ Aucun équipement trouvé", "ERROR")
+                    return False
+            else:
+                self.log(f"❌ Récupération équipements échouée - Status: {response.status_code}", "ERROR")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
+            return False
+    
+    def test_get_rsp_prod_user(self):
+        """TEST 2: Récupérer un utilisateur avec rôle RSP_PROD"""
+        self.log("🧪 TEST 2: Récupérer un utilisateur RSP_PROD")
+        
+        try:
+            response = self.admin_session.get(
+                f"{BACKEND_URL}/users",
+                timeout=15
+            )
+            
+            if response.status_code == 200:
+                users = response.json()
+                rsp_prod_users = [user for user in users if user.get('role') == 'RSP_PROD']
+                
+                if rsp_prod_users:
+                    self.rsp_prod_user_id = rsp_prod_users[0].get('id')
+                    self.log(f"✅ Utilisateur RSP_PROD trouvé - ID: {self.rsp_prod_user_id}")
+                    self.log(f"✅ Nom: {rsp_prod_users[0].get('prenom', '')} {rsp_prod_users[0].get('nom', '')}")
+                    return True
+                else:
+                    self.log("❌ Aucun utilisateur RSP_PROD trouvé", "ERROR")
+                    return False
+            else:
+                self.log(f"❌ Récupération utilisateurs échouée - Status: {response.status_code}", "ERROR")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
+            return False
+
+    def test_create_demande_arret(self):
+        """TEST 3: Créer une nouvelle demande d'arrêt pour maintenance"""
+        self.log("🧪 TEST 3: Créer une nouvelle demande d'arrêt pour maintenance")
+        
+        if not self.equipment_id or not self.rsp_prod_user_id:
+            self.log("❌ Prérequis manquants (équipement ou utilisateur RSP_PROD)", "ERROR")
+            return False, None
+        
+        # Dates pour la demande (demain et après-demain)
+        tomorrow = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
+        day_after = (datetime.now() + timedelta(days=2)).strftime("%Y-%m-%d")
+        
+        test_demande_data = {
+            "date_debut": tomorrow,
+            "date_fin": day_after,
+            "periode_debut": "JOURNEE_COMPLETE",
+            "periode_fin": "JOURNEE_COMPLETE",
+            "equipement_ids": [self.equipment_id],
+            "work_order_id": None,
+            "maintenance_preventive_id": None,
+            "commentaire": "Test demande arrêt pour maintenance préventive",
+            "destinataire_id": self.rsp_prod_user_id
         }
         
         try:
             response = self.admin_session.post(
-                f"{BACKEND_URL}/autorisations/",
-                json=test_autorisation_data,
+                f"{BACKEND_URL}/demandes-arret/",
+                json=test_demande_data,
                 timeout=15
             )
             
             if response.status_code in [200, 201]:
                 data = response.json()
-                self.log(f"✅ Autorisation créée - Status: {response.status_code}")
+                self.log(f"✅ Demande d'arrêt créée - Status: {response.status_code}")
                 self.log(f"✅ ID: {data.get('id')}")
-                self.log(f"✅ Numéro: {data.get('numero')}")
-                self.log(f"✅ Date établissement: {data.get('date_etablissement')}")
-                self.log(f"✅ Service demandeur: {data.get('service_demandeur')}")
                 self.log(f"✅ Statut: {data.get('statut')}")
+                self.log(f"✅ Demandeur: {data.get('demandeur_nom')}")
+                self.log(f"✅ Destinataire: {data.get('destinataire_nom')}")
+                self.log(f"✅ Équipements: {data.get('equipement_noms')}")
                 
                 # Vérifications critiques
-                numero = data.get('numero')
-                if numero and numero >= 8000:
-                    self.log(f"✅ SUCCÈS: Numéro >= 8000 (reçu: {numero})")
-                else:
-                    self.log(f"❌ ÉCHEC: Numéro < 8000 (reçu: {numero})", "ERROR")
-                    return False, None
-                
-                if data.get('date_etablissement'):
-                    self.log("✅ SUCCÈS: Date d'établissement auto-générée")
-                else:
-                    self.log("❌ ÉCHEC: Date d'établissement manquante", "ERROR")
-                    return False, None
-                
-                if data.get('statut') == "BROUILLON":
-                    self.log("✅ SUCCÈS: Statut par défaut 'BROUILLON'")
+                if data.get('statut') == "EN_ATTENTE":
+                    self.log("✅ SUCCÈS: Statut par défaut 'EN_ATTENTE'")
                 else:
                     self.log(f"❌ ÉCHEC: Statut incorrect (reçu: {data.get('statut')})", "ERROR")
                     return False, None
                 
-                if data.get('created_at') and data.get('updated_at'):
-                    self.log("✅ SUCCÈS: Champs created_at et updated_at présents")
+                if data.get('equipement_noms') and len(data.get('equipement_noms')) > 0:
+                    self.log("✅ SUCCÈS: Noms d'équipements correctement récupérés")
                 else:
-                    self.log("❌ ÉCHEC: Champs created_at/updated_at manquants", "ERROR")
+                    self.log("❌ ÉCHEC: Noms d'équipements manquants", "ERROR")
+                    return False, None
+                
+                if data.get('demandeur_nom') and data.get('destinataire_nom'):
+                    self.log("✅ SUCCÈS: Noms demandeur et destinataire formatés correctement")
+                else:
+                    self.log("❌ ÉCHEC: Noms demandeur/destinataire manquants", "ERROR")
+                    return False, None
+                
+                if data.get('date_creation') and data.get('date_expiration'):
+                    self.log("✅ SUCCÈS: Dates de création et expiration présentes")
+                else:
+                    self.log("❌ ÉCHEC: Dates de création/expiration manquantes", "ERROR")
                     return False, None
                 
                 # Stocker pour nettoyage
-                self.test_autorisations.append(data.get('id'))
+                self.test_demandes.append(data.get('id'))
                 return True, data
             else:
                 self.log(f"❌ Création échouée - Status: {response.status_code}", "ERROR")
