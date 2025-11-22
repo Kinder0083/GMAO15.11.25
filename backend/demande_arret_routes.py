@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from typing import List, Optional
 from datetime import datetime, timedelta, timezone
 import logging
+import uuid
 
 from auth import get_current_user
 from models import (
