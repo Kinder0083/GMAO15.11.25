@@ -86,7 +86,7 @@ class AutorisationsParticulieresTester:
         
         try:
             response = self.admin_session.post(
-                f"{BACKEND_URL}/autorisations",
+                f"{BACKEND_URL}/autorisations/",
                 json=test_autorisation_data,
                 timeout=15
             )
