@@ -263,8 +263,8 @@ const DemandeArretDialog = ({ open, onOpenChange, onSuccess }) => {
                           onCheckedChange={() => handleEquipmentToggle(equipment.id)}
                         />
                         <label htmlFor={`eq-${equipment.id}`} className="text-sm cursor-pointer flex-1">
-                          <span className="font-medium">{equipment.name}</span>
-                          {equipment.category && <span className="text-gray-500 ml-2">• {equipment.category}</span>}
+                          <span className="font-medium">{equipment.name || equipment.nom}</span>
+                          {(equipment.category || equipment.categorie) && <span className="text-gray-500 ml-2">• {equipment.category || equipment.categorie}</span>}
                         </label>
                       </div>
                     ))
