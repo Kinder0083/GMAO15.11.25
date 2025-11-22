@@ -31,9 +31,10 @@ def serialize_doc(doc):
     if doc is None:
         return None
     
-    # Convertir le _id principal
+    # Convertir le _id principal seulement si pas d'id existant
     if "_id" in doc:
-        doc["id"] = str(doc["_id"])
+        if "id" not in doc:
+            doc["id"] = str(doc["_id"])
         del doc["_id"]
     
     # Convertir récursivement tous les ObjectId
