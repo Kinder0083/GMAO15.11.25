@@ -139,6 +139,48 @@ const PlanningMPrev = () => {
   const today = new Date().toISOString().split('T')[0];
   const year = currentDate.getFullYear();
 
+  // Calculer les statistiques annuelles
+  const calculateAnnualStats = () => {
+    let totalOperational = 0;
+    let totalMaintenance = 0;
+    let totalOutOfService = 0;
+    
+    // Pour chaque équipement
+    equipments.forEach(equipment => {
+      // Pour chaque jour de l'année
+      for (let month = 0; month < 12; month++) {
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        for (let day = 1; day <= daysInMonth; day++) {
+          const date = new Date(year, month, day);
+          
+          // Vérifier les deux demi-journées
+          const statusAM = getEquipmentStatusForHalfDay(equipment.id, date, true);
+          const statusPM = getEquipmentStatusForHalfDay(equipment.id, date, false);
+          
+          // Compter les demi-journées
+          [statusAM, statusPM].forEach(status => {
+            if (status === 'OPERATIONNEL' || status === 'OPERATIONAL') {
+              totalOperational += 0.5;
+            } else if (status === 'EN_MAINTENANCE') {
+              totalMaintenance += 0.5;
+            } else if (status === 'HORS_SERVICE') {
+              totalOutOfService += 0.5;
+            }
+          });
+        }
+      }
+    });
+    
+    return {
+      operational: Math.round(totalOperational),
+      maintenance: Math.round(totalMaintenance),
+      outOfService: Math.round(totalOutOfService),
+      total: Math.round(totalOperational + totalMaintenance + totalOutOfService)
+    };
+  };
+
+  const annualStats = calculateAnnualStats();
+
   if (loading && equipments.length === 0) {
     return (
       <div className="flex items-center justify-center h-screen">
