@@ -492,22 +492,23 @@ class AutorisationsParticulieresTester:
             self.log(f"⚠️ PARTIEL: {deleted_count} autorisations supprimées, {failed_count} échecs")
             return deleted_count > 0  # Consider success if at least some were deleted
 
-    def cleanup_test_items(self):
-        """Nettoyer les items de test créés"""
-        self.log("🧹 Nettoyage des items de test...")
+    def cleanup_test_autorisations(self):
+        """Nettoyer les autorisations de test créées"""
+        self.log("🧹 Nettoyage des autorisations de test...")
         
-        for item_id in self.test_items:
+        for autorisation_id in self.test_autorisations[:]:
             try:
                 response = self.admin_session.delete(
-                    f"{BACKEND_URL}/surveillance/items/{item_id}",
+                    f"{BACKEND_URL}/autorisations/{autorisation_id}",
                     timeout=10
                 )
                 if response.status_code == 200:
-                    self.log(f"✅ Item {item_id} supprimé")
+                    self.log(f"✅ Autorisation {autorisation_id} supprimée")
+                    self.test_autorisations.remove(autorisation_id)
                 else:
-                    self.log(f"⚠️ Échec suppression item {item_id} - Status: {response.status_code}")
+                    self.log(f"⚠️ Échec suppression autorisation {autorisation_id} - Status: {response.status_code}")
             except:
-                self.log(f"⚠️ Erreur suppression item {item_id}")
+                self.log(f"⚠️ Erreur suppression autorisation {autorisation_id}")
 
     def run_surveillance_custom_category_tests(self):
         """Run comprehensive tests for Plan de Surveillance - Création contrôle avec catégorie personnalisée"""
