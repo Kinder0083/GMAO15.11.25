@@ -57,7 +57,11 @@ const AutorisationParticuliereForm = () => {
         personnel_autorise: personnel
       });
     } catch (error) {
-      toast.error('Erreur lors du chargement de l\'autorisation');
+      toast({
+        title: 'Erreur',
+        description: 'Erreur lors du chargement de l\'autorisation',
+        variant: 'destructive'
+      });
       console.error(error);
     }
   };
