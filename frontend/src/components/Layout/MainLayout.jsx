@@ -688,7 +688,7 @@ const MainLayout = () => {
       {/* Main Content */}
       <div
         className={`pt-16 transition-all duration-300 ${
-          sidebarOpen ? 'ml-64' : 'ml-0'
+          sidebarOpen ? 'ml-64' : 'ml-20'
         }`}
       >
         <div className="p-6">
