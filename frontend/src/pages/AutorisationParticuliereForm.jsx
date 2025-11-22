@@ -7,7 +7,7 @@ import { Label } from '../components/ui/label';
 import { Textarea } from '../components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { ArrowLeft, Save, Trash2, Plus, FileText } from 'lucide-react';
-import { toast } from 'react-hot-toast';
+import { useToast } from '../hooks/use-toast';
 
 const AutorisationParticuliereForm = () => {
   const navigate = useNavigate();
