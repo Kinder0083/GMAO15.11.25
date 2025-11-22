@@ -96,7 +96,7 @@ async def create_autorisation(
 @router.put("/{autorisation_id}")
 async def update_autorisation(
     autorisation_id: str,
-    autorisation: AutorisationParticuliere,
+    autorisation: AutorisationParticuliereUpdate,
     current_user: dict = Depends(get_current_user)
 ):
     """Mettre à jour une autorisation"""
@@ -105,7 +105,8 @@ async def update_autorisation(
         if not existing:
             raise HTTPException(status_code=404, detail="Autorisation non trouvée")
         
-        data = autorisation.model_dump()
+        # Ne garder que les champs non-null
+        data = {k: v for k, v in autorisation.model_dump().items() if v is not None}
         data["updated_at"] = datetime.now(timezone.utc).isoformat()
         
         await db.autorisations_particulieres.update_one(
@@ -113,8 +114,11 @@ async def update_autorisation(
             {"$set": data}
         )
         
+        # Récupérer l'autorisation mise à jour
+        updated = await db.autorisations_particulieres.find_one({"id": autorisation_id})
+        
         logger.info(f"Autorisation mise à jour: {autorisation_id}")
-        return data
+        return updated
     except HTTPException:
         raise
     except Exception as e:
