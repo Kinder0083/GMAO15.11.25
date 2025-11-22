@@ -681,7 +681,7 @@ class DemandeArretJournalisationTester:
         
         # Summary
         self.log("=" * 80)
-        self.log("DEMANDES D'ARRÊT POUR MAINTENANCE - RÉSULTATS DES TESTS")
+        self.log("JOURNALISATION DEMANDES D'ARRÊT - RÉSULTATS DES TESTS")
         self.log("=" * 80)
         
         passed = sum(results.values())
