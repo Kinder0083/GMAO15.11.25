@@ -11,9 +11,11 @@ from bson import ObjectId
 from dependencies import get_current_user
 from models import (
     DemandeArretMaintenance, DemandeArretMaintenanceCreate, DemandeArretMaintenanceUpdate,
-    DemandeArretStatus, PlanningEquipementEntry, EquipmentStatus, UserRole
+    DemandeArretStatus, PlanningEquipementEntry, EquipmentStatus, UserRole,
+    ActionType, EntityType
 )
 import email_service
+import audit_service as audit_module
 import os
 from motor.motor_asyncio import AsyncIOMotorClient
 
