@@ -590,7 +590,7 @@ const MainLayout = () => {
 
       {/* Sidebar */}
       <div
-        className={`fixed top-0 left-0 bottom-0 bg-white border-r border-gray-200 transition-all duration-300 z-20 ${
+        className={`fixed top-0 left-0 bottom-0 bg-white border-r border-gray-200 transition-all duration-300 z-30 shadow-lg ${
           sidebarOpen ? 'w-64' : 'w-20'
         }`}
       >
