@@ -631,11 +631,11 @@ const MainLayout = () => {
                 <button
                   key={index}
                   onClick={() => navigate(item.path)}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
                     isActive
-                      ? 'bg-blue-600 text-white shadow-md'
-                      : 'hover:bg-gray-100 text-gray-700 hover:text-blue-600'
-                  } ${!sidebarOpen ? 'justify-center' : ''}`}
+                      ? 'bg-blue-600 text-white'
+                      : 'hover:bg-gray-800 text-gray-300'
+                  } ${!sidebarOpen ? 'justify-center px-2' : ''}`}
                   title={!sidebarOpen ? item.label : ''}
                 >
                   <Icon size={20} className="flex-shrink-0" />
@@ -644,10 +644,10 @@ const MainLayout = () => {
               );
             })}
           
-          <div className="pt-3 mt-3 border-t border-gray-200">
+          <div className="pt-4 mt-4 border-t border-gray-700">
             <button
               onClick={() => navigate('/settings')}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-blue-600 transition-all ${!sidebarOpen ? 'justify-center' : ''}`}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 text-gray-300 transition-all ${!sidebarOpen ? 'justify-center px-2' : ''}`}
               title={!sidebarOpen ? 'Paramètres' : ''}
             >
               <Settings size={20} className="flex-shrink-0" />
@@ -657,7 +657,7 @@ const MainLayout = () => {
               <>
                 <button
                   onClick={() => navigate('/special-settings')}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-blue-600 transition-all ${!sidebarOpen ? 'justify-center' : ''}`}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 text-gray-300 transition-all ${!sidebarOpen ? 'justify-center px-2' : ''}`}
                   title={!sidebarOpen ? 'Paramètres Spéciaux' : ''}
                 >
                   <Shield size={20} className="flex-shrink-0" />
@@ -665,7 +665,7 @@ const MainLayout = () => {
                 </button>
                 <button
                   onClick={() => navigate('/updates')}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-blue-600 transition-all ${!sidebarOpen ? 'justify-center' : ''}`}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 text-gray-300 transition-all ${!sidebarOpen ? 'justify-center px-2' : ''}`}
                   title={!sidebarOpen ? 'Mise à jour' : ''}
                 >
                   <RefreshCw size={20} className="flex-shrink-0" />
@@ -673,7 +673,7 @@ const MainLayout = () => {
                 </button>
                 <button
                   onClick={() => navigate('/journal')}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-blue-600 transition-all ${!sidebarOpen ? 'justify-center' : ''}`}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 text-gray-300 transition-all ${!sidebarOpen ? 'justify-center px-2' : ''}`}
                   title={!sidebarOpen ? 'Journal' : ''}
                 >
                   <FileText size={20} className="flex-shrink-0" />
@@ -681,7 +681,7 @@ const MainLayout = () => {
                 </button>
                 <button
                   onClick={() => navigate('/ssh')}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-blue-600 transition-all ${!sidebarOpen ? 'justify-center' : ''}`}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 text-gray-300 transition-all ${!sidebarOpen ? 'justify-center px-2' : ''}`}
                   title={!sidebarOpen ? 'SSH' : ''}
                 >
                   <Terminal size={20} className="flex-shrink-0" />
@@ -691,7 +691,7 @@ const MainLayout = () => {
             )}
             <button
               onClick={handleLogout}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-red-50 text-gray-700 hover:text-red-600 transition-all ${!sidebarOpen ? 'justify-center' : ''}`}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-600 text-gray-300 transition-all ${!sidebarOpen ? 'justify-center px-2' : ''}`}
               title={!sidebarOpen ? 'Déconnexion' : ''}
             >
               <LogOut size={20} className="flex-shrink-0" />
