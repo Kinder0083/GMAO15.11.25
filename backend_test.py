@@ -16,7 +16,7 @@ BACKEND_URL = "https://iris-maintenance-2.preview.emergentagent.com/api"
 ADMIN_EMAIL = "admin@gmao-iris.local"
 ADMIN_PASSWORD = "Admin123!"
 
-class SurveillanceCustomCategoryTester:
+class AutorisationsParticulieresTester:
     def __init__(self):
         self.admin_session = requests.Session()
         self.admin_token = None
