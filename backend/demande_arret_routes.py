@@ -111,6 +111,18 @@ async def create_demande_arret(
         # Envoyer l'email de demande
         await send_demande_email(data)
         
+        # Enregistrer dans le journal d'audit
+        await audit_service.log_action(
+            user_id=current_user.get("id"),
+            user_name=f"{current_user.get('prenom', '')} {current_user.get('nom', '')}",
+            user_email=current_user.get("email"),
+            action=ActionType.CREATE,
+            entity_type=EntityType.DEMANDE_ARRET,
+            entity_id=data['id'],
+            entity_name=f"Demande d'arrêt du {demande.date_debut} au {demande.date_fin}",
+            details=f"Demande d'arrêt pour {len(equipement_noms)} équipement(s): {', '.join(equipement_noms)}. Destinataire: {data['destinataire_nom']}"
+        )
+        
         logger.info(f"Demande d'arrêt créée: {data['id']}")
         return serialize_doc(data)
     except HTTPException:
