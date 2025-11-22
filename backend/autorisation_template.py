@@ -30,15 +30,18 @@ def generate_autorisation_html(autorisation: dict) -> str:
             </tr>
         """
     
-    description_travaux = autorisation.get("description_travaux", "").replace("\n", "<br>")
+    # Remplacer les sauts de ligne par <br> pour l'affichage HTML
+    newline = "\n"
+    br_tag = "<br>"
+    description_travaux = autorisation.get("description_travaux", "").replace(newline, br_tag)
     horaire_debut = autorisation.get("horaire_debut", "")
     horaire_fin = autorisation.get("horaire_fin", "")
     lieu_travaux = autorisation.get("lieu_travaux", "")
     
     # Convertir les listes en HTML
-    risques_potentiels = autorisation.get("risques_potentiels", "").replace("\n", "<br>")
-    mesures_securite = autorisation.get("mesures_securite", "").replace("\n", "<br>")
-    equipements_protection = autorisation.get("equipements_protection", "").replace("\n", "<br>")
+    risques_potentiels = autorisation.get("risques_potentiels", "").replace(newline, br_tag)
+    mesures_securite = autorisation.get("mesures_securite", "").replace(newline, br_tag)
+    equipements_protection = autorisation.get("equipements_protection", "").replace(newline, br_tag)
     
     signature_demandeur = autorisation.get("signature_demandeur", "")
     date_signature_demandeur = autorisation.get("date_signature_demandeur", "")
