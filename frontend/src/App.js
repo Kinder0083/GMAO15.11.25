@@ -101,6 +101,7 @@ function App() {
             <Route path="reports" element={<Reports />} />
             <Route path="people" element={<People />} />
             <Route path="planning" element={<Planning />} />
+            <Route path="planning-mprev" element={<PlanningMPrev />} />
             <Route path="vendors" element={<Vendors />} />
             <Route path="purchase-history" element={<PurchaseHistory />} />
             <Route path="import-export" element={<ImportExport />} />
