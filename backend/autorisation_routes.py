@@ -8,6 +8,7 @@ from typing import List, Optional
 from datetime import datetime, timezone
 import uuid
 import logging
+from bson import ObjectId
 
 from models import AutorisationParticuliere, AutorisationParticuliereCreate, AutorisationParticuliereUpdate
 from dependencies import get_current_user, get_current_user_optional
