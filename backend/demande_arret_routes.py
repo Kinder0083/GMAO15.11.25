@@ -372,6 +372,20 @@ async def check_expired_demandes():
             
             # Envoyer email d'expiration
             await send_expiration_email(demande)
+            
+            # Enregistrer dans le journal d'audit
+            await audit_service.log_action(
+                user_id="SYSTEM",
+                user_name="Système Automatique",
+                user_email="system@gmao-iris.local",
+                action=ActionType.UPDATE,
+                entity_type=EntityType.DEMANDE_ARRET,
+                entity_id=demande["id"],
+                entity_name=f"Demande d'arrêt du {demande['date_debut']} au {demande['date_fin']}",
+                details=f"Demande d'arrêt EXPIRÉE automatiquement après 7 jours sans réponse du destinataire {demande['destinataire_nom']}",
+                changes={"statut": "EN_ATTENTE → EXPIREE"}
+            )
+            
             count += 1
         
         logger.info(f"{count} demandes expirées marquées")
