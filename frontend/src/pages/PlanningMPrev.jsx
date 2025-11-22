@@ -145,7 +145,7 @@ const PlanningMPrev = () => {
     'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
   ];
 
-  const days = getDaysInMonth();
+  const months = getMonthsInYear();
   const today = new Date().toISOString().split('T')[0];
 
   if (loading && equipments.length === 0) {
