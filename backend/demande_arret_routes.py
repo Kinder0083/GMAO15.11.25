@@ -127,12 +127,10 @@ async def get_demandes_arret(
         
         demandes = await db.demandes_arret.find(filter_query).sort("date_creation", -1).to_list(length=None)
         
-        # Nettoyer les _id MongoDB
-        for demande in demandes:
-            if "_id" in demande:
-                del demande["_id"]
+        # Sérialiser les documents
+        serialized_demandes = [serialize_doc(demande) for demande in demandes]
         
-        return demandes
+        return serialized_demandes
     except Exception as e:
         logger.error(f"Erreur récupération demandes: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
