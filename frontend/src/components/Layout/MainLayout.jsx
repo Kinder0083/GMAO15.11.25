@@ -14,6 +14,8 @@ import {
   Settings,
   Menu,
   X,
+  ChevronLeft,
+  ChevronRight,
   LogOut,
   Bell,
   Database,
