@@ -13,9 +13,13 @@ import { useToast } from '../hooks/use-toast';
 
 const AutorisationParticuliereForm = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { id } = useParams();
   const isEdit = Boolean(id);
   const { toast } = useToast();
+  
+  // Récupérer le poleId depuis le state de navigation
+  const fromPoleId = location.state?.fromPoleId;
 
   const [loading, setLoading] = useState(false);
   const [bonsTravail, setBonsTravail] = useState([]);
