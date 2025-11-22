@@ -430,33 +430,6 @@ const PlanningMPrev = () => {
             })}
           </div>
 
-          {/* Statistiques */}
-          <div className="grid grid-cols-3 gap-4 mt-6">
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-2xl font-bold">
-                  {equipments.filter(e => (e.status || e.statut) === 'OPERATIONNEL' || (e.status || e.statut) === 'OPERATIONAL').length}
-                </div>
-                <div className="text-sm text-gray-600">Équipements opérationnels</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-2xl font-bold">
-                  {equipments.filter(e => (e.status || e.statut) === 'EN_MAINTENANCE').length}
-                </div>
-                <div className="text-sm text-gray-600">En maintenance</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-2xl font-bold">
-                  {equipments.filter(e => (e.status || e.statut) === 'HORS_SERVICE').length}
-                </div>
-                <div className="text-sm text-gray-600">Hors service</div>
-              </CardContent>
-            </Card>
-          </div>
         </CardContent>
       </Card>
 
