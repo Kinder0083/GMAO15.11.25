@@ -635,10 +635,11 @@ class DemandeArretJournalisationTester:
             "get_equipment": False,
             "get_rsp_prod_user": False,
             "create_demande_arret": False,
-            "get_all_demandes_arret": False,
-            "get_demande_by_id": False,
-            "check_backend_logs": False,
-            "cleanup_remaining_demandes": False
+            "verify_journal_creation": False,
+            "approve_demande": False,
+            "verify_journal_approval": False,
+            "create_and_refuse_demande": False,
+            "final_journal_verification": False
         }
         
         # Test 1: Admin Login
