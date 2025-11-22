@@ -16,12 +16,14 @@ BACKEND_URL = "https://maint-dashboard-7.preview.emergentagent.com/api"
 ADMIN_EMAIL = "admin@gmao-iris.local"
 ADMIN_PASSWORD = "Admin123!"
 
-class AutorisationsParticulieresTester:
+class DemandeArretTester:
     def __init__(self):
         self.admin_session = requests.Session()
         self.admin_token = None
         self.admin_data = None
-        self.test_autorisations = []  # Store created test autorisations for cleanup
+        self.test_demandes = []  # Store created test demandes for cleanup
+        self.equipment_id = None
+        self.rsp_prod_user_id = None
         
     def log(self, message, level="INFO"):
         """Log test messages with timestamp"""
