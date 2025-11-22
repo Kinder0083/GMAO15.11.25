@@ -243,51 +243,59 @@ class AutorisationsParticulieresTester:
             self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
             return False
     
-    def test_create_existing_category_item(self):
-        """TEST 2: Tester avec une catégorie existante pour comparaison"""
-        self.log("🧪 TEST 2: Tester avec une catégorie existante pour comparaison")
+    def test_update_autorisation(self):
+        """TEST 4: Mettre à jour une autorisation"""
+        self.log("🧪 TEST 4: Mettre à jour une autorisation")
         
-        test_item_data = {
-            "classe_type": "Test Catégorie Existante",
-            "category": "INCENDIE",
-            "batiment": "BATIMENT EXISTANT",
-            "periodicite": "6 mois",
-            "responsable": "MAINT",
-            "executant": "Executant Existant",
-            "description": "Test avec catégorie existante"
+        if not self.test_autorisations:
+            self.log("⚠️ Aucune autorisation de test disponible", "WARNING")
+            return False
+        
+        autorisation_id = self.test_autorisations[0]
+        
+        update_data = {
+            "description_travaux": "Travaux de maintenance électrique - MISE À JOUR",
+            "statut": "VALIDE"
         }
         
         try:
-            response = self.admin_session.post(
-                f"{BACKEND_URL}/surveillance/items",
-                json=test_item_data,
+            response = self.admin_session.put(
+                f"{BACKEND_URL}/autorisations/{autorisation_id}",
+                json=update_data,
                 timeout=15
             )
             
-            if response.status_code in [200, 201]:
-                data = response.json()
-                self.log(f"✅ Item avec catégorie existante créé - Status: {response.status_code}")
-                self.log(f"✅ ID: {data.get('id')}")
-                self.log(f"✅ Classe: {data.get('classe_type')}")
-                self.log(f"✅ Catégorie: {data.get('category')}")
+            if response.status_code == 200:
+                autorisation = response.json()
+                self.log(f"✅ Autorisation mise à jour - Status: 200 OK")
+                self.log(f"✅ ID: {autorisation.get('id')}")
+                self.log(f"✅ Description: {autorisation.get('description_travaux')}")
+                self.log(f"✅ Statut: {autorisation.get('statut')}")
                 
-                # Vérifier que la catégorie existante fonctionne
-                if data.get('category') == "INCENDIE":
-                    self.log("✅ SUCCÈS: Catégorie existante 'INCENDIE' acceptée")
-                    # Stocker pour nettoyage
-                    self.test_items.append(data.get('id'))
-                    return True, data
+                # Vérifier que les modifications ont été appliquées
+                if (autorisation.get('description_travaux') == "Travaux de maintenance électrique - MISE À JOUR" and
+                    autorisation.get('statut') == "VALIDE"):
+                    self.log("✅ SUCCÈS: Description et statut mis à jour correctement")
+                    
+                    # Vérifier que updated_at a été mis à jour
+                    if autorisation.get('updated_at'):
+                        self.log("✅ SUCCÈS: updated_at mis à jour")
+                        return True
+                    else:
+                        self.log("❌ ÉCHEC: updated_at non mis à jour", "ERROR")
+                        return False
                 else:
-                    self.log(f"❌ ÉCHEC: Catégorie incorrecte - Attendu: INCENDIE, Reçu: {data.get('category')}", "ERROR")
-                    return False, None
+                    self.log("❌ ÉCHEC: Modifications non appliquées", "ERROR")
+                    return False
+                    
             else:
-                self.log(f"❌ Création échouée - Status: {response.status_code}", "ERROR")
+                self.log(f"❌ Mise à jour échouée - Status: {response.status_code}", "ERROR")
                 self.log(f"Response: {response.text}", "ERROR")
-                return False, None
+                return False
                 
         except requests.exceptions.RequestException as e:
             self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
-            return False, None
+            return False
 
     def test_create_second_custom_category_item(self):
         """TEST 4: Créer un 2ème item avec une autre catégorie personnalisée"""
