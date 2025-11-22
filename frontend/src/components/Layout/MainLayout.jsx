@@ -372,6 +372,7 @@ const MainLayout = () => {
     { icon: Lightbulb, label: 'Demandes d\'amél.', path: '/improvement-requests', module: 'improvementRequests' },
     { icon: Sparkles, label: 'Améliorations', path: '/improvements', module: 'improvements' },
     { icon: Calendar, label: 'Maintenance prev.', path: '/preventive-maintenance', module: 'preventiveMaintenance' },
+    { icon: Calendar, label: 'Planning M.Prev.', path: '/planning-mprev', module: 'preventiveMaintenance' },
     { icon: Wrench, label: 'Équipements', path: '/assets', module: 'assets' },
     { icon: Package, label: 'Inventaire', path: '/inventory', module: 'inventory' },
     { icon: MapPin, label: 'Zones', path: '/locations', module: 'locations' },
