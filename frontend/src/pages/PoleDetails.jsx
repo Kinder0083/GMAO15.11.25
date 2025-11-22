@@ -295,11 +295,11 @@ function PoleDetails() {
               <FileText className="mr-2 h-4 w-4" />
               Nouveau Bon de Travail
             </Button>
-            <Button onClick={() => navigate('/autorisations-particulieres')} variant="outline">
+            <Button onClick={() => navigate('/autorisations-particulieres', { state: { fromPoleId: poleId } })} variant="outline">
               <Shield className="mr-2 h-4 w-4" />
               Voir Autorisations
             </Button>
-            <Button onClick={() => navigate('/autorisations-particulieres/new')} variant="outline">
+            <Button onClick={() => navigate('/autorisations-particulieres/new', { state: { fromPoleId: poleId } })} variant="outline">
               <Shield className="mr-2 h-4 w-4" />
               Nouvelle Autorisation
             </Button>
