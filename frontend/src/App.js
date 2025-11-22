@@ -39,6 +39,8 @@ import SSHTerminal from "./pages/SSHTerminal";
 import PoleDetails from "./pages/PoleDetails";
 import BonDeTravailForm from "./pages/BonDeTravailForm";
 import BonDeTravailView from "./pages/BonDeTravailView";
+import AutorisationParticuliereForm from "./pages/AutorisationParticuliereForm";
+import AutorisationParticuliereView from "./pages/AutorisationParticuliereView";
 
 // Protected Route Component with Token Validation
 const ProtectedRoute = ({ children }) => {
