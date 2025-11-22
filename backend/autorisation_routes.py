@@ -128,6 +128,11 @@ async def update_autorisation(
         # Récupérer l'autorisation mise à jour
         updated = await db.autorisations_particulieres.find_one({"id": autorisation_id})
         
+        # Serialize document to handle ObjectId and other MongoDB types
+        if updated and "_id" in updated:
+            updated["id"] = str(updated["_id"])
+            del updated["_id"]
+        
         logger.info(f"Autorisation mise à jour: {autorisation_id}")
         return updated
     except HTTPException:
