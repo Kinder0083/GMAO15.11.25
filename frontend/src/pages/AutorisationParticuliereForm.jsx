@@ -505,17 +505,58 @@ const AutorisationParticuliereForm = () => {
           {/* Mesures de sécurité */}
           <Card>
             <CardHeader>
-              <CardTitle>Mesures de Sécurité *</CardTitle>
+              <CardTitle>Mesures de Sécurité</CardTitle>
             </CardHeader>
-            <CardContent>
-              <Textarea
-                name="mesures_securite"
-                value={formData.mesures_securite}
-                onChange={handleChange}
-                rows={4}
-                placeholder="Liste des mesures de sécurité (une par ligne)"
-                required
-              />
+            <CardContent className="space-y-3">
+              {[
+                { key: 'mesure_consignation_materiel', label: 'CONSIGNATION MAT. OU PIÈCE EN MOUV' },
+                { key: 'mesure_consignation_electrique', label: 'CONSIGNATION ÉLECTRIQUE' },
+                { key: 'mesure_debranchement_force', label: 'DÉBRANCHEMENT FORCE MOTRICE' },
+                { key: 'mesure_vidange_appareil', label: 'VIDANGE APPAREIL/TUYAUTERIE' },
+                { key: 'mesure_decontamination', label: 'DÉCONTAMINATION/LAVAGE' },
+                { key: 'mesure_degazage', label: 'DÉGAZAGE' },
+                { key: 'mesure_pose_joint', label: 'POSE JOINT PLEIN' },
+                { key: 'mesure_ventilation', label: 'VENTILATION FORCÉE' },
+                { key: 'mesure_zone_balisee', label: 'ZONE BALISÉE' },
+                { key: 'mesure_canalisations_electriques', label: 'CANALISATIONS ÉLECTRIQUES' },
+                { key: 'mesure_souterraines_balisees', label: 'SOUTERRAINES BALISÉES' },
+                { key: 'mesure_egouts_cables', label: 'ÉGOUTS ET CÂBLES PROTÉGÉS' },
+                { key: 'mesure_taux_oxygene', label: 'TAUX D\'OXYGÈNE' },
+                { key: 'mesure_taux_explosivite', label: 'TAUX D\'EXPLOSIVITÉ' },
+                { key: 'mesure_explosimetre', label: 'EXPLOSIMÈTRE EN CONTINU' },
+                { key: 'mesure_eclairage_surete', label: 'ÉCLAIRAGE DE SÛRETÉ' },
+                { key: 'mesure_extincteur', label: 'EXTINCTEUR TYPE' },
+                { key: 'mesure_autres', label: 'AUTRES' }
+              ].map((mesure) => (
+                <div key={mesure.key} className="flex items-center justify-between p-2 border rounded hover:bg-gray-50">
+                  <span className="text-sm font-medium flex-1">{mesure.label}</span>
+                  <RadioGroup
+                    value={formData[mesure.key]}
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, [mesure.key]: value }))}
+                    className="flex gap-4"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="A_FAIRE" id={`${mesure.key}_afaire`} />
+                      <label htmlFor={`${mesure.key}_afaire`} className="text-sm cursor-pointer">À FAIRE</label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="FAIT" id={`${mesure.key}_fait`} />
+                      <label htmlFor={`${mesure.key}_fait`} className="text-sm cursor-pointer">FAIT</label>
+                    </div>
+                  </RadioGroup>
+                </div>
+              ))}
+              <div className="mt-4">
+                <Label htmlFor="mesures_securite_texte">Précisions supplémentaires</Label>
+                <Textarea
+                  id="mesures_securite_texte"
+                  name="mesures_securite_texte"
+                  value={formData.mesures_securite_texte}
+                  onChange={handleChange}
+                  rows={3}
+                  placeholder="Détails supplémentaires..."
+                />
+              </div>
             </CardContent>
           </Card>
 
