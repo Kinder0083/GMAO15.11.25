@@ -455,7 +455,7 @@ class DemandeArretTester:
         
         # Summary
         self.log("=" * 80)
-        self.log("AUTORISATIONS PARTICULIÈRES - RÉSULTATS DES TESTS")
+        self.log("DEMANDES D'ARRÊT POUR MAINTENANCE - RÉSULTATS DES TESTS")
         self.log("=" * 80)
         
         passed = sum(results.values())
@@ -468,8 +468,8 @@ class DemandeArretTester:
         self.log(f"\n📊 Overall: {passed}/{total} tests passed")
         
         # Analyse détaillée des tests critiques
-        critical_tests = ["create_autorisation", "get_all_autorisations", "get_autorisation_by_id", 
-                         "update_autorisation", "generate_pdf", "delete_autorisation"]
+        critical_tests = ["get_equipment", "get_rsp_prod_user", "create_demande_arret", 
+                         "get_all_demandes_arret", "get_demande_by_id"]
         critical_passed = sum(results.get(test, False) for test in critical_tests)
         
         self.log("\n" + "=" * 60)
