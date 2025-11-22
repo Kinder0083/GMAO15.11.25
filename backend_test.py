@@ -138,53 +138,48 @@ class AutorisationsParticulieresTester:
             self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
             return False, None
     
-    def test_retrieve_created_item(self):
-        """TEST 2: Récupérer l'item créé et vérifier la catégorie"""
-        self.log("🧪 TEST 2: Récupérer l'item créé")
-        
-        if not self.test_items:
-            self.log("⚠️ Aucun item de test disponible", "WARNING")
-            return False
+    def test_get_all_autorisations(self):
+        """TEST 2: Récupérer toutes les autorisations"""
+        self.log("🧪 TEST 2: Récupérer toutes les autorisations")
         
         try:
             response = self.admin_session.get(
-                f"{BACKEND_URL}/surveillance/items",
+                f"{BACKEND_URL}/autorisations",
                 timeout=15
             )
             
             if response.status_code == 200:
-                items = response.json()
-                self.log(f"✅ Liste des items récupérée - {len(items)} items")
+                autorisations = response.json()
+                self.log(f"✅ Liste des autorisations récupérée - {len(autorisations)} autorisations")
                 
-                # Chercher notre item de test avec la catégorie personnalisée
-                test_item = None
-                for item in items:
-                    if item.get('id') in self.test_items and item.get('category') == 'TEST_CATEGORIE_NOUVELLE':
-                        test_item = item
+                # Chercher notre autorisation de test
+                test_autorisation = None
+                for autorisation in autorisations:
+                    if autorisation.get('id') in self.test_autorisations:
+                        test_autorisation = autorisation
                         break
                 
-                if test_item:
-                    self.log(f"✅ Item avec catégorie personnalisée trouvé - ID: {test_item.get('id')}")
-                    self.log(f"✅ Classe: {test_item.get('classe_type')}")
-                    self.log(f"✅ Catégorie: {test_item.get('category')}")
-                    self.log(f"✅ Bâtiment: {test_item.get('batiment')}")
-                    self.log(f"✅ Exécutant: {test_item.get('executant')}")
+                if test_autorisation:
+                    self.log(f"✅ Autorisation de test trouvée - ID: {test_autorisation.get('id')}")
+                    self.log(f"✅ Numéro: {test_autorisation.get('numero')}")
+                    self.log(f"✅ Service: {test_autorisation.get('service_demandeur')}")
+                    self.log(f"✅ Responsable: {test_autorisation.get('responsable')}")
+                    self.log(f"✅ Statut: {test_autorisation.get('statut')}")
                     
-                    # Vérifier tous les champs
-                    if (test_item.get('category') == 'TEST_CATEGORIE_NOUVELLE' and
-                        test_item.get('classe_type') == 'Test Frontend Categorie' and
-                        test_item.get('batiment') == 'BATIMENT TEST'):
-                        self.log("✅ SUCCÈS: Tous les champs sont corrects")
+                    # Vérifier que l'autorisation créée est incluse
+                    if (test_autorisation.get('service_demandeur') == 'Service Test' and
+                        test_autorisation.get('responsable') == 'Jean Dupont'):
+                        self.log("✅ SUCCÈS: Autorisation créée trouvée dans la liste")
                         return True
                     else:
-                        self.log("❌ ÉCHEC: Certains champs sont incorrects", "ERROR")
+                        self.log("❌ ÉCHEC: Données de l'autorisation incorrectes", "ERROR")
                         return False
                 else:
-                    self.log("❌ Item avec catégorie personnalisée non trouvé dans la liste", "ERROR")
+                    self.log("❌ Autorisation de test non trouvée dans la liste", "ERROR")
                     return False
                     
             else:
-                self.log(f"❌ Récupération des items échouée - Status: {response.status_code}", "ERROR")
+                self.log(f"❌ Récupération des autorisations échouée - Status: {response.status_code}", "ERROR")
                 return False
                 
         except requests.exceptions.RequestException as e:
