@@ -6,6 +6,7 @@ from typing import List, Optional
 from datetime import datetime, timedelta, timezone
 import logging
 import uuid
+from bson import ObjectId
 
 from dependencies import get_current_user
 from models import (
