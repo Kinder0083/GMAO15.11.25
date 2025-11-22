@@ -55,6 +55,32 @@ async def get_autorisations(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+
+@router.get("/by-bon-travail/{bon_travail_id}")
+async def get_autorisations_by_bon_travail(
+    bon_travail_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Récupérer toutes les autorisations liées à un bon de travail"""
+    try:
+        autorisations = await db.autorisations_particulieres.find(
+            {"bons_travail_ids": bon_travail_id}
+        ).to_list(length=None)
+        
+        # Serialize documents to handle ObjectId and other MongoDB types
+        serialized_autorisations = []
+        for autorisation in autorisations:
+            if "_id" in autorisation:
+                if "id" not in autorisation:
+                    autorisation["id"] = str(autorisation["_id"])
+                del autorisation["_id"]
+            serialized_autorisations.append(autorisation)
+        return serialized_autorisations
+    except Exception as e:
+        logger.error(f"Erreur récupération autorisations par bon: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.get("/{autorisation_id}")
 async def get_autorisation(
     autorisation_id: str,
