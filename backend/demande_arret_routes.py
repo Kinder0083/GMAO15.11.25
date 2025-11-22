@@ -44,9 +44,12 @@ async def create_demande_arret(
         # Récupérer les informations des équipements
         equipement_noms = []
         for eq_id in demande.equipement_ids:
+            logger.info(f"🔍 Recherche équipement avec ID: {eq_id}")
             equipement = await db.equipments.find_one({"id": eq_id})
+            logger.info(f"🔍 Équipement trouvé: {equipement is not None}")
             if equipement:
                 equipement_noms.append(equipement.get("nom", ""))
+                logger.info(f"🔍 Nom équipement: {equipement.get('nom', '')}")
         
         # Calculer la date d'expiration (7 jours)
         date_creation = datetime.now(timezone.utc)
