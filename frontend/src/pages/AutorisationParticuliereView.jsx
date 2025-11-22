@@ -31,7 +31,11 @@ const AutorisationParticuliereView = () => {
       setAutorisations(sorted);
       setLoading(false);
     } catch (error) {
-      toast.error('Erreur lors du chargement des autorisations');
+      toast({
+        title: 'Erreur',
+        description: 'Erreur lors du chargement des autorisations',
+        variant: 'destructive'
+      });
       console.error(error);
       setLoading(false);
     }
