@@ -140,7 +140,9 @@ async def update_autorisation(
         
         # Serialize document to handle ObjectId and other MongoDB types
         if updated and "_id" in updated:
-            updated["id"] = str(updated["_id"])
+            # Only set id from _id if id field doesn't exist
+            if "id" not in updated:
+                updated["id"] = str(updated["_id"])
             del updated["_id"]
         
         logger.info(f"Autorisation mise à jour: {autorisation_id}")
