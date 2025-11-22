@@ -510,36 +510,37 @@ class AutorisationsParticulieresTester:
             except:
                 self.log(f"⚠️ Erreur suppression autorisation {autorisation_id}")
 
-    def run_surveillance_custom_category_tests(self):
-        """Run comprehensive tests for Plan de Surveillance - Création contrôle avec catégorie personnalisée"""
+    def run_autorisations_particulieres_tests(self):
+        """Run comprehensive tests for Autorisations Particulières de Travaux - Module MAINT_FE_003_V03"""
         self.log("=" * 80)
-        self.log("TESTING PLAN DE SURVEILLANCE - CRÉATION CONTRÔLE AVEC CATÉGORIE PERSONNALISÉE")
+        self.log("TESTING AUTORISATIONS PARTICULIÈRES DE TRAVAUX - MODULE MAINT_FE_003_V03")
         self.log("=" * 80)
         self.log("CONTEXTE:")
-        self.log("Correction du bug empêchant la création de contrôles avec des catégories personnalisées.")
-        self.log("Le champ `category` a été changé de `Enum` à `str` pour accepter n'importe quelle catégorie.")
+        self.log("Test complet du nouveau module 'Autorisations Particulières de Travaux'")
+        self.log("Collection MongoDB: autorisations_particulieres")
+        self.log("Format conforme au document MAINT_FE_003_V03")
         self.log("")
         self.log("SCÉNARIOS DE TEST:")
-        self.log("1. 📋 Créer un contrôle avec TOUS les champs requis et nouvelle catégorie")
-        self.log("2. 📋 Tester avec une catégorie existante pour comparaison")
-        self.log("3. 🔍 Vérifier les logs backend pour erreurs")
-        self.log("4. 🔍 Récupérer l'item créé et vérifier tous les champs")
-        self.log("5. 📊 Vérifier statistiques avec nouvelle catégorie")
-        self.log("6. 📋 Créer un 2ème item avec une autre catégorie personnalisée")
-        self.log("7. 📊 Vérifier que les deux catégories apparaissent dans les statistiques")
-        self.log("8. 🧹 Nettoyer - Supprimer les items de test")
+        self.log("1. 📋 POST /api/autorisations - Créer une nouvelle autorisation")
+        self.log("2. 📋 GET /api/autorisations - Liste toutes les autorisations")
+        self.log("3. 📋 GET /api/autorisations/{id} - Récupérer une autorisation spécifique")
+        self.log("4. 📋 PUT /api/autorisations/{id} - Mettre à jour une autorisation")
+        self.log("5. 📋 GET /api/autorisations/{id}/pdf - Générer le PDF")
+        self.log("6. 📋 DELETE /api/autorisations/{id} - Supprimer une autorisation")
+        self.log("7. 🔍 Vérifier les logs backend pour erreurs")
+        self.log("8. 🧹 Nettoyer - Supprimer les autorisations de test restantes")
         self.log("=" * 80)
         
         results = {
             "admin_login": False,
-            "create_custom_category_item": False,
-            "create_existing_category_item": False,
+            "create_autorisation": False,
+            "get_all_autorisations": False,
+            "get_autorisation_by_id": False,
+            "update_autorisation": False,
+            "generate_pdf": False,
+            "delete_autorisation": False,
             "check_backend_logs": False,
-            "retrieve_created_item": False,
-            "verify_stats_with_new_category": False,
-            "create_second_custom_category_item": False,
-            "verify_both_categories_in_stats": False,
-            "delete_created_items": False
+            "cleanup_remaining_autorisations": False
         }
         
         # Test 1: Admin Login
@@ -549,41 +550,39 @@ class AutorisationsParticulieresTester:
             self.log("❌ Cannot proceed with other tests - Admin login failed", "ERROR")
             return results
         
-        # TESTS CRITIQUES DU PLAN DE SURVEILLANCE
+        # TESTS CRITIQUES DES AUTORISATIONS PARTICULIÈRES
         self.log("\n" + "=" * 60)
-        self.log("📋 TESTS CRITIQUES - CATÉGORIES PERSONNALISÉES")
+        self.log("📋 TESTS CRITIQUES - AUTORISATIONS PARTICULIÈRES")
         self.log("=" * 60)
         
-        # Test 2: Créer un item avec catégorie personnalisée
-        success, test_item = self.test_create_custom_category_item()
-        results["create_custom_category_item"] = success
+        # Test 2: Créer une autorisation
+        success, test_autorisation = self.test_create_autorisation()
+        results["create_autorisation"] = success
         
-        # Test 3: Créer un item avec catégorie existante pour comparaison
-        success_existing, test_item_existing = self.test_create_existing_category_item()
-        results["create_existing_category_item"] = success_existing
+        # Test 3: Récupérer toutes les autorisations
+        results["get_all_autorisations"] = self.test_get_all_autorisations()
         
-        # Test 4: Vérifier les logs backend
+        # Test 4: Récupérer une autorisation par ID
+        results["get_autorisation_by_id"] = self.test_get_autorisation_by_id()
+        
+        # Test 5: Mettre à jour une autorisation
+        results["update_autorisation"] = self.test_update_autorisation()
+        
+        # Test 6: Générer le PDF
+        results["generate_pdf"] = self.test_generate_pdf()
+        
+        # Test 7: Supprimer une autorisation
+        results["delete_autorisation"] = self.test_delete_autorisation()
+        
+        # Test 8: Vérifier les logs backend
         results["check_backend_logs"] = self.test_check_backend_logs()
         
-        # Test 5: Récupérer l'item créé
-        results["retrieve_created_item"] = self.test_retrieve_created_item()
-        
-        # Test 6: Vérifier les statistiques
-        results["verify_stats_with_new_category"] = self.test_verify_stats_with_new_category()
-        
-        # Test 7: Créer un deuxième item avec une autre catégorie
-        success2, test_item2 = self.test_create_second_custom_category_item()
-        results["create_second_custom_category_item"] = success2
-        
-        # Test 8: Vérifier que les deux catégories apparaissent dans les statistiques
-        results["verify_both_categories_in_stats"] = self.test_verify_both_categories_in_stats()
-        
         # Test 9: Nettoyage
-        results["delete_created_items"] = self.test_delete_created_items()
+        results["cleanup_remaining_autorisations"] = self.test_cleanup_remaining_autorisations()
         
         # Summary
         self.log("=" * 80)
-        self.log("PLAN DE SURVEILLANCE - CATÉGORIES PERSONNALISÉES - RÉSULTATS")
+        self.log("AUTORISATIONS PARTICULIÈRES - RÉSULTATS DES TESTS")
         self.log("=" * 80)
         
         passed = sum(results.values())
@@ -596,72 +595,104 @@ class AutorisationsParticulieresTester:
         self.log(f"\n📊 Overall: {passed}/{total} tests passed")
         
         # Analyse détaillée des tests critiques
-        critical_tests = ["create_custom_category_item", "retrieve_created_item", "verify_stats_with_new_category"]
+        critical_tests = ["create_autorisation", "get_all_autorisations", "get_autorisation_by_id", 
+                         "update_autorisation", "generate_pdf", "delete_autorisation"]
         critical_passed = sum(results.get(test, False) for test in critical_tests)
         
         self.log("\n" + "=" * 60)
         self.log("ANALYSE CRITIQUE DE LA FONCTIONNALITÉ")
         self.log("=" * 60)
         
-        # TEST CRITIQUE 1: Création avec catégorie personnalisée
-        if results.get("create_custom_category_item", False):
-            self.log("🎉 TEST CRITIQUE 1 - CRÉATION AVEC CATÉGORIE PERSONNALISÉE: ✅ SUCCÈS")
-            self.log("✅ POST /api/surveillance/items accepte les catégories personnalisées")
-            self.log("✅ Réponse 200/201 OK")
-            self.log("✅ Catégorie 'MA_NOUVELLE_CATEGORIE' acceptée et enregistrée")
+        # TEST CRITIQUE 1: Création d'autorisation
+        if results.get("create_autorisation", False):
+            self.log("🎉 TEST CRITIQUE 1 - CRÉATION D'AUTORISATION: ✅ SUCCÈS")
+            self.log("✅ POST /api/autorisations fonctionne correctement")
+            self.log("✅ Numérotation automatique >= 8000")
+            self.log("✅ Date d'établissement auto-générée")
+            self.log("✅ Statut par défaut 'BROUILLON'")
+            self.log("✅ Champs created_at, updated_at présents")
         else:
-            self.log("🚨 TEST CRITIQUE 1 - CRÉATION AVEC CATÉGORIE PERSONNALISÉE: ❌ ÉCHEC")
-            self.log("❌ Erreur lors de la création ou catégorie rejetée")
+            self.log("🚨 TEST CRITIQUE 1 - CRÉATION D'AUTORISATION: ❌ ÉCHEC")
+            self.log("❌ Erreur lors de la création d'autorisation")
         
-        # TEST CRITIQUE 2: Récupération des données
-        if results.get("retrieve_created_item", False):
-            self.log("🎉 TEST CRITIQUE 2 - RÉCUPÉRATION DES DONNÉES: ✅ SUCCÈS")
-            self.log("✅ GET /api/surveillance/items retourne l'item créé")
-            self.log("✅ Catégorie personnalisée correctement stockée")
-            self.log("✅ Tous les champs sont corrects")
+        # TEST CRITIQUE 2: Liste des autorisations
+        if results.get("get_all_autorisations", False):
+            self.log("🎉 TEST CRITIQUE 2 - LISTE DES AUTORISATIONS: ✅ SUCCÈS")
+            self.log("✅ GET /api/autorisations retourne la liste")
+            self.log("✅ Autorisation créée incluse dans la liste")
         else:
-            self.log("🚨 TEST CRITIQUE 2 - RÉCUPÉRATION DES DONNÉES: ❌ ÉCHEC")
-            self.log("❌ Item non trouvé ou données incorrectes")
+            self.log("🚨 TEST CRITIQUE 2 - LISTE DES AUTORISATIONS: ❌ ÉCHEC")
+            self.log("❌ Erreur lors de la récupération de la liste")
         
-        # TEST CRITIQUE 3: Statistiques
-        if results.get("verify_stats_with_new_category", False):
-            self.log("🎉 TEST CRITIQUE 3 - STATISTIQUES AVEC NOUVELLE CATÉGORIE: ✅ SUCCÈS")
-            self.log("✅ GET /api/surveillance/stats inclut la nouvelle catégorie")
-            self.log("✅ by_category contient 'MA_NOUVELLE_CATEGORIE'")
-            self.log("✅ Comptage correct")
+        # TEST CRITIQUE 3: Récupération par ID
+        if results.get("get_autorisation_by_id", False):
+            self.log("🎉 TEST CRITIQUE 3 - RÉCUPÉRATION PAR ID: ✅ SUCCÈS")
+            self.log("✅ GET /api/autorisations/{id} fonctionne")
+            self.log("✅ Tous les champs présents et corrects")
+            self.log("✅ personnel_autorise est un array")
         else:
-            self.log("🚨 TEST CRITIQUE 3 - STATISTIQUES AVEC NOUVELLE CATÉGORIE: ❌ ÉCHEC")
-            self.log("❌ Nouvelle catégorie non présente dans les statistiques")
+            self.log("🚨 TEST CRITIQUE 3 - RÉCUPÉRATION PAR ID: ❌ ÉCHEC")
+            self.log("❌ Erreur lors de la récupération par ID")
+        
+        # TEST CRITIQUE 4: Mise à jour
+        if results.get("update_autorisation", False):
+            self.log("🎉 TEST CRITIQUE 4 - MISE À JOUR: ✅ SUCCÈS")
+            self.log("✅ PUT /api/autorisations/{id} fonctionne")
+            self.log("✅ Modifications appliquées correctement")
+            self.log("✅ updated_at mis à jour")
+        else:
+            self.log("🚨 TEST CRITIQUE 4 - MISE À JOUR: ❌ ÉCHEC")
+            self.log("❌ Erreur lors de la mise à jour")
+        
+        # TEST CRITIQUE 5: Génération PDF
+        if results.get("generate_pdf", False):
+            self.log("🎉 TEST CRITIQUE 5 - GÉNÉRATION PDF: ✅ SUCCÈS")
+            self.log("✅ GET /api/autorisations/{id}/pdf fonctionne")
+            self.log("✅ Content-Type: text/html")
+            self.log("✅ HTML contient 'AUTORISATION PARTICULIÈRE DE TRAVAUX'")
+            self.log("✅ HTML contient le numéro d'autorisation")
+            self.log("✅ HTML contient les données de l'autorisation")
+        else:
+            self.log("🚨 TEST CRITIQUE 5 - GÉNÉRATION PDF: ❌ ÉCHEC")
+            self.log("❌ Erreur lors de la génération PDF")
+        
+        # TEST CRITIQUE 6: Suppression
+        if results.get("delete_autorisation", False):
+            self.log("🎉 TEST CRITIQUE 6 - SUPPRESSION: ✅ SUCCÈS")
+            self.log("✅ DELETE /api/autorisations/{id} fonctionne")
+            self.log("✅ Message de succès retourné")
+            self.log("✅ GET suivant retourne 404")
+        else:
+            self.log("🚨 TEST CRITIQUE 6 - SUPPRESSION: ❌ ÉCHEC")
+            self.log("❌ Erreur lors de la suppression")
         
         # Tests complémentaires
-        if results.get("create_second_custom_category_item", False):
-            self.log("✅ VALIDATION: Création de multiples catégories personnalisées")
+        if results.get("check_backend_logs", False):
+            self.log("✅ VALIDATION: Pas d'erreur critique dans les logs backend")
         
-        if results.get("verify_both_categories_in_stats", False):
-            self.log("✅ VALIDATION: Multiples catégories personnalisées dans les statistiques")
-        
-        if results.get("delete_created_items", False):
-            self.log("✅ NETTOYAGE: Items de test supprimés avec succès")
+        if results.get("cleanup_remaining_autorisations", False):
+            self.log("✅ NETTOYAGE: Autorisations de test supprimées avec succès")
         
         # Conclusion finale
         self.log("\n" + "=" * 80)
-        self.log("CONCLUSION FINALE - CATÉGORIES PERSONNALISÉES")
+        self.log("CONCLUSION FINALE - AUTORISATIONS PARTICULIÈRES")
         self.log("=" * 80)
         
         if critical_passed == len(critical_tests):
-            self.log("🎉 FONCTIONNALITÉ ENTIÈREMENT OPÉRATIONNELLE!")
-            self.log("✅ Création d'items avec catégories personnalisées fonctionne (200/201 OK)")
-            self.log("✅ Les catégories dynamiques sont acceptées (pas d'erreur de validation Pydantic)")
-            self.log("✅ Les statistiques incluent les nouvelles catégories")
-            self.log("✅ Pas d'erreur 'Erreur d'enregistrement'")
-            self.log("✅ Le bug de catégorie personnalisée est RÉSOLU")
-            self.log("✅ La fonctionnalité est PRÊTE POUR PRODUCTION")
+            self.log("🎉 MODULE AUTORISATIONS PARTICULIÈRES ENTIÈREMENT OPÉRATIONNEL!")
+            self.log("✅ Toutes les routes CRUD fonctionnent correctement")
+            self.log("✅ Numérotation automatique >= 8000 fonctionnelle")
+            self.log("✅ Date d'établissement auto-générée (format DD/MM/YYYY)")
+            self.log("✅ Authentification JWT requise pour toutes les routes")
+            self.log("✅ Validation des champs obligatoires")
+            self.log("✅ Gestion correcte du personnel_autorise (array)")
+            self.log("✅ Génération PDF HTML conforme au format MAINT_FE_003_V03")
+            self.log("✅ Le module est PRÊT POUR PRODUCTION")
         else:
-            self.log("⚠️ FONCTIONNALITÉ INCOMPLÈTE - PROBLÈMES DÉTECTÉS")
+            self.log("⚠️ MODULE AUTORISATIONS PARTICULIÈRES INCOMPLET - PROBLÈMES DÉTECTÉS")
             failed_critical = [test for test in critical_tests if not results.get(test, False)]
             self.log(f"❌ Tests critiques échoués: {', '.join(failed_critical)}")
-            self.log("❌ Les catégories personnalisées ne fonctionnent pas correctement")
-            self.log("❌ Le bug n'est pas entièrement résolu")
+            self.log("❌ Le module ne fonctionne pas correctement")
             self.log("❌ Intervention requise avant mise en production")
         
         return results
