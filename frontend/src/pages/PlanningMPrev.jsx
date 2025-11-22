@@ -33,9 +33,8 @@ const PlanningMPrev = () => {
     try {
       setLoading(true);
       const year = currentDate.getFullYear();
-      const month = currentDate.getMonth();
-      const startDate = new Date(year, month, 1).toISOString().split('T')[0];
-      const endDate = new Date(year, month + 1, 0).toISOString().split('T')[0];
+      const startDate = new Date(year, 0, 1).toISOString().split('T')[0]; // 1er janvier
+      const endDate = new Date(year, 11, 31).toISOString().split('T')[0]; // 31 décembre
       
       const entries = await demandesArretAPI.getPlanningEquipements({
         date_debut: startDate,
