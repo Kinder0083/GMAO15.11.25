@@ -1562,13 +1562,49 @@ class AutorisationParticuliereUpdate(BaseModel):
     service_demandeur: Optional[str] = None
     responsable: Optional[str] = None
     personnel_autorise: Optional[List[PersonnelAutorise]] = None
+    # Types de travaux
+    type_point_chaud: Optional[bool] = None
+    type_fouille: Optional[bool] = None
+    type_espace_clos: Optional[bool] = None
+    type_autre_cas: Optional[bool] = None
     description_travaux: Optional[str] = None
+    # Horaires
     horaire_debut: Optional[str] = None
     horaire_fin: Optional[str] = None
     lieu_travaux: Optional[str] = None
     risques_potentiels: Optional[str] = None
-    mesures_securite: Optional[str] = None
-    equipements_protection: Optional[str] = None
+    # Mesures de sécurité
+    mesure_consignation_materiel: Optional[str] = None
+    mesure_consignation_electrique: Optional[str] = None
+    mesure_debranchement_force: Optional[str] = None
+    mesure_vidange_appareil: Optional[str] = None
+    mesure_decontamination: Optional[str] = None
+    mesure_degazage: Optional[str] = None
+    mesure_pose_joint: Optional[str] = None
+    mesure_ventilation: Optional[str] = None
+    mesure_zone_balisee: Optional[str] = None
+    mesure_canalisations_electriques: Optional[str] = None
+    mesure_souterraines_balisees: Optional[str] = None
+    mesure_egouts_cables: Optional[str] = None
+    mesure_taux_oxygene: Optional[str] = None
+    mesure_taux_explosivite: Optional[str] = None
+    mesure_explosimetre: Optional[str] = None
+    mesure_eclairage_surete: Optional[str] = None
+    mesure_extincteur: Optional[str] = None
+    mesure_autres: Optional[str] = None
+    mesures_securite_texte: Optional[str] = None
+    # EPI
+    epi_visiere: Optional[bool] = None
+    epi_tenue_impermeable: Optional[bool] = None
+    epi_cagoule_air: Optional[bool] = None
+    epi_masque: Optional[bool] = None
+    epi_gant: Optional[bool] = None
+    epi_harnais: Optional[bool] = None
+    epi_outillage_anti_etincelle: Optional[bool] = None
+    epi_presence_surveillant: Optional[bool] = None
+    epi_autres: Optional[bool] = None
+    equipements_protection_texte: Optional[str] = None
+    # Signatures
     signature_demandeur: Optional[str] = None
     date_signature_demandeur: Optional[str] = None
     signature_responsable_securite: Optional[str] = None
