@@ -378,19 +378,65 @@ const AutorisationParticuliereForm = () => {
             </CardContent>
           </Card>
 
-          {/* Description des travaux */}
+          {/* Description des travaux (Type de travaux) */}
           <Card>
             <CardHeader>
-              <CardTitle>Description des Travaux *</CardTitle>
+              <CardTitle>Type de Travaux *</CardTitle>
             </CardHeader>
-            <CardContent>
-              <Textarea
-                name="description_travaux"
-                value={formData.description_travaux}
-                onChange={handleChange}
-                rows={5}
-                required
-              />
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="type_point_chaud"
+                    checked={formData.type_point_chaud}
+                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, type_point_chaud: checked }))}
+                  />
+                  <label htmlFor="type_point_chaud" className="text-sm font-medium cursor-pointer">
+                    Par point chaud
+                  </label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="type_fouille"
+                    checked={formData.type_fouille}
+                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, type_fouille: checked }))}
+                  />
+                  <label htmlFor="type_fouille" className="text-sm font-medium cursor-pointer">
+                    De fouille
+                  </label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="type_espace_clos"
+                    checked={formData.type_espace_clos}
+                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, type_espace_clos: checked }))}
+                  />
+                  <label htmlFor="type_espace_clos" className="text-sm font-medium cursor-pointer">
+                    En espace clos ou confiné
+                  </label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="type_autre_cas"
+                    checked={formData.type_autre_cas}
+                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, type_autre_cas: checked }))}
+                  />
+                  <label htmlFor="type_autre_cas" className="text-sm font-medium cursor-pointer">
+                    Autre cas
+                  </label>
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="description_travaux">Précisions</Label>
+                <Textarea
+                  id="description_travaux"
+                  name="description_travaux"
+                  value={formData.description_travaux}
+                  onChange={handleChange}
+                  rows={3}
+                  placeholder="Détails supplémentaires sur les travaux..."
+                />
+              </div>
             </CardContent>
           </Card>
 
