@@ -6456,13 +6456,11 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Routes API CRUD pour Autorisations Particulières"
-    - "Template HTML pour génération PDF MAINT_FE_003_V03"
     - "Formulaire AutorisationParticuliereForm.jsx"
     - "Vue liste AutorisationParticuliereView.jsx"
     - "Intégration routing et navigation"
   stuck_tasks: []
-  test_all: true
+  test_all: false
   test_priority: "sequential"
 
 agent_communication:
