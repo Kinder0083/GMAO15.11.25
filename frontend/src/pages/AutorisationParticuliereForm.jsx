@@ -93,18 +93,21 @@ const AutorisationParticuliereForm = () => {
     setFormData(prev => ({ ...prev, personnel_autorise: newPersonnel }));
   };
 
-  const handleBonTravailToggle = (bonId) => {
-    setFormData(prev => {
-      const currentIds = prev.bons_travail_ids || [];
-      const isSelected = currentIds.includes(bonId);
-      
-      return {
+  const handleAddBonTravail = () => {
+    if (selectedBonId && !formData.bons_travail_ids.includes(selectedBonId)) {
+      setFormData(prev => ({
         ...prev,
-        bons_travail_ids: isSelected
-          ? currentIds.filter(id => id !== bonId)
-          : [...currentIds, bonId]
-      };
-    });
+        bons_travail_ids: [...prev.bons_travail_ids, selectedBonId]
+      }));
+      setSelectedBonId('');
+    }
+  };
+
+  const handleRemoveBonTravail = (bonId) => {
+    setFormData(prev => ({
+      ...prev,
+      bons_travail_ids: prev.bons_travail_ids.filter(id => id !== bonId)
+    }));
   };
 
   const handleSubmit = async (e) => {
