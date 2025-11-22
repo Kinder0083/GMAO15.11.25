@@ -17,6 +17,7 @@ const AutorisationParticuliereForm = () => {
   const { toast } = useToast();
 
   const [loading, setLoading] = useState(false);
+  const [bonsTravail, setBonsTravail] = useState([]);
   const [formData, setFormData] = useState({
     service_demandeur: '',
     responsable: '',
@@ -36,7 +37,8 @@ const AutorisationParticuliereForm = () => {
     signature_demandeur: '',
     date_signature_demandeur: '',
     signature_responsable_securite: '',
-    date_signature_responsable: ''
+    date_signature_responsable: '',
+    bons_travail_ids: []
   });
 
   useEffect(() => {
