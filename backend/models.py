@@ -1669,3 +1669,97 @@ class BonDeTravailCreate(BaseModel):
     entreprise: str = "Non assignée"
 
 
+
+# ==================== DEMANDES D'ARRÊT POUR MAINTENANCE ====================
+
+class DemandeArretStatus(str, Enum):
+    EN_ATTENTE = "EN_ATTENTE"
+    APPROUVEE = "APPROUVEE"
+    REFUSEE = "REFUSEE"
+    EXPIREE = "EXPIREE"  # Auto-refusée après 7 jours
+
+class PeriodeType(str, Enum):
+    JOURNEE_COMPLETE = "JOURNEE_COMPLETE"
+    MATIN = "MATIN"  # 8h-12h
+    APRES_MIDI = "APRES_MIDI"  # 13h-17h
+
+class DemandeArretMaintenance(BaseModel):
+    """Demande d'arrêt d'équipement pour maintenance"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    
+    # Période demandée
+    date_debut: str  # Format ISO date
+    date_fin: str  # Format ISO date
+    periode_debut: PeriodeType = PeriodeType.JOURNEE_COMPLETE
+    periode_fin: PeriodeType = PeriodeType.JOURNEE_COMPLETE
+    
+    # Demandeur
+    demandeur_id: str
+    demandeur_nom: str
+    
+    # Équipements concernés (sélection multiple)
+    equipement_ids: List[str] = []
+    equipement_noms: List[str] = []  # Pour affichage
+    
+    # Ordre de travail ou maintenance préventive (optionnel)
+    work_order_id: Optional[str] = None
+    maintenance_preventive_id: Optional[str] = None
+    
+    # Commentaire libre
+    commentaire: str = ""
+    
+    # Destinataire
+    destinataire_id: str
+    destinataire_nom: str
+    destinataire_email: str
+    
+    # Statut et validation
+    statut: DemandeArretStatus = DemandeArretStatus.EN_ATTENTE
+    date_creation: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    date_expiration: str  # Auto-calculée : date_creation + 7 jours
+    date_reponse: Optional[str] = None
+    commentaire_reponse: Optional[str] = None
+    date_proposee: Optional[str] = None  # Si refus avec proposition nouvelle date
+    
+    # Token pour validation par email
+    validation_token: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    
+    # Métadonnées
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    updated_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class DemandeArretMaintenanceCreate(BaseModel):
+    """Modèle pour créer une demande d'arrêt"""
+    date_debut: str
+    date_fin: str
+    periode_debut: PeriodeType = PeriodeType.JOURNEE_COMPLETE
+    periode_fin: PeriodeType = PeriodeType.JOURNEE_COMPLETE
+    equipement_ids: List[str] = []
+    work_order_id: Optional[str] = None
+    maintenance_preventive_id: Optional[str] = None
+    commentaire: str = ""
+    destinataire_id: str  # Si non fourni, prendre le premier user avec rôle RSP_PROD
+
+class DemandeArretMaintenanceUpdate(BaseModel):
+    """Modèle pour mettre à jour une demande"""
+    statut: Optional[DemandeArretStatus] = None
+    commentaire_reponse: Optional[str] = None
+    date_proposee: Optional[str] = None
+
+# ==================== PLANNING EQUIPEMENT ====================
+
+class PlanningEquipementEntry(BaseModel):
+    """Entrée dans le planning équipement (après validation d'une demande)"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    equipement_id: str
+    date_debut: str
+    date_fin: str
+    periode_debut: PeriodeType
+    periode_fin: PeriodeType
+    statut: EquipmentStatus = EquipmentStatus.EN_MAINTENANCE
+    demande_arret_id: str  # Référence à la demande d'arrêt
+    work_order_id: Optional[str] = None
+    maintenance_preventive_id: Optional[str] = None
+    commentaire: str = ""
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
