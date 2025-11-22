@@ -5556,10 +5556,21 @@ async def startup_scheduler():
             replace_existing=True
         )
         
+        # Configurer la vérification des demandes d'arrêt expirées à 2h00 du matin
+        from demande_arret_routes import check_expired_demandes_cron
+        scheduler.add_job(
+            check_expired_demandes_cron,
+            CronTrigger(hour=2, minute=0),  # Tous les jours à 2h00
+            id='check_expired_demandes',
+            name='Vérification demandes arrêt expirées (7 jours)',
+            replace_existing=True
+        )
+        
         scheduler.start()
         logger.info("✅ Scheduler démarré:")
         logger.info("   - Vérification maintenances préventives: tous les jours à 00h00")
         logger.info("   - Vérification mises à jour: tous les jours à 01h00")
+        logger.info("   - Vérification demandes expirées: tous les jours à 02h00")
         
     except Exception as e:
         logger.error(f"❌ Erreur lors du démarrage du scheduler: {str(e)}")
