@@ -36,7 +36,8 @@ async def create_demande_arret(
     try:
         # Récupérer le destinataire
         logger.info(f"🔍 Recherche destinataire avec ID: {demande.destinataire_id}")
-        destinataire = await db.users.find_one({"id": demande.destinataire_id})
+        from bson import ObjectId
+        destinataire = await db.users.find_one({"_id": ObjectId(demande.destinataire_id)})
         logger.info(f"🔍 Destinataire trouvé: {destinataire is not None}")
         if not destinataire:
             raise HTTPException(status_code=404, detail="Destinataire non trouvé")
