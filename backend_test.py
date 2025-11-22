@@ -609,26 +609,25 @@ class DemandeArretJournalisationTester:
             self.log(f"✅ Demande {demande_id} marquée pour nettoyage")
             self.test_demandes.remove(demande_id)
 
-    def run_demande_arret_tests(self):
-        """Run comprehensive tests for Demande d'Arrêt pour Maintenance"""
+    def run_demande_arret_journalisation_tests(self):
+        """Run comprehensive tests for Demande d'Arrêt Journalisation"""
         self.log("=" * 80)
-        self.log("TESTING DEMANDE D'ARRÊT POUR MAINTENANCE")
+        self.log("TESTING JOURNALISATION DES DEMANDES D'ARRÊT DE MAINTENANCE")
         self.log("=" * 80)
         self.log("CONTEXTE:")
-        self.log("Test complet du module 'Demande d'Arrêt pour Maintenance'")
-        self.log("Collection MongoDB: demandes_arret")
-        self.log("Corrections testées:")
-        self.log("- equipement.get('nom', '') au lieu de equipement.get('name', '')")
-        self.log("- prenom/nom au lieu de first_name/last_name pour les utilisateurs")
+        self.log("Test de la journalisation automatique dans le journal d'audit")
+        self.log("pour toutes les actions sur les demandes d'arrêt")
         self.log("")
         self.log("SCÉNARIOS DE TEST:")
-        self.log("1. 🔧 GET /api/equipment - Récupérer un équipement valide")
-        self.log("2. 👤 GET /api/users - Récupérer un utilisateur RSP_PROD")
+        self.log("1. 🔧 GET /api/equipments - Récupérer un équipement valide")
+        self.log("2. 👤 GET /api/users - Récupérer un utilisateur destinataire")
         self.log("3. 📋 POST /api/demandes-arret/ - Créer une demande d'arrêt")
-        self.log("4. 📋 GET /api/demandes-arret/ - Liste toutes les demandes")
-        self.log("5. 📋 GET /api/demandes-arret/{id} - Récupérer une demande spécifique")
-        self.log("6. 🔍 Vérifier les logs backend pour erreurs")
-        self.log("7. 🧹 Nettoyer - Marquer les demandes de test pour nettoyage")
+        self.log("4. 📋 GET /api/audit-logs - Vérifier l'entrée CREATE dans le journal")
+        self.log("5. ✅ POST /api/demandes-arret/validate/{token} - Approuver la demande")
+        self.log("6. 📋 GET /api/audit-logs - Vérifier l'entrée UPDATE (APPROUVÉE) dans le journal")
+        self.log("7. ❌ Créer et refuser une nouvelle demande")
+        self.log("8. 📋 GET /api/audit-logs - Vérifier l'entrée UPDATE (REFUSÉE) dans le journal")
+        self.log("9. 📊 Vérification finale - Lister tous les logs DEMANDE_ARRET")
         self.log("=" * 80)
         
         results = {
