@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Badge } from '../components/ui/badge';
 import {
   ArrowLeft, Plus, Upload, FileText, Download, Trash2, Edit, File,
-  FileSpreadsheet, FileImage, FileVideo, Mail, Printer, Eye, Shield
+  FileSpreadsheet, FileImage, FileVideo, Mail, Printer, Eye, Shield, AlertTriangle
 } from 'lucide-react';
 import { documentationsAPI, autorisationsAPI } from '../services/api';
 import { useToast } from '../hooks/use-toast';
