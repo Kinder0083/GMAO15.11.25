@@ -1508,13 +1508,49 @@ class AutorisationParticuliereCreate(BaseModel):
     service_demandeur: str
     responsable: str
     personnel_autorise: List[PersonnelAutorise] = []
-    description_travaux: str
+    # Types de travaux
+    type_point_chaud: bool = False
+    type_fouille: bool = False
+    type_espace_clos: bool = False
+    type_autre_cas: bool = False
+    description_travaux: str = ""
+    # Horaires
     horaire_debut: str
     horaire_fin: str
     lieu_travaux: str
     risques_potentiels: str
-    mesures_securite: str
-    equipements_protection: str
+    # Mesures de sécurité
+    mesure_consignation_materiel: str = ""
+    mesure_consignation_electrique: str = ""
+    mesure_debranchement_force: str = ""
+    mesure_vidange_appareil: str = ""
+    mesure_decontamination: str = ""
+    mesure_degazage: str = ""
+    mesure_pose_joint: str = ""
+    mesure_ventilation: str = ""
+    mesure_zone_balisee: str = ""
+    mesure_canalisations_electriques: str = ""
+    mesure_souterraines_balisees: str = ""
+    mesure_egouts_cables: str = ""
+    mesure_taux_oxygene: str = ""
+    mesure_taux_explosivite: str = ""
+    mesure_explosimetre: str = ""
+    mesure_eclairage_surete: str = ""
+    mesure_extincteur: str = ""
+    mesure_autres: str = ""
+    mesures_securite_texte: str = ""
+    # EPI
+    epi_visiere: bool = False
+    epi_tenue_impermeable: bool = False
+    epi_cagoule_air: bool = False
+    epi_masque: bool = False
+    epi_gant: bool = False
+    epi_harnais: bool = False
+    epi_outillage_anti_etincelle: bool = False
+    epi_presence_surveillant: bool = False
+    epi_autres: bool = False
+    equipements_protection_texte: str = ""
+    # Signatures
     signature_demandeur: Optional[str] = None
     date_signature_demandeur: Optional[str] = None
     signature_responsable_securite: Optional[str] = None
