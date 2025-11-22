@@ -169,7 +169,12 @@ const AutorisationParticuliereForm = () => {
         title: 'Succès',
         description: 'Autorisation supprimée'
       });
-      navigate('/autorisations-particulieres');
+      // Retourner au pôle ou à la page documentations
+      if (fromPoleId) {
+        navigate(`/documentations/${fromPoleId}`);
+      } else {
+        navigate('/documentations');
+      }
     } catch (error) {
       toast({
         title: 'Erreur',
