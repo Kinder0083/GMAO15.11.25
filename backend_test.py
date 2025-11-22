@@ -649,32 +649,35 @@ class DemandeArretJournalisationTester:
             self.log("❌ Cannot proceed with other tests - Admin login failed", "ERROR")
             return results
         
-        # TESTS CRITIQUES DES DEMANDES D'ARRÊT
+        # TESTS CRITIQUES DE JOURNALISATION
         self.log("\n" + "=" * 60)
-        self.log("📋 TESTS CRITIQUES - DEMANDES D'ARRÊT POUR MAINTENANCE")
+        self.log("📋 TESTS CRITIQUES - JOURNALISATION DEMANDES D'ARRÊT")
         self.log("=" * 60)
         
         # Test 2: Récupérer un équipement
         results["get_equipment"] = self.test_get_equipment()
         
-        # Test 3: Récupérer un utilisateur RSP_PROD
+        # Test 3: Récupérer un utilisateur destinataire
         results["get_rsp_prod_user"] = self.test_get_rsp_prod_user()
         
         # Test 4: Créer une demande d'arrêt
         success, test_demande = self.test_create_demande_arret()
         results["create_demande_arret"] = success
         
-        # Test 5: Récupérer toutes les demandes
-        results["get_all_demandes_arret"] = self.test_get_all_demandes_arret()
+        # Test 5: Vérifier l'entrée CREATE dans le journal
+        results["verify_journal_creation"] = self.test_verify_journal_creation()
         
-        # Test 6: Récupérer une demande par ID
-        results["get_demande_by_id"] = self.test_get_demande_by_id()
+        # Test 6: Approuver la demande
+        results["approve_demande"] = self.test_approve_demande()
         
-        # Test 7: Vérifier les logs backend
-        results["check_backend_logs"] = self.test_check_backend_logs()
+        # Test 7: Vérifier l'entrée UPDATE (APPROUVÉE) dans le journal
+        results["verify_journal_approval"] = self.test_verify_journal_approval()
         
-        # Test 8: Nettoyage
-        results["cleanup_remaining_demandes"] = self.test_cleanup_remaining_demandes()
+        # Test 8: Créer et refuser une nouvelle demande
+        results["create_and_refuse_demande"] = self.test_create_and_refuse_demande()
+        
+        # Test 9: Vérification finale du journal
+        results["final_journal_verification"] = self.test_final_journal_verification()
         
         # Summary
         self.log("=" * 80)
