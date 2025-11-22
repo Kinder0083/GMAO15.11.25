@@ -408,59 +408,47 @@ class AutorisationsParticulieresTester:
             self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
             return False
 
-    def test_verify_both_categories_in_stats(self):
-        """TEST 5: Vérifier que les deux catégories personnalisées apparaissent dans les statistiques"""
-        self.log("🧪 TEST 5: Vérifier que les deux catégories personnalisées apparaissent dans les statistiques")
+    def test_check_backend_logs(self):
+        """TEST 7: Vérifier les logs backend pour erreurs"""
+        self.log("🧪 TEST 7: Vérifier les logs backend pour erreurs")
         
         try:
-            response = self.admin_session.get(
-                f"{BACKEND_URL}/surveillance/stats",
-                timeout=15
+            import subprocess
+            result = subprocess.run(
+                ["tail", "-n", "50", "/var/log/supervisor/backend.err.log"],
+                capture_output=True,
+                text=True,
+                timeout=10
             )
             
-            if response.status_code == 200:
-                stats = response.json()
-                self.log(f"✅ Statistiques récupérées - Status: 200 OK")
-                
-                if "by_category" in stats:
-                    by_category = stats["by_category"]
-                    self.log(f"✅ by_category trouvé avec {len(by_category)} catégories")
+            if result.returncode == 0:
+                logs = result.stdout
+                if logs.strip():
+                    self.log("⚠️ Logs d'erreur backend trouvés:")
+                    for line in logs.strip().split('\n')[-10:]:  # Dernières 10 lignes
+                        if line.strip():
+                            self.log(f"   {line}")
                     
-                    # Vérifier que les deux catégories personnalisées sont présentes
-                    categories_found = []
-                    if "TEST_CATEGORIE_NOUVELLE" in by_category:
-                        categories_found.append("TEST_CATEGORIE_NOUVELLE")
-                        self.log(f"✅ Catégorie 'TEST_CATEGORIE_NOUVELLE' trouvée")
-                    
-                    if "CATEGORIE_TEST_2" in by_category:
-                        categories_found.append("CATEGORIE_TEST_2")
-                        self.log(f"✅ Catégorie 'CATEGORIE_TEST_2' trouvée")
-                    
-                    if len(categories_found) == 2:
-                        self.log("✅ SUCCÈS: Les deux catégories personnalisées sont présentes dans les statistiques")
-                        
-                        # Afficher les détails
-                        for cat in categories_found:
-                            cat_stats = by_category[cat]
-                            self.log(f"✅ {cat}: {cat_stats.get('total')} items, {cat_stats.get('realises')} réalisés, {cat_stats.get('pourcentage')}%")
-                        
-                        return True
-                    else:
-                        self.log(f"❌ ÉCHEC: Seulement {len(categories_found)} catégorie(s) trouvée(s) sur 2", "ERROR")
-                        self.log(f"Catégories trouvées: {categories_found}")
-                        self.log(f"Toutes les catégories: {list(by_category.keys())}")
+                    # Chercher des erreurs spécifiques
+                    if "ValidationError" in logs:
+                        self.log("❌ Erreur de validation Pydantic détectée", "ERROR")
                         return False
+                    elif "autorisation" in logs.lower():
+                        self.log("⚠️ Erreur liée aux 'autorisations' détectée", "WARNING")
+                        return False
+                    else:
+                        self.log("✅ Pas d'erreur critique liée aux autorisations")
+                        return True
                 else:
-                    self.log("❌ ÉCHEC: 'by_category' non trouvé dans la réponse", "ERROR")
-                    return False
-                    
+                    self.log("✅ Aucune erreur dans les logs backend")
+                    return True
             else:
-                self.log(f"❌ Récupération des statistiques échouée - Status: {response.status_code}", "ERROR")
-                return False
+                self.log("⚠️ Impossible de lire les logs backend", "WARNING")
+                return True  # Ne pas faire échouer le test pour ça
                 
-        except requests.exceptions.RequestException as e:
-            self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
-            return False
+        except Exception as e:
+            self.log(f"⚠️ Erreur lecture logs: {str(e)}", "WARNING")
+            return True  # Ne pas faire échouer le test pour ça
 
     def test_delete_created_items(self):
         """TEST 6: Nettoyer - Supprimer les items de test"""
