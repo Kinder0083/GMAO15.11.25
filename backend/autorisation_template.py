@@ -30,7 +30,12 @@ def generate_autorisation_html(autorisation: dict) -> str:
             </tr>
         """
     
-    # Remplacer les sauts de ligne par <br> pour l'affichage HTML
+    # Types de travaux (checkboxes)
+    type_point_chaud = "☑" if autorisation.get("type_point_chaud") else "☐"
+    type_fouille = "☑" if autorisation.get("type_fouille") else "☐"
+    type_espace_clos = "☑" if autorisation.get("type_espace_clos") else "☐"
+    type_autre_cas = "☑" if autorisation.get("type_autre_cas") else "☐"
+    
     newline = "\n"
     br_tag = "<br>"
     description_travaux = autorisation.get("description_travaux", "").replace(newline, br_tag)
@@ -38,10 +43,59 @@ def generate_autorisation_html(autorisation: dict) -> str:
     horaire_fin = autorisation.get("horaire_fin", "")
     lieu_travaux = autorisation.get("lieu_travaux", "")
     
-    # Convertir les listes en HTML
     risques_potentiels = autorisation.get("risques_potentiels", "").replace(newline, br_tag)
-    mesures_securite = autorisation.get("mesures_securite", "").replace(newline, br_tag)
-    equipements_protection = autorisation.get("equipements_protection", "").replace(newline, br_tag)
+    
+    # Fonction helper pour afficher les mesures de sécurité
+    def format_mesure(key):
+        value = autorisation.get(key, "")
+        if value == "FAIT":
+            return '<span style="color: green; font-weight: bold;">✓ FAIT</span>'
+        elif value == "A_FAIRE":
+            return '<span style="color: orange; font-weight: bold;">⚠ À FAIRE</span>'
+        else:
+            return '<span style="color: gray;">-</span>'
+    
+    # Mesures de sécurité
+    mesures_rows = f"""
+        <tr><td>CONSIGNATION MAT. OU PIÈCE EN MOUV</td><td>{format_mesure("mesure_consignation_materiel")}</td></tr>
+        <tr><td>CONSIGNATION ÉLECTRIQUE</td><td>{format_mesure("mesure_consignation_electrique")}</td></tr>
+        <tr><td>DÉBRANCHEMENT FORCE MOTRICE</td><td>{format_mesure("mesure_debranchement_force")}</td></tr>
+        <tr><td>VIDANGE APPAREIL/TUYAUTERIE</td><td>{format_mesure("mesure_vidange_appareil")}</td></tr>
+        <tr><td>DÉCONTAMINATION/LAVAGE</td><td>{format_mesure("mesure_decontamination")}</td></tr>
+        <tr><td>DÉGAZAGE</td><td>{format_mesure("mesure_degazage")}</td></tr>
+        <tr><td>POSE JOINT PLEIN</td><td>{format_mesure("mesure_pose_joint")}</td></tr>
+        <tr><td>VENTILATION FORCÉE</td><td>{format_mesure("mesure_ventilation")}</td></tr>
+        <tr><td>ZONE BALISÉE</td><td>{format_mesure("mesure_zone_balisee")}</td></tr>
+        <tr><td>CANALISATIONS ÉLECTRIQUES</td><td>{format_mesure("mesure_canalisations_electriques")}</td></tr>
+        <tr><td>SOUTERRAINES BALISÉES</td><td>{format_mesure("mesure_souterraines_balisees")}</td></tr>
+        <tr><td>ÉGOUTS ET CÂBLES PROTÉGÉS</td><td>{format_mesure("mesure_egouts_cables")}</td></tr>
+        <tr><td>TAUX D'OXYGÈNE</td><td>{format_mesure("mesure_taux_oxygene")}</td></tr>
+        <tr><td>TAUX D'EXPLOSIVITÉ</td><td>{format_mesure("mesure_taux_explosivite")}</td></tr>
+        <tr><td>EXPLOSIMÈTRE EN CONTINU</td><td>{format_mesure("mesure_explosimetre")}</td></tr>
+        <tr><td>ÉCLAIRAGE DE SÛRETÉ</td><td>{format_mesure("mesure_eclairage_surete")}</td></tr>
+        <tr><td>EXTINCTEUR TYPE</td><td>{format_mesure("mesure_extincteur")}</td></tr>
+        <tr><td>AUTRES</td><td>{format_mesure("mesure_autres")}</td></tr>
+    """
+    
+    mesures_securite_texte = autorisation.get("mesures_securite_texte", "").replace(newline, br_tag)
+    
+    # EPI (checkboxes)
+    epi_list = []
+    if autorisation.get("epi_visiere"): epi_list.append("VISIÈRE")
+    if autorisation.get("epi_tenue_impermeable"): epi_list.append("TENUE IMPERMÉABLE, BOTTES")
+    if autorisation.get("epi_cagoule_air"): epi_list.append("CAGOULE AIR RESPIRABLE/ART")
+    if autorisation.get("epi_masque"): epi_list.append("MASQUE TYPE")
+    if autorisation.get("epi_gant"): epi_list.append("GANT TYPE")
+    if autorisation.get("epi_harnais"): epi_list.append("HARNAIS DE SÉCURITÉ")
+    if autorisation.get("epi_outillage_anti_etincelle"): epi_list.append("OUTILLAGE ANTI-ÉTINCELLE")
+    if autorisation.get("epi_presence_surveillant"): epi_list.append("PRÉSENCE D'UN SURVEILLANT")
+    if autorisation.get("epi_autres"): epi_list.append("AUTRES")
+    
+    epi_display = "<br>• ".join(epi_list) if epi_list else "Aucun EPI sélectionné"
+    if epi_list:
+        epi_display = "• " + epi_display
+    
+    equipements_protection_texte = autorisation.get("equipements_protection_texte", "").replace(newline, br_tag)
     
     signature_demandeur = autorisation.get("signature_demandeur", "")
     date_signature_demandeur = autorisation.get("date_signature_demandeur", "")
@@ -67,8 +121,8 @@ def generate_autorisation_html(autorisation: dict) -> str:
         }}
         body {{
             font-family: Arial, sans-serif;
-            font-size: 11pt;
-            line-height: 1.2;
+            font-size: 10pt;
+            line-height: 1.3;
             color: #000;
         }}
         .container {{
@@ -90,83 +144,92 @@ def generate_autorisation_html(autorisation: dict) -> str:
         }}
         .header-right {{
             text-align: right;
-            font-size: 10pt;
+            font-size: 9pt;
         }}
         h1 {{
             text-align: center;
-            font-size: 16pt;
+            font-size: 14pt;
             font-weight: bold;
-            margin: 15px 0;
+            margin: 10px 0;
             text-transform: uppercase;
         }}
         .ref-box {{
             display: flex;
             justify-content: space-between;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             border: 2px solid #000;
-            padding: 8px;
+            padding: 6px;
             background: #f0f0f0;
         }}
         .ref-item {{
-            font-size: 10pt;
+            font-size: 9pt;
             font-weight: bold;
         }}
         table {{
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }}
         th {{
             background-color: #e0e0e0;
             border: 1px solid #000;
-            padding: 6px;
+            padding: 5px;
             font-weight: bold;
             text-align: left;
-            font-size: 10pt;
+            font-size: 9pt;
         }}
         td {{
             border: 1px solid #000;
-            padding: 6px;
-            font-size: 10pt;
+            padding: 5px;
+            font-size: 9pt;
         }}
         .section-title {{
             background-color: #c0c0c0;
             border: 1px solid #000;
-            padding: 6px;
+            padding: 5px;
             font-weight: bold;
-            margin-top: 10px;
-            font-size: 11pt;
+            margin-top: 8px;
+            font-size: 10pt;
         }}
         .field-label {{
             font-weight: bold;
-            font-size: 10pt;
+            font-size: 9pt;
         }}
         .textarea-field {{
-            min-height: 80px;
+            min-height: 60px;
             vertical-align: top;
         }}
         .signature-section {{
             display: flex;
             justify-content: space-between;
-            margin-top: 20px;
+            margin-top: 15px;
         }}
         .signature-box {{
             width: 48%;
             border: 1px solid #000;
-            padding: 10px;
+            padding: 8px;
         }}
         .signature-title {{
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             text-align: center;
         }}
         .signature-line {{
-            margin-top: 40px;
+            margin-top: 30px;
             border-top: 1px solid #000;
-            padding-top: 5px;
-            font-size: 9pt;
+            padding-top: 4px;
+            font-size: 8pt;
         }}
-        .small-text {{
+        .checkbox-group {{
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            padding: 8px;
+        }}
+        .checkbox-item {{
+            display: flex;
+            align-items: center;
+            gap: 5px;
             font-size: 9pt;
         }}
     </style>
@@ -223,16 +286,30 @@ def generate_autorisation_html(autorisation: dict) -> str:
             </tbody>
         </table>
 
-        <!-- Description des travaux -->
-        <div class="section-title">DESCRIPTION DES TRAVAUX</div>
-        <table>
-            <tr>
-                <td class="textarea-field">{description_travaux}</td>
-            </tr>
-        </table>
+        <!-- Type de travaux -->
+        <div class="section-title">TYPE DE TRAVAUX</div>
+        <div class="checkbox-group">
+            <div class="checkbox-item">
+                <span style="font-size: 12pt;">{type_point_chaud}</span>
+                <span>Par point chaud</span>
+            </div>
+            <div class="checkbox-item">
+                <span style="font-size: 12pt;">{type_fouille}</span>
+                <span>De fouille</span>
+            </div>
+            <div class="checkbox-item">
+                <span style="font-size: 12pt;">{type_espace_clos}</span>
+                <span>En espace clos ou confiné</span>
+            </div>
+            <div class="checkbox-item">
+                <span style="font-size: 12pt;">{type_autre_cas}</span>
+                <span>Autre cas</span>
+            </div>
+        </div>
+        {f'<div style="padding: 8px; border: 1px solid #ddd; margin-top: 5px;"><strong>Précisions:</strong> {description_travaux}</div>' if description_travaux else ''}
 
         <!-- Horaires et lieu -->
-        <table>
+        <table style="margin-top: 10px;">
             <tr>
                 <th style="width: 30%;">HORAIRE DÉBUT</th>
                 <td style="width: 20%;">{horaire_debut}</td>
@@ -249,25 +326,33 @@ def generate_autorisation_html(autorisation: dict) -> str:
         <div class="section-title">RISQUES POTENTIELS</div>
         <table>
             <tr>
-                <td class="textarea-field">{risques_potentiels}</td>
+                <td class="textarea-field">{risques_potentiels if risques_potentiels else "Aucun risque identifié"}</td>
             </tr>
         </table>
 
         <!-- Mesures de sécurité -->
         <div class="section-title">MESURES DE SÉCURITÉ</div>
         <table>
-            <tr>
-                <td class="textarea-field">{mesures_securite}</td>
-            </tr>
+            <thead>
+                <tr>
+                    <th style="width: 70%;">MESURE</th>
+                    <th style="width: 30%; text-align: center;">STATUT</th>
+                </tr>
+            </thead>
+            <tbody>
+                {mesures_rows}
+            </tbody>
         </table>
+        {f'<div style="padding: 8px; border: 1px solid #ddd; margin-top: 5px;"><strong>Précisions:</strong> {mesures_securite_texte}</div>' if mesures_securite_texte else ''}
 
         <!-- Équipements de protection -->
         <div class="section-title">ÉQUIPEMENTS DE PROTECTION INDIVIDUELLE (EPI)</div>
         <table>
             <tr>
-                <td class="textarea-field">{equipements_protection}</td>
+                <td class="textarea-field">{epi_display}</td>
             </tr>
         </table>
+        {f'<div style="padding: 8px; border: 1px solid #ddd; margin-top: 5px;"><strong>Précisions:</strong> {equipements_protection_texte}</div>' if equipements_protection_texte else ''}
 
         <!-- Signatures -->
         <div class="signature-section">
