@@ -12,8 +12,14 @@ from models import (
     DemandeArretMaintenance, DemandeArretMaintenanceCreate, DemandeArretMaintenanceUpdate,
     DemandeArretStatus, PlanningEquipementEntry, EquipmentStatus, UserRole
 )
-from database import db
 import email_service
+import os
+from motor.motor_asyncio import AsyncIOMotorClient
+
+# MongoDB connection - utilise les mêmes variables d'environnement que server.py
+mongo_url = os.environ['MONGO_URL']
+client = AsyncIOMotorClient(mongo_url)
+db = client[os.environ.get('DB_NAME', 'gmao_iris')]
 
 logger = logging.getLogger(__name__)
 
