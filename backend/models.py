@@ -1463,6 +1463,9 @@ class AutorisationParticuliere(BaseModel):
     signature_responsable_securite: Optional[str] = None
     date_signature_responsable: Optional[str] = None
     
+    # Lien avec les bons de travail (optionnel, plusieurs bons possibles)
+    bons_travail_ids: List[str] = []
+    
     # Métadonnées
     statut: str = "BROUILLON"  # BROUILLON, VALIDE
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
