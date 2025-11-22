@@ -140,7 +140,12 @@ const AutorisationParticuliereForm = () => {
           description: 'Autorisation créée avec succès'
         });
       }
-      navigate('/autorisations-particulieres');
+      // Retourner au pôle ou à la liste des autorisations
+      if (fromPoleId) {
+        navigate(`/documentations/${fromPoleId}`);
+      } else {
+        navigate('/autorisations-particulieres');
+      }
     } catch (error) {
       toast({
         title: 'Erreur',
