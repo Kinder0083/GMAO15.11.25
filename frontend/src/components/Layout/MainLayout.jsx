@@ -621,6 +621,19 @@ const MainLayout = () => {
           )}
         </div>
 
+        {/* Bouton chevron en mode réduit */}
+        {!sidebarOpen && (
+          <div className="flex justify-center py-4 border-b border-gray-700">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="p-2 hover:bg-gray-800 rounded-lg transition-colors text-white"
+              title="Agrandir"
+            >
+              <ChevronRight size={20} />
+            </button>
+          </div>
+        )}
+
         <div className="p-4 space-y-2 h-[calc(100vh-4rem)] overflow-y-auto">
           {menuItems
             .filter(item => !item.adminOnly || user.role === 'ADMIN')
