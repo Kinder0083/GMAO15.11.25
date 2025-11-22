@@ -9,6 +9,7 @@ import { useToast } from '../hooks/use-toast';
 
 const AutorisationParticuliereView = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [autorisations, setAutorisations] = useState([]);
   const [filteredAutorisations, setFilteredAutorisations] = useState([]);
   const [loading, setLoading] = useState(true);
