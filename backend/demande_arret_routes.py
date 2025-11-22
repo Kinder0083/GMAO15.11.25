@@ -98,13 +98,16 @@ async def create_demande_arret(
         data["created_at"] = date_creation.isoformat()
         data["updated_at"] = date_creation.isoformat()
         
+        # Ajouter _id pour MongoDB
+        data["_id"] = ObjectId()
+        
         await db.demandes_arret.insert_one(data)
         
         # Envoyer l'email de demande
         await send_demande_email(data)
         
         logger.info(f"Demande d'arrêt créée: {data['id']}")
-        return data
+        return serialize_doc(data)
     except HTTPException:
         raise
     except Exception as e:
