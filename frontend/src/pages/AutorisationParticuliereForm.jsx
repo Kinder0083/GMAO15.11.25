@@ -67,7 +67,8 @@ const AutorisationParticuliereForm = () => {
       }
       setFormData({
         ...data,
-        personnel_autorise: personnel
+        personnel_autorise: personnel,
+        bons_travail_ids: data.bons_travail_ids || []
       });
     } catch (error) {
       toast({
