@@ -13,6 +13,7 @@ const AutorisationParticuliereForm = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEdit = Boolean(id);
+  const { toast } = useToast();
 
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
