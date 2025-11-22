@@ -62,45 +62,73 @@ class AutorisationsParticulieresTester:
             self.log(f"❌ Admin login request failed - Error: {str(e)}", "ERROR")
             return False
     
-    def test_create_custom_category_item(self):
-        """TEST 1: Créer un contrôle avec TOUS les champs requis et nouvelle catégorie"""
-        self.log("🧪 TEST 1: Créer un contrôle avec TOUS les champs requis et nouvelle catégorie")
+    def test_create_autorisation(self):
+        """TEST 1: Créer une nouvelle autorisation particulière"""
+        self.log("🧪 TEST 1: Créer une nouvelle autorisation particulière")
         
-        test_item_data = {
-            "classe_type": "Test Frontend Categorie",
-            "category": "TEST_CATEGORIE_NOUVELLE",
-            "batiment": "BATIMENT TEST",
-            "periodicite": "1 mois",
-            "responsable": "MAINT",
-            "executant": "Executant Test",
-            "description": "Test depuis frontend"
+        test_autorisation_data = {
+            "service_demandeur": "Service Test",
+            "responsable": "Jean Dupont",
+            "personnel_autorise": [
+                {"nom": "Pierre Martin", "fonction": "Technicien"},
+                {"nom": "Marie Durand", "fonction": "Ingénieur"}
+            ],
+            "description_travaux": "Travaux de maintenance électrique",
+            "horaire_debut": "08:00",
+            "horaire_fin": "17:00",
+            "lieu_travaux": "Bâtiment A - Salle électrique",
+            "risques_potentiels": "Électrocution\nChute",
+            "mesures_securite": "Consignation électrique\nHarnais obligatoire",
+            "equipements_protection": "Gants isolants\nCasque\nChaussures de sécurité",
+            "signature_demandeur": "Jean Dupont",
+            "date_signature_demandeur": "2025-01-15"
         }
         
         try:
             response = self.admin_session.post(
-                f"{BACKEND_URL}/surveillance/items",
-                json=test_item_data,
+                f"{BACKEND_URL}/autorisations",
+                json=test_autorisation_data,
                 timeout=15
             )
             
             if response.status_code in [200, 201]:
                 data = response.json()
-                self.log(f"✅ Item de surveillance créé - Status: {response.status_code}")
+                self.log(f"✅ Autorisation créée - Status: {response.status_code}")
                 self.log(f"✅ ID: {data.get('id')}")
-                self.log(f"✅ Classe: {data.get('classe_type')}")
-                self.log(f"✅ Catégorie: {data.get('category')}")
-                self.log(f"✅ Bâtiment: {data.get('batiment')}")
-                self.log(f"✅ Exécutant: {data.get('executant')}")
+                self.log(f"✅ Numéro: {data.get('numero')}")
+                self.log(f"✅ Date établissement: {data.get('date_etablissement')}")
+                self.log(f"✅ Service demandeur: {data.get('service_demandeur')}")
+                self.log(f"✅ Statut: {data.get('statut')}")
                 
-                # Vérifier que la catégorie personnalisée est bien enregistrée
-                if data.get('category') == "TEST_CATEGORIE_NOUVELLE":
-                    self.log("✅ SUCCÈS: Catégorie personnalisée 'TEST_CATEGORIE_NOUVELLE' acceptée")
-                    # Stocker pour nettoyage
-                    self.test_items.append(data.get('id'))
-                    return True, data
+                # Vérifications critiques
+                numero = data.get('numero')
+                if numero and numero >= 8000:
+                    self.log(f"✅ SUCCÈS: Numéro >= 8000 (reçu: {numero})")
                 else:
-                    self.log(f"❌ ÉCHEC: Catégorie incorrecte - Attendu: TEST_CATEGORIE_NOUVELLE, Reçu: {data.get('category')}", "ERROR")
+                    self.log(f"❌ ÉCHEC: Numéro < 8000 (reçu: {numero})", "ERROR")
                     return False, None
+                
+                if data.get('date_etablissement'):
+                    self.log("✅ SUCCÈS: Date d'établissement auto-générée")
+                else:
+                    self.log("❌ ÉCHEC: Date d'établissement manquante", "ERROR")
+                    return False, None
+                
+                if data.get('statut') == "BROUILLON":
+                    self.log("✅ SUCCÈS: Statut par défaut 'BROUILLON'")
+                else:
+                    self.log(f"❌ ÉCHEC: Statut incorrect (reçu: {data.get('statut')})", "ERROR")
+                    return False, None
+                
+                if data.get('created_at') and data.get('updated_at'):
+                    self.log("✅ SUCCÈS: Champs created_at et updated_at présents")
+                else:
+                    self.log("❌ ÉCHEC: Champs created_at/updated_at manquants", "ERROR")
+                    return False, None
+                
+                # Stocker pour nettoyage
+                self.test_autorisations.append(data.get('id'))
+                return True, data
             else:
                 self.log(f"❌ Création échouée - Status: {response.status_code}", "ERROR")
                 self.log(f"Response: {response.text}", "ERROR")
