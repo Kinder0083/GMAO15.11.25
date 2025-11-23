@@ -1792,3 +1792,171 @@ class PlanningEquipementEntry(BaseModel):
     commentaire: str = ""
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
+
+# ==================== USER PREFERENCES ====================
+
+class ThemeMode(str, Enum):
+    LIGHT = "light"
+    DARK = "dark"
+    AUTO = "auto"
+
+class SidebarPosition(str, Enum):
+    LEFT = "left"
+    RIGHT = "right"
+
+class SidebarBehavior(str, Enum):
+    ALWAYS_OPEN = "always_open"
+    MINIMIZABLE = "minimizable"
+    AUTO_COLLAPSE = "auto_collapse"
+
+class DisplayDensity(str, Enum):
+    COMPACT = "compact"
+    NORMAL = "normal"
+    SPACIOUS = "spacious"
+
+class FontSize(str, Enum):
+    SMALL = "small"
+    NORMAL = "normal"
+    LARGE = "large"
+
+class DateFormat(str, Enum):
+    DD_MM_YYYY = "DD/MM/YYYY"
+    MM_DD_YYYY = "MM/DD/YYYY"
+    YYYY_MM_DD = "YYYY-MM-DD"
+
+class TimeFormat(str, Enum):
+    H24 = "24h"
+    H12 = "12h"
+
+class Currency(str, Enum):
+    EUR = "€"
+    USD = "$"
+    GBP = "£"
+
+class MenuCategory(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    icon: Optional[str] = None
+    order: int = 0
+    items: List[str] = []  # Liste des IDs de menu items
+
+class MenuItem(BaseModel):
+    id: str
+    label: str
+    path: str
+    icon: str
+    module: str
+    order: int = 0
+    visible: bool = True
+    favorite: bool = False
+    category_id: Optional[str] = None
+
+class UserPreferences(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    
+    # Apparence générale
+    theme_mode: ThemeMode = ThemeMode.LIGHT
+    primary_color: str = "#2563eb"  # Bleu par défaut
+    secondary_color: str = "#64748b"  # Gris par défaut
+    background_image_url: Optional[str] = None
+    display_density: DisplayDensity = DisplayDensity.NORMAL
+    font_size: FontSize = FontSize.NORMAL
+    
+    # Sidebar
+    sidebar_bg_color: str = "#1f2937"  # Gris foncé par défaut
+    sidebar_position: SidebarPosition = SidebarPosition.LEFT
+    sidebar_behavior: SidebarBehavior = SidebarBehavior.MINIMIZABLE
+    sidebar_width: int = 256  # pixels (16rem = 256px)
+    sidebar_icon_color: str = "#ffffff"
+    
+    # Organisation du menu
+    menu_categories: List[MenuCategory] = []
+    menu_items: List[MenuItem] = []
+    
+    # Préférences d'affichage
+    default_home_page: str = "/dashboard"
+    date_format: DateFormat = DateFormat.DD_MM_YYYY
+    time_format: TimeFormat = TimeFormat.H24
+    currency: Currency = Currency.EUR
+    language: str = "fr"
+    
+    # Dashboard personnalisé
+    dashboard_widgets: List[str] = []  # IDs des widgets à afficher
+    dashboard_layout: Dict = {}  # Configuration du layout
+    
+    # Notifications
+    notifications_enabled: bool = True
+    email_notifications: bool = True
+    push_notifications: bool = True
+    sound_enabled: bool = True
+    stock_alert_threshold: int = 5
+    
+    # Page de personnalisation
+    customization_view_mode: str = "tabs"  # "tabs" ou "scroll"
+    
+    # Thèmes prédéfinis
+    preset_theme: Optional[str] = None  # "orange", "vert", "blanc", "bleu", "custom"
+    
+    # Métadonnées
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    updated_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class UserPreferencesCreate(BaseModel):
+    user_id: str
+    theme_mode: Optional[ThemeMode] = ThemeMode.LIGHT
+    primary_color: Optional[str] = "#2563eb"
+    secondary_color: Optional[str] = "#64748b"
+    background_image_url: Optional[str] = None
+    display_density: Optional[DisplayDensity] = DisplayDensity.NORMAL
+    font_size: Optional[FontSize] = FontSize.NORMAL
+    sidebar_bg_color: Optional[str] = "#1f2937"
+    sidebar_position: Optional[SidebarPosition] = SidebarPosition.LEFT
+    sidebar_behavior: Optional[SidebarBehavior] = SidebarBehavior.MINIMIZABLE
+    sidebar_width: Optional[int] = 256
+    sidebar_icon_color: Optional[str] = "#ffffff"
+    menu_categories: Optional[List[MenuCategory]] = []
+    menu_items: Optional[List[MenuItem]] = []
+    default_home_page: Optional[str] = "/dashboard"
+    date_format: Optional[DateFormat] = DateFormat.DD_MM_YYYY
+    time_format: Optional[TimeFormat] = TimeFormat.H24
+    currency: Optional[Currency] = Currency.EUR
+    language: Optional[str] = "fr"
+    dashboard_widgets: Optional[List[str]] = []
+    dashboard_layout: Optional[Dict] = {}
+    notifications_enabled: Optional[bool] = True
+    email_notifications: Optional[bool] = True
+    push_notifications: Optional[bool] = True
+    sound_enabled: Optional[bool] = True
+    stock_alert_threshold: Optional[int] = 5
+    customization_view_mode: Optional[str] = "tabs"
+    preset_theme: Optional[str] = None
+
+class UserPreferencesUpdate(BaseModel):
+    theme_mode: Optional[ThemeMode] = None
+    primary_color: Optional[str] = None
+    secondary_color: Optional[str] = None
+    background_image_url: Optional[str] = None
+    display_density: Optional[DisplayDensity] = None
+    font_size: Optional[FontSize] = None
+    sidebar_bg_color: Optional[str] = None
+    sidebar_position: Optional[SidebarPosition] = None
+    sidebar_behavior: Optional[SidebarBehavior] = None
+    sidebar_width: Optional[int] = None
+    sidebar_icon_color: Optional[str] = None
+    menu_categories: Optional[List[MenuCategory]] = None
+    menu_items: Optional[List[MenuItem]] = None
+    default_home_page: Optional[str] = None
+    date_format: Optional[DateFormat] = None
+    time_format: Optional[TimeFormat] = None
+    currency: Optional[Currency] = None
+    language: Optional[str] = None
+    dashboard_widgets: Optional[List[str]] = None
+    dashboard_layout: Optional[Dict] = None
+    notifications_enabled: Optional[bool] = None
+    email_notifications: Optional[bool] = None
+    push_notifications: Optional[bool] = None
+    sound_enabled: Optional[bool] = None
+    stock_alert_threshold: Optional[int] = None
+    customization_view_mode: Optional[str] = None
+    preset_theme: Optional[str] = None
