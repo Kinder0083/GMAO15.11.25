@@ -2149,78 +2149,8 @@ async def invite_user(user_invite: UserInvite, current_user: dict = Depends(get_
     
     # Définir les permissions par défaut selon le rôle
     if user_invite.permissions is None:
-        if user_invite.role == UserRole.ADMIN:
-            permissions = {
-                "dashboard": {"view": True, "edit": True, "delete": True},
-                "interventionRequests": {"view": True, "edit": True, "delete": True},
-                "workOrders": {"view": True, "edit": True, "delete": True},
-                "improvementRequests": {"view": True, "edit": True, "delete": True},
-                "improvements": {"view": True, "edit": True, "delete": True},
-                "preventiveMaintenance": {"view": True, "edit": True, "delete": True},
-                "assets": {"view": True, "edit": True, "delete": True},
-                "inventory": {"view": True, "edit": True, "delete": True},
-                "locations": {"view": True, "edit": True, "delete": True},
-                "meters": {"view": True, "edit": True, "delete": True},
-                "surveillance": {"view": True, "edit": True, "delete": True},
-                "presquaccident": {"view": True, "edit": True, "delete": True},
-                "documentations": {"view": True, "edit": True, "delete": True},
-                "reports": {"view": True, "edit": True, "delete": True},
-                "people": {"view": True, "edit": True, "delete": True},
-                "planning": {"view": True, "edit": True, "delete": True},
-                "vendors": {"view": True, "edit": True, "delete": True},
-                "purchaseHistory": {"view": True, "edit": True, "delete": True},
-                "importExport": {"view": True, "edit": True, "delete": True},
-                "audit": {"view": True, "edit": False, "delete": False},
-                "settings": {"view": True, "edit": True, "delete": False}
-            }
-        elif user_invite.role == UserRole.TECHNICIEN:
-            permissions = {
-                "dashboard": {"view": True, "edit": False, "delete": False},
-                "interventionRequests": {"view": True, "edit": True, "delete": False},
-                "workOrders": {"view": True, "edit": True, "delete": False},
-                "improvementRequests": {"view": True, "edit": True, "delete": False},
-                "improvements": {"view": True, "edit": False, "delete": False},
-                "preventiveMaintenance": {"view": True, "edit": True, "delete": False},
-                "assets": {"view": True, "edit": True, "delete": False},
-                "inventory": {"view": True, "edit": True, "delete": False},
-                "locations": {"view": True, "edit": False, "delete": False},
-                "meters": {"view": True, "edit": True, "delete": False},
-                "surveillance": {"view": True, "edit": True, "delete": False},
-                "presquaccident": {"view": True, "edit": True, "delete": False},
-                "documentations": {"view": True, "edit": False, "delete": False},
-                "reports": {"view": True, "edit": False, "delete": False},
-                "people": {"view": True, "edit": False, "delete": False},
-                "planning": {"view": True, "edit": False, "delete": False},
-                "vendors": {"view": True, "edit": False, "delete": False},
-                "purchaseHistory": {"view": False, "edit": False, "delete": False},
-                "importExport": {"view": False, "edit": False, "delete": False},
-                "audit": {"view": False, "edit": False, "delete": False},
-                "settings": {"view": False, "edit": False, "delete": False}
-            }
-        else:  # VISUALISEUR et autres rôles
-            permissions = {
-                "dashboard": {"view": True, "edit": False, "delete": False},
-                "interventionRequests": {"view": True, "edit": False, "delete": False},
-                "workOrders": {"view": True, "edit": False, "delete": False},
-                "improvementRequests": {"view": True, "edit": False, "delete": False},
-                "improvements": {"view": True, "edit": False, "delete": False},
-                "preventiveMaintenance": {"view": True, "edit": False, "delete": False},
-                "assets": {"view": True, "edit": False, "delete": False},
-                "inventory": {"view": True, "edit": False, "delete": False},
-                "locations": {"view": True, "edit": False, "delete": False},
-                "meters": {"view": True, "edit": False, "delete": False},
-                "surveillance": {"view": True, "edit": False, "delete": False},
-                "presquaccident": {"view": True, "edit": False, "delete": False},
-                "documentations": {"view": True, "edit": False, "delete": False},
-                "reports": {"view": True, "edit": False, "delete": False},
-                "people": {"view": True, "edit": False, "delete": False},
-                "planning": {"view": True, "edit": False, "delete": False},
-                "vendors": {"view": True, "edit": False, "delete": False},
-                "purchaseHistory": {"view": False, "edit": False, "delete": False},
-                "importExport": {"view": False, "edit": False, "delete": False},
-                "audit": {"view": False, "edit": False, "delete": False},
-                "settings": {"view": False, "edit": False, "delete": False}
-            }
+        # Utiliser la fonction centralisée pour obtenir les permissions par défaut
+        permissions = get_default_permissions_by_role(user_invite.role).model_dump()
     else:
         permissions = user_invite.permissions.model_dump()
     
