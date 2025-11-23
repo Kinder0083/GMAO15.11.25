@@ -5158,7 +5158,7 @@ async def get_intervention_request(request_id: str, current_user: dict = Depends
 async def update_intervention_request(
     request_id: str,
     request_update: InterventionRequestUpdate,
-    current_user: dict = Depends(get_current_user)
+    current_user: dict = Depends(require_permission("interventionRequests", "edit"))
 ):
     """Mettre à jour une demande d'intervention"""
     req = await db.intervention_requests.find_one({"id": request_id})
