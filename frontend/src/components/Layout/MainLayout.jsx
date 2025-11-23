@@ -367,6 +367,27 @@ const MainLayout = () => {
     }
   };
 
+  const loadInventoryStats = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const backend_url = getBackendURL();
+      
+      const response = await fetch(`${backend_url}/api/inventory/stats`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setInventoryStats(data);
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement des stats inventaire:', error);
+    }
+  };
+
+
 
   const menuItems = [
     { icon: LayoutDashboard, label: 'Tableau de bord', path: '/dashboard', module: 'dashboard' },
