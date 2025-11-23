@@ -10,7 +10,7 @@ import os
 from datetime import datetime, timedelta
 
 # Use the correct backend URL from frontend .env
-BACKEND_URL = "https://maint-dashboard-7.preview.emergentagent.com/api"
+BACKEND_URL = "https://maintenance-pro-23.preview.emergentagent.com/api"
 
 # Test credentials - admin account as specified in the request
 ADMIN_EMAIL = "admin@gmao-iris.local"
