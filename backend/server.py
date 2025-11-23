@@ -3114,7 +3114,7 @@ async def delete_vendor(vendor_id: str, current_user: dict = Depends(require_per
 
 # ==================== PURCHASE HISTORY ROUTES ====================
 @api_router.get("/purchase-history/grouped")
-async def get_purchase_history_grouped(current_user: dict = Depends(get_current_user)):
+async def get_purchase_history_grouped(current_user: dict = Depends(require_permission("purchaseHistory", "view"))):
     """Liste tous les achats groupés par N° Commande"""
     purchases = await db.purchase_history.find().sort("dateCreation", -1).to_list(5000)
     
