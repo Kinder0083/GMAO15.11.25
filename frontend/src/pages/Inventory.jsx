@@ -81,6 +81,10 @@ const Inventory = () => {
     
     try {
       await inventoryAPI.delete(itemToDelete);
+      
+      // Déclencher l'événement pour mettre à jour le badge dans le header
+      window.dispatchEvent(new Event('inventoryItemDeleted'));
+      
       toast({
         title: 'Succès',
         description: 'Article supprimé'
