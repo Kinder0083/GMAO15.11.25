@@ -5072,7 +5072,7 @@ async def get_meter_statistics(
         raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.delete("/readings/{reading_id}")
-async def delete_reading(reading_id: str, current_user: dict = Depends(get_current_user)):
+async def delete_reading(reading_id: str, current_user: dict = Depends(require_permission("meters", "delete"))):
     """Supprimer un relevé"""
     reading = await db.meter_readings.find_one({"id": reading_id})
     if not reading:
