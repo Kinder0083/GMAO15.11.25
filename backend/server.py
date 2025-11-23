@@ -2916,15 +2916,23 @@ async def request_help(
         </html>
         """
         
-        # Envoyer l'email à tous les administrateurs
+        # Envoyer l'email à tous les administrateurs avec la capture d'écran en pièce jointe
         try:
             subject = f"🆘 Demande d'Aide - {user_name} - {help_request.page_url}"
             
+            # Préparer la pièce jointe screenshot
+            attachments = [{
+                'data': screenshot_data,  # Base64 string
+                'filename': f'screenshot_{request_id[:8]}.png',
+                'mimetype': 'image/png'
+            }]
+            
             for admin_email in admin_emails:
-                email_service.send_email(
+                email_service.send_email_with_attachment(
                     to_email=admin_email,
                     subject=subject,
-                    html_content=email_html
+                    html_content=email_html,
+                    attachments=attachments
                 )
             
             # Journaliser l'action
