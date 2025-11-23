@@ -104,15 +104,30 @@ const PermissionsDialog = ({ open, onOpenChange, user, onSave }) => {
 
   const modules = [
     { key: 'dashboard', label: 'Tableau de bord', actions: ['view', 'edit'] },
+    { key: 'interventionRequests', label: 'Demandes d\'inter.', actions: ['view', 'create', 'edit', 'delete'] },
     { key: 'workOrders', label: 'Ordres de travail', actions: ['view', 'create', 'edit', 'delete'] },
-    { key: 'equipment', label: 'Équipements', actions: ['view', 'create', 'edit', 'delete'] },
+    { key: 'improvementRequests', label: 'Demandes d\'amél.', actions: ['view', 'create', 'edit', 'delete'] },
+    { key: 'improvements', label: 'Améliorations', actions: ['view', 'create', 'edit', 'delete'] },
+    { key: 'preventiveMaintenance', label: 'Maintenance prev.', actions: ['view', 'create', 'edit', 'delete'] },
+    { key: 'planningMprev', label: 'Planning M.Prev.', actions: ['view', 'edit'] },
+    { key: 'assets', label: 'Équipements', actions: ['view', 'create', 'edit', 'delete'] },
     { key: 'inventory', label: 'Inventaire', actions: ['view', 'create', 'edit', 'delete'] },
     { key: 'locations', label: 'Zones', actions: ['view', 'create', 'edit', 'delete'] },
-    { key: 'preventiveMaintenance', label: 'Maintenance préventive', actions: ['view', 'create', 'edit', 'delete'] },
+    { key: 'meters', label: 'Compteurs', actions: ['view', 'create', 'edit', 'delete'] },
+    { key: 'surveillance', label: 'Plan de Surveillance', actions: ['view', 'create', 'edit', 'delete'] },
+    { key: 'surveillanceRapport', label: 'Rapport Surveillance', actions: ['view', 'export'] },
+    { key: 'presquaccident', label: 'Presqu\'accident', actions: ['view', 'create', 'edit', 'delete'] },
+    { key: 'presquaccidentRapport', label: 'Rapport P.accident', actions: ['view', 'export'] },
+    { key: 'documentations', label: 'Documentations', actions: ['view', 'create', 'edit', 'delete'] },
     { key: 'reports', label: 'Rapports', actions: ['view', 'export'] },
     { key: 'people', label: 'Équipes', actions: ['view', 'create', 'edit', 'delete'] },
+    { key: 'planning', label: 'Planning', actions: ['view', 'edit'] },
     { key: 'vendors', label: 'Fournisseurs', actions: ['view', 'create', 'edit', 'delete'] },
-    { key: 'settings', label: 'Paramètres', actions: ['view', 'edit'] }
+    { key: 'purchaseHistory', label: 'Historique Achat', actions: ['view'] },
+    { key: 'importExport', label: 'Import / Export', actions: ['view', 'edit'] },
+    { key: 'journal', label: 'Journal d\'audit', actions: ['view'] },
+    { key: 'settings', label: 'Paramètres', actions: ['view', 'edit'] },
+    { key: 'personalization', label: 'Personnalisation', actions: ['view', 'edit'] }
   ];
 
   const actionLabels = {
