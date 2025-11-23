@@ -6793,9 +6793,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Formulaire AutorisationParticuliereForm.jsx"
-    - "Vue liste AutorisationParticuliereView.jsx"
-    - "Intégration routing et navigation"
+    - "Système de pièces utilisées - TESTS TERMINÉS"
   stuck_tasks: []
   test_all: false
   test_priority: "sequential"
