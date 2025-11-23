@@ -2,8 +2,8 @@
 Routes pour le manuel utilisateur
 """
 from fastapi import APIRouter, Depends, HTTPException
-from typing import Optional
-from dependencies import get_current_user, get_current_admin_user
+from typing import Optional, List
+from dependencies import get_current_user, get_current_admin_user, require_permission
 from models import ManualCreate, ManualSearchRequest
 from datetime import datetime, timezone
 import uuid
