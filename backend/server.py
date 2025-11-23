@@ -2904,7 +2904,7 @@ async def request_help(
                     ''' if help_request.console_logs else ''}
                     
                     <h3>📸 Capture d'écran:</h3>
-                    <img src="data:image/png;base64,{screenshot_data}" alt="Screenshot">
+                    <p style="color: #6b7280;">Voir la pièce jointe : screenshot.png</p>
                 </div>
                 
                 <div class="footer">
