@@ -4981,7 +4981,7 @@ async def get_meter_readings(
 @api_router.get("/meters/{meter_id}/statistics")
 async def get_meter_statistics(
     meter_id: str,
-    current_user: dict = Depends(get_current_user),
+    current_user: dict = Depends(require_permission("meters", "view")),
     period: str = "month"  # week, month, quarter, year
 ):
     """Obtenir les statistiques d'un compteur"""
