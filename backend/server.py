@@ -1842,8 +1842,12 @@ async def delete_location(loc_id: str, current_user: dict = Depends(require_perm
 
 # ==================== INVENTORY ROUTES ====================
 @api_router.get("/inventory", response_model=List[Inventory])
-async def get_inventory(current_user: dict = Depends(require_permission("inventory", "view"))):
-    """Liste tous les articles de l'inventaire"""
+async def get_inventory(current_user: dict = Depends(get_current_user)):
+    """Liste tous les articles de l'inventaire
+    
+    Note : Accessible à tous les utilisateurs authentifiés pour permettre
+    la sélection de pièces dans les ordres de travail, même sans permission 'inventory'.
+    """
     inventory = await db.inventory.find().to_list(1000)
     return [Inventory(**serialize_doc(item)) for item in inventory]
 
