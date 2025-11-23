@@ -385,6 +385,10 @@ class Comment(BaseModel):
 class CommentCreate(BaseModel):
     text: str
 
+class CommentWithPartsCreate(BaseModel):
+    text: str
+    parts_used: List['PartUsedCreate'] = []  # Liste des pièces utilisées
+
 # Parts Used Models
 class PartUsed(BaseModel):
     id: str
