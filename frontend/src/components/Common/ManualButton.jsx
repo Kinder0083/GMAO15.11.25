@@ -533,6 +533,16 @@ const ManualButton = () => {
                 <span>Manuel Utilisateur - GMAO Iris</span>
               </DialogTitle>
               <div className="flex items-center gap-2">
+                {isAdmin && (
+                  <Button
+                    variant={adminMode ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setAdminMode(!adminMode)}
+                    className="flex items-center gap-2"
+                  >
+                    {adminMode ? "👁️ Mode Lecture" : "⚙️ Mode Admin"}
+                  </Button>
+                )}
                 <Button
                   variant="outline"
                   size="sm"
