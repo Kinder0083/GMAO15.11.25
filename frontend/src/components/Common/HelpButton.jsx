@@ -5,7 +5,7 @@ import { Textarea } from '../ui/textarea';
 import { Label } from '../ui/label';
 import { useToast } from '../../hooks/use-toast';
 import { HelpCircle, Loader2 } from 'lucide-react';
-import html2canvas from 'html2canvas';
+import { toPng } from 'html-to-image';
 import axios from 'axios';
 import { getBackendURL } from '../../utils/config';
 
