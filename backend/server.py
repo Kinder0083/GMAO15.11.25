@@ -4090,7 +4090,9 @@ async def add_work_order_comment(
         
         # Traiter les pièces utilisées
         parts_used_list = []
+        logger.info(f"Traitement de {len(comment.parts_used)} pièces utilisées")
         for part in comment.parts_used:
+            logger.info(f"Pièce: inventory_item_id={part.inventory_item_id}, name={part.inventory_item_name}, custom={part.custom_part_name}, quantity={part.quantity}")
             part_data = {
                 "id": str(uuid.uuid4()),
                 "inventory_item_id": part.inventory_item_id,
