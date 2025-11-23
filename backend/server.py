@@ -1583,7 +1583,7 @@ async def get_availabilities(
     start_date: str = None,
     end_date: str = None,
     user_id: str = None,
-    current_user: dict = Depends(get_current_user)
+    current_user: dict = Depends(require_permission("planning", "view"))
 ):
     """Récupérer les disponibilités du personnel"""
     query = {}
