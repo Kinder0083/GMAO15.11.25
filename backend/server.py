@@ -1521,7 +1521,7 @@ async def update_parent_alert_status(parent_id: str):
                 )
 
 @api_router.patch("/equipments/{eq_id}/status")
-async def update_equipment_status(eq_id: str, statut: EquipmentStatus, current_user: dict = Depends(get_current_user)):
+async def update_equipment_status(eq_id: str, statut: EquipmentStatus, current_user: dict = Depends(require_permission("assets", "edit"))):
     """Mettre à jour rapidement le statut d'un équipement"""
     try:
         equipment = await db.equipments.find_one({"_id": ObjectId(eq_id)})
