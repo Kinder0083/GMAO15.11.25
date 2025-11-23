@@ -133,6 +133,39 @@ const MenuOrganizationSection = () => {
     }
   };
 
+  const migrateMenus = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user-preferences/migrate-menus`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.detail || 'Erreur lors de la migration');
+      }
+      
+      toast({ 
+        title: 'Succès', 
+        description: data.message || 'Menus mis à jour' 
+      });
+      
+      // Recharger les préférences
+      window.location.reload();
+    } catch (error) {
+      toast({ 
+        title: 'Erreur', 
+        description: error.message || 'Erreur de migration', 
+        variant: 'destructive' 
+      });
+    }
+  };
+
   const resetOrder = async () => {
     setMenuItems(DEFAULT_MENU_ITEMS);
     try {
