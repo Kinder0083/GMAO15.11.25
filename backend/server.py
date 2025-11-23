@@ -5592,7 +5592,7 @@ async def convert_to_improvement(
 async def upload_improvement_request_attachment(
     request_id: str,
     file: UploadFile = File(...),
-    current_user: dict = Depends(get_current_user)
+    current_user: dict = Depends(require_permission("improvementRequests", "edit"))
 ):
     """Upload fichier pour une demande d'amélioration"""
     req = await db.improvement_requests.find_one({"id": request_id})
