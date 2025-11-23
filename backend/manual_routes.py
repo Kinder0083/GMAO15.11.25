@@ -523,25 +523,55 @@ async def export_manual_pdf(
                 # Contenu de la section (formatage simple)
                 content = section.get('content', '')
                 
-                # Remplacer les caractères spéciaux pour PDF
-                content = content.replace('&', '&amp;')
-                content = content.replace('<', '&lt;')
-                content = content.replace('>', '&gt;')
+                # Fonction pour nettoyer et formater le texte pour PDF
+                def clean_text_for_pdf(text):
+                    # Échapper les caractères spéciaux XML/HTML
+                    text = text.replace('&', '&amp;')
+                    text = text.replace('<', '&lt;')
+                    text = text.replace('>', '&gt;')
+                    
+                    # Supprimer les emojis et caractères Unicode problématiques
+                    import re
+                    text = re.sub(r'[^\x00-\x7F]+', '', text)  # Supprimer Unicode non-ASCII
+                    
+                    # Convertir markdown gras (** texte **)
+                    # Utiliser regex pour remplacer par paires
+                    parts = text.split('**')
+                    result = []
+                    for i, part in enumerate(parts):
+                        if i % 2 == 0:
+                            result.append(part)  # Texte normal
+                        else:
+                            result.append(f'<b>{part}</b>')  # Texte en gras
+                    
+                    return ''.join(result)
                 
                 # Diviser en paragraphes
                 paragraphs = content.split('\n\n')
                 for para in paragraphs:
                     if para.strip():
                         # Traiter les listes à puces
-                        if para.strip().startswith('•'):
+                        if para.strip().startswith('•') or para.strip().startswith('-'):
                             lines = para.split('\n')
                             for line in lines:
                                 if line.strip():
-                                    story.append(Paragraph(line.strip(), content_style))
+                                    cleaned_line = clean_text_for_pdf(line.strip())
+                                    try:
+                                        story.append(Paragraph(cleaned_line, content_style))
+                                    except Exception as e:
+                                        # En cas d'erreur, ajouter le texte brut
+                                        logger.warning(f"Erreur formatage ligne: {str(e)}")
+                                        story.append(Paragraph(line.strip().replace('&', '&amp;'), content_style))
                         else:
-                            # Convertir markdown gras
-                            para = para.replace('**', '<b>').replace('**', '</b>')
-                            story.append(Paragraph(para.strip(), content_style))
+                            # Paragraphe normal
+                            cleaned_para = clean_text_for_pdf(para.strip())
+                            try:
+                                story.append(Paragraph(cleaned_para, content_style))
+                            except Exception as e:
+                                # En cas d'erreur, ajouter le texte brut
+                                logger.warning(f"Erreur formatage paragraphe: {str(e)}")
+                                story.append(Paragraph(para.strip().replace('&', '&amp;'), content_style))
+                        
                         story.append(Spacer(1, 0.2*cm))
                 
                 story.append(Spacer(1, 0.5*cm))
