@@ -722,10 +722,13 @@ const MainLayout = () => {
               );
             })}
           
-          <div className="pt-4 mt-4 border-t border-gray-700">
+          <div className="pt-4 mt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
             <button
               onClick={() => navigate('/settings')}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 text-gray-300 transition-all ${!sidebarOpen ? 'justify-center px-2' : ''}`}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${!sidebarOpen ? 'justify-center px-2' : ''}`}
+              style={getSidebarButtonStyle(location.pathname === '/settings')}
+              onMouseEnter={(e) => handleSidebarButtonHover(e, location.pathname === '/settings')}
+              onMouseLeave={(e) => handleSidebarButtonLeave(e, location.pathname === '/settings')}
               title={!sidebarOpen ? 'Paramètres' : ''}
             >
               <Settings size={20} className="flex-shrink-0" />
