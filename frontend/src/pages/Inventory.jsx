@@ -38,6 +38,29 @@ const Inventory = () => {
     }
   };
 
+  const adjustQuantity = async (item, delta) => {
+    try {
+      const newQuantity = item.quantite + delta;
+      await inventoryAPI.update(item.id, { ...item, quantite: newQuantity });
+      
+      // Mise à jour locale immédiate
+      setInventory(prev => prev.map(i => 
+        i.id === item.id ? { ...i, quantite: newQuantity } : i
+      ));
+      
+      toast({
+        title: 'Quantité mise à jour',
+        description: `${item.nom}: ${item.quantite} → ${newQuantity}`,
+      });
+    } catch (error) {
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de mettre à jour la quantité',
+        variant: 'destructive'
+      });
+    }
+  };
+
   const handleDelete = async (id) => {
     setItemToDelete(id);
     setDeleteDialogOpen(true);
