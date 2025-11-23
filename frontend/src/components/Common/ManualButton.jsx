@@ -350,14 +350,14 @@ const ManualButton = () => {
                   Table des Matières
                 </h3>
               </div>
-              <div className="flex-1 overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
+              <div className="flex-1 overflow-y-auto p-4 manual-scrollbar manual-toc">
                 {renderTableOfContents()}
               </div>
             </div>
 
             {/* Main Content with scrollbar */}
             <div className="flex-1 flex flex-col overflow-hidden min-w-0">
-              <div className="flex-1 overflow-y-auto p-8 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
+              <div className="flex-1 overflow-y-auto p-8 manual-scrollbar manual-content">
                 {renderContent()}
               </div>
             </div>
