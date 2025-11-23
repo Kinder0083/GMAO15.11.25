@@ -14,7 +14,9 @@ import {
   RotateCcw,
   Save,
   Grid3x3,
-  List
+  List,
+  Download,
+  Upload
 } from 'lucide-react';
 
 // Import des sections
