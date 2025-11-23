@@ -4835,7 +4835,7 @@ async def get_meter(meter_id: str, current_user: dict = Depends(require_permissi
 async def update_meter(
     meter_id: str,
     meter_update: MeterUpdate,
-    current_user: dict = Depends(get_current_user)
+    current_user: dict = Depends(require_permission("meters", "edit"))
 ):
     """Mettre à jour un compteur"""
     meter = await db.meters.find_one({"id": meter_id})
