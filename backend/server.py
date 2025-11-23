@@ -6220,3 +6220,213 @@ async def shutdown_services():
     
     client.close()
     logger.info("✅ Connexion MongoDB fermée")
+
+
+# ==================== MANUEL UTILISATEUR ENDPOINTS ====================
+
+@api_router.get("/manual/content")
+async def get_manual_content(
+    role_filter: Optional[str] = None,
+    module_filter: Optional[str] = None,
+    level_filter: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """Récupérer le contenu du manuel filtré selon le rôle et les préférences"""
+    try:
+        # Récupérer la version actuelle
+        current_version = await db.manual_versions.find_one({"is_current": True})
+        if not current_version:
+            # Créer le contenu par défaut si aucun manuel n'existe
+            return await initialize_default_manual(current_user)
+        
+        # Récupérer tous les chapitres et sections
+        chapters = await db.manual_chapters.find({}).sort("order", 1).to_list(None)
+        sections = await db.manual_sections.find({}).sort("order", 1).to_list(None)
+        
+        # Filtrer selon le rôle de l'utilisateur
+        user_role = current_user.get("role", "")
+        
+        filtered_chapters = []
+        for chapter in chapters:
+            # Si le chapitre a des rôles cibles et l'utilisateur n'est pas dans la liste, skip
+            if chapter.get("target_roles") and user_role not in chapter["target_roles"]:
+                continue
+            
+            # Appliquer les filtres additionnels
+            if role_filter and role_filter not in chapter.get("target_roles", []):
+                continue
+            if module_filter and module_filter not in chapter.get("target_modules", []):
+                continue
+            
+            chapter["id"] = str(chapter.get("_id", chapter.get("id")))
+            if "_id" in chapter:
+                del chapter["_id"]
+            filtered_chapters.append(chapter)
+        
+        filtered_sections = []
+        for section in sections:
+            # Filtrer selon les rôles
+            if section.get("target_roles") and user_role not in section["target_roles"]:
+                continue
+            
+            # Appliquer les filtres
+            if role_filter and role_filter not in section.get("target_roles", []):
+                continue
+            if module_filter and module_filter not in section.get("target_modules", []):
+                continue
+            if level_filter and section.get("level") != level_filter and section.get("level") != "both":
+                continue
+            
+            section["id"] = str(section.get("_id", section.get("id")))
+            if "_id" in section:
+                del section["_id"]
+            filtered_sections.append(section)
+        
+        return {
+            "version": current_version.get("version"),
+            "chapters": filtered_chapters,
+            "sections": filtered_sections,
+            "last_updated": current_version.get("release_date")
+        }
+        
+    except Exception as e:
+        logger.error(f"Erreur lors de la récupération du manuel: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/manual/search")
+async def search_manual(
+    search_request: ManualSearchRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """Rechercher dans le manuel"""
+    try:
+        query = search_request.query.lower()
+        
+        # Recherche dans les sections
+        sections = await db.manual_sections.find({}).to_list(None)
+        
+        results = []
+        for section in sections:
+            # Calculer le score de pertinence
+            score = 0.0
+            title_lower = section.get("title", "").lower()
+            content_lower = section.get("content", "").lower()
+            keywords = [k.lower() for k in section.get("keywords", [])]
+            
+            # Score basé sur le titre (poids 3)
+            if query in title_lower:
+                score += 3.0
+            
+            # Score basé sur les mots-clés (poids 2)
+            if any(query in kw for kw in keywords):
+                score += 2.0
+            
+            # Score basé sur le contenu (poids 1)
+            if query in content_lower:
+                score += 1.0
+            
+            if score > 0:
+                # Extraire un extrait pertinent
+                content = section.get("content", "")
+                excerpt_start = max(0, content_lower.find(query) - 50)
+                excerpt = content[excerpt_start:excerpt_start + 200]
+                
+                # Trouver le chapitre parent
+                chapter_id = None
+                chapters = await db.manual_chapters.find({}).to_list(None)
+                for chapter in chapters:
+                    if section.get("id") in chapter.get("sections", []):
+                        chapter_id = str(chapter.get("_id", chapter.get("id")))
+                        break
+                
+                results.append({
+                    "section_id": str(section.get("_id", section.get("id"))),
+                    "chapter_id": chapter_id,
+                    "title": section.get("title"),
+                    "excerpt": excerpt,
+                    "relevance_score": score
+                })
+        
+        # Trier par score
+        results.sort(key=lambda x: x["relevance_score"], reverse=True)
+        
+        return {"results": results[:10]}  # Top 10 résultats
+        
+    except Exception as e:
+        logger.error(f"Erreur lors de la recherche: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/manual/content")
+async def create_or_update_manual(
+    manual_data: ManualCreate,
+    current_user: dict = Depends(get_current_admin_user)
+):
+    """Créer ou mettre à jour le contenu du manuel (Super Admin uniquement)"""
+    try:
+        # Marquer les anciennes versions comme non-actuelles
+        await db.manual_versions.update_many(
+            {"is_current": True},
+            {"$set": {"is_current": False}}
+        )
+        
+        # Créer une nouvelle version
+        version = ManualVersion(
+            version=manual_data.version,
+            changes=manual_data.changes,
+            author_id=current_user["id"],
+            author_name=f"{current_user.get('prenom', '')} {current_user.get('nom', '')}",
+            is_current=True
+        )
+        await db.manual_versions.insert_one(version.model_dump())
+        
+        # Supprimer les chapitres et sections existants
+        await db.manual_chapters.delete_many({})
+        await db.manual_sections.delete_many({})
+        
+        # Insérer les nouveaux chapitres
+        for chapter in manual_data.chapters:
+            await db.manual_chapters.insert_one(chapter.model_dump())
+        
+        # Insérer les nouvelles sections
+        for section in manual_data.sections:
+            await db.manual_sections.insert_one(section.model_dump())
+        
+        logger.info(f"📚 Manuel mis à jour vers version {manual_data.version} par {current_user['email']}")
+        
+        return {"success": True, "message": f"Manuel mis à jour vers version {manual_data.version}"}
+        
+    except Exception as e:
+        logger.error(f"Erreur lors de la mise à jour du manuel: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/manual/export/pdf")
+async def export_manual_pdf(
+    role_filter: Optional[str] = None,
+    module_filter: Optional[str] = None,
+    include_images: bool = True,
+    current_user: dict = Depends(get_current_user)
+):
+    """Exporter le manuel en PDF"""
+    try:
+        # Pour l'instant, retourner un message
+        # L'export PDF sera implémenté plus tard avec une bibliothèque comme ReportLab ou WeasyPrint
+        return {
+            "message": "Export PDF en cours de développement",
+            "download_url": None
+        }
+    except Exception as e:
+        logger.error(f"Erreur lors de l'export PDF: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+async def initialize_default_manual(current_user: dict):
+    """Initialiser le manuel avec le contenu par défaut"""
+    # Cette fonction sera appelée pour créer le contenu initial
+    # Le contenu sera ajouté après dans un endpoint séparé
+    return {
+        "version": "1.0",
+        "chapters": [],
+        "sections": [],
+        "last_updated": datetime.now(timezone.utc).isoformat(),
+        "message": "Manuel vide - En attente d'initialisation"
+    }
+
