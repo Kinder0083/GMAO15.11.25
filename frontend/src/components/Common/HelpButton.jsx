@@ -34,33 +34,16 @@ const HelpButton = () => {
         return null;
       }
       
-      // Capturer l'élément root de React au lieu de document.body
-      const rootElement = document.getElementById('root');
-      
-      if (!rootElement) {
-        throw new Error('Élément root introuvable');
-      }
-      
-      // Capturer uniquement la zone visible (viewport) du root element
-      const canvas = await html2canvas(rootElement, {
-        // Capturer uniquement la zone visible
-        windowWidth: window.innerWidth,
-        windowHeight: window.innerHeight,
-        width: window.innerWidth,
-        height: window.innerHeight,
-        x: 0,
-        y: 0,
-        scrollX: 0,
-        scrollY: 0,
+      // Capturer document.body avec des paramètres optimisés
+      const canvas = await html2canvas(document.body, {
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#ffffff',
-        scale: 1, // Réduire la résolution pour diminuer la taille du fichier
+        scale: 1,
         logging: false,
         imageTimeout: 0,
-        // Ignorer les éléments avec ces attributs pour éviter de capturer des éléments cachés
+        // Ignorer les éléments cachés
         ignoreElements: (element) => {
-          // Ignorer les éléments avec display:none ou visibility:hidden
           const style = window.getComputedStyle(element);
           return style.display === 'none' || style.visibility === 'hidden';
         }
@@ -71,10 +54,10 @@ const HelpButton = () => {
       // Rouvrir la modale après la capture
       setOpen(true);
       
-      return canvas.toDataURL('image/png', 0.8); // Compression à 80% de qualité
+      return canvas.toDataURL('image/png', 0.8);
     } catch (error) {
       console.error('Erreur lors de la capture d\'écran:', error);
-      setOpen(true); // Rouvrir la modale même en cas d'erreur
+      setOpen(true);
       return null;
     }
   };
