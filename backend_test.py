@@ -289,76 +289,13 @@ class InventoryStatsTester:
             self.log(f"❌ Erreur lors de l'analyse - Error: {str(e)}", "ERROR")
             return False
     
-    def test_verify_work_order_update(self):
-        """TEST 4: Vérifier que l'ordre de travail contient les pièces utilisées"""
-        self.log("🧪 TEST 4: Vérifier la mise à jour de l'ordre de travail")
+    def cleanup_test_data(self):
+        """Nettoyer les données de test créées"""
+        self.log("🧹 Nettoyage des données de test...")
         
-        if not self.test_work_order_id:
-            self.log("❌ ID ordre de travail manquant", "ERROR")
-            return False
-        
-        try:
-            # GET /api/work-orders/{id} - Vérifier que les pièces sont dans l'historique
-            self.log("📋 Vérification de l'ordre de travail mis à jour...")
-            self.log(f"🔍 Debug - Using work order ID: {self.test_work_order_id}")
-            response = self.admin_session.get(
-                f"{BACKEND_URL}/work-orders/{self.test_work_order_id}",
-                timeout=15
-            )
-            
-            if response.status_code == 200:
-                work_order = response.json()
-                self.log(f"✅ Ordre de travail récupéré - ID: {work_order.get('id')}")
-                
-                # Vérifier les commentaires
-                comments = work_order.get('comments', [])
-                if comments:
-                    latest_comment = comments[-1]  # Dernier commentaire
-                    self.log(f"✅ Commentaire présent: {latest_comment.get('text')}")
-                    self.log(f"✅ Timestamp: {latest_comment.get('timestamp')}")
-                else:
-                    self.log("❌ Aucun commentaire trouvé", "ERROR")
-                    return False
-                
-                # Vérifier les pièces utilisées
-                parts_used = work_order.get('parts_used', [])
-                if parts_used:
-                    self.log(f"✅ Pièces utilisées trouvées: {len(parts_used)} pièce(s)")
-                    
-                    # Vérifier la première pièce
-                    part = parts_used[-1]  # Dernière pièce ajoutée
-                    self.log(f"✅ Pièce: {part.get('inventory_item_name')}")
-                    self.log(f"✅ Quantité: {part.get('quantity')}")
-                    self.log(f"✅ Source: {part.get('source_equipment_name')}")
-                    self.log(f"✅ Timestamp: {part.get('timestamp')}")
-                    
-                    # Vérifier tous les champs requis
-                    required_fields = ['id', 'inventory_item_id', 'inventory_item_name', 'quantity', 
-                                     'source_equipment_id', 'source_equipment_name', 'timestamp']
-                    missing_fields = [field for field in required_fields if not part.get(field)]
-                    
-                    if not missing_fields:
-                        self.log("✅ SUCCÈS: Tous les champs requis sont présents")
-                        return True
-                    else:
-                        self.log(f"❌ ÉCHEC: Champs manquants: {missing_fields}", "ERROR")
-                        return False
-                else:
-                    self.log("❌ ÉCHEC: Aucune pièce utilisée trouvée dans l'ordre de travail", "ERROR")
-                    return False
-            else:
-                self.log(f"❌ PROBLÈME IDENTIFIÉ: GET endpoint /api/work-orders/{{id}} retourne 400", "ERROR")
-                self.log("🔍 ANALYSE: L'endpoint cherche par 'id' mais la DB n'a que '_id'", "ERROR")
-                self.log("⚠️ CONTOURNEMENT: Vérification via les tests précédents réussis", "WARNING")
-                self.log("✅ CONFIRMATION: Les pièces sont bien ajoutées (commentaires et audit réussis)")
-                
-                # Since we know the parts_used system is working from previous tests, 
-                # we'll mark this as a minor backend issue but system functional
-                return True  # System is working, just a GET endpoint bug
-                
-        except requests.exceptions.RequestException as e:
-            self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
-            return False
+        # Note: Pas de nettoyage spécifique nécessaire pour ce test
+        # Les tests sont en lecture seule
+        self.log("✅ Nettoyage terminé (tests en lecture seule)")
     
     def test_external_parts(self):
         """TEST 5: Test avec pièce externe (texte libre)"""
