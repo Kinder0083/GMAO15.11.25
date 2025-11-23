@@ -554,36 +554,6 @@ async def export_manual_pdf(
                                 story.append(Paragraph(para.strip().replace('&', '&amp;'), content_style))
                         
                         story.append(Spacer(1, 0.2*cm))
-                
-                story.append(Spacer(1, 0.5*cm))
-            
-            # Saut de page entre chapitres
-            story.append(PageBreak())
-        
-        # Générer le PDF
-        doc.build(story)
-        
-        # Préparer la réponse
-        buffer.seek(0)
-        
-        filename = f"manuel_gmao_iris_{datetime.now(timezone.utc).strftime('%Y%m%d')}.pdf"
-        
-        return StreamingResponse(
-            buffer,
-            media_type="application/pdf",
-            headers={
-                "Content-Disposition": f"attachment; filename={filename}"
-            }
-        )
-        
-    except Exception as e:
-        logger.error(f"Erreur lors de l'export PDF: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Erreur lors de la génération du PDF: {str(e)}")
-
-
-# ========================================
-# ENDPOINTS ADMIN - ÉDITION DU MANUEL
-# ========================================
 
 @router.put("/manual/sections/{section_id}")
 async def update_manual_section(
