@@ -1,0 +1,131 @@
+{
+  "version": "1.0",
+  "release_date": "2025-11-23",
+  "chapters": [
+    {
+      "id": "ch-001",
+      "title": "🚀 Guide de Démarrage",
+      "description": "Premiers pas avec GMAO Iris - Pour tous les utilisateurs",
+      "icon": "Rocket",
+      "order": 1,
+      "target_roles": [],
+      "target_modules": []
+    },
+    {
+      "id": "ch-002",
+      "title": "👤 Gestion des Utilisateurs",
+      "description": "Créer, gérer les utilisateurs et leurs permissions",
+      "icon": "Users",
+      "order": 2,
+      "target_roles": ["ADMIN"],
+      "target_modules": ["people"]
+    },
+    {
+      "id": "ch-003",
+      "title": "📋 Ordres de Travail",
+      "description": "Créer, gérer et suivre les ordres de travail",
+      "icon": "ClipboardList",
+      "order": 3,
+      "target_roles": [],
+      "target_modules": ["workOrders"]
+    },
+    {
+      "id": "ch-004",
+      "title": "🔧 Gestion des Équipements",
+      "description": "Ajouter et gérer les équipements et leurs hiérarchies",
+      "icon": "Wrench",
+      "order": 4,
+      "target_roles": [],
+      "target_modules": ["assets"]
+    },
+    {
+      "id": "ch-005",
+      "title": "📦 Inventaire et Pièces",
+      "description": "Gérer le stock, ajouter des pièces et suivre les quantités",
+      "icon": "Package",
+      "order": 5,
+      "target_roles": [],
+      "target_modules": ["inventory"]
+    },
+    {
+      "id": "ch-006",
+      "title": "🗓️ Maintenance Préventive",
+      "description": "Planifier et gérer les maintenances préventives",
+      "icon": "Calendar",
+      "order": 6,
+      "target_roles": [],
+      "target_modules": ["preventiveMaintenance"]
+    },
+    {
+      "id": "ch-007",
+      "title": "💡 Demandes d'Intervention et d'Amélioration",
+      "description": "Gérer les demandes des utilisateurs",
+      "icon": "Lightbulb",
+      "order": 7,
+      "target_roles": [],
+      "target_modules": ["interventionRequests", "improvementRequests"]
+    },
+    {
+      "id": "ch-008",
+      "title": "🛡️ QHSE - Surveillance et Sécurité",
+      "description": "Plan de surveillance et gestion des presqu'accidents",
+      "icon": "Shield",
+      "order": 8,
+      "target_roles": ["ADMIN", "QHSE"],
+      "target_modules": ["surveillance", "presquaccident"]
+    },
+    {
+      "id": "ch-009",
+      "title": "📊 Rapports et Analyses",
+      "description": "Générer des rapports et analyser les données",
+      "icon": "BarChart3",
+      "order": 9,
+      "target_roles": [],
+      "target_modules": ["reports"]
+    },
+    {
+      "id": "ch-010",
+      "title": "⚙️ Personnalisation",
+      "description": "Personnaliser l'interface selon vos préférences",
+      "icon": "Settings",
+      "order": 10,
+      "target_roles": [],
+      "target_modules": []
+    },
+    {
+      "id": "ch-011",
+      "title": "❓ FAQ et Résolution de Problèmes",
+      "description": "Questions fréquentes et solutions aux problèmes courants",
+      "icon": "HelpCircle",
+      "order": 11,
+      "target_roles": [],
+      "target_modules": []
+    }
+  ],
+  "sections": [
+    {
+      "id": "sec-001-01",
+      "title": "Bienvenue dans GMAO Iris",
+      "content": "GMAO Iris est votre solution complète de gestion de maintenance assistée par ordinateur.\n\n📌 **Qu'est-ce qu'une GMAO ?**\n\nUne GMAO (Gestion de Maintenance Assistée par Ordinateur) est un logiciel qui permet de gérer l'ensemble des activités de maintenance d'une entreprise :\n\n• Planification des interventions\n• Suivi des équipements\n• Gestion des stocks de pièces\n• Traçabilité des actions\n• Analyse des performances\n\n🎯 **Objectifs de GMAO Iris :**\n\n1. **Optimiser** la maintenance préventive et curative\n2. **Réduire** les temps d'arrêt des équipements\n3. **Suivre** l'historique complet de vos installations\n4. **Analyser** les performances avec des rapports détaillés\n5. **Collaborer** efficacement entre les équipes\n\n✅ **Premiers pas recommandés :**\n\n1. Consultez la section \"Connexion et Navigation\"\n2. Familiarisez-vous avec votre rôle et vos permissions\n3. Explorez les différents modules selon vos besoins\n4. N'hésitez pas à utiliser la fonction de recherche dans ce manuel\n\n💡 **Astuce :** Utilisez le bouton \"Aide\" en haut à droite pour signaler un problème ou demander de l'assistance à tout moment.",
+      "order": 1,
+      "parent_id": null,
+      "target_roles": [],
+      "target_modules": [],
+      "level": "beginner",
+      "images": [],
+      "keywords": ["bienvenue", "introduction", "gmao", "objectifs", "premiers pas"]
+    },
+    {
+      "id": "sec-001-02",
+      "title": "Connexion et Navigation",
+      "content": "📱 **Se Connecter à GMAO Iris**\n\n1. **Accéder à l'application**\n   • Ouvrez votre navigateur web (Chrome, Firefox, Edge, Safari)\n   • Saisissez l'URL de GMAO Iris fournie par votre administrateur\n   • Bookmark la page pour un accès rapide\n\n2. **Première Connexion**\n   • Email : Votre adresse email professionnelle\n   • Mot de passe : Mot de passe temporaire fourni par l'admin\n   • ⚠️ Vous serez invité à changer votre mot de passe lors de la première connexion\n\n3. **Changer votre mot de passe**\n   • Minimum 8 caractères\n   • Au moins une majuscule, une minuscule et un chiffre\n   • Recommandé : utilisez un gestionnaire de mots de passe\n\n🗺️ **Navigation dans l'Interface**\n\n**Sidebar (Barre latérale)**\n• Contient tous les modules principaux\n• Cliquez sur un élément pour accéder au module\n• Utilisez l'icône ☰ pour réduire/agrandir la sidebar\n\n**Header (En-tête)**\n• Logo et nom de l'application à gauche\n• Boutons \"Manuel\" et \"Aide\" au centre\n• Badges de notifications (échéances, maintenances, stock)\n• Votre profil et menu utilisateur à droite\n\n**Zone principale**\n• Affiche le contenu du module sélectionné\n• Tableaux, formulaires, graphiques selon le module\n• Boutons d'action contextuels (Ajouter, Modifier, Supprimer)\n\n🎨 **Personnaliser votre Interface**\n\n• Cliquez sur l'icône 🎨 \"Personnalisation\" dans la sidebar\n• Changez les couleurs, la position de la sidebar, l'affichage\n• Consultez le chapitre \"Personnalisation\" pour plus de détails\n\n🔔 **Notifications**\n\n• Badge ROUGE (coin sup. gauche) : Maintenances préventives dues\n• Badge BLEU (coin inf. gauche) : Maintenances préventives bientôt dues  \n• Badge ORANGE (coin sup. droit) : Ordres de travail en retard\n• Badge VERT (en-tête) : Alertes stock faible\n\n• Cliquez sur un badge pour voir les détails et agir",
+      "order": 2,
+      "parent_id": null,
+      "target_roles": [],
+      "target_modules": [],
+      "level": "beginner",
+      "images": [],
+      "keywords": ["connexion", "login", "navigation", "interface", "mot de passe", "notifications"]
+    }
+  ]
+}
