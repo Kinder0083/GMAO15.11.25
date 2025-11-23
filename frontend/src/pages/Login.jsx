@@ -63,7 +63,19 @@ const Login = () => {
         description: `Bienvenue ${user.prenom} ${user.nom}`
       });
       
-      navigate('/dashboard');
+      // Récupérer les préférences utilisateur pour la page d'accueil
+      try {
+        const prefsResponse = await axios.get(`${BACKEND_URL}/api/user-preferences`, {
+          headers: { Authorization: `Bearer ${access_token}` }
+        });
+        
+        const defaultHomePage = prefsResponse.data?.default_home_page || '/dashboard';
+        navigate(defaultHomePage);
+      } catch (prefsError) {
+        // Si erreur de récupération des préférences, aller au dashboard par défaut
+        console.error('Erreur récupération préférences:', prefsError);
+        navigate('/dashboard');
+      }
     } catch (error) {
       toast({
         title: 'Erreur',
