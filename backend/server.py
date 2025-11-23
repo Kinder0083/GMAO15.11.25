@@ -6491,8 +6491,8 @@ Une GMAO (Gestion de Maintenance Assistée par Ordinateur) est un logiciel qui p
             "images": [],
             "video_url": None,
             "keywords": ["bienvenue", "introduction", "gmao"],
-            "created_at": datetime.now(timezone.utc),
-            "updated_at": datetime.now(timezone.utc)
+            "created_at": now.isoformat(),
+            "updated_at": now.isoformat()
         }
         await db.manual_sections.insert_one(section1)
         
