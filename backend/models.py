@@ -1974,3 +1974,75 @@ class HelpRequestResponse(BaseModel):
     success: bool
     message: str
     request_id: Optional[str] = None
+
+
+# ==================== MANUEL UTILISATEUR ====================
+
+class ManualSection(BaseModel):
+    """Une section du manuel (peut contenir des sous-sections)"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str
+    content: str  # Markdown format
+    order: int
+    parent_id: Optional[str] = None  # Pour les sous-sections
+    target_roles: List[str] = []  # Rôles concernés (vide = tous)
+    target_modules: List[str] = []  # Modules concernés (vide = général)
+    level: str = "beginner"  # "beginner", "advanced", "both"
+    images: List[str] = []  # URLs des images/captures
+    video_url: Optional[str] = None
+    keywords: List[str] = []  # Pour la recherche
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ManualChapter(BaseModel):
+    """Un chapitre du manuel contenant plusieurs sections"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str
+    description: str
+    icon: str = "BookOpen"
+    order: int
+    sections: List[str] = []  # IDs des sections
+    target_roles: List[str] = []
+    target_modules: List[str] = []
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ManualVersion(BaseModel):
+    """Version du manuel pour historique"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    version: str  # ex: "1.0", "1.1"
+    release_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    changes: List[str] = []  # Liste des modifications
+    author_id: str
+    author_name: str
+    is_current: bool = True
+
+class ManualCreate(BaseModel):
+    """Pour créer/mettre à jour le contenu du manuel"""
+    chapters: List[ManualChapter]
+    sections: List[ManualSection]
+    version: str
+    changes: List[str] = []
+
+class ManualSearchRequest(BaseModel):
+    """Requête de recherche dans le manuel"""
+    query: str
+    role_filter: Optional[str] = None
+    module_filter: Optional[str] = None
+    level_filter: Optional[str] = None
+
+class ManualSearchResult(BaseModel):
+    """Résultat de recherche"""
+    section_id: str
+    chapter_id: str
+    title: str
+    excerpt: str
+    relevance_score: float
+
+class ManualExportRequest(BaseModel):
+    """Requête d'export PDF"""
+    role_filter: Optional[str] = None
+    module_filter: Optional[str] = None
+    include_images: bool = True
+    include_toc: bool = True
+
