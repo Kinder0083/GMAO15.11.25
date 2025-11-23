@@ -237,9 +237,31 @@ const WorkOrderDialog = ({ open, onOpenChange, workOrder, onSuccess }) => {
     }
   };
 
-  const handleSkipStatusChange = () => {
-    setShowStatusDialog(false);
-    onOpenChange(false);
+  const handleSkipStatusChange = async () => {
+    try {
+      // Soumettre les pièces utilisées si présentes (même si on skip le changement de statut)
+      if (partsUsed.length > 0) {
+        await commentsAPI.addWorkOrderComment(workOrder.id, {
+          text: "Pièces utilisées lors de la consultation de l'ordre",
+          parts_used: partsUsed
+        });
+        toast({
+          title: 'Pièces enregistrées',
+          description: `${partsUsed.length} pièce(s) utilisée(s) enregistrée(s)`
+        });
+        setPartsUsed([]); // Réinitialiser
+        if (onSuccess) onSuccess(); // Rafraîchir les données
+      }
+      
+      setShowStatusDialog(false);
+      onOpenChange(false);
+    } catch (error) {
+      toast({
+        title: 'Erreur',
+        description: 'Impossible d\'enregistrer les pièces',
+        variant: 'destructive'
+      });
+    }
   };
 
   if (!workOrder) return null;
