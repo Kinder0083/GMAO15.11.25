@@ -4824,7 +4824,7 @@ async def get_all_meters(current_user: dict = Depends(require_permission("meters
         raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.get("/meters/{meter_id}", response_model=Meter)
-async def get_meter(meter_id: str, current_user: dict = Depends(get_current_user)):
+async def get_meter(meter_id: str, current_user: dict = Depends(require_permission("meters", "view"))):
     """Récupérer un compteur spécifique"""
     meter = await db.meters.find_one({"id": meter_id})
     if not meter:
