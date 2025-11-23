@@ -65,12 +65,15 @@ def get_default_permissions_by_role(role: str) -> UserPermissions:
             improvementRequests=ModulePermission(view=True, edit=True, delete=True),
             improvements=ModulePermission(view=True, edit=True, delete=True),
             preventiveMaintenance=ModulePermission(view=True, edit=True, delete=True),
+            planningMprev=ModulePermission(view=True, edit=True, delete=True),
             assets=ModulePermission(view=True, edit=True, delete=True),
             inventory=ModulePermission(view=True, edit=True, delete=True),
             locations=ModulePermission(view=True, edit=True, delete=True),
             meters=ModulePermission(view=True, edit=True, delete=True),
             surveillance=ModulePermission(view=True, edit=True, delete=True),
+            surveillanceRapport=ModulePermission(view=True, edit=True, delete=True),
             presquaccident=ModulePermission(view=True, edit=True, delete=True),
+            presquaccidentRapport=ModulePermission(view=True, edit=True, delete=True),
             documentations=ModulePermission(view=True, edit=True, delete=True),
             vendors=ModulePermission(view=True, edit=True, delete=True),
             reports=ModulePermission(view=True, edit=True, delete=True),
@@ -78,7 +81,9 @@ def get_default_permissions_by_role(role: str) -> UserPermissions:
             planning=ModulePermission(view=True, edit=True, delete=True),
             purchaseHistory=ModulePermission(view=True, edit=True, delete=True),
             importExport=ModulePermission(view=True, edit=True, delete=True),
-            journal=ModulePermission(view=True, edit=False, delete=False)
+            journal=ModulePermission(view=True, edit=False, delete=False),
+            settings=ModulePermission(view=True, edit=True, delete=False),
+            personalization=ModulePermission(view=True, edit=True, delete=False)
         )
     
     # DIRECTEUR : Demande d'inter./Demandes d'amél. en visualisation et modification
