@@ -678,13 +678,12 @@ const MainLayout = () => {
 
       {/* Sidebar */}
       <div
-        className={`fixed top-16 left-0 bottom-0 text-white transition-all duration-300 z-20 ${
-          sidebarOpen ? 'w-64' : 'w-20'
-        }`}
+        className="fixed top-16 bottom-0 text-white transition-all duration-300 z-20"
         style={{
           backgroundColor: preferences?.sidebar_bg_color || '#1f2937',
           width: sidebarOpen ? `${preferences?.sidebar_width || 256}px` : '80px',
-          [preferences?.sidebar_position === 'right' ? 'right' : 'left']: 0
+          left: preferences?.sidebar_position === 'right' ? 'auto' : 0,
+          right: preferences?.sidebar_position === 'right' ? 0 : 'auto'
         }}
       >
         <div className="p-4 space-y-2 h-full overflow-y-auto">
