@@ -602,3 +602,108 @@ Ceci est un email de test automatique envoyé depuis GMAO Iris.
     
     return send_email(to_email, subject, html_content, text_content)
 
+
+
+def send_email_with_attachment(
+    to_email: str, 
+    subject: str, 
+    html_content: str, 
+    attachments: Optional[List[Dict]] = None,
+    text_content: Optional[str] = None
+) -> bool:
+    """
+    Envoie un email avec pièces jointes via SMTP
+    
+    Args:
+        to_email: Email du destinataire
+        subject: Sujet de l'email
+        html_content: Contenu HTML de l'email
+        attachments: Liste de dict avec 'data' (bytes ou base64), 'filename', 'mimetype'
+        text_content: Contenu texte alternatif (optionnel)
+    
+    Returns:
+        bool: True si envoi réussi, False sinon
+    """
+    try:
+        logger.info(f"📧 Préparation email avec pièces jointes pour {to_email}")
+        
+        # Créer le message multipart
+        msg = MIMEMultipart('mixed')
+        msg['Subject'] = subject
+        msg['From'] = f"{SMTP_FROM_NAME} <{SMTP_SENDER_EMAIL}>"
+        msg['To'] = to_email
+        msg['Date'] = datetime.now().strftime('%a, %d %b %Y %H:%M:%S %z')
+        
+        # Créer la partie alternative (texte + HTML)
+        msg_alternative = MIMEMultipart('alternative')
+        msg.attach(msg_alternative)
+        
+        # Ajouter le texte brut si fourni
+        if text_content:
+            part_text = MIMEText(text_content, 'plain', 'utf-8')
+            msg_alternative.attach(part_text)
+        
+        # Ajouter le HTML
+        part_html = MIMEText(html_content, 'html', 'utf-8')
+        msg_alternative.attach(part_html)
+        
+        # Ajouter les pièces jointes
+        if attachments:
+            for attachment in attachments:
+                try:
+                    data = attachment.get('data')
+                    filename = attachment.get('filename', 'attachment')
+                    mimetype = attachment.get('mimetype', 'application/octet-stream')
+                    
+                    # Si data est en base64 string, le décoder
+                    if isinstance(data, str):
+                        # Retirer le préfixe data:image/png;base64, si présent
+                        if ',' in data:
+                            data = data.split(',')[1]
+                        data = base64.b64decode(data)
+                    
+                    # Créer la pièce jointe selon le type MIME
+                    if mimetype.startswith('image/'):
+                        part = MIMEImage(data, _subtype=mimetype.split('/')[-1])
+                    else:
+                        part = MIMEBase('application', 'octet-stream')
+                        part.set_payload(data)
+                        encoders.encode_base64(part)
+                    
+                    part.add_header('Content-Disposition', f'attachment; filename="{filename}"')
+                    msg.attach(part)
+                    
+                    logger.info(f"📎 Pièce jointe ajoutée: {filename} ({len(data)} bytes)")
+                    
+                except Exception as e:
+                    logger.error(f"❌ Erreur ajout pièce jointe {filename}: {str(e)}")
+        
+        # Connexion et envoi
+        logger.info(f"🔌 Connexion à {SMTP_SERVER}:{SMTP_PORT}...")
+        
+        if SMTP_USE_TLS and SMTP_PORT == 587:
+            server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=30)
+            logger.info("🔒 Démarrage STARTTLS...")
+            server.starttls()
+        elif SMTP_PORT == 465:
+            server = smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT, timeout=30)
+        else:
+            server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=30)
+        
+        # Authentification si nécessaire
+        if SMTP_USERNAME and SMTP_PASSWORD:
+            logger.info(f"🔐 Authentification avec {SMTP_USERNAME}...")
+            server.login(SMTP_USERNAME, SMTP_PASSWORD)
+            logger.info("✅ Authentification réussie")
+        
+        # Envoi
+        logger.info(f"📤 Envoi email avec pièces jointes à {to_email}...")
+        server.send_message(msg)
+        server.quit()
+        
+        logger.info(f"✅ Email avec pièces jointes envoyé avec succès à {to_email}")
+        return True
+        
+    except Exception as e:
+        logger.error(f"❌ Erreur lors de l'envoi de l'email avec pièces jointes : {str(e)}")
+        return False
