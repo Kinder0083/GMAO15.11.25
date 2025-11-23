@@ -102,6 +102,10 @@ const MainLayout = () => {
           loadSurveillanceBadgeStats();
         };
         
+        const handleInventoryChange = () => {
+          loadInventoryStats();
+        };
+        
         window.addEventListener('workOrderCreated', handleWorkOrderChange);
         window.addEventListener('workOrderUpdated', handleWorkOrderChange);
         window.addEventListener('workOrderDeleted', handleWorkOrderChange);
@@ -111,6 +115,9 @@ const MainLayout = () => {
         window.addEventListener('surveillanceItemCreated', handleSurveillanceChange);
         window.addEventListener('surveillanceItemUpdated', handleSurveillanceChange);
         window.addEventListener('surveillanceItemDeleted', handleSurveillanceChange);
+        window.addEventListener('inventoryItemCreated', handleInventoryChange);
+        window.addEventListener('inventoryItemUpdated', handleInventoryChange);
+        window.addEventListener('inventoryItemDeleted', handleInventoryChange);
         
         // Nettoyer les listeners et l'intervalle au démontage
         return () => {
@@ -124,6 +131,9 @@ const MainLayout = () => {
           window.removeEventListener('surveillanceItemCreated', handleSurveillanceChange);
           window.removeEventListener('surveillanceItemUpdated', handleSurveillanceChange);
           window.removeEventListener('surveillanceItemDeleted', handleSurveillanceChange);
+          window.removeEventListener('inventoryItemCreated', handleInventoryChange);
+          window.removeEventListener('inventoryItemUpdated', handleInventoryChange);
+          window.removeEventListener('inventoryItemDeleted', handleInventoryChange);
         };
       } catch (error) {
         console.error('Erreur lors du parsing des infos utilisateur:', error);
