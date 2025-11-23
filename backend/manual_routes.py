@@ -768,38 +768,3 @@ async def delete_manual_section(
         logger.error(f"Erreur lors de la suppression de la section: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-                            cleaned_para = clean_text_for_pdf(para.strip())
-                            try:
-                                story.append(Paragraph(cleaned_para, content_style))
-                            except Exception as e:
-                                # En cas d'erreur, ajouter le texte brut
-                                logger.warning(f"Erreur formatage paragraphe: {str(e)}")
-                                story.append(Paragraph(para.strip().replace('&', '&amp;'), content_style))
-                        
-                        story.append(Spacer(1, 0.2*cm))
-                
-                story.append(Spacer(1, 0.5*cm))
-            
-            # Saut de page entre chapitres
-            story.append(PageBreak())
-        
-        # Générer le PDF
-        doc.build(story)
-        
-        # Préparer la réponse
-        buffer.seek(0)
-        
-        filename = f"manuel_gmao_iris_{datetime.now(timezone.utc).strftime('%Y%m%d')}.pdf"
-        
-        return StreamingResponse(
-            buffer,
-            media_type="application/pdf",
-            headers={
-                "Content-Disposition": f"attachment; filename={filename}"
-            }
-        )
-        
-    except Exception as e:
-        logger.error(f"Erreur lors de l'export PDF: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Erreur lors de la génération du PDF: {str(e)}")
-
