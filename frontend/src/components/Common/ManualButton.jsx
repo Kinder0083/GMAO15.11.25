@@ -245,26 +245,33 @@ const ManualButton = () => {
     }
 
     return (
-      <div className="prose max-w-none">
-        <div className="mb-6">
-          <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
-            <Home size={14} />
-            <ChevronRight size={14} />
-            <span>{selectedChapter?.title}</span>
-            <ChevronRight size={14} />
-            <span className="text-gray-700">{selectedSection.title}</span>
-          </div>
-          <h1 className="text-3xl font-bold mb-4">{selectedSection.title}</h1>
+      <div className="max-w-5xl">
+        {/* Breadcrumb */}
+        <div className="manual-breadcrumb">
+          <Home size={16} />
+          <ChevronRight size={14} />
+          <span>{selectedChapter?.title}</span>
+          <ChevronRight size={14} />
+          <span>{selectedSection.title}</span>
         </div>
         
-        {/* Contenu en Markdown - pour l'instant en texte brut */}
+        {/* Titre de la section */}
+        <h1>{selectedSection.title}</h1>
+        
+        {/* Contenu avec formatage préservé */}
         <div className="whitespace-pre-wrap">{selectedSection.content}</div>
         
         {/* Images si présentes */}
         {selectedSection.images && selectedSection.images.length > 0 && (
-          <div className="mt-6 space-y-4">
+          <div className="mt-8 space-y-6">
             {selectedSection.images.map((img, idx) => (
-              <img key={idx} src={img} alt={`Illustration ${idx + 1}`} className="rounded border" />
+              <div key={idx} className="border rounded-lg p-4 bg-white shadow-sm">
+                <img 
+                  src={img} 
+                  alt={`Illustration ${idx + 1}`} 
+                  className="w-full rounded-lg"
+                />
+              </div>
             ))}
           </div>
         )}
