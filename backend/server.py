@@ -2092,7 +2092,7 @@ async def check_and_execute_due_maintenances_old(current_user: dict = Depends(ge
 
 # ==================== USERS ROUTES ====================
 @api_router.get("/users", response_model=List[User])
-async def get_users(current_user: dict = Depends(get_current_user)):
+async def get_users(current_user: dict = Depends(require_permission("people", "view"))):
     """Liste tous les utilisateurs"""
     users = await db.users.find().to_list(1000)
     return [User(**serialize_doc(user)) for user in users]
