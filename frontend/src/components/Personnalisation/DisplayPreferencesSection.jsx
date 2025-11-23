@@ -4,10 +4,12 @@ import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { usePreferences } from '../../contexts/PreferencesContext';
 import { useToast } from '../../hooks/use-toast';
+import { usePermissions } from '../../hooks/usePermissions';
 
 const DisplayPreferencesSection = () => {
   const { preferences, updatePreferences } = usePreferences();
   const { toast } = useToast();
+  const { canView } = usePermissions();
   const [localPrefs, setLocalPrefs] = useState(preferences || {});
 
   useEffect(() => {
@@ -26,6 +28,32 @@ const DisplayPreferencesSection = () => {
     }
   };
 
+  // Liste de toutes les pages disponibles avec leurs permissions
+  const availablePages = [
+    { value: '/dashboard', label: 'Tableau de bord', module: 'dashboard' },
+    { value: '/intervention-requests', label: 'Demandes d\'intervention', module: 'interventionRequests' },
+    { value: '/work-orders', label: 'Ordres de travail', module: 'workOrders' },
+    { value: '/improvement-requests', label: 'Demandes d\'amélioration', module: 'improvementRequests' },
+    { value: '/improvements', label: 'Améliorations', module: 'improvements' },
+    { value: '/preventive-maintenance', label: 'Maintenance préventive', module: 'preventiveMaintenance' },
+    { value: '/planning-mprev', label: 'Planning M.Prev.', module: 'preventiveMaintenance' },
+    { value: '/assets', label: 'Équipements', module: 'assets' },
+    { value: '/inventory', label: 'Inventaire', module: 'inventory' },
+    { value: '/locations', label: 'Zones', module: 'locations' },
+    { value: '/meters', label: 'Compteurs', module: 'meters' },
+    { value: '/surveillance-plan', label: 'Plan de Surveillance', module: 'surveillance' },
+    { value: '/surveillance-rapport', label: 'Rapport Surveillance', module: 'surveillance' },
+    { value: '/presqu-accident', label: 'Presqu\'accident', module: 'presquaccident' },
+    { value: '/presqu-accident-rapport', label: 'Rapport P.accident', module: 'presquaccident' },
+    { value: '/documentations', label: 'Documentations', module: 'documentations' },
+    { value: '/reports', label: 'Rapports', module: 'reports' },
+    { value: '/people', label: 'Équipes', module: 'people' },
+    { value: '/planning', label: 'Planning', module: 'planning' },
+    { value: '/vendors', label: 'Fournisseurs', module: 'vendors' },
+    { value: '/purchase-history', label: 'Historique Achat', module: 'purchaseHistory' },
+    { value: '/import-export', label: 'Import / Export', module: 'importExport' }
+  ].filter(page => canView(page.module));
+
   return (
     <div className="space-y-6">
       <Card>
@@ -35,12 +63,16 @@ const DisplayPreferencesSection = () => {
             <Select value={localPrefs.default_home_page} onValueChange={(v) => handleChange('default_home_page', v)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="/dashboard">Tableau de bord</SelectItem>
-                <SelectItem value="/work-orders">Ordres de travail</SelectItem>
-                <SelectItem value="/assets">Équipements</SelectItem>
-                <SelectItem value="/inventory">Inventaire</SelectItem>
+                {availablePages.map(page => (
+                  <SelectItem key={page.value} value={page.value}>
+                    {page.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
+            <p className="text-xs text-gray-500 mt-2">
+              Cette page s'ouvrira automatiquement après votre connexion
+            </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
