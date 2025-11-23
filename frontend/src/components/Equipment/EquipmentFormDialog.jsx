@@ -161,6 +161,7 @@ const EquipmentFormDialog = ({ open, onOpenChange, equipment, onSuccess, parentI
                 <SelectContent>
                   <SelectItem value="OPERATIONNEL">Opérationnel</SelectItem>
                   <SelectItem value="EN_MAINTENANCE">En maintenance</SelectItem>
+                  <SelectItem value="EN_CT">En C.T</SelectItem>
                   <SelectItem value="HORS_SERVICE">Hors service</SelectItem>
                 </SelectContent>
               </Select>
