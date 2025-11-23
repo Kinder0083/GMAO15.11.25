@@ -219,54 +219,74 @@ class InventoryStatsTester:
             self.log(f"❌ Erreur lors de la validation - Error: {str(e)}", "ERROR")
             return False
 
-    def test_verify_inventory_deduction(self):
-        """TEST 3: Vérifications après ajout - Déduction inventaire et mise à jour ordre de travail"""
-        self.log("🧪 TEST 3: Vérifier la déduction automatique du stock")
+    def test_detailed_analysis(self):
+        """TEST 4: Analyse détaillée des articles par catégorie"""
+        self.log("🧪 TEST 4: Analyse détaillée des articles par catégorie")
         
-        if not self.test_inventory_item_id:
-            self.log("❌ ID pièce d'inventaire manquant", "ERROR")
+        if not self.inventory_data:
+            self.log("❌ Données d'inventaire manquantes", "ERROR")
             return False
         
         try:
-            # GET /api/inventory/{id} - Vérifier que la quantité a été déduite de 2 unités
-            self.log("📦 Vérification de la déduction du stock...")
-            response = self.admin_session.get(
-                f"{BACKEND_URL}/inventory",
-                timeout=15
-            )
+            self.log("📋 Analyse détaillée des articles d'inventaire:")
             
-            if response.status_code == 200:
-                inventory_items = response.json()
-                # Trouver notre pièce
-                test_item = None
-                for item in inventory_items:
-                    if item.get('id') == self.test_inventory_item_id:
-                        test_item = item
-                        break
+            rupture_items = []
+            niveau_bas_items = []
+            normal_items = []
+            
+            for item in self.inventory_data:
+                quantite = item.get('quantite', 0)
+                quantite_min = item.get('quantiteMin', 0)
+                nom = item.get('nom', 'N/A')
+                code = item.get('code', 'N/A')
                 
-                if test_item:
-                    current_quantity = test_item.get('quantite', 0)
-                    expected_quantity = self.initial_inventory_quantity - 2
-                    
-                    self.log(f"📊 Quantité initiale: {self.initial_inventory_quantity}")
-                    self.log(f"📊 Quantité actuelle: {current_quantity}")
-                    self.log(f"📊 Quantité attendue: {expected_quantity}")
-                    
-                    if current_quantity == expected_quantity:
-                        self.log("✅ SUCCÈS: Déduction automatique du stock confirmée (-2 unités)")
-                        return True
-                    else:
-                        self.log(f"❌ ÉCHEC: Déduction incorrecte. Attendu: {expected_quantity}, Trouvé: {current_quantity}", "ERROR")
-                        return False
+                if quantite <= 0:
+                    rupture_items.append({
+                        'nom': nom,
+                        'code': code,
+                        'quantite': quantite,
+                        'quantiteMin': quantite_min
+                    })
+                elif quantite <= quantite_min:
+                    niveau_bas_items.append({
+                        'nom': nom,
+                        'code': code,
+                        'quantite': quantite,
+                        'quantiteMin': quantite_min
+                    })
                 else:
-                    self.log("❌ Pièce d'inventaire non trouvée", "ERROR")
-                    return False
+                    normal_items.append({
+                        'nom': nom,
+                        'code': code,
+                        'quantite': quantite,
+                        'quantiteMin': quantite_min
+                    })
+            
+            self.log(f"📊 ARTICLES EN RUPTURE ({len(rupture_items)}):")
+            for item in rupture_items[:5]:  # Afficher les 5 premiers
+                self.log(f"   - {item['nom']} (Code: {item['code']}, Qté: {item['quantite']})")
+            if len(rupture_items) > 5:
+                self.log(f"   ... et {len(rupture_items) - 5} autres")
+            
+            self.log(f"📊 ARTICLES NIVEAU BAS ({len(niveau_bas_items)}):")
+            for item in niveau_bas_items[:5]:  # Afficher les 5 premiers
+                self.log(f"   - {item['nom']} (Code: {item['code']}, Qté: {item['quantite']}, Min: {item['quantiteMin']})")
+            if len(niveau_bas_items) > 5:
+                self.log(f"   ... et {len(niveau_bas_items) - 5} autres")
+            
+            self.log(f"📊 ARTICLES NORMAUX: {len(normal_items)}")
+            
+            # Vérifier que les calculs correspondent aux stats
+            if (len(rupture_items) == self.stats_data.get('rupture') and 
+                len(niveau_bas_items) == self.stats_data.get('niveau_bas')):
+                self.log("✅ Analyse détaillée cohérente avec les statistiques")
+                return True
             else:
-                self.log(f"❌ Récupération inventaire échouée - Status: {response.status_code}", "ERROR")
+                self.log("❌ Incohérence entre l'analyse détaillée et les statistiques", "ERROR")
                 return False
                 
-        except requests.exceptions.RequestException as e:
-            self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
+        except Exception as e:
+            self.log(f"❌ Erreur lors de l'analyse - Error: {str(e)}", "ERROR")
             return False
     
     def test_verify_work_order_update(self):
