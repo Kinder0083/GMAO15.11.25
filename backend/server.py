@@ -3703,7 +3703,7 @@ async def export_data(
 
 
 @api_router.get("/purchase-history/template")
-async def download_purchase_template(format: str = "csv", current_user: dict = Depends(get_current_user)):
+async def download_purchase_template(format: str = "csv", current_user: dict = Depends(require_permission("purchaseHistory", "view"))):
     """Télécharger un template vide pour l'import des achats"""
     
     # Structure du template avec les noms de colonnes françaises
