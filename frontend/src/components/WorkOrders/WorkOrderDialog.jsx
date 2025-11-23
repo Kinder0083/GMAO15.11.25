@@ -202,9 +202,22 @@ const WorkOrderDialog = ({ open, onOpenChange, workOrder, onSuccess }) => {
     try {
       // Soumettre les pièces utilisées si présentes (AVANT le changement de statut)
       if (partsUsed.length > 0) {
+        // Nettoyer les données avant envoi (retirer l'id temporaire)
+        const cleanedParts = partsUsed.map(part => ({
+          inventory_item_id: part.inventory_item_id,
+          inventory_item_name: part.inventory_item_name,
+          custom_part_name: part.custom_part_name,
+          quantity: part.quantity,
+          source_equipment_id: part.source_equipment_id,
+          source_equipment_name: part.source_equipment_name,
+          custom_source: part.custom_source
+        }));
+        
+        console.log('Envoi des pièces:', cleanedParts); // Debug
+        
         await commentsAPI.addWorkOrderComment(workOrder.id, {
           text: "Pièces utilisées lors de la fermeture de l'ordre",
-          parts_used: partsUsed
+          parts_used: cleanedParts
         });
         toast({
           title: 'Pièces enregistrées',
