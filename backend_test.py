@@ -505,8 +505,11 @@ class PartsUsedSystemTester:
             self.log("   2. Pièce externe 1 (Quantité: 2)")
             self.log("   3. Pièce externe 2 (Quantité: 1)")
             
+            # Use ObjectId for comments endpoint
+            comments_id = self.test_work_order_object_id or self.test_work_order_id
+            
             response = self.admin_session.post(
-                f"{BACKEND_URL}/work-orders/{self.test_work_order_id}/comments",
+                f"{BACKEND_URL}/work-orders/{comments_id}/comments",
                 json=comment_data,
                 timeout=15
             )
