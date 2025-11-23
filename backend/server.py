@@ -5665,7 +5665,7 @@ async def download_improvement_attachment(imp_id: str, filename: str, current_us
 async def add_improvement_comment(
     imp_id: str,
     comment_data: dict,
-    current_user: dict = Depends(get_current_user)
+    current_user: dict = Depends(require_permission("improvements", "edit"))
 ):
     """Ajouter un commentaire à une amélioration"""
     imp = await db.improvements.find_one({"id": imp_id})
