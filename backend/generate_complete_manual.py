@@ -550,8 +550,838 @@ Mettez à jour en temps réel""",
         "target_roles": [],
         "target_modules": ["assets"],
         "keywords": ["statut", "état", "disponibilité"]
-    }
-}
+    },
+    
+    # Chapitre 5 : Maintenance Préventive
+    "sec-005-01": {
+        "title": "Comprendre la Maintenance Préventive",
+        "content": """🔄 **Qu'est-ce que la Maintenance Préventive ?**
+
+**Définition**
+Maintenance planifiée pour éviter les pannes et prolonger la durée de vie des équipements.
+
+**Avantages**
+• ⬇️ Réduction des pannes imprévues
+• 💰 Économies sur les réparations d'urgence
+• ⏱️ Moins de temps d'arrêt
+• 📈 Meilleure disponibilité
+• 🛡️ Sécurité améliorée
+
+**Types de Maintenance Préventive**
+1. **Systématique** : Basée sur le temps
+   - Hebdomadaire, mensuelle, annuelle
+   - Exemple : Vidange tous les 6 mois
+
+2. **Conditionnelle** : Basée sur l'état
+   - Inspection des paramètres
+   - Exemple : Changer si vibrations > seuil
+
+3. **Prévisionnelle** : Basée sur l'analyse
+   - Analyse d'huile, thermographie
+   - Prédit la défaillance avant qu'elle n'arrive
+
+**Cycle de Vie**
+Planification → Programmation → Exécution → Validation → Amélioration
+
+💡 **Règle d'Or**
+20% de préventif évite 80% de curatif !""",
+        "level": "beginner",
+        "target_roles": [],
+        "target_modules": ["preventiveMaintenance"],
+        "keywords": ["préventif", "planification", "maintenance"]
+    },
+    
+    "sec-005-02": {
+        "title": "Créer un Plan de Maintenance",
+        "content": """📅 **Créer un Plan de Maintenance Préventive**
+
+**Étape 1** : Module "Maintenance Préventive"
+Cliquez "+ Nouveau plan"
+
+**Informations Obligatoires**
+• **Titre** : Description claire
+• **Équipement** : Sélectionner
+• **Fréquence** : Hebdomadaire, Mensuelle, Trimestrielle, Semestrielle, Annuelle
+• **Date de début** : Première intervention
+
+**Informations Recommandées**
+• Instructions détaillées
+• Checklist des tâches
+• Pièces à vérifier/remplacer
+• Temps estimé
+• Assigné à (technicien)
+
+**Options Avancées**
+• Générer OT automatiquement
+• Alertes X jours avant
+• Stop si équipement hors service
+
+**Calendrier**
+• Visualisez toutes les maintenances sur un calendrier
+• Vue mois, semaine, jour
+
+💡 **Astuce**
+Basez-vous sur les recommandations du fabricant""",
+        "level": "beginner",
+        "target_roles": [],
+        "target_modules": ["preventiveMaintenance"],
+        "keywords": ["plan", "créer", "fréquence"]
+    },
+    
+    "sec-005-03": {
+        "title": "Gérer les Échéances",
+        "content": """⏰ **Suivre les Échéances**
+
+**Tableau de Bord**
+Affiche :
+• Maintenances dues aujourd'hui
+• Maintenances à venir (7 jours)
+• Maintenances en retard ⚠️
+
+**Badge de Notification**
+Badge ROUGE dans le header : maintenances dues
+
+**Statuts des Maintenances**
+• 🔵 **Planifiée** : Programmée
+• ⏳ **Due** : À faire maintenant
+• ⚠️ **En retard** : Échéance dépassée
+• ✅ **Réalisée** : Complétée
+• ⏸️ **Suspendue** : Temporairement désactivée
+
+**Marquer comme Réalisée**
+1. Ouvrir la maintenance
+2. Bouton "Marquer comme réalisée"
+3. Remplir le rapport :
+   - Observations
+   - Anomalies détectées
+   - Pièces changées
+   - Prochaines actions
+4. Valider
+
+**OT Automatique**
+Si l'option est activée, un OT est créé automatiquement à chaque échéance""",
+        "level": "beginner",
+        "target_roles": [],
+        "target_modules": ["preventiveMaintenance"],
+        "keywords": ["échéance", "notification", "due"]
+    },
+    
+    "sec-005-04": {
+        "title": "Historique et Statistiques",
+        "content": """📊 **Analyser les Performances**
+
+**Historique d'un Plan**
+• Toutes les réalisations passées
+• Respect des délais
+• Problèmes récurrents
+• Pièces consommées
+
+**KPIs de la Maintenance Préventive**
+• **Taux de réalisation** : % maintenances faites à temps
+• **MTBF** : Temps moyen entre pannes (amélioration)
+• **Coût préventif vs curatif**
+• **Temps moyen d'intervention**
+
+**Rapports Disponibles**
+1. Respect du calendrier
+2. Maintenances par équipement
+3. Coûts de maintenance préventive
+4. Efficacité (réduction des pannes)
+
+**Amélioration Continue**
+• Si pannes malgré préventif : ajuster fréquence
+• Si aucun problème détecté : espacer
+• Analyser les équipements critiques
+
+💡 **Objectif**
+Taux de réalisation > 95%""",
+        "level": "advanced",
+        "target_roles": [],
+        "target_modules": ["preventiveMaintenance"],
+        "keywords": ["statistiques", "rapport", "KPI"]
+    },
+    
+    # Chapitre 6 : Gestion du Stock
+    "sec-006-01": {
+        "title": "Ajouter un Article au Stock",
+        "content": """📦 **Créer un Article de Stock**
+
+**Étape 1** : Module "Stock & Inventaire"
+Cliquez "+ Nouvel article"
+
+**Informations Essentielles**
+• **Nom** : Désignation claire
+• **Code article** : Référence unique
+• **Catégorie** : Mécanique, Électrique, Consommable, etc.
+• **Quantité** : Stock actuel
+• **Unité** : Pièce, Kg, Litre, Mètre
+
+**Informations de Gestion**
+• **Stock minimum** : Seuil d'alerte
+• **Stock maximum** : Quantité optimale
+• **Emplacement** : Rayon, étagère
+• **Prix unitaire** : Coût
+
+**Fournisseur**
+• Fournisseur principal
+• Référence fournisseur
+• Délai de livraison
+
+**Photo**
+Ajoutez une photo pour identification
+
+💡 **Code Article**
+Utilisez un code structuré :
+CAT-TYPE-NUMERO
+Ex: "ELEC-MOTOR-001\"""",
+        "level": "beginner",
+        "target_roles": [],
+        "target_modules": ["inventory"],
+        "keywords": ["stock", "article", "ajouter"]
+    },
+    
+    "sec-006-02": {
+        "title": "Gérer les Mouvements de Stock",
+        "content": """📊 **Suivre les Mouvements**
+
+**Types de Mouvements**
+• ➕ **Entrée** : Réception, retour
+• ➖ **Sortie** : Utilisation, prêt
+• 🔄 **Transfert** : Changement d'emplacement
+• ✏️ **Ajustement** : Correction inventaire
+
+**Enregistrer une Entrée**
+1. Ouvrir l'article
+2. Bouton "Mouvement de stock"
+3. Type : "Entrée"
+4. Quantité reçue
+5. Numéro bon de livraison
+6. Date de réception
+7. Valider
+
+**Enregistrer une Sortie**
+1. Ouvrir l'article
+2. Type : "Sortie"
+3. Quantité utilisée
+4. Lié à un OT (recommandé)
+5. Utilisateur
+6. Valider
+
+**Historique des Mouvements**
+• Tous les mouvements sont tracés
+• Qui, Quand, Combien, Pourquoi
+• Valeur du stock en temps réel
+
+⚠️ **Alerte Stock Bas**
+Notification automatique si stock < minimum""",
+        "level": "beginner",
+        "target_roles": [],
+        "target_modules": ["inventory"],
+        "keywords": ["mouvement", "entrée", "sortie"]
+    },
+    
+    "sec-006-03": {
+        "title": "Réaliser un Inventaire",
+        "content": """📋 **Inventaire Physique**
+
+**Pourquoi un Inventaire ?**
+• Vérifier concordance stock/réel
+• Détecter pertes, vols, erreurs
+• Valorisation comptable
+• Réglementation
+
+**Préparation**
+1. Planifier : date, heure, équipe
+2. Imprimer la liste (Export Excel)
+3. Préparer étiquettes et scanner
+
+**Réalisation**
+1. Module "Stock & Inventaire"
+2. Bouton "Nouvel inventaire"
+3. Sélectionner articles ou catégorie
+4. Mode de comptage :
+   - Par article
+   - Par emplacement
+   - Complet
+
+**Comptage**
+• Compter physiquement
+• Saisir quantité réelle
+• Noter écarts
+• Chercher causes si écart > 5%
+
+**Validation**
+1. Réviser les écarts importants
+2. Valider l'inventaire
+3. Ajustements automatiques
+4. Rapport généré
+
+**Fréquence Recommandée**
+• Articles A (critiques) : Mensuel
+• Articles B : Trimestriel
+• Articles C : Annuel""",
+        "level": "advanced",
+        "target_roles": [],
+        "target_modules": ["inventory"],
+        "keywords": ["inventaire", "comptage"]
+    },
+    
+    "sec-006-04": {
+        "title": "Gérer les Alertes Stock",
+        "content": """🔔 **Alertes et Réapprovisionnement**
+
+**Types d'Alertes**
+• 🔴 **Stock critique** : < Stock minimum
+• 🟠 **Stock bas** : < 120% stock minimum
+• ⚪ **Rupture** : Quantité = 0
+• ⚫ **Stock mort** : Aucun mouvement 12 mois
+
+**Configurer les Alertes**
+1. Ouvrir l'article
+2. Définir "Stock minimum"
+3. Activer "Alertes automatiques"
+4. Destinataires emails
+
+**Badge de Notification**
+Badge VERT dans header : articles en alerte
+
+**Liste des Articles en Alerte**
+Module "Stock & Inventaire" → Onglet "Alertes"
+
+**Réapprovisionnement**
+1. Consulter la liste d'alertes
+2. Bouton "Créer commande"
+3. Quantité = (Stock max - Stock actuel)
+4. Envoyer au fournisseur
+
+**Calcul Automatique**
+• Consommation moyenne
+• Délai de livraison
+• Stock de sécurité
+→ Proposition quantité optimale
+
+💡 **Astuce**
+Configurez stock minimum = (Consommation moyenne × Délai livraison) + Stock sécurité""",
+        "level": "advanced",
+        "target_roles": [],
+        "target_modules": ["inventory"],
+        "keywords": ["alerte", "réapprovisionnement", "stock minimum"]
+    },
+    
+    # Chapitre 7 : Demandes d'Intervention
+    "sec-007-01": {
+        "title": "Soumettre une Demande",
+        "content": """📝 **Créer une Demande d'Intervention**
+
+**Pour Qui ?**
+Tout utilisateur peut créer une demande
+
+**Étape 1** : Module "Demandes d'intervention"
+Cliquez "+ Nouvelle demande"
+
+**Informations à Remplir**
+• **Titre** : Problème en quelques mots
+• **Description** : Détails précis
+• **Équipement** : Quel équipement ?
+• **Zone** : Localisation
+• **Priorité suggérée** : Basse, Normale, Haute
+• **Photos** : Très recommandé !
+
+**Priorités**
+• **Basse** : Confort, pas urgent
+• **Normale** : Défaut sans impact production
+• **Haute** : Impact production modéré
+• **Urgente** : Arrêt production, sécurité
+
+**Après Soumission**
+• Statut : "En attente"
+• Notification aux responsables maintenance
+• Numéro de demande : DI-XXXX
+
+💡 **Conseil**
+Plus la description est précise, plus vite on peut intervenir !
+Ajoutez photos/vidéos si possible.""",
+        "level": "beginner",
+        "target_roles": [],
+        "target_modules": ["interventionRequests"],
+        "keywords": ["demande", "intervention", "créer"]
+    },
+    
+    "sec-007-02": {
+        "title": "Suivre ma Demande",
+        "content": """👁️ **Suivre l'État de ma Demande**
+
+**Statuts Possibles**
+1. **En attente** : Soumise, pas encore traitée
+2. **Approuvée** : Acceptée, va être planifiée
+3. **En cours** : OT créé, intervention lancée
+4. **Terminée** : Résolue
+5. **Rejetée** : Non retenue (avec justification)
+
+**Voir mes Demandes**
+Module "Demandes d'intervention" → Filtre "Mes demandes"
+
+**Notifications**
+Vous êtes notifié par email :
+• Changement de statut
+• Commentaire ajouté
+• Intervention terminée
+
+**Ajouter un Commentaire**
+• Ouvrir la demande
+• Section "Commentaires"
+• Préciser, ajouter infos
+
+**Clôturer**
+Une fois résolue :
+• Vérifiez que le problème est résolu
+• Bouton "Valider la résolution"
+• Donnez votre satisfaction (optionnel)
+
+💡 **Suivi en Temps Réel**
+Toutes les actions sont tracées avec date et responsable""",
+        "level": "beginner",
+        "target_roles": [],
+        "target_modules": ["interventionRequests"],
+        "keywords": ["suivre", "statut", "notification"]
+    },
+    
+    "sec-007-03": {
+        "title": "Traiter une Demande (Responsable)",
+        "content": """⚙️ **Traiter les Demandes d'Intervention**
+
+⚠️ **Prérequis** : Droits de modification
+
+**Étape 1** : Évaluer la Demande
+• Lire description et photos
+• Évaluer urgence réelle
+• Vérifier disponibilité pièces
+• Estimer temps et coût
+
+**Étape 2** : Décider
+**Option A - Approuver**
+1. Bouton "Approuver"
+2. Ajuster priorité si nécessaire
+3. Assigner technicien
+4. Planifier intervention
+
+**Option B - Rejeter**
+1. Bouton "Rejeter"
+2. ⚠️ Justification OBLIGATOIRE
+3. Proposer alternative si possible
+
+**Étape 3** : Créer l'OT
+Bouton "Convertir en OT"
+• Toutes les infos sont pré-remplies
+• OT lié automatiquement
+• Demandeur notifié
+
+**Suivi**
+• Tableau de bord : demandes en attente
+• Temps moyen de traitement
+• Taux d'approbation
+
+💡 **Objectif**
+Traiter toutes demandes < 24h""",
+        "level": "advanced",
+        "target_roles": ["ADMIN", "RSP_PROD", "INDUS"],
+        "target_modules": ["interventionRequests"],
+        "keywords": ["traiter", "approuver", "rejeter"]
+    },
+    
+    # Chapitre 8 : Demandes d'Amélioration
+    "sec-008-01": {
+        "title": "Soumettre une Idée",
+        "content": """💡 **Proposer une Amélioration**
+
+**C'est Quoi ?**
+Suggérer une amélioration pour :
+• Optimiser un processus
+• Améliorer la productivité
+• Renforcer la sécurité
+• Réduire les coûts
+• Améliorer la qualité
+
+**Créer une Demande**
+Module "Demandes d'amélioration" → "+ Nouvelle demande"
+
+**Formulaire**
+• **Titre** : Nom de l'idée
+• **Contexte** : Situation actuelle
+• **Proposition** : Votre idée
+• **Bénéfices attendus** : Gains espérés
+• **Risques** : Contraintes/difficultés
+• **Priorité** : Faible, Moyenne, Haute
+
+**Catégories**
+• Processus
+• Équipement
+• Sécurité
+• Qualité
+• Organisation
+• Formation
+
+**Après Soumission**
+• Statut : "En attente"
+• Évaluation par comité
+• Vous serez tenu informé
+
+🏆 **Culture d'Amélioration Continue**
+Chaque idée compte !""",
+        "level": "beginner",
+        "target_roles": [],
+        "target_modules": ["improvementRequests"],
+        "keywords": ["amélioration", "idée", "proposition"]
+    },
+    
+    "sec-008-02": {
+        "title": "Évaluer une Demande",
+        "content": """🔍 **Analyser les Demandes d'Amélioration**
+
+⚠️ **Prérequis** : Droits de modification (ADMIN, DIRECTEUR, QHSE, RSP_PROD)
+
+**Processus d'Évaluation**
+1. **Lecture** : Comprendre la proposition
+2. **Analyse** : Faisabilité technique et financière
+3. **Évaluation** : Ratio bénéfices/coûts
+4. **Décision** : Approuver ou refuser
+
+**Critères d'Évaluation**
+• Impact sur productivité
+• Coût de mise en œuvre
+• Retour sur investissement (ROI)
+• Délai de réalisation
+• Ressources nécessaires
+• Conformité réglementaire
+
+**Statuts**
+• **En attente** : Non encore évaluée
+• **En évaluation** : Analyse en cours
+• **Approuvée** : Validée, à planifier
+• **Rejetée** : Non retenue
+• **Convertie** : Transformée en projet d'amélioration
+
+**Commenter**
+Échangez avec le demandeur pour préciser sa proposition
+
+💡 **Délai Cible**
+Réponse dans les 15 jours""",
+        "level": "advanced",
+        "target_roles": ["ADMIN", "DIRECTEUR", "QHSE", "RSP_PROD"],
+        "target_modules": ["improvementRequests"],
+        "keywords": ["évaluer", "analyser"]
+    },
+    
+    "sec-008-03": {
+        "title": "Convertir en Projet",
+        "content": """🚀 **Transformer en Projet d'Amélioration**
+
+**Quand Convertir ?**
+Lorsque la demande est approuvée et mérite un suivi projet
+
+**Conversion**
+1. Ouvrir la demande approuvée
+2. Bouton "Convertir en amélioration"
+3. Compléter les infos projet :
+   - Responsable projet
+   - Budget alloué
+   - Date limite
+   - Jalons
+4. Valider
+
+**Numérotation**
+Les améliorations ont un numéro >= 7000
+(Ex: 7001, 7002, etc.)
+
+**Lien Automatique**
+La demande est liée au projet
+Traçabilité complète
+
+**Suivi Projet**
+Module "Améliorations" pour le suivi détaillé
+
+💡 **Astuce**
+Une demande approuvée ne devient pas forcément un projet immédiatement
+Peut être mise en file d'attente""",
+        "level": "advanced",
+        "target_roles": ["ADMIN", "DIRECTEUR"],
+        "target_modules": ["improvementRequests", "improvements"],
+        "keywords": ["convertir", "projet"]
+    },
+    
+    # Chapitre 9 : Projets d'Amélioration
+    "sec-009-01": {
+        "title": "Créer un Projet",
+        "content": """📈 **Lancer un Projet d'Amélioration**
+
+**Deux Méthodes**
+1. Convertir une demande (recommandé)
+2. Créer directement (Module "Améliorations" → "+ Nouveau")
+
+**Informations Projet**
+• **Titre** : Nom du projet
+• **Description** : Objectifs détaillés
+• **Responsable** : Chef de projet
+• **Budget** : Montant alloué
+• **Date début / fin** : Planning
+• **Priorité** : Faible, Moyenne, Haute
+
+**Équipe Projet**
+• Ajouter membres
+• Définir rôles
+• Notifications automatiques
+
+**Jalons**
+Définir les grandes étapes :
+• Étude de faisabilité
+• Validation direction
+• Réalisation
+• Tests
+• Déploiement
+
+**Documents**
+Joindre :
+• Cahier des charges
+• Plans
+• Devis fournisseurs
+• Autorisations
+
+💡 **Méthode Agile**
+Découpez en petites étapes""",
+        "level": "advanced",
+        "target_roles": ["ADMIN", "DIRECTEUR"],
+        "target_modules": ["improvements"],
+        "keywords": ["projet", "amélioration", "créer"]
+    },
+    
+    "sec-009-02": {
+        "title": "Suivre l'Avancement",
+        "content": """📊 **Piloter le Projet**
+
+**Statuts du Projet**
+• **Planifié** : Validé, pas démarré
+• **En cours** : Réalisation
+• **En pause** : Suspendu temporairement
+• **Terminé** : Achevé avec succès
+• **Annulé** : Abandonné
+
+**Tableau de Bord Projet**
+• % d'avancement
+• Budget consommé vs alloué
+• Temps écoulé vs prévu
+• Jalons franchis
+• Problèmes bloquants
+
+**Mise à Jour**
+1. Ouvrir le projet
+2. Modifier % avancement
+3. Ajouter commentaire sur évolution
+4. Mettre à jour statut si nécessaire
+
+**Rapports d'Avancement**
+Section "Commentaires" :
+• Rapport hebdomadaire recommandé
+• Difficultés rencontrées
+• Actions correctives
+• Prochaines étapes
+
+**Alertes**
+• Dépassement budget
+• Retard sur planning
+• Jalon non franchi
+
+💡 **Communication**
+Informez régulièrement les parties prenantes""",
+        "level": "advanced",
+        "target_roles": ["ADMIN", "DIRECTEUR"],
+        "target_modules": ["improvements"],
+        "keywords": ["suivi", "avancement", "pilotage"]
+    },
+    
+    "sec-009-03": {
+        "title": "Clôturer un Projet",
+        "content": """✅ **Finaliser le Projet**
+
+**Avant Clôture**
+☑️ Tous les jalons franchis
+☑️ Objectifs atteints
+☑️ Tests validés
+☑️ Documentation complète
+☑️ Formation utilisateurs (si nécessaire)
+
+**Bilan Final**
+1. Ouvrir le projet
+2. Section "Bilan"
+3. Remplir :
+   - Objectifs atteints (Oui/Partiellement/Non)
+   - Écarts budget
+   - Écarts planning
+   - Bénéfices réalisés
+   - Leçons apprises
+   - Recommandations
+
+**Mesure des Bénéfices**
+• Gains de productivité mesurés
+• Économies réalisées
+• ROI calculé
+• Satisfaction utilisateurs
+
+**Clôture**
+Statut : "Terminé"
+Génère rapport final automatique
+
+**Capitalisation**
+• Archivage documentation
+• Partage bonnes pratiques
+• Base de connaissance
+
+🏆 **Célébrez !**
+Remerciez l'équipe projet""",
+        "level": "advanced",
+        "target_roles": ["ADMIN", "DIRECTEUR"],
+        "target_modules": ["improvements"],
+        "keywords": ["clôturer", "bilan", "finaliser"]
+    },
+    
+    # Chapitre 10 : Rapports et Analyses
+    "sec-010-01": {
+        "title": "Tableau de Bord Principal",
+        "content": """📊 **Visualiser les KPIs**
+
+**Accès**
+Module "Rapports & Analyses" → Tableau de bord
+
+**Indicateurs Clés**
+🔧 **Ordres de Travail**
+• Total OT ce mois
+• En cours vs terminés
+• Taux de complétion
+• OT en retard
+
+⚙️ **Maintenance Préventive**
+• Respect du planning
+• Maintenances dues
+• Taux de réalisation
+
+📦 **Stock**
+• Articles en alerte
+• Valeur du stock
+• Ruptures ce mois
+
+💰 **Coûts**
+• Coût total maintenance
+• Répartition préventif/curatif
+• Top 5 équipements coûteux
+
+**Période**
+Sélectionnez :
+• Aujourd'hui
+• Cette semaine
+• Ce mois
+• Ce trimestre
+• Cette année
+• Personnalisée
+
+**Graphiques**
+• Évolution temporelle
+• Répartition par catégorie
+• Comparatif périodes
+
+💡 **Actualisation**
+Données mises à jour en temps réel""",
+        "level": "both",
+        "target_roles": [],
+        "target_modules": ["reports"],
+        "keywords": ["tableau de bord", "KPI", "indicateurs"]
+    },
+    
+    "sec-010-02": {
+        "title": "Rapports Prédéfinis",
+        "content": """📋 **Générer des Rapports**
+
+**Types de Rapports Disponibles**
+
+**1. Rapport Ordres de Travail**
+• Liste complète des OT
+• Filtres : statut, période, équipement, technicien
+• Temps passé et coûts
+• Export Excel/PDF
+
+**2. Rapport Équipements**
+• Historique par équipement
+• MTBF, MTTR, disponibilité
+• Coûts de maintenance cumulés
+• Top pannes récurrentes
+
+**3. Rapport Maintenance Préventive**
+• Planning vs réalisé
+• Maintenances en retard
+• Efficacité par technicien
+• Détection de problèmes récurrents
+
+**4. Rapport Stock**
+• État des stocks
+• Mouvements période
+• Articles sans mouvement
+• Valorisation
+
+**5. Rapport Temps**
+• Temps passé par technicien
+• Temps par catégorie d'intervention
+• Productivité
+• Heures supplémentaires
+
+**Génération**
+1. Sélectionner type de rapport
+2. Choisir période
+3. Appliquer filtres
+4. Cliquer "Générer"
+5. Exporter (Excel, PDF, CSV)
+
+💡 **Automatisation**
+Programmez envoi automatique par email (hebdo, mensuel)""",
+        "level": "both",
+        "target_roles": [],
+        "target_modules": ["reports"],
+        "keywords": ["rapport", "export", "génération"]
+    },
+    
+    "sec-010-03": {
+        "title": "Analyses Avancées",
+        "content": """🔬 **Analyses Approfondies**
+
+⚠️ **Prérequis** : Rôle ADMIN, DIRECTEUR, QHSE
+
+**Analyse de Fiabilité**
+• Courbe de baignoire
+• Taux de défaillance
+• Prédiction pannes futures
+• Équipements à remplacer
+
+**Analyse ABC des Équipements**
+• **A (Critiques)** : 20% équipements, 80% impact
+• **B (Importants)** : 30% équipements, 15% impact
+• **C (Standards)** : 50% équipements, 5% impact
+
+Stratégie de maintenance adaptée à chaque classe
+
+**Analyse Coûts**
+• Ratio préventif/curatif (objectif 30/70)
+• Coût par type d'intervention
+• Tendance des coûts
+• ROI de la GMAO
+
+**Analyse Temps**
+• Répartition temps productif/improductif
+• Temps d'attente pièces
+• Temps de déplacement
+• Optimisation planning
+
+**Analyse Root Cause (RCA)**
+• Pannes récurrentes
+• Causes profondes
+• Diagramme Ishikawa
+• Plan d'actions correcti
 
 async def generate_manual():
     client = AsyncIOMotorClient(mongo_url)
