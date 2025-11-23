@@ -1273,8 +1273,13 @@ async def delete_attachment(
 
 # ==================== EQUIPMENTS ROUTES ====================
 @api_router.get("/equipments", response_model=List[Equipment])
-async def get_equipments(current_user: dict = Depends(require_permission("assets", "view"))):
-    """Liste tous les équipements"""
+async def get_equipments(current_user: dict = Depends(get_current_user)):
+    """Liste tous les équipements
+    
+    Note : Accessible à tous les utilisateurs authentifiés pour permettre
+    la sélection d'équipements dans les ordres de travail (Prélevée Sur), 
+    même sans permission 'assets'.
+    """
     equipments = await db.equipments.find().to_list(1000)
     
     for eq in equipments:
