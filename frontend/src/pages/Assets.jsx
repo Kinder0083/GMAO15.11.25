@@ -128,6 +128,13 @@ const Assets = () => {
         label: 'Hors service',
         icon: AlertCircle,
         iconColor: 'text-red-600'
+      },
+      'EN_CT': { 
+        bg: 'bg-purple-100', 
+        text: 'text-purple-700', 
+        label: 'En C.T',
+        icon: FileCheck,
+        iconColor: 'text-purple-600'
       }
     };
     const badge = badges[statut] || badges['OPERATIONNEL'];
