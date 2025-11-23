@@ -2922,9 +2922,9 @@ async def request_help(
             
             for admin_email in admin_emails:
                 email_service.send_email(
-                    to=admin_email,
+                    to_email=admin_email,
                     subject=subject,
-                    html_body=email_html
+                    html_content=email_html
                 )
             
             # Journaliser l'action
