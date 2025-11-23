@@ -2227,7 +2227,7 @@ async def get_user_permissions(user_id: str, current_user: dict = Depends(get_cu
 @api_router.get("/users/default-permissions/{role}")
 async def get_default_permissions_for_role(
     role: str,
-    current_user: dict = Depends(get_current_user)
+    current_user: dict = Depends(get_current_admin_user)
 ):
     """Obtenir les permissions par défaut pour un rôle spécifique (admin uniquement)"""
     try:
