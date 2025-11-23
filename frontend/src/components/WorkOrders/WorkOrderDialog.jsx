@@ -567,13 +567,25 @@ const WorkOrderDialog = ({ open, onOpenChange, workOrder, onSuccess }) => {
                           value={part.inventory_item_id || 'custom'}
                           onValueChange={(value) => {
                             if (value === 'custom') {
-                              updatePartUsed(part.id, 'inventory_item_id', null);
-                              updatePartUsed(part.id, 'inventory_item_name', null);
+                              // Texte libre : réinitialiser les champs inventaire
+                              setPartsUsed(partsUsed.map(p => 
+                                p.id === part.id 
+                                  ? { ...p, inventory_item_id: null, inventory_item_name: null } 
+                                  : p
+                              ));
                             } else {
+                              // Pièce d'inventaire : mettre à jour tous les champs en une fois
                               const item = inventoryItems.find(i => i.id === value);
-                              updatePartUsed(part.id, 'inventory_item_id', value);
-                              updatePartUsed(part.id, 'inventory_item_name', item?.nom || '');
-                              updatePartUsed(part.id, 'custom_part_name', '');
+                              setPartsUsed(partsUsed.map(p => 
+                                p.id === part.id 
+                                  ? { 
+                                      ...p, 
+                                      inventory_item_id: value,
+                                      inventory_item_name: item?.nom || '',
+                                      custom_part_name: ''
+                                    } 
+                                  : p
+                              ));
                             }
                           }}
                         >
