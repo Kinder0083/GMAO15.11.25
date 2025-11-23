@@ -70,12 +70,20 @@ const InventoryFormDialog = ({ open, onOpenChange, item, onSuccess }) => {
 
       if (item) {
         await inventoryAPI.update(item.id, submitData);
+        
+        // Déclencher l'événement pour mettre à jour le badge dans le header
+        window.dispatchEvent(new Event('inventoryItemUpdated'));
+        
         toast({
           title: 'Succès',
           description: 'Article modifié avec succès'
         });
       } else {
         await inventoryAPI.create(submitData);
+        
+        // Déclencher l'événement pour mettre à jour le badge dans le header
+        window.dispatchEvent(new Event('inventoryItemCreated'));
+        
         toast({
           title: 'Succès',
           description: 'Article créé avec succès'
