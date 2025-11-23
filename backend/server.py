@@ -2660,10 +2660,12 @@ async def reset_user_preferences(current_user: dict = Depends(get_current_user))
         # Journaliser l'action
         await audit_service.log_action(
             user_id=user_id,
+            user_name=current_user.get("name", ""),
+            user_email=current_user.get("email", ""),
             action=ActionType.UPDATE,
             entity_type=EntityType.SETTINGS,
             entity_id=user_id,
-            description=f"Préférences utilisateur réinitialisées"
+            details=f"Préférences utilisateur réinitialisées"
         )
         
         return {"message": "Préférences réinitialisées avec succès", "preferences": preferences_obj}
