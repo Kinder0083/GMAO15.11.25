@@ -47,11 +47,16 @@ const DEFAULT_MENU_ITEMS = [
   { id: 'locations', label: 'Zones', path: '/locations', icon: 'MapPin', module: 'locations', visible: true, favorite: false, order: 9 },
   { id: 'meters', label: 'Compteurs', path: '/meters', icon: 'Gauge', module: 'meters', visible: true, favorite: false, order: 10 },
   { id: 'surveillance-plan', label: 'Plan de Surveillance', path: '/surveillance-plan', icon: 'Shield', module: 'surveillance', visible: true, favorite: false, order: 11 },
-  { id: 'presqu-accident', label: 'Presqu\'accident', path: '/presqu-accident', icon: 'AlertTriangle', module: 'presquaccident', visible: true, favorite: false, order: 12 },
-  { id: 'documentations', label: 'Documentations', path: '/documentations', icon: 'FolderOpen', module: 'documentations', visible: true, favorite: false, order: 13 },
-  { id: 'reports', label: 'Rapports', path: '/reports', icon: 'BarChart3', module: 'reports', visible: true, favorite: false, order: 14 },
-  { id: 'people', label: 'Équipes', path: '/people', icon: 'Users', module: 'people', visible: true, favorite: false, order: 15 },
-  { id: 'vendors', label: 'Fournisseurs', path: '/vendors', icon: 'ShoppingCart', module: 'vendors', visible: true, favorite: false, order: 16 }
+  { id: 'surveillance-rapport', label: 'Rapport Surveillance', path: '/surveillance-rapport', icon: 'FileText', module: 'surveillance', visible: true, favorite: false, order: 12 },
+  { id: 'presqu-accident', label: 'Presqu\'accident', path: '/presqu-accident', icon: 'AlertTriangle', module: 'presquaccident', visible: true, favorite: false, order: 13 },
+  { id: 'presqu-accident-rapport', label: 'Rapport P.accident', path: '/presqu-accident-rapport', icon: 'FileText', module: 'presquaccident', visible: true, favorite: false, order: 14 },
+  { id: 'documentations', label: 'Documentations', path: '/documentations', icon: 'FolderOpen', module: 'documentations', visible: true, favorite: false, order: 15 },
+  { id: 'reports', label: 'Rapports', path: '/reports', icon: 'BarChart3', module: 'reports', visible: true, favorite: false, order: 16 },
+  { id: 'people', label: 'Équipes', path: '/people', icon: 'Users', module: 'people', visible: true, favorite: false, order: 17 },
+  { id: 'planning', label: 'Planning', path: '/planning', icon: 'Calendar', module: 'planning', visible: true, favorite: false, order: 18 },
+  { id: 'vendors', label: 'Fournisseurs', path: '/vendors', icon: 'ShoppingCart', module: 'vendors', visible: true, favorite: false, order: 19 },
+  { id: 'purchase-history', label: 'Historique Achat', path: '/purchase-history', icon: 'ShoppingBag', module: 'purchaseHistory', visible: true, favorite: false, order: 20 },
+  { id: 'import-export', label: 'Import / Export', path: '/import-export', icon: 'Database', module: 'importExport', visible: true, favorite: false, order: 21 }
 ];
 
 const MenuOrganizationSection = () => {
