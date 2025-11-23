@@ -54,6 +54,7 @@ const MainLayout = () => {
   const [overdueRequestsCount, setOverdueRequestsCount] = useState(0); // Demandes d'inter. + Demandes d'amél. (jaune)
   const [overdueMaintenanceCount, setOverdueMaintenanceCount] = useState(0); // Maintenances préventives (bleu)
   const [surveillanceBadge, setSurveillanceBadge] = useState({ echeances_proches: 0, pourcentage_realisation: 0 });
+  const [inventoryStats, setInventoryStats] = useState({ rupture: 0, niveau_bas: 0 }); // Stats inventaire
   const { canView, isAdmin } = usePermissions();
 
   useEffect(() => {
