@@ -6,10 +6,14 @@ Support SMTP externe avec authentification (Gmail, SendGrid, etc.)
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.mime.image import MIMEImage
+from email.mime.base import MIMEBase
+from email import encoders
 import os
-from typing import Optional
+from typing import Optional, List, Dict
 import logging
 from datetime import datetime
+import base64
 
 logger = logging.getLogger(__name__)
 
