@@ -6544,8 +6544,8 @@ Cliquez sur un badge pour voir les détails.""",
             "images": [],
             "video_url": None,
             "keywords": ["connexion", "navigation", "interface"],
-            "created_at": datetime.now(timezone.utc),
-            "updated_at": datetime.now(timezone.utc)
+            "created_at": now.isoformat(),
+            "updated_at": now.isoformat()
         }
         await db.manual_sections.insert_one(section2)
         
