@@ -61,6 +61,54 @@ const Personnalisation = () => {
     }
   };
 
+  const handleExport = () => {
+    const config = JSON.stringify(preferences, null, 2);
+    const blob = new Blob([config], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `gmao-preferences-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    toast({
+      title: 'Succès',
+      description: 'Configuration exportée avec succès'
+    });
+  };
+
+  const handleImport = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'application/json';
+    input.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        try {
+          const text = await file.text();
+          const config = JSON.parse(text);
+          
+          // Valider et importer les préférences
+          await updatePreferences(config);
+          
+          toast({
+            title: 'Succès',
+            description: 'Configuration importée avec succès'
+          });
+        } catch (error) {
+          toast({
+            title: 'Erreur',
+            description: 'Fichier de configuration invalide',
+            variant: 'destructive'
+          });
+        }
+      }
+    };
+    input.click();
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
