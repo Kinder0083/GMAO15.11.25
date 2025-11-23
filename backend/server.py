@@ -1331,7 +1331,7 @@ async def create_equipment(eq_create: EquipmentCreate, current_user: dict = Depe
     return Equipment(**eq)
 
 @api_router.get("/equipments/{eq_id}", response_model=Equipment)
-async def get_equipment_detail(eq_id: str, current_user: dict = Depends(get_current_user)):
+async def get_equipment_detail(eq_id: str, current_user: dict = Depends(require_permission("assets", "view"))):
     """Récupérer les détails d'un équipement"""
     try:
         eq = await db.equipments.find_one({"_id": ObjectId(eq_id)})
