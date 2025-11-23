@@ -1422,7 +1422,13 @@ async def generate_manual():
             {"id": "ch-001", "title": "🚀 Guide de Démarrage", "description": "Premiers pas", "icon": "Rocket", "order": 1, "sections": ["sec-001-01", "sec-001-02", "sec-001-03", "sec-001-04"], "target_roles": [], "target_modules": []},
             {"id": "ch-002", "title": "👤 Utilisateurs", "description": "Gérer les utilisateurs", "icon": "Users", "order": 2, "sections": ["sec-002-01", "sec-002-02", "sec-002-03"], "target_roles": ["ADMIN"], "target_modules": ["people"]},
             {"id": "ch-003", "title": "📋 Ordres de Travail", "description": "Gérer les OT", "icon": "ClipboardList", "order": 3, "sections": ["sec-003-01", "sec-003-02", "sec-003-03", "sec-003-04", "sec-003-05"], "target_roles": [], "target_modules": ["workOrders"]},
-            {"id": "ch-004", "title": "🔧 Équipements", "description": "Gérer les équipements", "icon": "Wrench", "order": 4, "sections": ["sec-004-01", "sec-004-02", "sec-004-03", "sec-004-04"], "target_roles": [], "target_modules": ["assets"]}
+            {"id": "ch-004", "title": "🔧 Équipements", "description": "Gérer les équipements", "icon": "Wrench", "order": 4, "sections": ["sec-004-01", "sec-004-02", "sec-004-03", "sec-004-04"], "target_roles": [], "target_modules": ["assets"]},
+            {"id": "ch-005", "title": "🔄 Maintenance Préventive", "description": "Planifier les maintenances", "icon": "RotateCw", "order": 5, "sections": ["sec-005-01", "sec-005-02", "sec-005-03", "sec-005-04"], "target_roles": [], "target_modules": ["preventiveMaintenance"]},
+            {"id": "ch-006", "title": "📦 Gestion du Stock", "description": "Gérer l'inventaire", "icon": "Package", "order": 6, "sections": ["sec-006-01", "sec-006-02", "sec-006-03", "sec-006-04"], "target_roles": [], "target_modules": ["inventory"]},
+            {"id": "ch-007", "title": "📝 Demandes d'Intervention", "description": "Soumettre et traiter", "icon": "FileText", "order": 7, "sections": ["sec-007-01", "sec-007-02", "sec-007-03"], "target_roles": [], "target_modules": ["interventionRequests"]},
+            {"id": "ch-008", "title": "💡 Demandes d'Amélioration", "description": "Proposer des améliorations", "icon": "Lightbulb", "order": 8, "sections": ["sec-008-01", "sec-008-02", "sec-008-03"], "target_roles": [], "target_modules": ["improvementRequests"]},
+            {"id": "ch-009", "title": "📈 Projets d'Amélioration", "description": "Gérer les projets", "icon": "TrendingUp", "order": 9, "sections": ["sec-009-01", "sec-009-02", "sec-009-03"], "target_roles": ["ADMIN", "DIRECTEUR"], "target_modules": ["improvements"]},
+            {"id": "ch-010", "title": "📊 Rapports et Analyses", "description": "Analyser les performances", "icon": "BarChart", "order": 10, "sections": ["sec-010-01", "sec-010-02", "sec-010-03"], "target_roles": [], "target_modules": ["reports"]}
         ]
         
         for chapter in chapters:
