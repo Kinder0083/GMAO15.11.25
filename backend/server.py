@@ -5656,7 +5656,7 @@ async def upload_improvement_attachment(
     return await upload_attachment_generic(imp_id, file, "improvements", current_user)
 
 @api_router.get("/improvements/{imp_id}/attachments/{filename}")
-async def download_improvement_attachment(imp_id: str, filename: str, current_user: dict = Depends(get_current_user)):
+async def download_improvement_attachment(imp_id: str, filename: str, current_user: dict = Depends(require_permission("improvements", "view"))):
     """Télécharger un fichier d'une amélioration"""
     return await download_attachment_generic(imp_id, filename, "improvements")
 
