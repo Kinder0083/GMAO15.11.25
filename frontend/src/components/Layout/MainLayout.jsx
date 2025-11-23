@@ -81,12 +81,15 @@ const MainLayout = () => {
         loadOverdueCount();
         // Charger les stats du badge de surveillance
         loadSurveillanceBadgeStats();
+        // Charger les stats de l'inventaire
+        loadInventoryStats();
         
         // Rafraîchir les notifications toutes les 60 secondes
         const intervalId = setInterval(() => {
           loadWorkOrdersCount(parsedUser.id);
           loadOverdueCount();
           loadSurveillanceBadgeStats();
+          loadInventoryStats();
         }, 60000); // 60 secondes
         
         // Écouter les événements de création/modification/suppression
