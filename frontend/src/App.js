@@ -131,11 +131,13 @@ function App() {
             <Route path="autorisations-particulieres/new" element={<AutorisationParticuliereForm />} />
             <Route path="autorisations-particulieres/edit/:id" element={<AutorisationParticuliereForm />} />
             <Route path="ssh" element={<SSHTerminal />} />
+            <Route path="personnalisation" element={<Personnalisation />} />
           </Route>
         </Routes>
       </BrowserRouter>
       <Toaster />
     </div>
+    </PreferencesProvider>
   );
 }
 
