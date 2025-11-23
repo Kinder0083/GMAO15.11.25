@@ -203,17 +203,38 @@ const Inventory = () => {
         </Card>
       )}
 
-      {/* Search */}
+      {/* Search and Filters */}
       <Card>
         <CardContent className="pt-6">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-            <Input
-              placeholder="Rechercher par nom, référence ou catégorie..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
+          <div className="space-y-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              <Input
+                placeholder="Rechercher par nom, référence ou catégorie..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            
+            {/* Badge filtre actif */}
+            {filterAlert && (
+              <div className="flex items-center gap-2 bg-orange-50 border border-orange-200 rounded-lg p-3">
+                <AlertTriangle size={18} className="text-orange-600" />
+                <span className="text-sm text-orange-800 font-medium">
+                  Affichage des articles en alerte uniquement (Rupture + Niveau bas)
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setFilterAlert(false)}
+                  className="ml-auto text-orange-600 hover:text-orange-800 hover:bg-orange-100"
+                >
+                  <X size={16} className="mr-1" />
+                  Réinitialiser
+                </Button>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
