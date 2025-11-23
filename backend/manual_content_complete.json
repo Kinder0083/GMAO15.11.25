@@ -169,3 +169,29 @@
     }
   ]
 }
+    ,{
+      "id": "sec-002-01",
+      "title": "Créer un Nouvel Utilisateur",
+      "content": "👥 **Workflow Complet : Créer un Utilisateur**\n\n⚠️ **Prérequis** : Vous devez avoir le rôle ADMIN\n\n**Étape 1 : Accéder au Module Équipes**\n1. Cliquez sur \"Équipes\" dans la sidebar\n2. Vous verrez la liste de tous les utilisateurs\n3. Cliquez sur le bouton \"+ Inviter membre\" en haut à droite\n\n**Étape 2 : Remplir le Formulaire**\n\n📝 **Informations Obligatoires**\n• **Email** : Adresse email professionnelle (unique)\n• **Prénom** et **Nom**\n• **Rôle** : Sélectionnez parmi :\n  - ADMIN (accès complet)\n  - DIRECTEUR (vision globale)\n  - QHSE (sécurité/qualité)\n  - TECHNICIEN (exécution)\n  - ADV (achats/ventes)\n  - LABO (laboratoire)\n  - VISUALISEUR (lecture seule)\n\n📝 **Informations Optionnelles**\n• Téléphone\n• Fonction/Poste\n• Département\n• Photo de profil\n\n**Étape 3 : Configurer les Permissions**\n\nLes permissions sont automatiquement assignées selon le rôle, mais vous pouvez les personnaliser :\n\n• **Vue** : Consulter les données\n• **Édition** : Modifier les données\n• **Suppression** : Supprimer les données\n\nModules configurables :\n- Ordres de travail\n- Équipements\n- Inventaire\n- Rapports\n- Et bien d'autres...\n\n**Étape 4 : Envoyer l'Invitation**\n\n1. Cliquez sur \"Envoyer l'invitation\"\n2. L'utilisateur reçoit un email avec :\n   • Lien d'activation\n   • Instructions de première connexion\n   • Mot de passe temporaire\n\n**Étape 5 : Vérification**\n\n✅ L'utilisateur apparaît dans la liste avec le statut \"En attente\"\n✅ Une fois activé, le statut passe à \"Actif\"\n\n💡 **Bonnes Pratiques**\n\n• Utilisez des emails professionnels uniquement\n• Donnez le minimum de permissions nécessaires\n• Vérifiez régulièrement les comptes inactifs\n• Désactivez (ne supprimez pas) les comptes des anciens employés",
+      "order": 1,
+      "parent_id": null,
+      "target_roles": ["ADMIN"],
+      "target_modules": ["people"],
+      "level": "beginner",
+      "images": [],
+      "keywords": ["utilisateur", "créer", "inviter", "membre", "rôle", "permissions"]
+    },
+    {
+      "id": "sec-002-02",
+      "title": "Modifier les Permissions d'un Utilisateur",
+      "content": "🔐 **Gérer les Permissions Utilisateurs**\n\n⚠️ **Prérequis** : Rôle ADMIN requis\n\n**Comprendre le Système de Permissions**\n\nChaque module dans GMAO Iris a 3 niveaux de permission :\n• **Voir** (View) : Consulter les données\n• **Éditer** (Edit) : Créer et modifier\n• **Supprimer** (Delete) : Supprimer définitivement\n\n**Modifier les Permissions : Étapes**\n\n**1. Accéder au Profil Utilisateur**\n• Module \"Équipes\" → Cliquez sur l'utilisateur\n• Bouton \"Modifier les permissions\"\n\n**2. Vue d'Ensemble des Modules**\n\nVous verrez tous les modules avec leurs permissions actuelles :\n\n✅ = Permission accordée\n❌ = Permission refusée\n\n**3. Modifier par Module**\n\nExemple : Ordres de Travail\n• ✅ Voir : L'utilisateur peut consulter les OT\n• ✅ Éditer : Il peut créer et modifier des OT\n• ❌ Supprimer : Il ne peut pas supprimer d'OT\n\n**4. Sauvegarder les Modifications**\n• Cliquez sur \"Enregistrer\"\n• Les changements sont immédiats\n• L'utilisateur voit les modifications à sa prochaine connexion\n\n**Permissions par Rôle par Défaut**\n\n**ADMIN** : ✅ Tout\n\n**TECHNICIEN** :\n• Ordres de travail : ✅ Voir, ✅ Éditer, ❌ Supprimer\n• Équipements : ✅ Voir, ✅ Éditer, ❌ Supprimer\n• Inventaire : ✅ Voir, ❌ Éditer, ❌ Supprimer\n\n**VISUALISEUR** :\n• Tous modules : ✅ Voir, ❌ Éditer, ❌ Supprimer\n\n**QHSE** :\n• Plan surveillance : ✅ Voir, ✅ Éditer, ✅ Supprimer\n• Presqu'accidents : ✅ Voir, ✅ Éditer, ✅ Supprimer\n• Autres modules : ✅ Voir, ❌ Éditer, ❌ Supprimer\n\n⚠️ **Attention : Permissions Spéciales**\n\nCertaines actions nécessitent toujours les droits ADMIN :\n• Gestion des utilisateurs\n• Configuration système\n• Paramètres SMTP\n• Accès aux logs d'audit\n\n💡 **Conseil de Sécurité**\n\n1. **Principe du moindre privilège** : Donnez uniquement les accès nécessaires\n2. **Revue régulière** : Vérifiez les permissions tous les 3 mois\n3. **Documentation** : Notez pourquoi une permission spéciale a été donnée\n4. **Audit** : Consultez les logs pour surveiller les actions sensibles",
+      "order": 2,
+      "parent_id": null,
+      "target_roles": ["ADMIN"],
+      "target_modules": ["people"],
+      "level": "advanced",
+      "images": [],
+      "keywords": ["permissions", "droits", "accès", "sécurité", "modifier"]
+    }
+  ]
+}
