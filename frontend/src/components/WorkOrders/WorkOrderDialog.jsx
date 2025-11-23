@@ -567,7 +567,7 @@ const WorkOrderDialog = ({ open, onOpenChange, workOrder, onSuccess }) => {
                 <div className="space-y-1">
                   {workOrder.parts_used.map((part, index) => (
                     <div key={part.id || index} className="text-xs text-gray-700">
-                      <span className="font-bold">{part.quantity}</span> {part.inventory_item_name || part.custom_part_name} - {part.timestamp ? formatDate(part.timestamp) : 'Date inconnue'}
+                      <span className="font-bold">{part.quantity}</span> {part.inventory_item_name || part.custom_part_name} - {part.timestamp ? formatDate(part.timestamp) : 'Date inconnue'}{part.user_name && ` par ${part.user_name}`}
                     </div>
                   ))}
                 </div>
