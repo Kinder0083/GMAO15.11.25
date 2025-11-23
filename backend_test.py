@@ -175,6 +175,7 @@ class PartsUsedSystemTester:
             if response.status_code in [200, 201]:
                 data = response.json()
                 self.test_work_order_id = data.get('id')
+                self.test_work_order_object_id = data.get('id')  # For now, same ID
                 self.log(f"✅ Ordre de travail créé - ID: {self.test_work_order_id}")
                 return True
             else:
