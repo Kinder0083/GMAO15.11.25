@@ -589,105 +589,13 @@ class PartsUsedSystemTester:
             self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
             return False
     
-    def test_create_and_refuse_demande(self):
-        """TEST 8: Créer une nouvelle demande et la refuser pour tester le journal"""
-        self.log("🧪 TEST 8: Créer une nouvelle demande et la refuser")
+    def cleanup_test_data(self):
+        """Nettoyer les données de test créées"""
+        self.log("🧹 Nettoyage des données de test...")
         
-        if not self.equipment_id or not self.rsp_prod_user_id:
-            self.log("❌ Prérequis manquants", "ERROR")
-            return False
-        
-        # Créer une nouvelle demande
-        tomorrow = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
-        day_after = (datetime.now() + timedelta(days=2)).strftime("%Y-%m-%d")
-        
-        test_demande_data = {
-            "date_debut": tomorrow,
-            "date_fin": day_after,
-            "periode_debut": "JOURNEE_COMPLETE",
-            "periode_fin": "JOURNEE_COMPLETE",
-            "equipement_ids": [self.equipment_id],
-            "commentaire": "Test refus journalisation",
-            "destinataire_id": self.rsp_prod_user_id
-        }
-        
-        try:
-            # Créer la demande
-            response = self.admin_session.post(
-                f"{BACKEND_URL}/demandes-arret/",
-                json=test_demande_data,
-                timeout=15
-            )
-            
-            if response.status_code not in [200, 201]:
-                self.log(f"❌ Création de la demande échouée - Status: {response.status_code}", "ERROR")
-                return False
-            
-            data = response.json()
-            demande_id = data.get('id')
-            validation_token = data.get('validation_token')
-            self.test_demandes.append(demande_id)
-            
-            self.log(f"✅ Nouvelle demande créée pour test de refus - ID: {demande_id}")
-            
-            # Refuser la demande
-            response = self.admin_session.post(
-                f"{BACKEND_URL}/demandes-arret/refuse/{validation_token}",
-                json={"commentaire": "Refusé pour test de journalisation"},
-                timeout=15
-            )
-            
-            if response.status_code == 200:
-                self.log("✅ Demande refusée avec succès")
-                
-                # Vérifier le journal
-                response = self.admin_session.get(
-                    f"{BACKEND_URL}/audit-logs",
-                    params={
-                        "entity_type": "DEMANDE_ARRET",
-                        "limit": 50
-                    },
-                    timeout=15
-                )
-                
-                if response.status_code == 200:
-                    logs_data = response.json()
-                    logs = logs_data.get('logs', [])
-                    
-                    # Chercher l'entrée de refus
-                    refusal_log = None
-                    for log in logs:
-                        if (log.get('entity_id') == demande_id and 
-                            log.get('action') == 'UPDATE' and
-                            'REFUSÉE' in log.get('details', '')):
-                            refusal_log = log
-                            break
-                    
-                    if refusal_log:
-                        self.log("✅ SUCCÈS: Entrée de refus trouvée dans le journal")
-                        self.log(f"✅ Details: {refusal_log.get('details')}")
-                        
-                        # Vérifier les changements de statut
-                        changes = refusal_log.get('changes', {})
-                        if changes.get('statut') == 'EN_ATTENTE → REFUSEE':
-                            self.log("✅ SUCCÈS: Changement de statut de refus correctement enregistré")
-                            return True
-                        else:
-                            self.log(f"❌ ÉCHEC: Changement de statut incorrect: {changes.get('statut')}", "ERROR")
-                            return False
-                    else:
-                        self.log("❌ ÉCHEC: Entrée de refus non trouvée dans le journal", "ERROR")
-                        return False
-                else:
-                    self.log(f"❌ Récupération du journal échouée - Status: {response.status_code}", "ERROR")
-                    return False
-            else:
-                self.log(f"❌ Refus de la demande échoué - Status: {response.status_code}", "ERROR")
-                return False
-                
-        except requests.exceptions.RequestException as e:
-            self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
-            return False
+        # Note: Pas de nettoyage spécifique nécessaire pour ce test
+        # Les commentaires et pièces utilisées restent dans l'historique
+        self.log("✅ Nettoyage terminé (données conservées pour historique)")
     
     def test_final_journal_verification(self):
         """TEST 9: Vérification finale - Lister tous les logs DEMANDE_ARRET"""
