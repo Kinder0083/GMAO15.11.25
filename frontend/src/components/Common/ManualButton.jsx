@@ -194,6 +194,98 @@ const ManualButton = () => {
     }
   };
 
+
+
+  // Fonctions d'édition Admin
+  const startEditSection = (section) => {
+    setEditingSection(section.id);
+    setEditTitle(section.title);
+    setEditContent(section.content);
+    setEditLevel(section.level);
+  };
+
+  const cancelEdit = () => {
+    setEditingSection(null);
+    setEditTitle('');
+    setEditContent('');
+    setEditLevel('beginner');
+  };
+
+  const saveSection = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const backend_url = getBackendURL();
+      
+      const response = await axios.put(
+        `${backend_url}/api/manual/sections/${editingSection}`,
+        {
+          title: editTitle,
+          content: editContent,
+          level: editLevel
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+      
+      toast({
+        title: 'Succès',
+        description: 'Section mise à jour avec succès'
+      });
+      
+      // Recharger le manuel
+      await loadManual();
+      cancelEdit();
+      
+    } catch (error) {
+      console.error('Erreur sauvegarde:', error);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de sauvegarder la section',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const deleteSection = async (sectionId) => {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer cette section ?')) {
+      return;
+    }
+    
+    try {
+      const token = localStorage.getItem('token');
+      const backend_url = getBackendURL();
+      
+      await axios.delete(
+        `${backend_url}/api/manual/sections/${sectionId}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+      
+      toast({
+        title: 'Succès',
+        description: 'Section supprimée avec succès'
+      });
+      
+      // Recharger le manuel
+      await loadManual();
+      setSelectedSection(null);
+      
+    } catch (error) {
+      console.error('Erreur suppression:', error);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de supprimer la section',
+        variant: 'destructive'
+      });
+    }
+  };
+
   const searchManual = async () => {
     if (!searchQuery.trim()) return;
     
