@@ -1960,3 +1960,17 @@ class UserPreferencesUpdate(BaseModel):
     stock_alert_threshold: Optional[int] = None
     customization_view_mode: Optional[str] = None
     preset_theme: Optional[str] = None
+
+# ==================== SUPPORT HELP REQUEST ====================
+
+class HelpRequest(BaseModel):
+    screenshot: str  # Base64 encoded image
+    user_message: Optional[str] = None
+    page_url: str
+    browser_info: str
+    console_logs: Optional[List[str]] = []
+    
+class HelpRequestResponse(BaseModel):
+    success: bool
+    message: str
+    request_id: Optional[str] = None
