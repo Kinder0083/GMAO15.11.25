@@ -568,6 +568,9 @@ const MainLayout = () => {
             </div>
             <span className="font-semibold text-gray-800 text-lg">GMAO Iris</span>
           </div>
+          
+          {/* Bouton d'aide */}
+          <HelpButton />
         </div>
 
         <div className="flex items-center gap-4">
