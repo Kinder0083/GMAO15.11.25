@@ -53,7 +53,9 @@ async def get_manual_content(
             if module_filter and module_filter not in chapter.get("target_modules", []):
                 continue
             
-            chapter["id"] = str(chapter.get("_id", chapter.get("id")))
+            # Garder l'ID original (ch-001) et non l'ID MongoDB
+            if "id" not in chapter or not chapter["id"]:
+                chapter["id"] = str(chapter.get("_id"))
             if "_id" in chapter:
                 del chapter["_id"]
             filtered_chapters.append(chapter)
