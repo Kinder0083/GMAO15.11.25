@@ -6420,13 +6420,145 @@ async def export_manual_pdf(
 
 async def initialize_default_manual(current_user: dict):
     """Initialiser le manuel avec le contenu par défaut"""
-    # Cette fonction sera appelée pour créer le contenu initial
-    # Le contenu sera ajouté après dans un endpoint séparé
-    return {
-        "version": "1.0",
-        "chapters": [],
-        "sections": [],
-        "last_updated": datetime.now(timezone.utc).isoformat(),
-        "message": "Manuel vide - En attente d'initialisation"
-    }
+    try:
+        logger.info("📚 Initialisation du manuel avec contenu par défaut...")
+        
+        # Créer la version initiale
+        version = {
+            "id": str(uuid.uuid4()),
+            "version": "1.0",
+            "release_date": datetime.now(timezone.utc),
+            "changes": ["Création initiale du manuel"],
+            "author_id": current_user.get("id", "system"),
+            "author_name": current_user.get("nom", "Système") + " " + current_user.get("prenom", ""),
+            "is_current": True
+        }
+        await db.manual_versions.insert_one(version)
+        
+        # Créer le premier chapitre
+        chapter1 = {
+            "id": "ch-001",
+            "title": "🚀 Guide de Démarrage",
+            "description": "Premiers pas avec GMAO Iris",
+            "icon": "Rocket",
+            "order": 1,
+            "sections": ["sec-001-01", "sec-001-02"],
+            "target_roles": [],
+            "target_modules": [],
+            "created_at": datetime.now(timezone.utc),
+            "updated_at": datetime.now(timezone.utc)
+        }
+        await db.manual_chapters.insert_one(chapter1)
+        
+        # Créer les sections du chapitre 1
+        section1 = {
+            "id": "sec-001-01",
+            "title": "Bienvenue dans GMAO Iris",
+            "content": """GMAO Iris est votre solution complète de gestion de maintenance assistée par ordinateur.
+
+📌 **Qu'est-ce qu'une GMAO ?**
+
+Une GMAO (Gestion de Maintenance Assistée par Ordinateur) est un logiciel qui permet de gérer l'ensemble des activités de maintenance d'une entreprise :
+
+• Planification des interventions
+• Suivi des équipements
+• Gestion des stocks de pièces
+• Traçabilité des actions
+• Analyse des performances
+
+🎯 **Objectifs de GMAO Iris :**
+
+1. **Optimiser** la maintenance préventive et curative
+2. **Réduire** les temps d'arrêt des équipements
+3. **Suivre** l'historique complet de vos installations
+4. **Analyser** les performances avec des rapports détaillés
+5. **Collaborer** efficacement entre les équipes
+
+✅ **Premiers pas recommandés :**
+
+1. Consultez la section "Connexion et Navigation"
+2. Familiarisez-vous avec votre rôle et vos permissions
+3. Explorez les différents modules selon vos besoins
+4. N'hésitez pas à utiliser la fonction de recherche dans ce manuel
+
+💡 **Astuce :** Utilisez le bouton "Aide" en haut à droite pour signaler un problème ou demander de l'assistance à tout moment.""",
+            "order": 1,
+            "parent_id": None,
+            "target_roles": [],
+            "target_modules": [],
+            "level": "beginner",
+            "images": [],
+            "video_url": None,
+            "keywords": ["bienvenue", "introduction", "gmao"],
+            "created_at": datetime.now(timezone.utc),
+            "updated_at": datetime.now(timezone.utc)
+        }
+        await db.manual_sections.insert_one(section1)
+        
+        section2 = {
+            "id": "sec-001-02",
+            "title": "Connexion et Navigation",
+            "content": """📱 **Se Connecter à GMAO Iris**
+
+1. **Accéder à l'application**
+   • Ouvrez votre navigateur web (Chrome, Firefox, Edge, Safari)
+   • Saisissez l'URL de GMAO Iris
+   • Bookmark la page pour un accès rapide
+
+2. **Première Connexion**
+   • Email : Votre adresse email professionnelle
+   • Mot de passe : Mot de passe fourni par l'administrateur
+   • ⚠️ Changez votre mot de passe lors de la première connexion
+
+3. **Changer votre mot de passe**
+   • Minimum 8 caractères
+   • Au moins une majuscule, une minuscule et un chiffre
+
+🗺️ **Navigation dans l'Interface**
+
+**Sidebar (Barre latérale)**
+• Contient tous les modules principaux
+• Cliquez sur un élément pour accéder au module
+• Utilisez l'icône ☰ pour réduire/agrandir la sidebar
+
+**Header (En-tête)**
+• Logo et nom de l'application à gauche
+• Boutons "Manuel" et "Aide" au centre
+• Badges de notifications
+• Votre profil à droite
+
+🔔 **Notifications**
+
+• Badge ROUGE : Maintenances préventives dues
+• Badge BLEU : Maintenances bientôt dues
+• Badge ORANGE : Ordres de travail en retard
+• Badge VERT : Alertes stock faible
+
+Cliquez sur un badge pour voir les détails.""",
+            "order": 2,
+            "parent_id": None,
+            "target_roles": [],
+            "target_modules": [],
+            "level": "beginner",
+            "images": [],
+            "video_url": None,
+            "keywords": ["connexion", "navigation", "interface"],
+            "created_at": datetime.now(timezone.utc),
+            "updated_at": datetime.now(timezone.utc)
+        }
+        await db.manual_sections.insert_one(section2)
+        
+        logger.info("✅ Manuel initialisé avec succès")
+        
+        # Retourner le contenu
+        return {
+            "version": "1.0",
+            "chapters": [chapter1],
+            "sections": [section1, section2],
+            "last_updated": datetime.now(timezone.utc).isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Erreur lors de l'initialisation du manuel: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
