@@ -173,7 +173,7 @@ const ManualButton = () => {
     if (!manualData || !manualData.chapters) return null;
 
     return (
-      <div className="space-y-2">
+      <div className="space-y-1">
         {manualData.chapters.map(chapter => {
           const chapterSections = manualData.sections.filter(
             s => chapter.sections.includes(s.id)
@@ -181,35 +181,41 @@ const ManualButton = () => {
           const isExpanded = expandedChapters.has(chapter.id);
 
           return (
-            <div key={chapter.id} className="border-b pb-2">
+            <div key={chapter.id} className="mb-2">
               <div
-                className="flex items-center justify-between p-2 hover:bg-gray-100 rounded cursor-pointer"
+                className="flex items-center justify-between p-3 hover:bg-white rounded-lg cursor-pointer transition-colors border border-transparent hover:border-gray-200"
                 onClick={() => toggleChapter(chapter.id)}
               >
                 <div className="flex items-center gap-2 flex-1">
-                  {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                  <span className="font-semibold text-sm">{chapter.title}</span>
+                  {isExpanded ? <ChevronDown size={18} className="text-gray-600" /> : <ChevronRight size={18} className="text-gray-600" />}
+                  <span className="font-semibold text-sm text-gray-800">{chapter.title}</span>
                 </div>
               </div>
               
               {isExpanded && chapterSections.length > 0 && (
-                <div className="ml-6 mt-1 space-y-1">
+                <div className="ml-8 mt-1 space-y-0.5">
                   {chapterSections.map(section => (
                     <div
                       key={section.id}
-                      className={`p-2 text-sm rounded cursor-pointer hover:bg-blue-50 ${
-                        selectedSection?.id === section.id ? 'bg-blue-100 font-medium' : ''
+                      className={`p-2.5 text-sm rounded-lg cursor-pointer transition-all ${
+                        selectedSection?.id === section.id 
+                          ? 'bg-blue-100 text-blue-800 font-medium border-l-4 border-blue-600 pl-3' 
+                          : 'hover:bg-gray-100 text-gray-700 hover:text-gray-900 border-l-4 border-transparent hover:border-gray-300 pl-3'
                       }`}
                       onClick={() => selectSection(section, chapter)}
                     >
-                      {section.title}
-                      {section.level !== 'both' && (
-                        <span className={`ml-2 text-xs px-1 rounded ${
-                          section.level === 'beginner' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'
-                        }`}>
-                          {section.level === 'beginner' ? 'Débutant' : 'Avancé'}
-                        </span>
-                      )}
+                      <div className="flex items-center justify-between">
+                        <span>{section.title}</span>
+                        {section.level !== 'both' && (
+                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                            section.level === 'beginner' 
+                              ? 'bg-green-100 text-green-700' 
+                              : 'bg-orange-100 text-orange-700'
+                          }`}>
+                            {section.level === 'beginner' ? '🎓 Débutant' : '⚡ Avancé'}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
