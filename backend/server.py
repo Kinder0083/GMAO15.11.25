@@ -5837,7 +5837,7 @@ async def create_improvement(imp_create: ImprovementCreate, current_user: dict =
 async def update_improvement(
     imp_id: str,
     imp_update: ImprovementUpdate,
-    current_user: dict = Depends(get_current_user)
+    current_user: dict = Depends(require_permission("improvements", "edit"))
 ):
     """Mettre à jour une amélioration"""
     imp = await db.improvements.find_one({"id": imp_id})
