@@ -564,6 +564,196 @@ async def export_manual_pdf(
                                         story.append(Paragraph(line.strip().replace('&', '&amp;'), content_style))
                         else:
                             # Paragraphe normal
+
+
+
+# ========================================
+# ENDPOINTS ADMIN - ÉDITION DU MANUEL
+# ========================================
+
+@router.put("/manual/sections/{section_id}")
+async def update_manual_section(
+    section_id: str,
+    title: Optional[str] = None,
+    content: Optional[str] = None,
+    level: Optional[str] = None,
+    keywords: Optional[List[str]] = None,
+    current_user: dict = Depends(require_permission("admin", "edit"))
+):
+    """Mettre à jour une section du manuel (ADMIN uniquement)"""
+    try:
+        # Construire l'update
+        update_data = {
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        if title is not None:
+            update_data["title"] = title
+        if content is not None:
+            update_data["content"] = content
+        if level is not None:
+            if level not in ["beginner", "advanced", "both"]:
+                raise HTTPException(status_code=400, detail="Niveau invalide")
+            update_data["level"] = level
+        if keywords is not None:
+            update_data["keywords"] = keywords
+        
+        # Mettre à jour dans MongoDB
+        result = await db.manual_sections.update_one(
+            {"id": section_id},
+            {"$set": update_data}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Section non trouvée")
+        
+        # Log audit
+        await db.audit_log.insert_one({
+            "id": str(uuid.uuid4()),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "user_id": current_user.get("id"),
+            "user_email": current_user.get("email"),
+            "user_name": f"{current_user.get('firstName', '')} {current_user.get('lastName', '')}".strip(),
+            "action": "UPDATE",
+            "entity_type": "manual_section",
+            "entity_id": section_id,
+            "details": update_data
+        })
+        
+        logger.info(f"Section {section_id} mise à jour par {current_user.get('email')}")
+        
+        return {"message": "Section mise à jour avec succès", "section_id": section_id}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erreur lors de la mise à jour de la section: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/manual/sections")
+async def create_manual_section(
+    chapter_id: str,
+    title: str,
+    content: str,
+    level: str = "beginner",
+    keywords: List[str] = [],
+    current_user: dict = Depends(require_permission("admin", "edit"))
+):
+    """Créer une nouvelle section du manuel (ADMIN uniquement)"""
+    try:
+        # Vérifier que le chapitre existe
+        chapter = await db.manual_chapters.find_one({"id": chapter_id})
+        if not chapter:
+            raise HTTPException(status_code=404, detail="Chapitre non trouvé")
+        
+        # Générer ID pour la nouvelle section
+        # Format: sec-XXX-YY où XXX est le numéro du chapitre
+        chapter_num = chapter_id.split('-')[1]
+        
+        # Compter les sections existantes du chapitre
+        existing_sections = chapter.get("sections", [])
+        new_section_num = len(existing_sections) + 1
+        section_id = f"sec-{chapter_num}-{new_section_num:02d}"
+        
+        # Créer la section
+        now = datetime.now(timezone.utc)
+        section = {
+            "id": section_id,
+            "title": title,
+            "content": content,
+            "order": new_section_num,
+            "parent_id": None,
+            "target_roles": [],
+            "target_modules": [],
+            "level": level,
+            "images": [],
+            "video_url": None,
+            "keywords": keywords,
+            "created_at": now.isoformat(),
+            "updated_at": now.isoformat()
+        }
+        
+        await db.manual_sections.insert_one(section)
+        
+        # Ajouter la section au chapitre
+        await db.manual_chapters.update_one(
+            {"id": chapter_id},
+            {"$push": {"sections": section_id}}
+        )
+        
+        # Log audit
+        await db.audit_log.insert_one({
+            "id": str(uuid.uuid4()),
+            "timestamp": now.isoformat(),
+            "user_id": current_user.get("id"),
+            "user_email": current_user.get("email"),
+            "user_name": f"{current_user.get('firstName', '')} {current_user.get('lastName', '')}".strip(),
+            "action": "CREATE",
+            "entity_type": "manual_section",
+            "entity_id": section_id,
+            "details": {"chapter_id": chapter_id, "title": title}
+        })
+        
+        logger.info(f"Section {section_id} créée par {current_user.get('email')}")
+        
+        return {"message": "Section créée avec succès", "section_id": section_id, "section": section}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erreur lors de la création de la section: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.delete("/manual/sections/{section_id}")
+async def delete_manual_section(
+    section_id: str,
+    current_user: dict = Depends(require_permission("admin", "delete"))
+):
+    """Supprimer une section du manuel (ADMIN uniquement)"""
+    try:
+        # Vérifier que la section existe
+        section = await db.manual_sections.find_one({"id": section_id})
+        if not section:
+            raise HTTPException(status_code=404, detail="Section non trouvée")
+        
+        # Trouver le chapitre parent
+        chapter = await db.manual_chapters.find_one({"sections": section_id})
+        
+        # Supprimer la section
+        await db.manual_sections.delete_one({"id": section_id})
+        
+        # Retirer de la liste des sections du chapitre
+        if chapter:
+            await db.manual_chapters.update_one(
+                {"id": chapter["id"]},
+                {"$pull": {"sections": section_id}}
+            )
+        
+        # Log audit
+        await db.audit_log.insert_one({
+            "id": str(uuid.uuid4()),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "user_id": current_user.get("id"),
+            "user_email": current_user.get("email"),
+            "user_name": f"{current_user.get('firstName', '')} {current_user.get('lastName', '')}".strip(),
+            "action": "DELETE",
+            "entity_type": "manual_section",
+            "entity_id": section_id,
+            "details": {"title": section.get("title")}
+        })
+        
+        logger.info(f"Section {section_id} supprimée par {current_user.get('email')}")
+        
+        return {"message": "Section supprimée avec succès"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erreur lors de la suppression de la section: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
                             cleaned_para = clean_text_for_pdf(para.strip())
                             try:
                                 story.append(Paragraph(cleaned_para, content_style))
