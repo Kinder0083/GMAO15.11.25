@@ -5426,7 +5426,7 @@ async def get_improvement_request(request_id: str, current_user: dict = Depends(
 async def update_improvement_request(
     request_id: str,
     request_update: ImprovementRequestUpdate,
-    current_user: dict = Depends(get_current_user)
+    current_user: dict = Depends(require_permission("improvementRequests", "edit"))
 ):
     """Mettre à jour une demande d'amélioration"""
     req = await db.improvement_requests.find_one({"id": request_id})
