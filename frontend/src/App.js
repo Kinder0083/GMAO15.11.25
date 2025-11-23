@@ -2,6 +2,7 @@ import React from "react";
 import "./App.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "./components/ui/toaster";
+import { PreferencesProvider } from "./contexts/PreferencesContext";
 
 // Layout
 import MainLayout from "./components/Layout/MainLayout";
