@@ -481,48 +481,6 @@ const WorkOrderDialog = ({ open, onOpenChange, workOrder, onSuccess }) => {
             <p className="text-xs text-gray-500 mt-1">Ctrl+Entrée pour envoyer</p>
           </div>
 
-          {/* Historique des pièces utilisées */}
-          {workOrder.parts_used && workOrder.parts_used.length > 0 && (
-            <>
-              <Separator className="my-6" />
-              <div>
-                <div className="flex items-center gap-2 mb-4">
-                  <Package size={20} className="text-blue-600" />
-                  <h3 className="text-lg font-semibold text-gray-900">Historique des Pièces Utilisées</h3>
-                </div>
-                <div className="bg-blue-50 rounded-lg p-4 space-y-3">
-                  {workOrder.parts_used.map((part, index) => (
-                    <div key={part.id || index} className="bg-white rounded-lg p-3 shadow-sm">
-                      <div className="grid grid-cols-2 gap-2 text-sm">
-                        <div>
-                          <span className="font-semibold text-gray-600">Pièce :</span>
-                          <p className="text-gray-900">
-                            {part.inventory_item_name || part.custom_part_name}
-                          </p>
-                        </div>
-                        <div>
-                          <span className="font-semibold text-gray-600">Quantité :</span>
-                          <p className="text-gray-900 font-bold">{part.quantity}</p>
-                        </div>
-                        <div className="col-span-2">
-                          <span className="font-semibold text-gray-600">Prélevée sur :</span>
-                          <p className="text-gray-900">
-                            {part.source_equipment_name || part.custom_source || 'Non spécifié'}
-                          </p>
-                        </div>
-                        <div className="col-span-2">
-                          <span className="text-xs text-gray-500">
-                            {formatDate(part.timestamp)}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </>
-          )}
-
           {/* Pièces utilisées - Formulaire d'ajout */}
           <Separator className="my-6" />
           <div>
