@@ -4068,10 +4068,10 @@ async def export_audit_logs(
 @api_router.post("/work-orders/{work_order_id}/comments")
 async def add_work_order_comment(
     work_order_id: str,
-    comment: CommentCreate,
+    comment: CommentWithPartsCreate,
     current_user: dict = Depends(get_current_user)
 ):
-    """Ajoute un commentaire à un ordre de travail"""
+    """Ajoute un commentaire et des pièces utilisées à un ordre de travail"""
     try:
         # Vérifier que l'ordre de travail existe (chercher par _id ObjectId)
         work_order = await db.work_orders.find_one({"_id": ObjectId(work_order_id)})
@@ -4087,13 +4087,48 @@ async def add_work_order_comment(
             "timestamp": datetime.now(timezone.utc)
         }
         
-        # Ajouter le commentaire à l'ordre de travail
+        # Traiter les pièces utilisées
+        parts_used_list = []
+        for part in comment.parts_used:
+            part_data = {
+                "id": str(uuid.uuid4()),
+                "inventory_item_id": part.inventory_item_id,
+                "inventory_item_name": part.inventory_item_name,
+                "custom_part_name": part.custom_part_name,
+                "quantity": part.quantity,
+                "source_equipment_id": part.source_equipment_id,
+                "source_equipment_name": part.source_equipment_name,
+                "custom_source": part.custom_source,
+                "timestamp": datetime.now(timezone.utc)
+            }
+            parts_used_list.append(part_data)
+            
+            # Si c'est une pièce d'inventaire, déduire du stock
+            if part.inventory_item_id:
+                inventory_item = await db.inventory.find_one({"_id": ObjectId(part.inventory_item_id)})
+                if inventory_item:
+                    new_quantity = inventory_item["quantite"] - part.quantity
+                    await db.inventory.update_one(
+                        {"_id": ObjectId(part.inventory_item_id)},
+                        {"$set": {"quantite": new_quantity}}
+                    )
+                    logger.info(f"Stock mis à jour: {part.inventory_item_name} - {part.quantity} unité(s) déduite(s)")
+        
+        # Mettre à jour l'ordre de travail
+        update_data = {"$push": {"comments": new_comment}}
+        if parts_used_list:
+            update_data["$push"]["parts_used"] = {"$each": parts_used_list}
+        
         await db.work_orders.update_one(
             {"_id": ObjectId(work_order_id)},
-            {"$push": {"comments": new_comment}}
+            update_data
         )
         
         # Log dans l'audit
+        details_text = f"Commentaire ajouté: {comment.text[:50]}..."
+        if parts_used_list:
+            details_text += f" | {len(parts_used_list)} pièce(s) utilisée(s)"
+        
         await audit_service.log_action(
             user_id=current_user["id"],
             user_name=f"{current_user['prenom']} {current_user['nom']}",
@@ -4102,10 +4137,10 @@ async def add_work_order_comment(
             entity_type=EntityType.WORK_ORDER,
             entity_id=work_order_id,
             entity_name=work_order.get("titre", ""),
-            details=f"Commentaire ajouté: {comment.text[:50]}..."
+            details=details_text
         )
         
-        return new_comment
+        return {"comment": new_comment, "parts_used": parts_used_list}
         
     except HTTPException:
         raise
