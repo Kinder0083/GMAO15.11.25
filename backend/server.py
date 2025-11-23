@@ -3440,7 +3440,7 @@ async def create_purchase(purchase: PurchaseHistoryCreate, current_user: dict = 
     return PurchaseHistory(**serialize_doc(purchase_dict))
 
 @api_router.put("/purchase-history/{purchase_id}", response_model=PurchaseHistory)
-async def update_purchase(purchase_id: str, purchase_update: PurchaseHistoryUpdate, current_user: dict = Depends(get_current_user)):
+async def update_purchase(purchase_id: str, purchase_update: PurchaseHistoryUpdate, current_user: dict = Depends(require_permission("purchaseHistory", "edit"))):
     """Modifier un achat"""
     try:
         update_data = {k: v for k, v in purchase_update.model_dump().items() if v is not None}
