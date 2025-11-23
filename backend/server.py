@@ -4753,7 +4753,7 @@ async def add_work_order_parts(
 @api_router.get("/work-orders/{work_order_id}/comments")
 async def get_work_order_comments(
     work_order_id: str,
-    current_user: dict = Depends(get_current_user)
+    current_user: dict = Depends(require_permission("workOrders", "view"))
 ):
     """Récupère tous les commentaires d'un ordre de travail"""
     try:
