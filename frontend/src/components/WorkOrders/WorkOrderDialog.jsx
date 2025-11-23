@@ -315,10 +315,8 @@ const WorkOrderDialog = ({ open, onOpenChange, workOrder, onSuccess }) => {
             return cleanPart;
           });
           
-          await commentsAPI.addWorkOrderComment(workOrder.id, {
-            text: "Pièces utilisées lors de la consultation de l'ordre",
-            parts_used: cleanedParts
-          });
+          // Enregistrer les pièces SANS créer de commentaire
+          await workOrdersAPI.addWorkOrderParts(workOrder.id, cleanedParts);
           toast({
             title: 'Pièces enregistrées',
             description: `${cleanedParts.length} pièce(s) utilisée(s) enregistrée(s)`
