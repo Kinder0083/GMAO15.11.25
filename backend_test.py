@@ -816,37 +816,34 @@ class PartsUsedSystemTester:
             self.log(f"✅ Demande {demande_id} marquée pour nettoyage")
             self.test_demandes.remove(demande_id)
 
-    def run_demande_arret_journalisation_tests(self):
-        """Run comprehensive tests for Demande d'Arrêt Journalisation"""
+    def run_parts_used_system_tests(self):
+        """Run comprehensive tests for Parts Used System in Work Orders"""
         self.log("=" * 80)
-        self.log("TESTING JOURNALISATION DES DEMANDES D'ARRÊT DE MAINTENANCE")
+        self.log("TESTING SYSTÈME DE PIÈCES UTILISÉES DANS LES ORDRES DE TRAVAIL")
         self.log("=" * 80)
         self.log("CONTEXTE:")
-        self.log("Test de la journalisation automatique dans le journal d'audit")
-        self.log("pour toutes les actions sur les demandes d'arrêt")
+        self.log("Test complet du système permettant d'ajouter des pièces utilisées lors des interventions.")
+        self.log("Les pièces doivent être déduites de l'inventaire automatiquement et l'historique doit être conservé.")
         self.log("")
         self.log("SCÉNARIOS DE TEST:")
-        self.log("1. 🔧 GET /api/equipments - Récupérer un équipement valide")
-        self.log("2. 👤 GET /api/users - Récupérer un utilisateur destinataire")
-        self.log("3. 📋 POST /api/demandes-arret/ - Créer une demande d'arrêt")
-        self.log("4. 📋 GET /api/audit-logs - Vérifier l'entrée CREATE dans le journal")
-        self.log("5. ✅ POST /api/demandes-arret/validate/{token} - Approuver la demande")
-        self.log("6. 📋 GET /api/audit-logs - Vérifier l'entrée UPDATE (APPROUVÉE) dans le journal")
-        self.log("7. ❌ Créer et refuser une nouvelle demande")
-        self.log("8. 📋 GET /api/audit-logs - Vérifier l'entrée UPDATE (REFUSÉE) dans le journal")
-        self.log("9. 📊 Vérification finale - Lister tous les logs DEMANDE_ARRET")
+        self.log("1. 📦 Vérifier l'état initial (inventaire, ordres de travail, équipements)")
+        self.log("2. 🔧 Test d'ajout de pièces avec commentaire")
+        self.log("3. ✅ Vérifications après ajout (déduction inventaire)")
+        self.log("4. 📋 Vérifier mise à jour ordre de travail")
+        self.log("5. 🌐 Test avec pièce externe (texte libre)")
+        self.log("6. 📊 Test d'ajout multiple de pièces")
+        self.log("7. 📋 Vérification du journal d'audit")
         self.log("=" * 80)
         
         results = {
             "admin_login": False,
-            "get_equipment": False,
-            "get_rsp_prod_user": False,
-            "create_demande_arret": False,
-            "verify_journal_creation": False,
-            "approve_demande": False,
-            "verify_journal_approval": False,
-            "create_and_refuse_demande": False,
-            "final_journal_verification": False
+            "get_initial_state": False,
+            "add_parts_with_comment": False,
+            "verify_inventory_deduction": False,
+            "verify_work_order_update": False,
+            "external_parts": False,
+            "multiple_parts_addition": False,
+            "verify_audit_journal": False
         }
         
         # Test 1: Admin Login
@@ -856,39 +853,35 @@ class PartsUsedSystemTester:
             self.log("❌ Cannot proceed with other tests - Admin login failed", "ERROR")
             return results
         
-        # TESTS CRITIQUES DE JOURNALISATION
+        # TESTS CRITIQUES DU SYSTÈME DE PIÈCES UTILISÉES
         self.log("\n" + "=" * 60)
-        self.log("📋 TESTS CRITIQUES - JOURNALISATION DEMANDES D'ARRÊT")
+        self.log("🔧 TESTS CRITIQUES - SYSTÈME DE PIÈCES UTILISÉES")
         self.log("=" * 60)
         
-        # Test 2: Récupérer un équipement
-        results["get_equipment"] = self.test_get_equipment()
+        # Test 1: Vérifier l'état initial
+        results["get_initial_state"] = self.test_get_initial_state()
         
-        # Test 3: Récupérer un utilisateur destinataire
-        results["get_rsp_prod_user"] = self.test_get_rsp_prod_user()
+        # Test 2: Ajouter des pièces avec commentaire
+        results["add_parts_with_comment"] = self.test_add_parts_with_comment()
         
-        # Test 4: Créer une demande d'arrêt
-        success, test_demande = self.test_create_demande_arret()
-        results["create_demande_arret"] = success
+        # Test 3: Vérifier la déduction d'inventaire
+        results["verify_inventory_deduction"] = self.test_verify_inventory_deduction()
         
-        # Test 5: Vérifier l'entrée CREATE dans le journal
-        results["verify_journal_creation"] = self.test_verify_journal_creation()
+        # Test 4: Vérifier la mise à jour de l'ordre de travail
+        results["verify_work_order_update"] = self.test_verify_work_order_update()
         
-        # Test 6: Approuver la demande
-        results["approve_demande"] = self.test_approve_demande()
+        # Test 5: Test avec pièce externe
+        results["external_parts"] = self.test_external_parts()
         
-        # Test 7: Vérifier l'entrée UPDATE (APPROUVÉE) dans le journal
-        results["verify_journal_approval"] = self.test_verify_journal_approval()
+        # Test 6: Test d'ajout multiple
+        results["multiple_parts_addition"] = self.test_multiple_parts_addition()
         
-        # Test 8: Créer et refuser une nouvelle demande
-        results["create_and_refuse_demande"] = self.test_create_and_refuse_demande()
-        
-        # Test 9: Vérification finale du journal
-        results["final_journal_verification"] = self.test_final_journal_verification()
+        # Test 7: Vérifier le journal d'audit
+        results["verify_audit_journal"] = self.test_verify_audit_journal()
         
         # Summary
         self.log("=" * 80)
-        self.log("JOURNALISATION DEMANDES D'ARRÊT - RÉSULTATS DES TESTS")
+        self.log("SYSTÈME DE PIÈCES UTILISÉES - RÉSULTATS DES TESTS")
         self.log("=" * 80)
         
         passed = sum(results.values())
@@ -901,92 +894,98 @@ class PartsUsedSystemTester:
         self.log(f"\n📊 Overall: {passed}/{total} tests passed")
         
         # Analyse détaillée des tests critiques
-        critical_tests = ["create_demande_arret", "verify_journal_creation", "approve_demande", 
-                         "verify_journal_approval", "create_and_refuse_demande", "final_journal_verification"]
+        critical_tests = ["get_initial_state", "add_parts_with_comment", "verify_inventory_deduction", 
+                         "verify_work_order_update", "external_parts", "multiple_parts_addition", "verify_audit_journal"]
         critical_passed = sum(results.get(test, False) for test in critical_tests)
         
         self.log("\n" + "=" * 60)
-        self.log("ANALYSE CRITIQUE DE LA JOURNALISATION")
+        self.log("ANALYSE CRITIQUE DU SYSTÈME DE PIÈCES UTILISÉES")
         self.log("=" * 60)
         
-        # TEST CRITIQUE 1: Création demande d'arrêt
-        if results.get("create_demande_arret", False):
-            self.log("🎉 TEST CRITIQUE 1 - CRÉATION DEMANDE D'ARRÊT: ✅ SUCCÈS")
-            self.log("✅ POST /api/demandes-arret/ fonctionne correctement")
-            self.log("✅ Demande créée avec token de validation")
+        # TEST CRITIQUE 1: État initial
+        if results.get("get_initial_state", False):
+            self.log("🎉 TEST CRITIQUE 1 - ÉTAT INITIAL: ✅ SUCCÈS")
+            self.log("✅ Inventaire, ordres de travail et équipements accessibles")
+            self.log("✅ Données de test préparées")
         else:
-            self.log("🚨 TEST CRITIQUE 1 - CRÉATION DEMANDE D'ARRÊT: ❌ ÉCHEC")
-            self.log("❌ Erreur lors de la création de demande d'arrêt")
+            self.log("🚨 TEST CRITIQUE 1 - ÉTAT INITIAL: ❌ ÉCHEC")
+            self.log("❌ Impossible d'accéder aux données de base")
         
-        # TEST CRITIQUE 2: Vérification journal création
-        if results.get("verify_journal_creation", False):
-            self.log("🎉 TEST CRITIQUE 2 - JOURNAL CRÉATION: ✅ SUCCÈS")
-            self.log("✅ Entrée CREATE trouvée dans le journal d'audit")
-            self.log("✅ Action: CREATE, Entity Type: DEMANDE_ARRET")
-            self.log("✅ Détails contiennent noms équipements et destinataire")
+        # TEST CRITIQUE 2: Ajout de pièces
+        if results.get("add_parts_with_comment", False):
+            self.log("🎉 TEST CRITIQUE 2 - AJOUT PIÈCES: ✅ SUCCÈS")
+            self.log("✅ POST /api/work-orders/{id}/comments avec parts_used fonctionne")
+            self.log("✅ Pièces correctement ajoutées avec commentaire")
         else:
-            self.log("🚨 TEST CRITIQUE 2 - JOURNAL CRÉATION: ❌ ÉCHEC")
-            self.log("❌ Entrée CREATE non trouvée ou incomplète")
+            self.log("🚨 TEST CRITIQUE 2 - AJOUT PIÈCES: ❌ ÉCHEC")
+            self.log("❌ Erreur lors de l'ajout de pièces")
         
-        # TEST CRITIQUE 3: Approbation demande
-        if results.get("approve_demande", False):
-            self.log("🎉 TEST CRITIQUE 3 - APPROBATION DEMANDE: ✅ SUCCÈS")
-            self.log("✅ POST /api/demandes-arret/validate/{token} fonctionne")
-            self.log("✅ Demande approuvée avec commentaire")
+        # TEST CRITIQUE 3: Déduction inventaire
+        if results.get("verify_inventory_deduction", False):
+            self.log("🎉 TEST CRITIQUE 3 - DÉDUCTION INVENTAIRE: ✅ SUCCÈS")
+            self.log("✅ Déduction automatique du stock pour pièces d'inventaire")
+            self.log("✅ Quantités correctement mises à jour")
         else:
-            self.log("🚨 TEST CRITIQUE 3 - APPROBATION DEMANDE: ❌ ÉCHEC")
-            self.log("❌ Erreur lors de l'approbation")
+            self.log("🚨 TEST CRITIQUE 3 - DÉDUCTION INVENTAIRE: ❌ ÉCHEC")
+            self.log("❌ Déduction automatique ne fonctionne pas")
         
-        # TEST CRITIQUE 4: Vérification journal approbation
-        if results.get("verify_journal_approval", False):
-            self.log("🎉 TEST CRITIQUE 4 - JOURNAL APPROBATION: ✅ SUCCÈS")
-            self.log("✅ Entrée UPDATE trouvée avec détails 'APPROUVÉE'")
-            self.log("✅ Changes: 'EN_ATTENTE → APPROUVEE'")
+        # TEST CRITIQUE 4: Mise à jour ordre de travail
+        if results.get("verify_work_order_update", False):
+            self.log("🎉 TEST CRITIQUE 4 - MISE À JOUR ORDRE: ✅ SUCCÈS")
+            self.log("✅ Historique complet conservé dans work_order.parts_used")
+            self.log("✅ Toutes les informations présentes (timestamp, noms, quantités, sources)")
         else:
-            self.log("🚨 TEST CRITIQUE 4 - JOURNAL APPROBATION: ❌ ÉCHEC")
-            self.log("❌ Entrée UPDATE approbation non trouvée")
+            self.log("🚨 TEST CRITIQUE 4 - MISE À JOUR ORDRE: ❌ ÉCHEC")
+            self.log("❌ Historique des pièces non conservé")
         
-        # TEST CRITIQUE 5: Création et refus demande
-        if results.get("create_and_refuse_demande", False):
-            self.log("🎉 TEST CRITIQUE 5 - REFUS DEMANDE: ✅ SUCCÈS")
-            self.log("✅ Nouvelle demande créée et refusée")
-            self.log("✅ Entrée UPDATE trouvée avec détails 'REFUSÉE'")
-            self.log("✅ Changes: 'EN_ATTENTE → REFUSEE'")
+        # TEST CRITIQUE 5: Pièces externes
+        if results.get("external_parts", False):
+            self.log("🎉 TEST CRITIQUE 5 - PIÈCES EXTERNES: ✅ SUCCÈS")
+            self.log("✅ Pas de déduction pour pièces externes (texte libre)")
+            self.log("✅ Pièces externes correctement enregistrées")
         else:
-            self.log("🚨 TEST CRITIQUE 5 - REFUS DEMANDE: ❌ ÉCHEC")
-            self.log("❌ Erreur lors du refus ou journalisation")
+            self.log("🚨 TEST CRITIQUE 5 - PIÈCES EXTERNES: ❌ ÉCHEC")
+            self.log("❌ Gestion des pièces externes incorrecte")
         
-        # TEST CRITIQUE 6: Vérification finale
-        if results.get("final_journal_verification", False):
-            self.log("🎉 TEST CRITIQUE 6 - VÉRIFICATION FINALE: ✅ SUCCÈS")
-            self.log("✅ Toutes les actions DEMANDE_ARRET enregistrées")
-            self.log("✅ Actions CREATE et UPDATE présentes")
+        # TEST CRITIQUE 6: Ajout multiple
+        if results.get("multiple_parts_addition", False):
+            self.log("🎉 TEST CRITIQUE 6 - AJOUT MULTIPLE: ✅ SUCCÈS")
+            self.log("✅ Ajout de plusieurs pièces simultanément")
+            self.log("✅ Toutes les pièces enregistrées et déductions correctes")
         else:
-            self.log("🚨 TEST CRITIQUE 6 - VÉRIFICATION FINALE: ❌ ÉCHEC")
-            self.log("❌ Journalisation incomplète")
+            self.log("🚨 TEST CRITIQUE 6 - AJOUT MULTIPLE: ❌ ÉCHEC")
+            self.log("❌ Problème avec l'ajout multiple de pièces")
+        
+        # TEST CRITIQUE 7: Journal d'audit
+        if results.get("verify_audit_journal", False):
+            self.log("🎉 TEST CRITIQUE 7 - JOURNAL D'AUDIT: ✅ SUCCÈS")
+            self.log("✅ Journal d'audit mis à jour")
+            self.log("✅ Logs contiennent 'pièce(s) utilisée(s)'")
+        else:
+            self.log("🚨 TEST CRITIQUE 7 - JOURNAL D'AUDIT: ❌ ÉCHEC")
+            self.log("❌ Journal d'audit non mis à jour")
         
         # Conclusion finale
         self.log("\n" + "=" * 80)
-        self.log("CONCLUSION FINALE - JOURNALISATION DEMANDES D'ARRÊT")
+        self.log("CONCLUSION FINALE - SYSTÈME DE PIÈCES UTILISÉES")
         self.log("=" * 80)
         
         if critical_passed == len(critical_tests):
-            self.log("🎉 JOURNALISATION DEMANDES D'ARRÊT ENTIÈREMENT FONCTIONNELLE!")
-            self.log("✅ Toutes les actions sont correctement enregistrées dans le journal d'audit")
-            self.log("✅ POST /api/demandes-arret/ - Journalisation CREATE fonctionnelle")
-            self.log("✅ POST /api/demandes-arret/validate/{token} - Journalisation UPDATE (APPROUVÉE)")
-            self.log("✅ POST /api/demandes-arret/refuse/{token} - Journalisation UPDATE (REFUSÉE)")
-            self.log("✅ GET /api/audit-logs - Récupération des logs avec filtres")
-            self.log("✅ Détails complets: noms équipements, destinataire, changements de statut")
-            self.log("✅ Entity Type: DEMANDE_ARRET correctement utilisé")
-            self.log("✅ Actions: CREATE, UPDATE correctement enregistrées")
-            self.log("✅ Changes: statut transitions correctement trackées")
-            self.log("✅ La journalisation est PRÊTE POUR PRODUCTION")
+            self.log("🎉 SYSTÈME DE PIÈCES UTILISÉES ENTIÈREMENT FONCTIONNEL!")
+            self.log("✅ Déduction automatique du stock pour pièces d'inventaire")
+            self.log("✅ Pas de déduction pour pièces externes (texte libre)")
+            self.log("✅ Historique complet conservé dans work_order.parts_used")
+            self.log("✅ Toutes les informations présentes (timestamp, noms, quantités, sources)")
+            self.log("✅ Journal d'audit mis à jour")
+            self.log("✅ POST /api/work-orders/{id}/comments avec parts_used fonctionnel")
+            self.log("✅ Support des pièces d'inventaire et externes")
+            self.log("✅ Ajout multiple de pièces supporté")
+            self.log("✅ Le système est PRÊT POUR PRODUCTION")
         else:
-            self.log("⚠️ JOURNALISATION DEMANDES D'ARRÊT INCOMPLÈTE - PROBLÈMES DÉTECTÉS")
+            self.log("⚠️ SYSTÈME DE PIÈCES UTILISÉES INCOMPLET - PROBLÈMES DÉTECTÉS")
             failed_critical = [test for test in critical_tests if not results.get(test, False)]
             self.log(f"❌ Tests critiques échoués: {', '.join(failed_critical)}")
-            self.log("❌ La journalisation ne fonctionne pas correctement")
+            self.log("❌ Le système de pièces utilisées ne fonctionne pas correctement")
             self.log("❌ Intervention requise avant mise en production")
         
         return results
