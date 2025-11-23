@@ -5494,7 +5494,7 @@ async def convert_to_improvement(
     request_id: str,
     assignee_id: Optional[str] = None,
     date_limite: Optional[str] = None,
-    current_user: dict = Depends(get_current_user)
+    current_user: dict = Depends(require_permission("improvementRequests", "edit"))
 ):
     """Convertir une demande d'amélioration en amélioration (Admin/Technicien uniquement)"""
     if current_user.get("role") not in ["ADMIN", "TECHNICIEN"]:
