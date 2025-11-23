@@ -136,6 +136,8 @@ const HelpButton = () => {
         throw new Error('Impossible de capturer l\'écran');
       }
       
+      console.log('📸 Screenshot capturé, taille:', screenshot.length, 'caractères');
+      
       // 2. Collecter les informations
       const helpData = {
         screenshot: screenshot,
@@ -145,9 +147,13 @@ const HelpButton = () => {
         console_logs: collectConsoleLogs()
       };
       
+      console.log('📦 Données préparées pour envoi');
+      
       // 3. Envoyer au backend
       const token = localStorage.getItem('token');
       const backend_url = getBackendURL();
+      
+      console.log('🚀 Envoi vers:', `${backend_url}/api/support/request-help`);
       
       const response = await axios.post(
         `${backend_url}/api/support/request-help`,
@@ -159,6 +165,8 @@ const HelpButton = () => {
           }
         }
       );
+      
+      console.log('✅ Réponse reçue:', response.data);
       
       // 4. Confirmer le succès
       toast({
@@ -172,7 +180,9 @@ const HelpButton = () => {
       setMessage('');
       
     } catch (error) {
-      console.error('Erreur lors de l\'envoi de la demande d\'aide:', error);
+      console.error('❌ Erreur complète:', error);
+      console.error('❌ Message:', error.message);
+      console.error('❌ Response:', error.response);
       
       let errorMessage = 'Une erreur est survenue lors de l\'envoi';
       
