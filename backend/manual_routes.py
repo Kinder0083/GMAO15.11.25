@@ -214,25 +214,6 @@ async def create_or_update_manual(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/manual/export/pdf")
-async def export_manual_pdf(
-    role_filter: Optional[str] = None,
-    module_filter: Optional[str] = None,
-    include_images: bool = True,
-    current_user: dict = Depends(get_current_user)
-):
-    """Exporter le manuel en PDF"""
-    try:
-        # Pour l'instant, retourner un message
-        return {
-            "message": "Export PDF en cours de développement",
-            "download_url": None
-        }
-    except Exception as e:
-        logger.error(f"Erreur lors de l'export PDF: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
 async def initialize_default_manual(current_user: dict):
     """Initialiser le manuel avec le contenu par défaut"""
     try:
