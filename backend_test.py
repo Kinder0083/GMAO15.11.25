@@ -63,80 +63,48 @@ class InventoryStatsTester:
             self.log(f"❌ Admin login request failed - Error: {str(e)}", "ERROR")
             return False
     
-    def test_get_initial_state(self):
-        """TEST 1: Vérifier l'état initial - Inventaire, Ordres de travail, Équipements"""
-        self.log("🧪 TEST 1: Vérifier l'état initial du système")
+    def test_get_inventory_data(self):
+        """TEST 1: Récupérer les données d'inventaire pour validation"""
+        self.log("🧪 TEST 1: Récupération des données d'inventaire")
         
         try:
-            # 1. GET /api/inventory - Noter la quantité d'une pièce test
-            self.log("📦 Récupération de l'inventaire...")
+            # GET /api/inventory - Récupérer tous les items d'inventaire
+            self.log("📦 Récupération de l'inventaire complet...")
             response = self.admin_session.get(f"{BACKEND_URL}/inventory", timeout=15)
             
             if response.status_code == 200:
-                inventory_items = response.json()
-                if inventory_items:
-                    # Prendre le premier item d'inventaire
-                    test_item = inventory_items[0]
-                    self.test_inventory_item_id = test_item.get('id')
-                    self.initial_inventory_quantity = test_item.get('quantite', 0)
-                    self.inventory_item_name = test_item.get('nom', 'Pièce Test')
+                self.inventory_data = response.json()
+                self.log(f"✅ Inventaire récupéré - {len(self.inventory_data)} articles trouvés")
+                
+                # Analyser les données pour comprendre la répartition
+                rupture_count = 0
+                niveau_bas_count = 0
+                normal_count = 0
+                
+                for item in self.inventory_data:
+                    quantite = item.get('quantite', 0)
+                    quantite_min = item.get('quantiteMin', 0)
+                    nom = item.get('nom', 'N/A')
                     
-                    self.log(f"✅ Pièce d'inventaire trouvée - ID: {self.test_inventory_item_id}")
-                    self.log(f"✅ Nom: {self.inventory_item_name}")
-                    self.log(f"✅ Quantité initiale: {self.initial_inventory_quantity}")
-                else:
-                    self.log("❌ Aucune pièce d'inventaire trouvée", "ERROR")
-                    return False
+                    if quantite <= 0:
+                        rupture_count += 1
+                        self.log(f"   📉 RUPTURE: {nom} (Quantité: {quantite})")
+                    elif quantite <= quantite_min:
+                        niveau_bas_count += 1
+                        self.log(f"   ⚠️ NIVEAU BAS: {nom} (Quantité: {quantite}, Min: {quantite_min})")
+                    else:
+                        normal_count += 1
+                
+                self.log(f"📊 Analyse inventaire:")
+                self.log(f"   - Articles en rupture (quantité <= 0): {rupture_count}")
+                self.log(f"   - Articles niveau bas (0 < quantité <= quantiteMin): {niveau_bas_count}")
+                self.log(f"   - Articles normaux: {normal_count}")
+                self.log(f"   - Total alertes attendues: {rupture_count + niveau_bas_count}")
+                
+                return True
             else:
                 self.log(f"❌ Récupération inventaire échouée - Status: {response.status_code}", "ERROR")
                 return False
-            
-            # 2. GET /api/work-orders - Prendre un ordre de travail existant
-            self.log("📋 Récupération des ordres de travail...")
-            response = self.admin_session.get(f"{BACKEND_URL}/work-orders", timeout=15)
-            
-            if response.status_code == 200:
-                work_orders = response.json()
-                if work_orders:
-                    # Prendre le premier ordre de travail
-                    test_wo = work_orders[0]
-                    self.test_work_order_id = test_wo.get('id')  # This is actually the MongoDB ObjectId
-                    self.test_work_order_object_id = test_wo.get('id')  # Same ID for both endpoints
-                    self.log(f"✅ Ordre de travail trouvé - ID: {self.test_work_order_id}")
-                    self.log(f"✅ Titre: {test_wo.get('titre', 'N/A')}")
-                    
-                    # Check if parts_used already exists (from previous tests)
-                    existing_parts = test_wo.get('parts_used', [])
-                    if existing_parts:
-                        self.log(f"ℹ️ Ordre de travail contient déjà {len(existing_parts)} pièce(s) utilisée(s)")
-                else:
-                    self.log("⚠️ Aucun ordre de travail existant, création d'un nouveau...")
-                    return self.create_test_work_order()
-            else:
-                self.log(f"❌ Récupération ordres de travail échouée - Status: {response.status_code}", "ERROR")
-                return False
-            
-            # 3. GET /api/equipment - Prendre un équipement test
-            self.log("🔧 Récupération des équipements...")
-            response = self.admin_session.get(f"{BACKEND_URL}/equipments", timeout=15)
-            
-            if response.status_code == 200:
-                equipments = response.json()
-                if equipments:
-                    test_equipment = equipments[0]
-                    self.test_equipment_id = test_equipment.get('id')
-                    self.equipment_name = test_equipment.get('nom', 'Équipement Test')
-                    self.log(f"✅ Équipement trouvé - ID: {self.test_equipment_id}")
-                    self.log(f"✅ Nom: {self.equipment_name}")
-                else:
-                    self.log("❌ Aucun équipement trouvé", "ERROR")
-                    return False
-            else:
-                self.log(f"❌ Récupération équipements échouée - Status: {response.status_code}", "ERROR")
-                return False
-            
-            self.log("✅ État initial vérifié avec succès")
-            return True
                 
         except requests.exceptions.RequestException as e:
             self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
