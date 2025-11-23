@@ -595,6 +595,37 @@ const MainLayout = () => {
             </div>
           </button>
           
+          {/* Badge Inventaire (Niveau bas + Rupture) */}
+          <button 
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative group"
+            onClick={() => navigate('/inventory', { state: { filterAlert: true } })}
+            title="Inventaire - Articles en alerte"
+          >
+            <Package size={20} className="text-gray-600" />
+            {(inventoryStats.rupture + inventoryStats.niveau_bas) > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                {(inventoryStats.rupture + inventoryStats.niveau_bas) > 9 ? '9+' : (inventoryStats.rupture + inventoryStats.niveau_bas)}
+              </span>
+            )}
+            {/* Tooltip avec détails */}
+            <div className="absolute hidden group-hover:block right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 z-50 p-3">
+              <div className="text-sm font-semibold text-gray-800 mb-2">Alertes Inventaire</div>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">En rupture:</span>
+                  <span className="font-bold text-red-600">{inventoryStats.rupture}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Niveau bas:</span>
+                  <span className="font-bold text-orange-600">{inventoryStats.niveau_bas}</span>
+                </div>
+              </div>
+              <div className="mt-3 pt-3 border-t border-gray-200 text-xs text-gray-500">
+                💡 Cliquez pour voir les articles en alerte
+              </div>
+            </div>
+          </button>
+          
           {/* Cloche notifications */}
           <button 
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative"
