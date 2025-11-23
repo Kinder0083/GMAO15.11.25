@@ -32,12 +32,15 @@ class UserPermissions(BaseModel):
     improvementRequests: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
     improvements: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
     preventiveMaintenance: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
+    planningMprev: ModulePermission = ModulePermission(view=True, edit=False, delete=False)  # Planning M.Prev.
     assets: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
     inventory: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
     locations: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
     meters: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
-    surveillance: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
-    presquaccident: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
+    surveillance: ModulePermission = ModulePermission(view=True, edit=False, delete=False)  # Plan de Surveillance
+    surveillanceRapport: ModulePermission = ModulePermission(view=True, edit=False, delete=False)  # Rapport Surveillance
+    presquaccident: ModulePermission = ModulePermission(view=True, edit=False, delete=False)  # Presqu'accident
+    presquaccidentRapport: ModulePermission = ModulePermission(view=True, edit=False, delete=False)  # Rapport P.accident
     documentations: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
     vendors: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
     reports: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
@@ -45,7 +48,9 @@ class UserPermissions(BaseModel):
     planning: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
     purchaseHistory: ModulePermission = ModulePermission(view=True, edit=False, delete=False)
     importExport: ModulePermission = ModulePermission(view=False, edit=False, delete=False)
-    journal: ModulePermission = ModulePermission(view=False, edit=False, delete=False)
+    journal: ModulePermission = ModulePermission(view=False, edit=False, delete=False)  # Audit
+    settings: ModulePermission = ModulePermission(view=False, edit=False, delete=False)  # Paramètres
+    personalization: ModulePermission = ModulePermission(view=True, edit=True, delete=False)  # Personnalisation
 
 # Fonction helper pour obtenir les permissions par défaut selon le rôle
 def get_default_permissions_by_role(role: str) -> UserPermissions:
