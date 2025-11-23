@@ -120,44 +120,11 @@ const ManualButton = () => {
   };
 
   const exportPDF = async () => {
-    try {
-      toast({
-        title: 'Export PDF',
-        description: 'Génération du PDF en cours...'
-      });
-      
-      const token = localStorage.getItem('token');
-      const backend_url = getBackendURL();
-      
-      const response = await axios.get(
-        `${backend_url}/api/manual/export/pdf`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          responseType: 'blob'
-        }
-      );
-      
-      // Créer un lien de téléchargement
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'Manuel_GMAO_Iris.pdf');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      
-      toast({
-        title: 'Succès',
-        description: 'Manuel téléchargé avec succès'
-      });
-    } catch (error) {
-      console.error('Erreur export PDF:', error);
-      toast({
-        title: 'Information',
-        description: 'Export PDF en cours de développement',
-        variant: 'default'
-      });
-    }
+    toast({
+      title: 'Information',
+      description: 'L\'export PDF sera disponible prochainement. Pour l\'instant, vous pouvez imprimer cette page (Ctrl+P) pour générer un PDF.',
+      duration: 5000
+    });
   };
 
   const searchManual = async () => {
