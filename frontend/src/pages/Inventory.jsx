@@ -55,6 +55,9 @@ const Inventory = () => {
         i.id === item.id ? { ...i, quantite: newQuantity } : i
       ));
       
+      // Déclencher l'événement pour mettre à jour le badge dans le header
+      window.dispatchEvent(new Event('inventoryItemUpdated'));
+      
       toast({
         title: 'Quantité mise à jour',
         description: `${item.nom}: ${item.quantite} → ${newQuantity}`,
