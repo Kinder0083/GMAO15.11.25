@@ -4115,14 +4115,23 @@ async def add_work_order_comment(
                     logger.info(f"Stock mis à jour: {part.inventory_item_name} - {part.quantity} unité(s) déduite(s)")
         
         # Mettre à jour l'ordre de travail
-        update_data = {"$push": {"comments": new_comment}}
         if parts_used_list:
-            update_data["$push"]["parts_used"] = {"$each": parts_used_list}
-        
-        await db.work_orders.update_one(
-            {"_id": ObjectId(work_order_id)},
-            update_data
-        )
+            # Push commentaire ET pièces utilisées en une seule opération
+            await db.work_orders.update_one(
+                {"_id": ObjectId(work_order_id)},
+                {
+                    "$push": {
+                        "comments": new_comment,
+                        "parts_used": {"$each": parts_used_list}
+                    }
+                }
+            )
+        else:
+            # Push seulement le commentaire
+            await db.work_orders.update_one(
+                {"_id": ObjectId(work_order_id)},
+                {"$push": {"comments": new_comment}}
+            )
         
         # Log dans l'audit
         details_text = f"Commentaire ajouté: {comment.text[:50]}..."
