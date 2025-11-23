@@ -255,6 +255,10 @@ const WorkOrderDialog = ({ open, onOpenChange, workOrder, onSuccess }) => {
           
           // Enregistrer les pièces SANS créer de commentaire
           await workOrdersAPI.addWorkOrderParts(workOrder.id, cleanedParts);
+          
+          // Déclencher l'événement pour mettre à jour le badge inventaire dans le header
+          window.dispatchEvent(new Event('inventoryItemUpdated'));
+          
           toast({
             title: 'Pièces enregistrées',
             description: `${cleanedParts.length} pièce(s) utilisée(s) enregistrée(s)`
