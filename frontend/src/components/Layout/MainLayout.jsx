@@ -812,9 +812,11 @@ const MainLayout = () => {
 
       {/* Main Content */}
       <div
-        className={`transition-all duration-300 ${
-          sidebarOpen ? 'ml-64' : 'ml-20'
-        }`}
+        className="transition-all duration-300"
+        style={{
+          marginLeft: preferences?.sidebar_position === 'right' ? 0 : (sidebarOpen ? `${preferences?.sidebar_width || 256}px` : '80px'),
+          marginRight: preferences?.sidebar_position === 'right' ? (sidebarOpen ? `${preferences?.sidebar_width || 256}px` : '80px') : 0
+        }}
       >
         <div className="p-6 pt-20">
           <Outlet />
