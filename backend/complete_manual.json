@@ -1,0 +1,122 @@
+{
+  "version": "1.1",
+  "changes": [
+    "Ajout de tous les chapitres et sections du manuel",
+    "Contenu détaillé pour chaque module",
+    "Workflows complets et pas-à-pas",
+    "FAQ et résolution de problèmes"
+  ],
+  "chapters": [
+    {
+      "id": "ch-001",
+      "title": "🚀 Guide de Démarrage",
+      "description": "Premiers pas avec GMAO Iris",
+      "icon": "Rocket",
+      "order": 1,
+      "sections": ["sec-001-01", "sec-001-02", "sec-001-03", "sec-001-04"],
+      "target_roles": [],
+      "target_modules": []
+    },
+    {
+      "id": "ch-002",
+      "title": "👤 Gestion des Utilisateurs",
+      "description": "Créer et gérer les utilisateurs",
+      "icon": "Users",
+      "order": 2,
+      "sections": ["sec-002-01", "sec-002-02", "sec-002-03"],
+      "target_roles": ["ADMIN"],
+      "target_modules": ["people"]
+    },
+    {
+      "id": "ch-003",
+      "title": "📋 Ordres de Travail",
+      "description": "Créer et gérer les ordres de travail",
+      "icon": "ClipboardList",
+      "order": 3,
+      "sections": ["sec-003-01", "sec-003-02", "sec-003-03", "sec-003-04", "sec-003-05"],
+      "target_roles": [],
+      "target_modules": ["workOrders"]
+    },
+    {
+      "id": "ch-004",
+      "title": "🔧 Gestion des Équipements",
+      "description": "Ajouter et gérer les équipements",
+      "icon": "Wrench",
+      "order": 4,
+      "sections": ["sec-004-01", "sec-004-02", "sec-004-03", "sec-004-04"],
+      "target_roles": [],
+      "target_modules": ["assets"]
+    },
+    {
+      "id": "ch-005",
+      "title": "📦 Inventaire",
+      "description": "Gérer le stock et les pièces",
+      "icon": "Package",
+      "order": 5,
+      "sections": ["sec-005-01", "sec-005-02", "sec-005-03"],
+      "target_roles": [],
+      "target_modules": ["inventory"]
+    },
+    {
+      "id": "ch-006",
+      "title": "🗓️ Maintenance Préventive",
+      "description": "Planifier les maintenances",
+      "icon": "Calendar",
+      "order": 6,
+      "sections": ["sec-006-01", "sec-006-02", "sec-006-03"],
+      "target_roles": [],
+      "target_modules": ["preventiveMaintenance"]
+    },
+    {
+      "id": "ch-007",
+      "title": "💡 Demandes",
+      "description": "Gérer les demandes d'intervention",
+      "icon": "Lightbulb",
+      "order": 7,
+      "sections": ["sec-007-01", "sec-007-02"],
+      "target_roles": [],
+      "target_modules": ["interventionRequests"]
+    },
+    {
+      "id": "ch-008",
+      "title": "🛡️ QHSE",
+      "description": "Plan de surveillance et sécurité",
+      "icon": "Shield",
+      "order": 8,
+      "sections": ["sec-008-01", "sec-008-02"],
+      "target_roles": ["ADMIN", "QHSE"],
+      "target_modules": ["surveillance"]
+    },
+    {
+      "id": "ch-009",
+      "title": "📊 Rapports",
+      "description": "Générer et analyser les rapports",
+      "icon": "BarChart3",
+      "order": 9,
+      "sections": ["sec-009-01", "sec-009-02"],
+      "target_roles": [],
+      "target_modules": ["reports"]
+    },
+    {
+      "id": "ch-010",
+      "title": "⚙️ Personnalisation",
+      "description": "Personnaliser l'interface",
+      "icon": "Settings",
+      "order": 10,
+      "sections": ["sec-010-01", "sec-010-02", "sec-010-03"],
+      "target_roles": [],
+      "target_modules": []
+    },
+    {
+      "id": "ch-011",
+      "title": "❓ FAQ",
+      "description": "Questions fréquentes",
+      "icon": "HelpCircle",
+      "order": 11,
+      "sections": ["sec-011-01", "sec-011-02", "sec-011-03"],
+      "target_roles": [],
+      "target_modules": []
+    }
+  ],
+  "sections": []
+}
