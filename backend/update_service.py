@@ -170,6 +170,49 @@ class UpdateService:
         except Exception as e:
             logger.error(f"❌ Erreur lors du marquage de la notification: {str(e)}")
 
+
+    async def get_recent_updates_info(self, days: int = 7) -> Dict:
+        """
+        Récupère les informations des mises à jour récentes
+        Args:
+            days: Nombre de jours à regarder en arrière
+        Returns:
+            Dict avec les infos des mises à jour récentes
+        """
+        try:
+            cutoff_date = datetime.now() - timedelta(days=days)
+            
+            # Récupérer les notifications récentes non lues
+            notifications = await self.db.update_notifications.find({
+                "created_at": {"$gte": cutoff_date.isoformat()},
+                "read": False
+            }).sort("created_at", -1).to_list(10)
+            
+            recent_updates = []
+            for notif in notifications:
+                recent_updates.append({
+                    "version": notif.get("version"),
+                    "date": notif.get("created_at"),
+                    "features": notif.get("features", []),
+                    "fixes": notif.get("fixes", []),
+                    "breaking_changes": notif.get("breaking_changes", [])
+                })
+            
+            return {
+                "has_recent_updates": len(recent_updates) > 0,
+                "count": len(recent_updates),
+                "updates": recent_updates,
+                "current_version": self.current_version
+            }
+        except Exception as e:
+            logger.error(f"❌ Erreur récupération info MAJ récentes: {str(e)}")
+            return {
+                "has_recent_updates": False,
+                "count": 0,
+                "updates": [],
+                "current_version": self.current_version
+            }
+
     
     def check_git_conflicts(self) -> Dict:
         """
