@@ -1887,6 +1887,33 @@ async def delete_inventory_item(inv_id: str, current_user: dict = Depends(get_cu
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+@api_router.get("/inventory/stats")
+async def get_inventory_stats(current_user: dict = Depends(require_permission("inventory", "view"))):
+    """Récupère les statistiques de l'inventaire (rupture et niveau bas)"""
+    try:
+        inventory = await db.inventory.find().to_list(1000)
+        
+        rupture = 0
+        niveau_bas = 0
+        
+        for item in inventory:
+            quantite = item.get("quantite", 0)
+            quantite_min = item.get("quantiteMin", 0)
+            
+            if quantite <= 0:
+                rupture += 1
+            elif quantite <= quantite_min:
+                niveau_bas += 1
+        
+        return {
+            "rupture": rupture,
+            "niveau_bas": niveau_bas
+        }
+    except Exception as e:
+        logging.error(f"Erreur lors du calcul des stats inventaire: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # ==================== PREVENTIVE MAINTENANCE ROUTES ====================
 @api_router.get("/preventive-maintenance", response_model=List[PreventiveMaintenance])
 async def get_preventive_maintenance(current_user: dict = Depends(require_permission("preventiveMaintenance", "view"))):
