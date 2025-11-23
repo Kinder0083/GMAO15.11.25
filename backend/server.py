@@ -6446,8 +6446,8 @@ async def initialize_default_manual(current_user: dict):
             "sections": ["sec-001-01", "sec-001-02"],
             "target_roles": [],
             "target_modules": [],
-            "created_at": datetime.now(timezone.utc),
-            "updated_at": datetime.now(timezone.utc)
+            "created_at": now.isoformat(),
+            "updated_at": now.isoformat()
         }
         await db.manual_chapters.insert_one(chapter1)
         
