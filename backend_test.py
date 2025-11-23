@@ -105,10 +105,19 @@ class PartsUsedSystemTester:
                 if work_orders:
                     # Prendre le premier ordre de travail
                     test_wo = work_orders[0]
-                    self.test_work_order_id = test_wo.get('id')
+                    self.test_work_order_id = test_wo.get('id')  # UUID for GET endpoint
+                    self.test_work_order_object_id = test_wo.get('id')  # For now, try with same ID
                     self.log(f"✅ Ordre de travail trouvé - ID: {self.test_work_order_id}")
                     self.log(f"✅ Titre: {test_wo.get('titre', 'N/A')}")
                     self.log(f"🔍 Debug - Work order keys: {list(test_wo.keys())}")
+                    
+                    # Check if there's a MongoDB ObjectId field
+                    if '_id' in test_wo:
+                        self.test_work_order_object_id = test_wo.get('_id')
+                        self.log(f"🔍 Debug - ObjectId found: {self.test_work_order_object_id}")
+                    elif 'objectId' in test_wo:
+                        self.test_work_order_object_id = test_wo.get('objectId')
+                        self.log(f"🔍 Debug - ObjectId found: {self.test_work_order_object_id}")
                 else:
                     self.log("⚠️ Aucun ordre de travail existant, création d'un nouveau...")
                     return self.create_test_work_order()
