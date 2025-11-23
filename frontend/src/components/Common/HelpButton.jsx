@@ -34,27 +34,38 @@ const HelpButton = () => {
         return null;
       }
       
-      // Capturer document.body avec des paramètres optimisés
-      const canvas = await html2canvas(document.body, {
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#ffffff',
-        scale: 1,
-        logging: false,
-        imageTimeout: 0,
-        // Ignorer les éléments cachés
-        ignoreElements: (element) => {
-          const style = window.getComputedStyle(element);
-          return style.display === 'none' || style.visibility === 'hidden';
+      // Masquer temporairement le badge Emergent pour la capture
+      const emergentBadge = document.getElementById('emergent-badge');
+      const originalBadgeDisplay = emergentBadge ? emergentBadge.style.display : null;
+      if (emergentBadge) {
+        emergentBadge.style.display = 'none';
+      }
+      
+      // Capturer avec html-to-image (meilleure gestion CSS)
+      const rootElement = document.getElementById('root') || document.body;
+      const dataUrl = await toPng(rootElement, {
+        quality: 0.8,
+        pixelRatio: 1,
+        cacheBust: true,
+        filter: (node) => {
+          // Filtrer les éléments à exclure
+          if (node.id === 'emergent-badge') return false;
+          const style = window.getComputedStyle(node);
+          return style.display !== 'none' && style.visibility !== 'hidden';
         }
       });
+      
+      // Restaurer le badge
+      if (emergentBadge && originalBadgeDisplay !== null) {
+        emergentBadge.style.display = originalBadgeDisplay;
+      }
       
       console.log('✅ Capture réussie pour:', currentUrl);
       
       // Rouvrir la modale après la capture
       setOpen(true);
       
-      return canvas.toDataURL('image/png', 0.8);
+      return dataUrl;
     } catch (error) {
       console.error('Erreur lors de la capture d\'écran:', error);
       setOpen(true);
