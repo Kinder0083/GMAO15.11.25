@@ -2577,10 +2577,12 @@ async def update_user_preferences(
             # Journaliser l'action
             await audit_service.log_action(
                 user_id=user_id,
+                user_name=current_user.get("name", ""),
+                user_email=current_user.get("email", ""),
                 action=ActionType.UPDATE,
                 entity_type=EntityType.SETTINGS,
                 entity_id=user_id,
-                description=f"Préférences utilisateur créées"
+                details=f"Préférences utilisateur créées"
             )
             
             return preferences_obj
