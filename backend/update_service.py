@@ -471,12 +471,18 @@ class UpdateService:
                 pull_stdout, pull_stderr = await asyncio.wait_for(pull_process.communicate(), timeout=120)
                 
                 if pull_process.returncode != 0:
-                    logger.error(f"❌ Échec du git pull: {pull_stderr.decode()}")
-                    return {
-                        "success": False,
-                        "message": "Échec du téléchargement de la mise à jour",
-                        "error": pull_stderr.decode()
-                    }
+                    error_msg = pull_stderr.decode()
+                    logger.warning(f"⚠️ Git pull a échoué: {error_msg}")
+                    # Ne pas bloquer si Git n'est pas configuré (environnement sans Git)
+                    if "No remote" in error_msg or "no remote" in error_msg or "not a git repository" in error_msg:
+                        logger.info("ℹ️ Environnement sans Git, passage à l'étape suivante")
+                    else:
+                        logger.error(f"❌ Échec du git pull: {error_msg}")
+                        return {
+                            "success": False,
+                            "message": "Échec du téléchargement de la mise à jour",
+                            "error": error_msg
+                        }
                 
                 logger.info("✅ Mise à jour téléchargée")
                 
