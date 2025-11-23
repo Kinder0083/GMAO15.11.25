@@ -1236,7 +1236,7 @@ async def download_attachment(
 async def delete_attachment(
     wo_id: str,
     attachment_id: str,
-    current_user: dict = Depends(get_current_user)
+    current_user: dict = Depends(require_permission("workOrders", "edit"))
 ):
     """Supprimer une pièce jointe"""
     try:
