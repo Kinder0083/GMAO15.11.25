@@ -1114,7 +1114,7 @@ MAX_FILE_SIZE = 25 * 1024 * 1024  # 25MB
 async def upload_attachment(
     wo_id: str,
     file: UploadFile = File(...),
-    current_user: dict = Depends(get_current_user)
+    current_user: dict = Depends(require_permission("workOrders", "edit"))
 ):
     """Uploader une pièce jointe (max 25MB)"""
     try:
