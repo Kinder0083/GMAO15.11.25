@@ -21,6 +21,7 @@ import {
   BarChart3,
   Users,
   ShoppingCart,
+  ShoppingBag,
   Calendar,
   MessageSquare,
   Lightbulb,
@@ -29,7 +30,8 @@ import {
   Shield,
   FileText,
   AlertTriangle,
-  FolderOpen
+  FolderOpen,
+  Database
 } from 'lucide-react';
 
 const DEFAULT_MENU_ITEMS = [
