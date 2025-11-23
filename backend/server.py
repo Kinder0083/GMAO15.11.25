@@ -2826,7 +2826,7 @@ async def request_help(
             ]
             
             # Vérifier la limite
-            if len(help_request_tracker[user_id]) >= 5:
+            if len(help_request_tracker[user_id]) >= 15:
                 raise HTTPException(
                     status_code=429, 
                     detail="Limite de demandes d'aide atteinte. Veuillez réessayer dans 1 heure."
