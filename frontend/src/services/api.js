@@ -221,6 +221,10 @@ export const commentsAPI = {
     const response = await api.post(`/work-orders/${workOrderId}/comments`, payload);
     return response.data;
   },
+  addWorkOrderParts: async (workOrderId, parts) => {
+    const response = await api.post(`/work-orders/${workOrderId}/parts-used`, parts);
+    return response.data;
+  },
   getWorkOrderComments: async (workOrderId) => {
     const response = await api.get(`/work-orders/${workOrderId}/comments`);
     return response.data;
