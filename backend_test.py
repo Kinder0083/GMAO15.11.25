@@ -110,35 +110,49 @@ class InventoryStatsTester:
             self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
             return False
     
-    def create_test_work_order(self):
-        """Créer un ordre de travail de test si aucun n'existe"""
-        self.log("📋 Création d'un ordre de travail de test...")
+    def test_inventory_stats_endpoint(self):
+        """TEST 2: Tester l'endpoint GET /api/inventory/stats"""
+        self.log("🧪 TEST 2: Test de l'endpoint GET /api/inventory/stats")
         
         try:
-            wo_data = {
-                "titre": "Test pièces utilisées",
-                "description": "Ordre de travail créé pour tester le système de pièces utilisées",
-                "type": "CORRECTIF",
-                "priorite": "NORMALE",
-                "statut": "OUVERT",
-                "equipement_id": self.test_equipment_id,
-                "tempsEstime": 2.0
-            }
+            # GET /api/inventory/stats
+            self.log("📊 Appel de l'endpoint /api/inventory/stats...")
+            response = self.admin_session.get(f"{BACKEND_URL}/inventory/stats", timeout=15)
             
-            response = self.admin_session.post(
-                f"{BACKEND_URL}/work-orders",
-                json=wo_data,
-                timeout=15
-            )
-            
-            if response.status_code in [200, 201]:
-                data = response.json()
-                self.test_work_order_id = data.get('id')
-                self.test_work_order_object_id = data.get('id')  # For now, same ID
-                self.log(f"✅ Ordre de travail créé - ID: {self.test_work_order_id}")
-                return True
+            if response.status_code == 200:
+                self.stats_data = response.json()
+                self.log("✅ Endpoint /api/inventory/stats répond correctement (200 OK)")
+                
+                # Vérifier la structure de la réponse
+                if 'rupture' in self.stats_data and 'niveau_bas' in self.stats_data:
+                    rupture = self.stats_data.get('rupture')
+                    niveau_bas = self.stats_data.get('niveau_bas')
+                    
+                    self.log(f"✅ Réponse contient les champs requis:")
+                    self.log(f"   - rupture: {rupture}")
+                    self.log(f"   - niveau_bas: {niveau_bas}")
+                    
+                    # Vérifier que les valeurs sont des entiers >= 0
+                    if isinstance(rupture, int) and rupture >= 0:
+                        self.log(f"✅ Champ 'rupture' est un entier >= 0: {rupture}")
+                    else:
+                        self.log(f"❌ Champ 'rupture' invalide: {rupture} (type: {type(rupture)})", "ERROR")
+                        return False
+                    
+                    if isinstance(niveau_bas, int) and niveau_bas >= 0:
+                        self.log(f"✅ Champ 'niveau_bas' est un entier >= 0: {niveau_bas}")
+                    else:
+                        self.log(f"❌ Champ 'niveau_bas' invalide: {niveau_bas} (type: {type(niveau_bas)})", "ERROR")
+                        return False
+                    
+                    return True
+                else:
+                    self.log("❌ Réponse ne contient pas les champs requis 'rupture' et 'niveau_bas'", "ERROR")
+                    self.log(f"Réponse reçue: {self.stats_data}", "ERROR")
+                    return False
             else:
-                self.log(f"❌ Création ordre de travail échouée - Status: {response.status_code}", "ERROR")
+                self.log(f"❌ Endpoint /api/inventory/stats échoué - Status: {response.status_code}", "ERROR")
+                self.log(f"Response: {response.text}", "ERROR")
                 return False
                 
         except requests.exceptions.RequestException as e:
