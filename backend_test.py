@@ -21,7 +21,8 @@ class PartsUsedSystemTester:
         self.admin_session = requests.Session()
         self.admin_token = None
         self.admin_data = None
-        self.test_work_order_id = None
+        self.test_work_order_id = None  # UUID for GET endpoint
+        self.test_work_order_object_id = None  # ObjectId for comments endpoint
         self.test_inventory_item_id = None
         self.test_equipment_id = None
         self.initial_inventory_quantity = None
