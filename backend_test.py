@@ -174,39 +174,57 @@ class PartsUsedSystemTester:
             self.log(f"❌ Request failed - Error: {str(e)}", "ERROR")
             return False
     
-    def test_get_rsp_prod_user(self):
-        """TEST 2: Récupérer un utilisateur avec rôle RSP_PROD (ou admin si pas disponible)"""
-        self.log("🧪 TEST 2: Récupérer un utilisateur RSP_PROD")
+    def test_add_parts_with_comment(self):
+        """TEST 2: Test d'ajout de pièces avec commentaire"""
+        self.log("🧪 TEST 2: Test d'ajout de pièces avec déduction stock")
+        
+        if not self.test_work_order_id or not self.test_inventory_item_id or not self.test_equipment_id:
+            self.log("❌ Prérequis manquants pour le test", "ERROR")
+            return False
         
         try:
-            response = self.admin_session.get(
-                f"{BACKEND_URL}/users",
+            # POST /api/work-orders/{id}/comments avec parts_used
+            comment_data = {
+                "text": "Test ajout pièce avec déduction stock",
+                "parts_used": [
+                    {
+                        "inventory_item_id": self.test_inventory_item_id,
+                        "inventory_item_name": self.inventory_item_name,
+                        "quantity": 2,
+                        "source_equipment_id": self.test_equipment_id,
+                        "source_equipment_name": self.equipment_name
+                    }
+                ]
+            }
+            
+            self.log(f"📤 Envoi du commentaire avec pièce utilisée...")
+            self.log(f"   Pièce: {self.inventory_item_name} (Quantité: 2)")
+            self.log(f"   Source: {self.equipment_name}")
+            
+            response = self.admin_session.post(
+                f"{BACKEND_URL}/work-orders/{self.test_work_order_id}/comments",
+                json=comment_data,
                 timeout=15
             )
             
             if response.status_code == 200:
-                users = response.json()
-                rsp_prod_users = [user for user in users if user.get('role') == 'RSP_PROD']
+                data = response.json()
+                self.log("✅ Commentaire avec pièce ajouté avec succès")
+                self.log(f"✅ Commentaire ID: {data.get('comment', {}).get('id')}")
+                self.log(f"✅ Pièces utilisées: {len(data.get('parts_used', []))}")
                 
-                if rsp_prod_users:
-                    self.rsp_prod_user_id = rsp_prod_users[0].get('id')
-                    self.log(f"✅ Utilisateur RSP_PROD trouvé - ID: {self.rsp_prod_user_id}")
-                    self.log(f"✅ Nom: {rsp_prod_users[0].get('prenom', '')} {rsp_prod_users[0].get('nom', '')}")
+                # Vérifier que la pièce est dans la réponse
+                parts_used = data.get('parts_used', [])
+                if parts_used and len(parts_used) > 0:
+                    part = parts_used[0]
+                    self.log(f"✅ Pièce ajoutée: {part.get('inventory_item_name')} (Quantité: {part.get('quantity')})")
                     return True
                 else:
-                    # Fallback to admin user for testing
-                    admin_users = [user for user in users if user.get('role') == 'ADMIN']
-                    if admin_users:
-                        self.rsp_prod_user_id = admin_users[0].get('id')
-                        self.log(f"⚠️ Aucun RSP_PROD trouvé, utilisation d'un ADMIN - ID: {self.rsp_prod_user_id}")
-                        self.log(f"✅ Nom: {admin_users[0].get('prenom', '')} {admin_users[0].get('nom', '')}")
-                        self.log(f"🔍 Debug - User data: {admin_users[0]}")
-                        return True
-                    else:
-                        self.log("❌ Aucun utilisateur RSP_PROD ou ADMIN trouvé", "ERROR")
-                        return False
+                    self.log("❌ Aucune pièce utilisée dans la réponse", "ERROR")
+                    return False
             else:
-                self.log(f"❌ Récupération utilisateurs échouée - Status: {response.status_code}", "ERROR")
+                self.log(f"❌ Ajout commentaire échoué - Status: {response.status_code}", "ERROR")
+                self.log(f"Response: {response.text}", "ERROR")
                 return False
                 
         except requests.exceptions.RequestException as e:
