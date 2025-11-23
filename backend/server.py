@@ -2794,6 +2794,173 @@ async def test_smtp_config(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+
+# ==================== SUPPORT HELP ROUTES ====================
+
+# Stockage en mémoire des demandes d'aide par utilisateur (anti-spam)
+help_request_tracker = {}
+
+@api_router.post("/support/request-help", response_model=HelpRequestResponse)
+async def request_help(
+    help_request: HelpRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Envoyer une demande d'aide aux administrateurs
+    Limitation : 5 demandes par heure par utilisateur
+    """
+    try:
+        user_id = current_user.get("id")
+        user_name = f"{current_user['prenom']} {current_user['nom']}"
+        user_email = current_user['email']
+        
+        # Anti-spam : Vérifier le nombre de demandes dans la dernière heure
+        now = datetime.now(timezone.utc)
+        one_hour_ago = now - timedelta(hours=1)
+        
+        if user_id in help_request_tracker:
+            # Nettoyer les anciennes requêtes
+            help_request_tracker[user_id] = [
+                req_time for req_time in help_request_tracker[user_id] 
+                if req_time > one_hour_ago
+            ]
+            
+            # Vérifier la limite
+            if len(help_request_tracker[user_id]) >= 5:
+                raise HTTPException(
+                    status_code=429, 
+                    detail="Limite de demandes d'aide atteinte. Veuillez réessayer dans 1 heure."
+                )
+        else:
+            help_request_tracker[user_id] = []
+        
+        # Enregistrer cette demande
+        help_request_tracker[user_id].append(now)
+        
+        # Générer un ID unique pour cette demande
+        request_id = str(uuid.uuid4())
+        
+        # Récupérer tous les administrateurs
+        admins = await db.users.find({"role": "ADMIN"}).to_list(100)
+        admin_emails = [admin['email'] for admin in admins if admin.get('email')]
+        
+        if not admin_emails:
+            raise HTTPException(
+                status_code=500,
+                detail="Aucun administrateur trouvé pour recevoir la demande"
+            )
+        
+        # Préparer les données du screenshot (décoder base64 si nécessaire)
+        screenshot_data = help_request.screenshot
+        if screenshot_data.startswith('data:image'):
+            # Extraire seulement les données base64
+            screenshot_data = screenshot_data.split(',')[1]
+        
+        # Créer le contenu HTML de l'email
+        email_html = f"""
+        <html>
+        <head>
+            <style>
+                body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                .container {{ max-width: 800px; margin: 0 auto; padding: 20px; }}
+                .header {{ background-color: #dc2626; color: white; padding: 20px; border-radius: 8px 8px 0 0; }}
+                .content {{ background-color: #f9fafb; padding: 20px; border: 1px solid #e5e7eb; }}
+                .info-section {{ background-color: white; padding: 15px; margin: 10px 0; border-radius: 6px; border-left: 4px solid #2563eb; }}
+                .label {{ font-weight: bold; color: #1f2937; }}
+                .value {{ color: #4b5563; margin-left: 10px; }}
+                .message-box {{ background-color: #fef3c7; padding: 15px; border-left: 4px solid #f59e0b; margin: 15px 0; }}
+                .logs-box {{ background-color: #fee2e2; padding: 15px; border-left: 4px solid #dc2626; margin: 15px 0; font-family: monospace; font-size: 12px; }}
+                .footer {{ text-align: center; color: #6b7280; font-size: 12px; margin-top: 20px; }}
+                img {{ max-width: 100%; height: auto; border: 2px solid #e5e7eb; border-radius: 8px; margin-top: 15px; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>🆘 Demande d'Aide - GMAO Iris</h1>
+                    <p style="margin: 5px 0;">ID: {request_id}</p>
+                </div>
+                
+                <div class="content">
+                    <div class="info-section">
+                        <p><span class="label">👤 Utilisateur:</span><span class="value">{user_name} ({user_email})</span></p>
+                        <p><span class="label">📄 Page:</span><span class="value">{help_request.page_url}</span></p>
+                        <p><span class="label">🌐 Navigateur:</span><span class="value">{help_request.browser_info}</span></p>
+                        <p><span class="label">🕐 Date/Heure:</span><span class="value">{now.strftime('%d/%m/%Y %H:%M:%S')} UTC</span></p>
+                    </div>
+                    
+                    {f'''
+                    <div class="message-box">
+                        <h3 style="margin-top: 0;">💬 Message de l'utilisateur:</h3>
+                        <p>{help_request.user_message}</p>
+                    </div>
+                    ''' if help_request.user_message else ''}
+                    
+                    {f'''
+                    <div class="logs-box">
+                        <h3 style="margin-top: 0; color: #dc2626;">⚠️ Logs Console (Erreurs):</h3>
+                        {"<br>".join(help_request.console_logs[:10])}
+                    </div>
+                    ''' if help_request.console_logs else ''}
+                    
+                    <h3>📸 Capture d'écran:</h3>
+                    <img src="data:image/png;base64,{screenshot_data}" alt="Screenshot">
+                </div>
+                
+                <div class="footer">
+                    <p>Cette demande d'aide a été générée automatiquement par GMAO Iris</p>
+                    <p>Pour répondre à l'utilisateur, envoyez un email à: {user_email}</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        
+        # Envoyer l'email à tous les administrateurs
+        try:
+            subject = f"🆘 Demande d'Aide - {user_name} - {help_request.page_url}"
+            
+            for admin_email in admin_emails:
+                email_service.send_email(
+                    to=admin_email,
+                    subject=subject,
+                    html_body=email_html
+                )
+            
+            # Journaliser l'action
+            await audit_service.log_action(
+                user_id=user_id,
+                user_name=user_name,
+                user_email=user_email,
+                action=ActionType.CREATE,
+                entity_type=EntityType.SETTINGS,  # Utiliser SETTINGS comme type générique
+                entity_id=request_id,
+                entity_name="Demande d'aide",
+                details=f"Demande d'aide envoyée depuis {help_request.page_url} à {len(admin_emails)} administrateur(s)"
+            )
+            
+            logger.info(f"✅ Demande d'aide {request_id} envoyée à {len(admin_emails)} administrateur(s)")
+            
+            return HelpRequestResponse(
+                success=True,
+                message=f"Demande d'aide envoyée avec succès à {len(admin_emails)} administrateur(s)",
+                request_id=request_id
+            )
+            
+        except Exception as email_error:
+            logger.error(f"❌ Erreur lors de l'envoi de l'email d'aide: {str(email_error)}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"Erreur lors de l'envoi de l'email: {str(email_error)}"
+            )
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"❌ Erreur lors du traitement de la demande d'aide: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # ==================== VENDORS ROUTES ====================
 @api_router.get("/vendors", response_model=List[Vendor])
 async def get_vendors(current_user: dict = Depends(require_permission("vendors", "view"))):
