@@ -78,6 +78,12 @@ export const workOrdersAPI = {
   },
   deleteAttachment: (workOrderId, attachmentId) => {
     return api.delete(`/work-orders/${workOrderId}/attachments/${attachmentId}`);
+  },
+  
+  // Parts used
+  addWorkOrderParts: async (workOrderId, parts) => {
+    const response = await api.post(`/work-orders/${workOrderId}/parts-used`, parts);
+    return response.data;
   }
 };
 
